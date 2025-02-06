@@ -2,11 +2,11 @@
 using Microsoft.EntityFrameworkCore;
 
 namespace FF.Articles.Backend.Identity.API.Infrastructure;
-public class ApplicationDbContext : DbContext
+public class IdentityDbContext : DbContext
 {
     public DbSet<User> Users { get; set; }
 
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+    public IdentityDbContext(DbContextOptions<IdentityDbContext> options)
         : base(options) { }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
