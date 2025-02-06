@@ -1,0 +1,6 @@
+@FF.Articles.Backend.Identity.API_HostAddress = http://localhost:5102
+
+GET {{FF.Articles.Backend.Identity.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

@@ -1,7 +1,7 @@
 # Ignore build folders
-.vs/
-/bin/
-/obj/
+.vs
+bin
+obj
 
 # Ignore user-specific files
 *.user
