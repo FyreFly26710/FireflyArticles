@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace FF.Articles.Backend.Common.Responses;
-public class PageResponse<TEntity>(int pageIndex, int pageSize, long count, List<TEntity> data) where TEntity : class
+public class PageResponse<T>(int pageIndex, int pageSize, long count, List<T> data) where T : class
 {
     public int PageIndex { get; } = pageIndex;
 
@@ -13,5 +13,5 @@ public class PageResponse<TEntity>(int pageIndex, int pageSize, long count, List
 
     public long Count { get; } = count;
 
-    public List<TEntity> Data { get; } = data;
+    public List<T> Data { get; } = data;
 }

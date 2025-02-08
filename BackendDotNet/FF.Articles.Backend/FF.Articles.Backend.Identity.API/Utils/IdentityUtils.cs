@@ -1,82 +1,45 @@
-using FF.Articles.Backend.Common.Dtos;
 using FF.Articles.Backend.Identity.API.Models.Entities;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
 using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
-
+using System.Text.Json;
 
 namespace FF.Articles.Backend.Identity.API.Utils;
 
 public class IdentityUtils
 {
-    public static async Task SignInUser(User user, HttpContext httpContext)
+    /// <summary>
+    /// User info is stored in cliams. Claims are stored client side in cookies.
+    /// Other API endpoints can access user info by decrypting the cookie.
+    /// </summary>
+    public static async Task SignIn(User user, HttpContext httpContext)
     {
+        // Remove password from user object
+        user.UserPassword = string.Empty;
+
+        string userJson = JsonSerializer.Serialize(user);
         var claims = new List<Claim>
         {
-            new Claim(ClaimTypes.Name, user.UserAccount),
+            new Claim(ClaimTypes.Name, user.UserName ?? "Guest"),
             new Claim(ClaimTypes.Role, user.UserRole),
-            new Claim("Id", user.Id.ToString()),
-            new Claim("UserName", user.UserName ?? string.Empty),
-            new Claim("UserAvatar", user.UserAvatar ?? string.Empty),
-            new Claim("UserProfile", user.UserProfile ?? string.Empty),
-            new Claim("CreateTime", user.CreateTime.ToString() ?? string.Empty)
+            new Claim("user", userJson),
         };
 
         var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
-        var authProperties = new AuthenticationProperties
-        {
-            IsPersistent = true,
-            ExpiresUtc = DateTimeOffset.UtcNow.AddDays(7)
-        };
-
-        await httpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
-    }
-
-    public static User GetUserFromHttpRequest(HttpRequest request)
-    {
-        var claimsPrincipal = request.HttpContext.User;
-        if (claimsPrincipal == null)
-        {
-            return null;
-        }
-        var userAccount = claimsPrincipal.FindFirst(ClaimTypes.Name)?.Value;
-        var userRole = claimsPrincipal.FindFirst(ClaimTypes.Role)?.Value;
-        var idString = claimsPrincipal.FindFirst("Id")?.Value;
-        var userName = claimsPrincipal.FindFirst("UserName")?.Value;
-        var userAvatar = claimsPrincipal.FindFirst("UserAvatar")?.Value;
-        var userProfile = claimsPrincipal.FindFirst("UserProfile")?.Value;
-        var createTimeString = claimsPrincipal.FindFirst("CreateTime")?.Value;
-
-        if (userAccount != null && userRole != null && idString != null)
-        {
-            int id = int.TryParse(idString, out var parsedId) ? parsedId : 0;
-            DateTime createTime = DateTime.Parse(createTimeString) ;
-
-            return new User
+        await httpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, 
+            new ClaimsPrincipal(claimsIdentity),
+            new AuthenticationProperties
             {
-                Id = id,
-                UserAccount = userAccount,
-                UserRole = userRole,
-                UserName = userName,
-                UserAvatar = userAvatar,
-                UserProfile = userProfile,
-                CreateTime = createTime
-            };
-        }
+                IsPersistent = true,
+                ExpiresUtc = DateTimeOffset.UtcNow.AddDays(7)
+            });
+    }
 
-        return null;
-    }
-    public static async Task<bool> SignOutUser(HttpRequest httpRequest)
-    {
-        await httpRequest.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-        return true;
-    }
+    public static User GetUserFromHttpRequest(HttpRequest request) 
+        => JsonSerializer.Deserialize<User>(request.HttpContext.User.FindFirst("user").Value);
+
+    public static async Task SignOutUser(HttpRequest httpRequest)
+        => await httpRequest.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
 }

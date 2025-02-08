@@ -13,14 +13,5 @@ public class User : BaseEntity
     /// User role: admin, user, editor 
     /// </summary>
     public string UserRole { get; set; }
-    /// <summary>
-    /// Read only, modified by mysql
-    /// </summary>
-    public DateTime? CreateTime { get; set; }
-    /// <summary>
-    /// Read only, modified by mysql
-    /// </summary>
-    public DateTime? UpdateTime { get; set; }
-    public int IsDelete { get; set; }
 }
 

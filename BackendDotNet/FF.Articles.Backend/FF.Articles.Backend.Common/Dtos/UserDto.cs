@@ -1,7 +1,12 @@
-﻿namespace FF.Articles.Backend.Common.Dtos;
-public class UserDto
+﻿using FF.Articles.Backend.Common.Bases;
+
+namespace FF.Articles.Backend.Common.Dtos;
+
+/// <summary>
+/// Copy from User; Transfer user data between API microservices
+/// </summary>
+public class UserDto: BaseEntity
 {
-    public long Id { get; set; }
     public string UserAccount { get; set; }
     public string UserPassword { get; set; }
     public string? UserEmail { get; set; }
@@ -9,10 +14,7 @@ public class UserDto
     public string? UserAvatar { get; set; }
     public string? UserProfile { get; set; }
     /// <summary>
-    /// User role: user, admin, dev 
+    /// User role: admin, user, editor 
     /// </summary>
     public string UserRole { get; set; }
-    public DateTime CreateTime { get; set; }
-    public DateTime UpdateTime { get; set; }
-    public int IsDelete { get; set; }
 }

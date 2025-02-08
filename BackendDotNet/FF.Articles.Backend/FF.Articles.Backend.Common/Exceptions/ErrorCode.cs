@@ -15,6 +15,7 @@ public class ErrorCode
     public static readonly ErrorCode FORBIDDEN_ERROR = new ErrorCode(40300, "Access forbidden");
     public static readonly ErrorCode SYSTEM_ERROR = new ErrorCode(50000, "Internal system exception");
     public static readonly ErrorCode OPERATION_ERROR = new ErrorCode(50001, "Operation failure");
+    public static readonly ErrorCode CONCURRENCY_ERROR = new ErrorCode(50001, "The record was modified");
 
     public int Code { get; }
     public string Message { get; }

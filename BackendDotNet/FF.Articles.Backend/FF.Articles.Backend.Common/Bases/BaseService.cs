@@ -1,4 +1,5 @@
-﻿using FF.Articles.Backend.Common.Exceptions;
+﻿using FF.Articles.Backend.Common.Constants;
+using FF.Articles.Backend.Common.Exceptions;
 using FF.Articles.Backend.Common.Requests;
 using FF.Articles.Backend.Common.Responses;
 using Microsoft.EntityFrameworkCore;
@@ -10,141 +11,97 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace FF.Articles.Backend.Common.Bases;
-public class BaseService<TEntity,TContext> : IBaseService<TEntity, TContext> where TEntity : BaseEntity where TContext : DbContext
+public abstract class BaseService<TEntity, TContext> (TContext _context, ILogger<BaseService<TEntity, TContext>> _logger) 
+    : IBaseService<TEntity, TContext> 
+    where TEntity : BaseEntity 
+    where TContext : DbContext
 {
-    protected readonly TContext _context;
-    private readonly ILogger<BaseService<TEntity, TContext>> _logger;
+    /// <summary>
+    /// No Tracking by default
+    /// </summary>
+    public virtual IQueryable<TEntity> GetQueryable() => _context.Set<TEntity>().AsQueryable();
+    public virtual async Task<bool> ExistsAsync(long id) => await _context.Set<TEntity>().AnyAsync(e => e.Id == id);
 
-    public BaseService(TContext context, ILogger<BaseService<TEntity, TContext>> logger)
+    #region single CRUD operations
+    public virtual async Task<TEntity> GetByIdAsync(long id) => await _context.Set<TEntity>().FindAsync(id);
+    public virtual async Task<long> CreateAsync(TEntity entity)
     {
-        _context = context;
-        _logger = logger;
-    }
-
-    public async Task<TEntity> GetByIdAsync(long id)
-    {
-        TEntity? entity = await _context.Set<TEntity>().FindAsync(id);
-        if (entity == null)
-        {
-            _logger.LogError($"Entity {typeof(TEntity)} with id {id} not found");
-            throw new ApiException(ErrorCode.NOT_FOUND_ERROR);
-        }
-        return entity;
-    }
-
-    public async Task<List<TEntity>> GetAllAsync() => await _context.Set<TEntity>().ToListAsync();
-    public async Task<List<TEntity>> GetAllIncludeDeleteAsync() => await _context.Set<TEntity>().IgnoreQueryFilters().ToListAsync();
-    public IQueryable<TEntity> AsQueryable() => _context.Set<TEntity>().AsQueryable();
-    public async Task<long> CreateAsync(TEntity entity)
-    {
-        if (entity == null)
-        {
-            throw new ApiException(ErrorCode.PARAMS_ERROR);
-        }
+        if (entity.CreateTime == null)
+            entity.CreateTime = DateTime.UtcNow;
+        if (entity.UpdateTime == null)
+            entity.UpdateTime = DateTime.UtcNow;
 
         await _context.Set<TEntity>().AddAsync(entity);
         await _context.SaveChangesAsync();
-
         return entity.Id;
     }
-
-    public async Task<List<long>> CreateBatchAsync(List<TEntity> entities)
+    public virtual async Task<TEntity> GetByIdAsTrackingAsync(long id) 
+        => await _context.Set<TEntity>().AsTracking().FirstOrDefaultAsync(e=>e.Id==id);
+    /// <summary>
+    /// the para must be a tracked entity (GetByIdAsTrackingAsync)
+    /// </summary>
+    public virtual async Task<long> UpdateAsync(TEntity trackedEntity)
     {
-        if (entities == null || !entities.Any())
-        {
-            throw new ApiException(ErrorCode.PARAMS_ERROR);
-        }
-
-        await _context.Set<TEntity>().AddRangeAsync(entities);
+        var entry = _context.Entry(trackedEntity);
+        entry.State = EntityState.Modified;
+        // ensure the UpdateTime is updated
+        entry.Property(e => e.UpdateTime).CurrentValue = DateTime.UtcNow;
         await _context.SaveChangesAsync();
-
-        return entities.Select(e => e.Id).ToList();
+        return trackedEntity.Id;
     }
 
-    public async Task<List<TEntity>> GetByIdsAsync(List<long> ids)
+    public virtual async Task<bool> DeleteAsync(long id)
     {
-        if (ids == null || ids.Count == 0)
-        {
-            return new List<TEntity>();
-        }
+        var entity = await GetByIdAsTrackingAsync(id);
+        if (entity == null)
+            return false;
 
-        return await _context.Set<TEntity>()
-                             .Where(e => ids.Contains(e.Id))
-                             .ToListAsync();
+        entity.IsDelete = 1;
+        await _context.SaveChangesAsync();
+        return true;
     }
-    public async Task<PageResponse<TEntity>> GetPagedList(PageRequest pageRequest)
+    #endregion
+
+
+
+    #region batch CRUD operations
+
+    public virtual async Task<List<TEntity>> GetAllAsync() => await _context.Set<TEntity>().ToListAsync();
+    public virtual async Task<List<TEntity>> GetAllAsync(List<long> ids)
+        => await _context.Set<TEntity>().Where(e => ids.Contains(e.Id)).ToListAsync();
+    public virtual async Task<PageResponse<TEntity>> GetAllAsync(PageRequest pageRequest)
     {
         var query = _context.Set<TEntity>().AsQueryable();
-
         // Apply sorting if a SortField is provided
         if (!string.IsNullOrWhiteSpace(pageRequest.SortField))
         {
-            query = pageRequest.SortOrder == SortOrder.ASC
+            query = pageRequest.SortOrder == SortOrderConstant.ASC
                 ? query.OrderBy(e => EF.Property<object>(e, pageRequest.SortField))
                 : query.OrderByDescending(e => EF.Property<object>(e, pageRequest.SortField));
         }
-
         // Get total count before applying pagination
         long totalCount = await query.LongCountAsync();
-
         // Apply pagination
         var data = await query
             .Skip((pageRequest.PageNumber - 1) * pageRequest.PageSize)
             .Take(pageRequest.PageSize)
             .ToListAsync();
-
         return new PageResponse<TEntity>(pageRequest.PageNumber, pageRequest.PageSize, totalCount, data);
     }
-    public async Task<long> UpdateAsync(TEntity entity)
+
+    public virtual async Task<List<long>> CreateBatchAsync(List<TEntity> entities) => throw new NotImplementedException();
+    public virtual async Task<List<long>> UpdateBatchAsync(List<TEntity> entities) => throw new NotImplementedException();
+    public virtual async Task<bool> DeleteBatchAsync(List<long> ids)
     {
-        if (entity == null)
-        {
-            throw new ApiException(ErrorCode.PARAMS_ERROR);
-        }
-
-        _context.Set<TEntity>().Update(entity);
-        await _context.SaveChangesAsync();
-
-        return entity.Id;
-    }
-
-    public async Task<List<long>> UpdateBatchAsync(List<TEntity> entities)
-    {
-        if (entities == null || !entities.Any())
-        {
-            throw new ApiException(ErrorCode.PARAMS_ERROR);
-        }
-
-        _context.Set<TEntity>().UpdateRange(entities);
-        await _context.SaveChangesAsync();
-
-        return entities.Select(e => e.Id).ToList();
-    }
-
-    public async Task<bool> DeleteAsync(long id)
-    {
-        var entity = await GetByIdAsync(id);
-        if (entity == null)
-        {
-            return false;
-        }
-
-        _context.Set<TEntity>().Remove(entity);
+        var entities = await _context.Set<TEntity>().AsTracking()
+            .Where(e => ids.Contains(e.Id))
+            .ToListAsync();
+        foreach (var entity in entities)
+            entity.IsDelete = 1;
         await _context.SaveChangesAsync();
         return true;
     }
-    public async Task<bool> DeleteByIds(List<long> ids)
-    {
-        var entities = await GetByIdsAsync(ids);
 
-        if (!entities.Any())
-        {
-            return false;
-        }
+    #endregion
 
-        _context.Set<TEntity>().RemoveRange(entities);
-        await _context.SaveChangesAsync();
-        return true;
-    }
-    public async Task<bool> ExistsAsync(long id) => await _context.Set<TEntity>().AnyAsync(e => e.Id == id);
 }

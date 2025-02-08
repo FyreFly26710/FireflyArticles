@@ -7,7 +7,11 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace FF.Articles.Backend.Common.Utils;
-public static class ResultUtils
+
+/// <summary>
+/// Return result util class
+/// </summary>
+public static class ResultUtil
 {
     public static ApiResponse<T> Success<T>(T data) => new(0, data, "ok");
     //public static ApiResponse<T> Error<T>(int code, string message) => new(code, default, message);

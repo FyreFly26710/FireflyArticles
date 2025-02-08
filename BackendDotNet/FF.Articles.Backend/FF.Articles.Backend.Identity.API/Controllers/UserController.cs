@@ -2,97 +2,71 @@
 using FF.Articles.Backend.Common.Exceptions;
 using FF.Articles.Backend.Common.Responses;
 using FF.Articles.Backend.Common.Utils;
-using FF.Articles.Backend.Identity.API.Interfaces;
 using FF.Articles.Backend.Identity.API.Models.Requests;
 using FF.Articles.Backend.Identity.API.Models.Responses;
 using Microsoft.AspNetCore.Mvc;
+using AutoMapper;
+using FF.Articles.Backend.Identity.API.Models.Entities;
+using Microsoft.AspNetCore.Authorization;
+using FF.Articles.Backend.Identity.API.Utils;
+using FF.Articles.Backend.Common.Requests;
+using FF.Articles.Backend.Identity.API.Services;
+using FF.Articles.Backend.Common.Constants;
 
 namespace FF.Articles.Backend.Identity.API.Controllers;
 [ApiController]
-[Route("/user")]
-public class UserController : ControllerBase
+[Route("api/identity/user")]
+public class UserController(IUserService _userService, ILogger<UserController> _logger, IMapper _mapper)
+    : ControllerBase
 {
-    private IUserService _userService;
-    private ILogger<UserController> _logger;
-
-    public UserController(IUserService userService, ILogger<UserController> logger)
-    {
-        _userService = userService;
-        _logger = logger;
-    }
 
     [HttpPost("register")]
     public async Task<ApiResponse<long>> UserRegister([FromBody] UserRegisterRequest userRegisterRequest)
     {
-        // Check for null request
         if (userRegisterRequest == null)
-        {
-            return ResultUtils.Error<long>(ErrorCode.PARAMS_ERROR);
-        }
+            return ResultUtil.Error<long>(ErrorCode.PARAMS_ERROR);
 
         string userAccount = userRegisterRequest.UserAccount;
         string userPassword = userRegisterRequest.UserPassword;
-        string checkPassword = userRegisterRequest.confirmPassword;
+        string confirmPassword = userRegisterRequest.confirmPassword;
+        if (string.IsNullOrWhiteSpace(userAccount) || string.IsNullOrWhiteSpace(userPassword) || string.IsNullOrWhiteSpace(confirmPassword))
+            return ResultUtil.Error<long>(ErrorCode.PARAMS_ERROR, "User account, password, and confirm password cannot be blank.");
 
-        // Validate input
-        if (string.IsNullOrWhiteSpace(userAccount) || string.IsNullOrWhiteSpace(userPassword) || string.IsNullOrWhiteSpace(checkPassword))
-        {
-            return ResultUtils.Error<long>(ErrorCode.PARAMS_ERROR, "User account, password, and confirm password cannot be blank.");
-        }
+        long result = await _userService.UserRegister(userAccount, userPassword, confirmPassword);
 
-        // Call the user service to register
-        long result = await _userService.UserRegister(userAccount, userPassword, checkPassword);
-
-        return ResultUtils.Success(result);
+        return ResultUtil.Success(result);
     }
 
     [HttpPost("login")]
-    public async Task<ApiResponse<LoginUserResponse>> UserLogin([FromBody] UserRegisterRequest userRegisterRequest)
+    public async Task<ApiResponse<LoginUserResponse>> UserLogin([FromBody] UserLoginRequest userLoginRequest)
     {
-        // Check for null request
-        if (userRegisterRequest == null)
-        {
-            return ResultUtils.Error<LoginUserResponse>(ErrorCode.PARAMS_ERROR);
-        }
-        string userAccount = userRegisterRequest.UserAccount;
-        string userPassword = userRegisterRequest.UserPassword;
-        // Validate input
+        if (userLoginRequest == null)
+            return ResultUtil.Error<LoginUserResponse>(ErrorCode.PARAMS_ERROR);
+
+        string userAccount = userLoginRequest.UserAccount;
+        string userPassword = userLoginRequest.UserPassword;
         if (string.IsNullOrWhiteSpace(userAccount) || string.IsNullOrWhiteSpace(userPassword))
-        {
-            return ResultUtils.Error<LoginUserResponse>(ErrorCode.PARAMS_ERROR, "User account and password cannot be blank.");
-        }
-        // Call the user service to login
+            return ResultUtil.Error<LoginUserResponse>(ErrorCode.PARAMS_ERROR, "User account and password cannot be blank.");
+
         LoginUserResponse result = await _userService.UserLogin(userAccount, userPassword, Request);
-        return ResultUtils.Success(result);
+        return ResultUtil.Success(result);
     }
 
     [HttpPost("logout")]
+    [Authorize]
     public async Task<ApiResponse<bool>> UserLogout()
     {
-        bool result = await _userService.UserLogout(Request);
-        return ResultUtils.Success(result);
+        await IdentityUtils.SignOutUser(Request);
+        return ResultUtil.Success(true);
     }
 
     [HttpPost("getLoginUser")]
+    [Authorize]
     public ApiResponse<LoginUserResponse> GetLoginUser()
     {
         var user = _userService.GetLoginUser(Request);
-        var loginUserResponse = _userService.GetLoginUserResponse(user);
-        return ResultUtils.Success(loginUserResponse);
+        var loginUserResponse = _mapper.Map<LoginUserResponse>(user);
+        return ResultUtil.Success(loginUserResponse);
     }
 
-    //region DB Operation (Admin)
-    [HttpPost("delete")]
-    public async Task<ApiResponse<bool>> DeleteUser([FromBody] long id)
-    {
-        if (id <= 0)
-        {
-            return ResultUtils.Error<bool>(ErrorCode.PARAMS_ERROR, "Invalid user id");
-        }
-        await _userService.DeleteAsync(id);
-        return ResultUtils.Success(true);
-    }
-
-
-    //endregion
 }

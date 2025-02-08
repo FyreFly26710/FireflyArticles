@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FF.Articles.Backend.Common.Constants;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,11 +11,6 @@ public class PageRequest
     public int PageNumber { get; set; } = 1;
     public int PageSize { get; set; } = 20;
     public string? SortField { get; set; }
-    public SortOrder SortOrder { get; set; } = SortOrder.ASC;
+    public string SortOrder { get; set; } = SortOrderConstant.ASC;
 }
 
-public enum SortOrder
-{
-    ASC,
-    DESC
-}
