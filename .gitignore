@@ -3,5 +3,14 @@
 bin
 obj
 
+.github
+
 # Ignore user-specific files
 *.user
+
+
+# Ignore React folders
+node_modules
+.next/
+
+
