@@ -4,6 +4,7 @@ using FF.Articles.Backend.Contents.API.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FF.Articles.Backend.Contents.API.Infrastructure.Migrations
 {
     [DbContext(typeof(ContentsDbContext))]
-    partial class ArticleDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250212195937_InitDb")]
+    partial class InitDb
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -25,11 +28,11 @@ namespace FF.Articles.Backend.Contents.API.Infrastructure.Migrations
 
             modelBuilder.Entity("FF.Articles.Backend.Contents.API.Models.Entities.Article", b =>
                 {
-                    b.Property<long>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
+                        .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Abstraction")
                         .IsRequired()
@@ -67,15 +70,15 @@ namespace FF.Articles.Backend.Contents.API.Infrastructure.Migrations
                         .HasColumnType("nvarchar(1000)")
                         .HasDefaultValue("");
 
-                    b.Property<long>("TopicId")
-                        .HasColumnType("bigint");
+                    b.Property<int>("TopicId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdateTime")
                         .IsConcurrencyToken()
                         .HasColumnType("datetime2");
 
-                    b.Property<long>("UserId")
-                        .HasColumnType("bigint");
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -84,17 +87,17 @@ namespace FF.Articles.Backend.Contents.API.Infrastructure.Migrations
 
             modelBuilder.Entity("FF.Articles.Backend.Contents.API.Models.Entities.ArticleTag", b =>
                 {
-                    b.Property<long>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
+                        .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<long>("ArticleId")
-                        .HasColumnType("bigint");
+                    b.Property<int>("ArticleId")
+                        .HasColumnType("int");
 
-                    b.Property<long>("TagId")
-                        .HasColumnType("bigint");
+                    b.Property<int>("TagId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -103,11 +106,11 @@ namespace FF.Articles.Backend.Contents.API.Infrastructure.Migrations
 
             modelBuilder.Entity("FF.Articles.Backend.Contents.API.Models.Entities.Tag", b =>
                 {
-                    b.Property<long>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
+                        .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("TagName")
                         .IsRequired()
@@ -121,11 +124,11 @@ namespace FF.Articles.Backend.Contents.API.Infrastructure.Migrations
 
             modelBuilder.Entity("FF.Articles.Backend.Contents.API.Models.Entities.Topic", b =>
                 {
-                    b.Property<long>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
+                        .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Abstraction")
                         .IsRequired()
@@ -167,8 +170,8 @@ namespace FF.Articles.Backend.Contents.API.Infrastructure.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("datetime2");
 
-                    b.Property<long>("UserId")
-                        .HasColumnType("bigint");
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 

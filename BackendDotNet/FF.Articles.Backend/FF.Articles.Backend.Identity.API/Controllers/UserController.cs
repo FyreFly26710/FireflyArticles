@@ -21,18 +21,18 @@ public class UserController(IUserService _userService, ILogger<UserController> _
 {
 
     [HttpPost("register")]
-    public async Task<ApiResponse<long>> UserRegister([FromBody] UserRegisterRequest userRegisterRequest)
+    public async Task<ApiResponse<int>> UserRegister([FromBody] UserRegisterRequest userRegisterRequest)
     {
         if (userRegisterRequest == null)
-            return ResultUtil.Error<long>(ErrorCode.PARAMS_ERROR);
+            return ResultUtil.Error<int>(ErrorCode.PARAMS_ERROR);
 
         string userAccount = userRegisterRequest.UserAccount;
         string userPassword = userRegisterRequest.UserPassword;
         string confirmPassword = userRegisterRequest.confirmPassword;
         if (string.IsNullOrWhiteSpace(userAccount) || string.IsNullOrWhiteSpace(userPassword) || string.IsNullOrWhiteSpace(confirmPassword))
-            return ResultUtil.Error<long>(ErrorCode.PARAMS_ERROR, "User account, password, and confirm password cannot be blank.");
+            return ResultUtil.Error<int>(ErrorCode.PARAMS_ERROR, "User account, password, and confirm password cannot be blank.");
 
-        long result = await _userService.UserRegister(userAccount, userPassword, confirmPassword);
+        int result = await _userService.UserRegister(userAccount, userPassword, confirmPassword);
 
         return ResultUtil.Success(result);
     }

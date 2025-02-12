@@ -1,7 +1,9 @@
 using FF.Articles.Backend.Contents.API.Infrastructure;
+using FF.Articles.Backend.Contents.API.MappingProfiles;
+using FF.Articles.Backend.Contents.API.RemoteServices;
+using FF.Articles.Backend.Contents.API.RemoteServices.Interfaces;
 using FF.Articles.Backend.Contents.API.Services;
 using FF.Articles.Backend.Contents.API.Services.Interfaces;
-using FF.Articles.Backend.Identity.API.MappingProfiles;
 using FF.Articles.Backend.ServiceDefaults;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,9 +19,14 @@ builder.Services.AddDbContext<ContentsDbContext>(options =>
     .EnableSensitiveDataLogging();
 });
 
-builder.Services.AddAutoMapper(typeof(ArticleMappingProfile));
+builder.Services.AddAutoMapper(typeof(ContentsMappingProfile));
 
 builder.Services.AddScoped<IArticleService, ArticleService>();
+builder.Services.AddScoped<ITagService, TagService>();
+builder.Services.AddScoped<IArticleTagService, ArticleTagService>();
+builder.Services.AddScoped<ITopicService, TopicService>();
+
+builder.Services.AddScoped<IIdentityRemoteService, IdentityRemoteService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

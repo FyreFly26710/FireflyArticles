@@ -16,7 +16,7 @@ public class IdentityDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        modelBuilder.HasDefaultSchema("Identity");
+        //modelBuilder.HasDefaultSchema("Identity");
         ConfigureUser(modelBuilder);
 
 
@@ -24,11 +24,11 @@ public class IdentityDbContext : DbContext
 
     private void ConfigureUser(ModelBuilder modelBuilder)
     {
-        EFCoreUtil.ConfigBasetEntity<User>(modelBuilder);
+        EFCoreUtil.ConfigBaseEntity<User>(modelBuilder);
 
         modelBuilder.Entity<User>(entity =>
         {
-            entity.ToTable("User");
+            entity.ToTable("Users");
             entity.Property(u => u.UserAccount).HasMaxLength(255).IsRequired();
             entity.Property(u => u.UserPassword).HasMaxLength(255).IsRequired();
             entity.Property(u => u.UserName).HasMaxLength(255);

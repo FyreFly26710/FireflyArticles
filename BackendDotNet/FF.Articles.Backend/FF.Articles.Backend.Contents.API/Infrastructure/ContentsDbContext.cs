@@ -32,7 +32,7 @@ public class ContentsDbContext : DbContext
 
     private void ConfigureArticle(ModelBuilder modelBuilder)
     {
-        EFCoreUtil.ConfigBasetEntity<Article>(modelBuilder);
+        EFCoreUtil.ConfigBaseEntity<Article>(modelBuilder);
 
         modelBuilder.Entity<Article>(entity =>
         {
@@ -46,7 +46,7 @@ public class ContentsDbContext : DbContext
     }
     private void ConfigureTopic(ModelBuilder modelBuilder)
     {
-        EFCoreUtil.ConfigBasetEntity<Topic>(modelBuilder);
+        EFCoreUtil.ConfigBaseEntity<Topic>(modelBuilder);
 
         modelBuilder.Entity<Topic>(entity =>
         {

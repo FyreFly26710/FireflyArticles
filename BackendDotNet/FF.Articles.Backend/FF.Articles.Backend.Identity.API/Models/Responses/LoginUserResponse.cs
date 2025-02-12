@@ -8,7 +8,7 @@ namespace FF.Articles.Backend.Identity.API.Models.Responses;
 public class LoginUserResponse
 {
 
-    public long Id { get; set; }
+    public int Id { get; set; }
     public string UserAccount { get; set; }
     public string? UserName { get; set; }
     public string? UserEmail { get; set; }

@@ -8,7 +8,7 @@ namespace FF.Articles.Backend.Identity.API.Services;
 
 public interface IUserService : IBaseService<User, IdentityDbContext>
 {
-    Task<long> UserRegister(string userAccount, string userPassword, string checkPassword);
+    Task<int> UserRegister(string userAccount, string userPassword, string checkPassword);
 
     Task<LoginUserResponse> UserLogin(string userAccount, string userPassword, HttpRequest request);
 

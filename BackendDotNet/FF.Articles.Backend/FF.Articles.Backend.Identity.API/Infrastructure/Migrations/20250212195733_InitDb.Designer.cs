@@ -12,14 +12,15 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FF.Articles.Backend.Identity.API.Infrastructure.Migrations
 {
     [DbContext(typeof(IdentityDbContext))]
-    [Migration("20250208193516_AlterBaseEntityColumns")]
-    partial class AlterBaseEntityColumns
+    [Migration("20250212195733_InitDb")]
+    partial class InitDb
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
+                .HasDefaultSchema("Identity")
                 .HasAnnotation("ProductVersion", "8.0.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
@@ -27,14 +28,13 @@ namespace FF.Articles.Backend.Identity.API.Infrastructure.Migrations
 
             modelBuilder.Entity("FF.Articles.Backend.Identity.API.Models.Entities.User", b =>
                 {
-                    b.Property<long>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
+                        .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime?>("CreateTime")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2");
 
                     b.Property<int?>("IsDelete")
@@ -43,7 +43,7 @@ namespace FF.Articles.Backend.Identity.API.Infrastructure.Migrations
                         .HasDefaultValue(0);
 
                     b.Property<DateTime?>("UpdateTime")
-                        .ValueGeneratedOnAddOrUpdate()
+                        .IsConcurrencyToken()
                         .HasColumnType("datetime2");
 
                     b.Property<string>("UserAccount")
@@ -80,7 +80,7 @@ namespace FF.Articles.Backend.Identity.API.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("User", (string)null);
+                    b.ToTable("User", "Identity");
                 });
 #pragma warning restore 612, 618
         }

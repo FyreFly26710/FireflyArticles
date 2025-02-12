@@ -6,16 +6,20 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace FF.Articles.Backend.Identity.API.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitDb : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.EnsureSchema(
+                name: "Identity");
+
             migrationBuilder.CreateTable(
                 name: "User",
+                schema: "Identity",
                 columns: table => new
                 {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     UserAccount = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     UserPassword = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
@@ -24,10 +28,9 @@ namespace FF.Articles.Backend.Identity.API.Infrastructure.Migrations
                     UserAvatar = table.Column<string>(type: "nvarchar(1024)", maxLength: 1024, nullable: true),
                     UserProfile = table.Column<string>(type: "nvarchar(512)", maxLength: 512, nullable: true),
                     UserRole = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false, defaultValue: "user"),
-                    CreateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    IsDelete = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
-                    RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
+                    CreateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsDelete = table.Column<int>(type: "int", nullable: true, defaultValue: 0)
                 },
                 constraints: table =>
                 {
@@ -39,7 +42,8 @@ namespace FF.Articles.Backend.Identity.API.Infrastructure.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "User");
+                name: "User",
+                schema: "Identity");
         }
     }
 }

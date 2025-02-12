@@ -24,7 +24,7 @@ public static class EFCoreUtil
     /// Keep all columns of the base entity (Id, CreateTime, UpdateTime, IsDelete). 
     /// Apply Soft delete and concurrency token
     /// </summary>
-    public static void ConfigBasetEntity<TEntity>(ModelBuilder modelBuilder) where TEntity : BaseEntity
+    public static void ConfigBaseEntity<TEntity>(ModelBuilder modelBuilder) where TEntity : BaseEntity
     {
         modelBuilder.Entity<TEntity>(entity =>
         {

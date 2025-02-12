@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace FF.Articles.Backend.Contents.API.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialContentDb : Migration
+    public partial class InitDb : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -19,13 +19,13 @@ namespace FF.Articles.Backend.Contents.API.Infrastructure.Migrations
                 schema: "Contents",
                 columns: table => new
                 {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Title = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false, defaultValue: ""),
                     Content = table.Column<string>(type: "NVARCHAR(MAX)", nullable: false, defaultValue: ""),
                     Abstraction = table.Column<string>(type: "nvarchar(4000)", maxLength: 4000, nullable: false, defaultValue: ""),
-                    UserId = table.Column<long>(type: "bigint", nullable: false),
-                    TopicId = table.Column<long>(type: "bigint", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    TopicId = table.Column<int>(type: "int", nullable: false),
                     SortNumber = table.Column<int>(type: "int", nullable: false),
                     IsHidden = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
                     CreateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -42,10 +42,10 @@ namespace FF.Articles.Backend.Contents.API.Infrastructure.Migrations
                 schema: "Contents",
                 columns: table => new
                 {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ArticleId = table.Column<long>(type: "bigint", nullable: false),
-                    TagId = table.Column<long>(type: "bigint", nullable: false)
+                    ArticleId = table.Column<int>(type: "int", nullable: false),
+                    TagId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -57,7 +57,7 @@ namespace FF.Articles.Backend.Contents.API.Infrastructure.Migrations
                 schema: "Contents",
                 columns: table => new
                 {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     TagName = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false)
                 },
@@ -71,12 +71,12 @@ namespace FF.Articles.Backend.Contents.API.Infrastructure.Migrations
                 schema: "Contents",
                 columns: table => new
                 {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Title = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false, defaultValue: ""),
                     Content = table.Column<string>(type: "NVARCHAR(MAX)", nullable: false, defaultValue: ""),
                     Abstraction = table.Column<string>(type: "nvarchar(4000)", maxLength: 4000, nullable: false, defaultValue: ""),
-                    UserId = table.Column<long>(type: "bigint", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: false),
                     SortNumber = table.Column<int>(type: "int", nullable: false),
                     IsHidden = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
                     CreateTime = table.Column<DateTime>(type: "datetime2", nullable: true),

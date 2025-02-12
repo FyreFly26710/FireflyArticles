@@ -1,3 +1,4 @@
+using FF.Articles.Backend.Common.Dtos;
 using FF.Articles.Backend.Identity.API.Models.Entities;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -16,8 +17,18 @@ public class IdentityUtils
     {
         // Remove password from user object
         user.UserPassword = string.Empty;
-
-        string userJson = JsonSerializer.Serialize(user);
+        var userDto = new UserDto()
+        {
+            UserId = user.Id,
+            CreateTime = user.CreateTime,
+            UserAccount = user.UserAccount,
+            UserEmail = user.UserEmail,
+            UserName = user.UserName,
+            UserAvatar = user.UserAvatar,
+            UserProfile = user.UserProfile,
+            UserRole = user.UserRole
+        };
+        string userJson = JsonSerializer.Serialize(userDto);
         var claims = new List<Claim>
         {
             new Claim(ClaimTypes.Name, user.UserName ?? "Guest"),
@@ -36,8 +47,8 @@ public class IdentityUtils
             });
     }
 
-    public static User GetUserFromHttpRequest(HttpRequest request) 
-        => JsonSerializer.Deserialize<User>(request.HttpContext.User.FindFirst("user").Value);
+    //public static User GetUserFromHttpRequest(HttpRequest request) 
+    //    => JsonSerializer.Deserialize<User>(request.HttpContext.User.FindFirst("user").Value);
 
     public static async Task SignOutUser(HttpRequest httpRequest)
         => await httpRequest.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);

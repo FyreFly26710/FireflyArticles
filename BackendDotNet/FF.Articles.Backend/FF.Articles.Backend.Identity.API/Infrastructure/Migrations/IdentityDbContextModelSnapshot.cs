@@ -17,7 +17,6 @@ namespace FF.Articles.Backend.Identity.API.Infrastructure.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasDefaultSchema("Identity")
                 .HasAnnotation("ProductVersion", "8.0.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
@@ -25,11 +24,11 @@ namespace FF.Articles.Backend.Identity.API.Infrastructure.Migrations
 
             modelBuilder.Entity("FF.Articles.Backend.Identity.API.Models.Entities.User", b =>
                 {
-                    b.Property<long>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
+                        .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime?>("CreateTime")
                         .HasColumnType("datetime2");
@@ -77,7 +76,7 @@ namespace FF.Articles.Backend.Identity.API.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("User", "Identity");
+                    b.ToTable("Users", (string)null);
                 });
 #pragma warning restore 612, 618
         }

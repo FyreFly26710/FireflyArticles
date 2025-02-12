@@ -3,12 +3,14 @@
 namespace FF.Articles.Backend.Common.Dtos;
 
 /// <summary>
-/// Copy from User; Transfer user data between API microservices
+/// Transfer user data between API microservices
 /// </summary>
-public class UserDto: BaseEntity
+public class UserDto
 {
+    public int UserId { get; set; }
+    public DateTime? CreateTime { get; set; }
+
     public string UserAccount { get; set; }
-    public string UserPassword { get; set; }
     public string? UserEmail { get; set; }
     public string? UserName { get; set; }
     public string? UserAvatar { get; set; }

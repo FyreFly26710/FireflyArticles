@@ -5,6 +5,7 @@ using AutoMapper;
 using FF.Articles.Backend.Common.Bases;
 using FF.Articles.Backend.Common.Constants;
 using FF.Articles.Backend.Common.Exceptions;
+using FF.Articles.Backend.Common.Utils;
 using FF.Articles.Backend.Identity.API.Infrastructure;
 using FF.Articles.Backend.Identity.API.Models.Entities;
 using FF.Articles.Backend.Identity.API.Models.Responses;
@@ -18,7 +19,7 @@ public class UserService(IdentityDbContext _context, ILogger<UserService> _logge
 {
     private const string SALT = "Firefly";
 
-    public async Task<long> UserRegister(string userAccount, string userPassword, string checkPassword)
+    public async Task<int> UserRegister(string userAccount, string userPassword, string checkPassword)
     {
         validateAccount(userAccount, userPassword, checkPassword);
 
@@ -38,7 +39,7 @@ public class UserService(IdentityDbContext _context, ILogger<UserService> _logge
             UserPassword = encryptedPassword
         };
 
-        long userId = await this.CreateAsync(user);
+        int userId = await this.CreateAsync(user);
         return userId;
 
     }
@@ -65,14 +66,15 @@ public class UserService(IdentityDbContext _context, ILogger<UserService> _logge
     public User GetLoginUser(HttpRequest request)
     {
         //User? user = request.HttpContext.Session.GetObject<User>(UserConstant.USER_LOGIN_STATE);
-        User? user = IdentityUtils.GetUserFromHttpRequest(request);
+        var user = UserUtil.GetUserFromHttpRequest(request);
         if (user == null)
         {
             throw new ApiException(ErrorCode.NOT_LOGIN_ERROR);
         }
         // need to get latest state of user??
         // user = _context.Users.Find(user.Id);
-        return (User)user;
+        
+        return _mapper.Map<User>(user);
     }
 
     public bool IsAdmin(HttpRequest request) => IsAdmin(GetLoginUser(request));
