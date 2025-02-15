@@ -12,5 +12,8 @@ obj
 # Ignore React folders
 node_modules
 .next/
+.idea/
 
-
+ #config
+/FrontendReact/ff-articles-frontend/.env
+/FrontendReact/ff-articles-frontend/openapi.config.ts
