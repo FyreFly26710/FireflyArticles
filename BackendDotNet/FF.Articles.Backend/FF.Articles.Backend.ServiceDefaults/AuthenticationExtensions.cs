@@ -20,10 +20,8 @@ public static class AuthenticationExtensions
                 options.Cookie.Name = "AuthCookie";
                 //options.ExpireTimeSpan = TimeSpan.FromDays(7); // optional
                 options.Cookie.HttpOnly = true;
-                options.Cookie.SecurePolicy = CookieSecurePolicy.None; // only for localhost
-                options.Cookie.SameSite = SameSiteMode.Lax; // Allows cross-API requests on localhost
-                //options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Ensure this is set for production (HTTPS)
-                //options.Cookie.SameSite = SameSiteMode.Lax; // Secure cookie behavior
+                options.Cookie.SecurePolicy = CookieSecurePolicy.None;
+                options.Cookie.SameSite = SameSiteMode.Lax; 
             });
         builder.Services.AddDataProtection()
             .PersistKeysToFileSystem(new DirectoryInfo(@"D:\202502"))
@@ -41,7 +39,7 @@ public static class AuthenticationExtensions
                     builder.AllowAnyHeader()
                            .AllowAnyMethod()
                            //.AllowAnyOrigin()
-                           .WithOrigins("http://localhost:22000", "http://localhost:23000")
+                           .WithOrigins("http://localhost:3000","http://localhost:22000", "http://localhost:23000")
                            .AllowCredentials();
                 });
         });
@@ -53,7 +51,7 @@ public static class AuthenticationExtensions
                     builder.AllowAnyHeader()
                            .AllowAnyMethod()
                            //.AllowAnyOrigin()
-                           .WithOrigins("http://localhost:22000", "http://localhost:23000")
+                           .WithOrigins("http://localhost:3000","http://localhost:22000", "http://localhost:23000")
                            .AllowCredentials();
                 });
         });

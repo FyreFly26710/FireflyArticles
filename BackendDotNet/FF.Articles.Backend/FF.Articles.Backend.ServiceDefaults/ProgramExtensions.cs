@@ -16,6 +16,7 @@ public static class ProgramExtensions
 {
     public static WebApplicationBuilder AddServiceDefaults(this WebApplicationBuilder builder)
     {
+
         builder.AddLogger();
         builder.AddCors();
         builder.AddCookieAuth();

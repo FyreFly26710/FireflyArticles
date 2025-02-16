@@ -10,8 +10,10 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
-//builder.AddEFSqlServer<ArticleDbContext>(builder.Configuration.GetConnectionString("DefaultConnection"));
-
+// builder.Services.AddHttpsRedirection(options => {
+//     options.RedirectStatusCode = StatusCodes.Status307TemporaryRedirect;
+//     options.HttpsPort = 23000; 
+// });
 builder.Services.AddDbContext<ContentsDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
