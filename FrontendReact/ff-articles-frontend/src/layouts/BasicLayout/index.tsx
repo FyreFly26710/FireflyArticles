@@ -1,18 +1,18 @@
 "use client";
-import {GithubFilled, LogoutOutlined,} from '@ant-design/icons';
-import {ProLayout,} from '@ant-design/pro-components';
-import {Dropdown, message,} from 'antd';
+import { GithubFilled, LogoutOutlined, } from '@ant-design/icons';
+import { ProLayout, } from '@ant-design/pro-components';
+import { Dropdown, message, } from 'antd';
 import React from 'react';
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import menus from "../../../config/menus";
-import {AppDispatch, RootState} from "@/stores";
-import {useDispatch, useSelector} from "react-redux";
-import {postUserLogout} from "@/api/identity/api/user";
-import {setLoginUser} from "@/stores/loginUser";
-import {DEFAULT_USER} from "@/constants/user";
-import {UserOutlined} from "@ant-design/icons";
+import { AppDispatch, RootState } from "@/stores";
+import { useDispatch, useSelector } from "react-redux";
+import { postUserLogout } from "@/api/identity/api/user";
+import { setLoginUser } from "@/stores/loginUser";
+import { DEFAULT_USER } from "@/constants/user";
+import { UserOutlined } from "@ant-design/icons";
 import getAccessibleMenus from "@/access/menuAccess";
 
 
@@ -20,7 +20,7 @@ interface Props {
     children: React.ReactNode;
 }
 
-export default function BasicLayout({children}: Props) {
+export default function BasicLayout({ children }: Props) {
     const pathname = usePathname();
     const dispatch = useDispatch<AppDispatch>();
 
@@ -106,7 +106,7 @@ export default function BasicLayout({children}: Props) {
                             href="https://github.com/FyreFly26710/ideabank"
                             target="_blank"
                         >
-                            <GithubFilled key="GithubFilled"/>
+                            <GithubFilled key="GithubFilled" />
                         </a>,];
                 }}
                 headerTitleRender={(logo, title, _) => {

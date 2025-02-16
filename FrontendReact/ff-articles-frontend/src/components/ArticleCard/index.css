@@ -1,0 +1,16 @@
+.article-card{
+    min-width: 600px;
+    overflow-x: auto;
+
+}
+.header-card{
+    height: 150px;
+    overflow: auto;
+    padding-right: 8px;
+}
+.content-card{
+    max-height: calc(100vh - 250px);
+    min-height: 600px;
+    overflow: auto;
+    padding-right: 8px;
+}

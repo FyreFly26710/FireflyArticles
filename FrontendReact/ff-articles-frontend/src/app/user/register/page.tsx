@@ -40,9 +40,9 @@ const UserRegisterPage: React.FC = (props) => {
             <LoginForm<API.UserRegisterRequest>
                 form={form}
                 logo={
-                    <Image src="/assets/logo.png" alt="Interview Duck" width={44} height={44} />
+                    <Image src="/assets/logo.png" alt="FF Articles" width={44} height={44} />
                 }
-                title="Idea Bank - User Registration"
+                title="FF Articles - User Registration"
                 subTitle="Knowledge sharing platform"
                 onFinish={doSubmit}
                 submitter={{

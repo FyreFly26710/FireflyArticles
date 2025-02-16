@@ -4,7 +4,7 @@ import request from "@/libs/request";
 
 /** 此处后端没有提供注释 POST /api/identity/admin/delete */
 export async function postAdminOpenApiDelete(
-  body: number,
+  body: API.DeleteByIdRequest,
   options?: { [key: string]: any }
 ) {
   return request<API.BooleanApiResponse>("/api/identity/admin/delete", {

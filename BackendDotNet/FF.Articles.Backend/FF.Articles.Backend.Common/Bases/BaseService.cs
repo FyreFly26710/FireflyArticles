@@ -110,9 +110,15 @@ public abstract class BaseService<TEntity, TContext>(TContext _context, ILogger<
         // Apply sorting if a SortField is provided
         if (!string.IsNullOrWhiteSpace(pageRequest.SortField))
         {
-            query = pageRequest.SortOrder == SortOrderConstant.ASC
-                ? query.OrderBy(e => EF.Property<object>(e, pageRequest.SortField))
-                : query.OrderByDescending(e => EF.Property<object>(e, pageRequest.SortField));
+            var propertyInfo = typeof(TEntity).GetProperties()
+                .FirstOrDefault(p => p.Name.Equals(pageRequest.SortField, StringComparison.OrdinalIgnoreCase));
+
+            if (propertyInfo != null)
+            {
+                query = pageRequest.SortOrder == SortOrderConstant.ASC
+                    ? query.OrderBy(e => EF.Property<object>(e, propertyInfo.Name))
+                    : query.OrderByDescending(e => EF.Property<object>(e, propertyInfo.Name));
+            }
         }
         // Get total count before applying pagination
         int totalCount = await query.CountAsync();

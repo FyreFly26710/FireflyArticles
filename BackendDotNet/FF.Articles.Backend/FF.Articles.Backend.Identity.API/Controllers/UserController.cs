@@ -20,6 +20,11 @@ public class UserController(IUserService _userService, ILogger<UserController> _
     : ControllerBase
 {
 
+    /// <summary>
+    /// User register
+    /// </summary>
+    /// <param name="userRegisterRequest"></param>
+    /// <returns></returns>
     [HttpPost("register")]
     public async Task<ApiResponse<int>> UserRegister([FromBody] UserRegisterRequest userRegisterRequest)
     {
@@ -36,7 +41,11 @@ public class UserController(IUserService _userService, ILogger<UserController> _
 
         return ResultUtil.Success(result);
     }
-
+    /// <summary>
+    /// User login
+    /// </summary>
+    /// <param name="userLoginRequest"></param>
+    /// <returns></returns>
     [HttpPost("login")]
     public async Task<ApiResponse<LoginUserResponse>> UserLogin([FromBody] UserLoginRequest userLoginRequest)
     {
@@ -51,7 +60,10 @@ public class UserController(IUserService _userService, ILogger<UserController> _
         LoginUserResponse result = await _userService.UserLogin(userAccount, userPassword, Request);
         return ResultUtil.Success(result);
     }
-
+    /// <summary>
+    /// User logout
+    /// </summary>
+    /// <returns></returns>
     [HttpPost("logout")]
     [Authorize]
     public async Task<ApiResponse<bool>> UserLogout()
@@ -59,7 +71,10 @@ public class UserController(IUserService _userService, ILogger<UserController> _
         await IdentityUtils.SignOutUser(Request);
         return ResultUtil.Success(true);
     }
-
+    /// <summary>
+    /// Get login user
+    /// </summary>
+    /// <returns></returns>
     [HttpPost("getLoginUser")]
     [Authorize]
     public ApiResponse<LoginUserResponse> GetLoginUser()

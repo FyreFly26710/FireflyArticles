@@ -20,7 +20,11 @@ namespace FF.Articles.Backend.Identity.API.Controllers;
 public class AdminController(IUserService _userService, ILogger<AdminController> _logger, IMapper _mapper)
 : ControllerBase
 {
-
+    /// <summary>
+    /// List user response
+    /// </summary>
+    /// <param name="pageRequest"></param>
+    /// <returns></returns>
     [HttpPost("list")]
     [Authorize(Roles = UserConstant.ADMIN_ROLE)]
     public async Task<ApiResponse<PageResponse<UserResponse>>> ListUsers([FromBody] PageRequest pageRequest)
@@ -31,18 +35,26 @@ public class AdminController(IUserService _userService, ILogger<AdminController>
         return ResultUtil.Success(response);
     }
 
-
+    /// <summary>
+    /// delete user by id
+    /// </summary>
+    /// <param name="deleteByIdRequest"></param>
+    /// <returns></returns>
     [HttpPost("delete")]
     [Authorize(Roles = UserConstant.ADMIN_ROLE)]
-    public async Task<ApiResponse<bool>> DeleteUser([FromBody] int id)
+    public async Task<ApiResponse<bool>> DeleteUser([FromBody] DeleteByIdRequest deleteByIdRequest)
     {
-        if (id <= 0)
+        if (deleteByIdRequest.Id <= 0)
             return ResultUtil.Error<bool>(ErrorCode.PARAMS_ERROR, "Invalid user id");
 
-        await _userService.DeleteAsync(id);
+        await _userService.DeleteAsync(deleteByIdRequest.Id);
         return ResultUtil.Success(true);
     }
-
+    /// <summary>
+    /// Update user
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
     [HttpPost("update")]
     [Authorize(Roles = UserConstant.ADMIN_ROLE)]
     public async Task<ApiResponse<bool>> UpdateUser([FromBody] UserUpdateRequest request)
@@ -58,7 +70,11 @@ public class AdminController(IUserService _userService, ILogger<AdminController>
         await _userService.UpdateAsync(user);
         return ResultUtil.Success(true);
     }
-
+    /// <summary>
+    /// Get user dto by id
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     [EnableCors("AllowedBackendUrls")]
     [HttpGet("get-dto/{id}")]
     public async Task<ApiResponse<UserDto>> GetUserDto(int id)

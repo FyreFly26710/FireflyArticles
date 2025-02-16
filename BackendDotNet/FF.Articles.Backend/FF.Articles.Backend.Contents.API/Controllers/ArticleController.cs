@@ -22,6 +22,9 @@ public class ArticleController(ILogger<ArticleController> _logger, IMapper _mapp
     IIdentityRemoteService _identityRemoteService)
     : ControllerBase
 {
+    /// <summary>
+    /// Get article response by id
+    /// </summary>
     [HttpGet("get/{id}")]
     public async Task<ApiResponse<ArticleResponse>> GetById(int id)
     {
@@ -37,6 +40,9 @@ public class ArticleController(ILogger<ArticleController> _logger, IMapper _mapp
         return ResultUtil.Success(articleResponse);
     }
 
+    /// <summary>
+    /// Get article response by page
+    /// </summary>
     [HttpPost("get-page")]
     public async Task<ApiResponse<PageResponse<ArticleResponse>>> GetByPage(PageRequest pageRequest)
     {
@@ -69,6 +75,9 @@ public class ArticleController(ILogger<ArticleController> _logger, IMapper _mapp
 
 
     #region DB Modification
+    /// <summary>
+    /// Add article
+    /// </summary>
     [HttpPost("add")]
     public async Task<ApiResponse<int>> AddArticle([FromBody] ArticleAddRequest articleAddRequest)
     {
@@ -83,6 +92,11 @@ public class ArticleController(ILogger<ArticleController> _logger, IMapper _mapp
 
         return ResultUtil.Success(article.Id);
     }
+    /// <summary>
+    /// Edit article
+    /// </summary>
+    /// <param name="articleEditRequest"></param>
+    /// <returns></returns>
     [HttpPost("edit")]
     public async Task<ApiResponse<int>> EditArticle([FromBody] ArticleEditRequest articleEditRequest)
     {
@@ -105,6 +119,11 @@ public class ArticleController(ILogger<ArticleController> _logger, IMapper _mapp
 
         return ResultUtil.Success(article.Id);
     }
+    /// <summary>
+    /// Delete article
+    /// </summary>
+    /// <param name="deleteByIdRequest"></param>
+    /// <returns></returns>
     [HttpPost("delete")]
     public async Task<ApiResponse<bool>> DeleteArticle([FromBody] DeleteByIdRequest deleteByIdRequest)
     {

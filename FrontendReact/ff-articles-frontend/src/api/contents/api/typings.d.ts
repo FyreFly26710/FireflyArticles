@@ -120,6 +120,7 @@ declare namespace API {
     title?: string;
     content?: string;
     abstraction?: string;
+    topicImage?: string;
     sortNumber?: number;
     isHidden?: number;
   };
@@ -129,6 +130,7 @@ declare namespace API {
     title?: string;
     content?: string;
     abstraction?: string;
+    topicImage?: string;
     sortNumber?: number;
     isHidden?: number;
   };
@@ -140,10 +142,12 @@ declare namespace API {
     title?: string;
     content?: string;
     abstraction?: string;
+    topicImage?: string;
     userId?: number;
     user?: UserDto;
     sortNumber?: number;
     isHidden?: number;
+    articles?: ArticleResponsePageResponse;
   };
 
   type TopicResponseApiResponse = {

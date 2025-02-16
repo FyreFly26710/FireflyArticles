@@ -17,9 +17,15 @@ namespace FF.Articles.Backend.Contents.API.Controllers;
 [Route("api/contents/topic")]
 public class TopicController(ILogger<TopicController> _logger, IMapper _mapper,
     ITopicService _topicService,
+    IArticleService _articleService,
     IIdentityRemoteService _identityRemoteService)
     : ControllerBase
 {
+    /// <summary>
+    /// Get topic response by id
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     [HttpGet("get/{id}")]
     public async Task<ApiResponse<TopicResponse>> GetById(int id)
     {
@@ -30,9 +36,19 @@ public class TopicController(ILogger<TopicController> _logger, IMapper _mapper,
             return ResultUtil.Error<TopicResponse>(ErrorCode.NOT_FOUND_ERROR, "Topic not found");
         var topicResponse = _mapper.Map<TopicResponse>(topic);
         topicResponse.User = await _identityRemoteService.GetUserByIdAsync(topic.UserId);
+        List<Article> articles = _articleService.GetQueryable().Where(x => x.TopicId == id).OrderBy(x => x.SortNumber).ToList();
+        var pageResponse = new PageResponse<ArticleResponse>();
+        _mapper.Map(articles, pageResponse.Data);
+        pageResponse.PageSize = 100;
+        pageResponse.RecordCount = articles.Count;
+        topicResponse.Articles = pageResponse;
         return ResultUtil.Success(topicResponse);
     }
-
+    /// <summary>
+    /// Get topics by page
+    /// </summary>
+    /// <param name="pageRequest"></param>
+    /// <returns></returns>
     [HttpPost("get-page")]
     public async Task<ApiResponse<PageResponse<TopicResponse>>> GetByPage(PageRequest pageRequest)
     {
@@ -47,7 +63,12 @@ public class TopicController(ILogger<TopicController> _logger, IMapper _mapper,
         foreach (var topic in topicList)
         {
             topic.User = await _identityRemoteService.GetUserByIdAsync(topic.UserId);
-        }
+            List<Article> articles = _articleService.GetQueryable().Where(x => x.TopicId == topic.TopicId).OrderBy(x => x.SortNumber).ToList();
+            var pageResponse = new PageResponse<ArticleResponse>();
+            _mapper.Map(articles, pageResponse.Data);
+            pageResponse.PageSize = 100;
+            pageResponse.RecordCount = articles.Count;
+            topic.Articles = pageResponse;        }
         var res = new PageResponse<TopicResponse>()
         {
             Data = topicList,
@@ -62,6 +83,11 @@ public class TopicController(ILogger<TopicController> _logger, IMapper _mapper,
 
 
     #region DB Modification
+    /// <summary>
+    /// Add topic
+    /// </summary>
+    /// <param name="topicAddRequest"></param>
+    /// <returns></returns>
     [HttpPost("add")]
     public async Task<ApiResponse<int>> AddTopic([FromBody] TopicAddRequest topicAddRequest)
     {
@@ -73,6 +99,11 @@ public class TopicController(ILogger<TopicController> _logger, IMapper _mapper,
         int topicId = await _topicService.CreateAsync(topic);
         return ResultUtil.Success(topic.Id);
     }
+    /// <summary>
+    /// Edit topic
+    /// </summary>
+    /// <param name="topicEditRequest"></param>
+    /// <returns></returns>
     [HttpPost("edit")]
     public async Task<ApiResponse<int>> EditTopic([FromBody] TopicEditRequest topicEditRequest)
     {
@@ -92,6 +123,11 @@ public class TopicController(ILogger<TopicController> _logger, IMapper _mapper,
 
         return ResultUtil.Success(topic.Id);
     }
+    /// <summary>
+    /// Delete topic
+    /// </summary>
+    /// <param name="deleteByIdRequest"></param>
+    /// <returns></returns>
     [HttpPost("delete")]
     public async Task<ApiResponse<bool>> DeleteTopic([FromBody] DeleteByIdRequest deleteByIdRequest)
     {

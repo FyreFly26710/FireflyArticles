@@ -19,6 +19,11 @@ public class TagController(ILogger<ArticleController> _logger, IMapper _mapper,
     : ControllerBase
 {
 
+    /// <summary>
+    /// Get tag response by id
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     [HttpGet("get/{id}")]
     public async Task<ApiResponse<TagResponse>> GetById(int id)
     {
@@ -30,6 +35,10 @@ public class TagController(ILogger<ArticleController> _logger, IMapper _mapper,
         var tagResponse = _mapper.Map<TagResponse>(tag);
         return ResultUtil.Success(tagResponse);
     }
+    /// <summary>
+    /// Get all tags
+    /// </summary>
+    /// <returns></returns>
     [HttpGet("get/all")]
     public async Task<ApiResponse<List<TagResponse>>> GetAll()
     {
@@ -37,7 +46,11 @@ public class TagController(ILogger<ArticleController> _logger, IMapper _mapper,
         var tagResponse = _mapper.Map<List<TagResponse>>(tags);
         return ResultUtil.Success(tagResponse);
     }
-
+    /// <summary>
+    /// Add tag
+    /// </summary>
+    /// <param name="tagAddRequest"></param>
+    /// <returns></returns>
     [HttpPost("add")]
     public async Task<ApiResponse<int>> AddTag([FromBody] TagAddRequest tagAddRequest)
     {
@@ -47,6 +60,11 @@ public class TagController(ILogger<ArticleController> _logger, IMapper _mapper,
         int tagId = await _tagService.CreateAsync(tag);
         return ResultUtil.Success(tagId);
     }
+    /// <summary>
+    /// Edit tag
+    /// </summary>
+    /// <param name="tagEditRequest"></param>
+    /// <returns></returns>
     [HttpPost("edit")]
     public async Task<ApiResponse<int>> EditTag([FromBody] TagEditRequest tagEditRequest)
     {
@@ -62,6 +80,11 @@ public class TagController(ILogger<ArticleController> _logger, IMapper _mapper,
         }
         return ResultUtil.Success(tag.Id);
     }
+    /// <summary>
+    /// Delete tag
+    /// </summary>
+    /// <param name="deleteByIdRequest"></param>
+    /// <returns></returns>
     [HttpPost("delete")]
     public async Task<ApiResponse<bool>> DeleteTag([FromBody] DeleteByIdRequest deleteByIdRequest)
     {

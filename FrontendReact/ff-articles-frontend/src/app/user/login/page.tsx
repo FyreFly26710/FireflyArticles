@@ -12,7 +12,6 @@ import { setLoginUser } from "@/stores/loginUser";
 import { useDispatch } from "react-redux";
 import "./index.css";
 import {postUserLogin} from "@/api/identity/api/user";
-import {getTagGetAll} from "@/api/contents/api/tag";
 
 /**
  * User login page
@@ -48,9 +47,9 @@ const UserLoginPage: React.FC = (props) => {
             <LoginForm<API.UserLoginRequest>
                 form={form}
                 logo={
-                    <Image src="/assets/logo.png" alt="Idea Bank" width={44} height={44} />
+                    <Image src="/assets/logo.png" alt="FF Articles" width={44} height={44} />
                 }
-                title="Idea Bank - User Login"
+                title="FF Articles - User Login"
                 subTitle="Knowledge sharing platform"
                 onFinish={doSubmit}
                 submitter={{

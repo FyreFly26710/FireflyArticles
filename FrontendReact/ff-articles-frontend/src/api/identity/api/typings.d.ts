@@ -5,6 +5,10 @@ declare namespace API {
     message?: string;
   };
 
+  type DeleteByIdRequest = {
+    id?: number;
+  };
+
   type getAdminGetDtoIdParams = {
     id: number;
   };

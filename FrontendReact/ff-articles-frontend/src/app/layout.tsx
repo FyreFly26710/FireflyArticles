@@ -9,6 +9,8 @@ import store, {AppDispatch} from "@/stores";
 import {postUserGetLoginUser} from "@/api/identity/api/user";
 import {setLoginUser} from "@/stores/loginUser";
 import AccessLayout from "@/access/AccessLayout";
+import enGB from 'antd/locale/en_GB';
+import { ConfigProvider } from "antd";
 
 const InitLayout: React.FC<
     Readonly<{
@@ -43,6 +45,8 @@ export default function RootLayout({
     return (
         <html lang="en">
         <body>
+        <ConfigProvider locale={enGB}>
+
         <AntdRegistry>
             <Provider store={store}>s
                 <InitLayout>
@@ -52,6 +56,7 @@ export default function RootLayout({
                 </InitLayout>
             </Provider>
         </AntdRegistry>
+        </ConfigProvider>
         </body>
         </html>
     );
