@@ -1,58 +1,42 @@
 ﻿using AutoMapper;
 using FF.Articles.Backend.Common.Exceptions;
-using FF.Articles.Backend.Common.Requests;
 using FF.Articles.Backend.Common.Responses;
 using FF.Articles.Backend.Common.Utils;
+using FF.Articles.Backend.Contents.API.Models.Dtos;
 using FF.Articles.Backend.Contents.API.Models.Entities;
 using FF.Articles.Backend.Contents.API.Models.Requests.Articles;
 using FF.Articles.Backend.Contents.API.Models.Requests.Tags;
-using FF.Articles.Backend.Contents.API.Models.Responses;
 using FF.Articles.Backend.Contents.API.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FF.Articles.Backend.Contents.API.Controllers;
 
 [ApiController]
-[Route("api/contents/tag")]
+[Route("api/contents/tags")]
 public class TagController(ILogger<ArticleController> _logger, IMapper _mapper,
     ITagService _tagService)
     : ControllerBase
 {
-
-    /// <summary>
-    /// Get tag response by id
-    /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
-    [HttpGet("get/{id}")]
-    public async Task<ApiResponse<TagResponse>> GetById(int id)
+    [HttpGet("{id}")]
+    public async Task<ApiResponse<TagDto>> GetById(int id)
     {
         if (id <= 0)
-            return ResultUtil.Error<TagResponse>(ErrorCode.PARAMS_ERROR, "Invalid tag id");
+            return ResultUtil.Error<TagDto>(ErrorCode.PARAMS_ERROR, "Invalid tag id");
         var tag = await _tagService.GetByIdAsync(id);
         if (tag == null)
-            return ResultUtil.Error<TagResponse>(ErrorCode.NOT_FOUND_ERROR, "Tag not found");
-        var tagResponse = _mapper.Map<TagResponse>(tag);
+            return ResultUtil.Error<TagDto>(ErrorCode.NOT_FOUND_ERROR, "Tag not found");
+        var tagResponse = _mapper.Map<TagDto>(tag);
         return ResultUtil.Success(tagResponse);
     }
-    /// <summary>
-    /// Get all tags
-    /// </summary>
-    /// <returns></returns>
-    [HttpGet("get/all")]
-    public async Task<ApiResponse<List<TagResponse>>> GetAll()
+    [HttpGet]
+    public async Task<ApiResponse<List<TagDto>>> GetAll()
     {
         var tags = await _tagService.GetAllAsync();
-        var tagResponse = _mapper.Map<List<TagResponse>>(tags);
+        var tagResponse = _mapper.Map<List<TagDto>>(tags);
         return ResultUtil.Success(tagResponse);
     }
-    /// <summary>
-    /// Add tag
-    /// </summary>
-    /// <param name="tagAddRequest"></param>
-    /// <returns></returns>
-    [HttpPost("add")]
-    public async Task<ApiResponse<int>> AddTag([FromBody] TagAddRequest tagAddRequest)
+    [HttpPut]
+    public async Task<ApiResponse<int>> AddByRequest([FromBody] TagAddRequest tagAddRequest)
     {
         if (tagAddRequest == null)
             return ResultUtil.Error<int>(ErrorCode.PARAMS_ERROR);
@@ -60,40 +44,27 @@ public class TagController(ILogger<ArticleController> _logger, IMapper _mapper,
         int tagId = await _tagService.CreateAsync(tag);
         return ResultUtil.Success(tagId);
     }
-    /// <summary>
-    /// Edit tag
-    /// </summary>
-    /// <param name="tagEditRequest"></param>
-    /// <returns></returns>
-    [HttpPost("edit")]
-    public async Task<ApiResponse<int>> EditTag([FromBody] TagEditRequest tagEditRequest)
+    [HttpPost]
+    public async Task<ApiResponse<bool>> EditByRequest([FromBody] TagEditRequest tagEditRequest)
     {
         if (tagEditRequest == null)
-            return ResultUtil.Error<int>(ErrorCode.PARAMS_ERROR);
+            return ResultUtil.Error<bool>(ErrorCode.PARAMS_ERROR);
         var tag = await _tagService.GetByIdAsTrackingAsync(tagEditRequest.TagId);
         if (tag == null)
-            return ResultUtil.Error<int>(ErrorCode.PARAMS_ERROR, "Tag not found");
+            return ResultUtil.Error<bool>(ErrorCode.PARAMS_ERROR, "Tag not found");
         if (!string.IsNullOrWhiteSpace(tagEditRequest.TagName))
         {
             tag.TagName = tagEditRequest.TagName;
             await _tagService.UpdateAsync(tag);
         }
-        return ResultUtil.Success(tag.Id);
+        return ResultUtil.Success(true);
     }
-    /// <summary>
-    /// Delete tag
-    /// </summary>
-    /// <param name="deleteByIdRequest"></param>
-    /// <returns></returns>
-    [HttpPost("delete")]
-    public async Task<ApiResponse<bool>> DeleteTag([FromBody] DeleteByIdRequest deleteByIdRequest)
+    [HttpDelete("{id}")]
+    public async Task<ApiResponse<bool>> DeleteById(int id)
     {
-        if (deleteByIdRequest == null)
+        if (id <= 0)
             return ResultUtil.Error<bool>(ErrorCode.PARAMS_ERROR);
-        var tag = await _tagService.GetByIdAsTrackingAsync(deleteByIdRequest.Id);
-        if (tag == null)
-            return ResultUtil.Error<bool>(ErrorCode.PARAMS_ERROR, "Tag not found");
-        await _tagService.HardDeleteAsync(tag.Id);
+        await _tagService.HardDeleteAsync(id);
         return ResultUtil.Success(true);
     }
 }

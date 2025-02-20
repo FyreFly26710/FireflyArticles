@@ -1,6 +1,5 @@
 ﻿using FF.Articles.Backend.Common.Constants;
 using FF.Articles.Backend.Common.Exceptions;
-using FF.Articles.Backend.Common.Requests;
 using FF.Articles.Backend.Common.Responses;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -104,7 +103,7 @@ public abstract class BaseService<TEntity, TContext>(TContext _context, ILogger<
     public virtual async Task<List<TEntity>> GetAllAsync() => await _context.Set<TEntity>().ToListAsync();
     public virtual async Task<List<TEntity>> GetAllAsync(List<int> ids)
         => await _context.Set<TEntity>().Where(e => ids.Contains(e.Id)).ToListAsync();
-    public virtual async Task<PageResponse<TEntity>> GetAllAsync(PageRequest pageRequest)
+    public virtual async Task<Paged<TEntity>> GetAllAsync(PageRequest pageRequest)
     {
         var query = _context.Set<TEntity>().AsQueryable();
         // Apply sorting if a SortField is provided
@@ -127,7 +126,7 @@ public abstract class BaseService<TEntity, TContext>(TContext _context, ILogger<
             .Skip((pageRequest.PageNumber - 1) * pageRequest.PageSize)
             .Take(pageRequest.PageSize)
             .ToListAsync();
-        return new PageResponse<TEntity>(pageRequest.PageNumber, pageRequest.PageSize, totalCount, data);
+        return new Paged<TEntity>(pageRequest.PageNumber, pageRequest.PageSize, totalCount, data);
     }
 
     public virtual async Task<List<int>> CreateBatchAsync(List<TEntity> entities) => throw new NotImplementedException();

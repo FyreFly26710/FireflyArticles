@@ -18,7 +18,7 @@ export default async function BankPage({params}:{params:{topicId:number}}) {
         const topicRes = await getTopicGetId({
             id: (topicId),
         });
-        topic = topicRes.data;
+        topic = topicRes.data.data;
         console.log(topic);
     } catch (e: any) {
         console.error("Failed fetching topics, " + e.message);
@@ -64,11 +64,11 @@ export default async function BankPage({params}:{params:{topicId:number}}) {
                 ></Meta>
             </Card>
             <div style={{marginBottom: 16}}/>
-            <ArticleList
-                articleList={topic.articles.data || []}
+            {/* <ArticleList
+                articleList={topic.articles || []}
                 cardTitle={`Question List (${topic.articles?.length || 0})`}
                 topicId={(topicId)}
-            />
+            /> */}
         </div>
     );
 }

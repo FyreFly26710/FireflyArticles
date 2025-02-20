@@ -1,6 +1,6 @@
 ﻿using FF.Articles.Backend.Common.Bases;
 using FF.Articles.Backend.Common.Constants;
-using FF.Articles.Backend.Common.Requests;
+using FF.Articles.Backend.Common.Responses;
 using Microsoft.EntityFrameworkCore;
 
 namespace FF.Articles.Backend.Common.Utils;

@@ -19,4 +19,4 @@ FrontendReact/ff-articles-frontend/.env
 FrontendReact/ff-articles-frontend/src/config.js
 
 # Ignore openapi config
-FrontendReact/ff-articles-frontend/openapi.config.ts
+# FrontendReact/ff-articles-frontend/openapi.config.ts

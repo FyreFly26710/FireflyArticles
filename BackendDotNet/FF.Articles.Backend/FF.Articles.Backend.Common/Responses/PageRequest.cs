@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FF.Articles.Backend.Common.Requests;
+namespace FF.Articles.Backend.Common.Responses;
 public class PageRequest
 {
     public int PageNumber { get; set; } = 1;

@@ -1,5 +1,4 @@
-﻿using FF.Articles.Backend.Common.Requests;
-using FF.Articles.Backend.Common.Responses;
+﻿using FF.Articles.Backend.Common.Responses;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -15,7 +14,7 @@ public interface IBaseService<TEntity, TContext> where TEntity : BaseEntity wher
     Task<int> SaveAsync();
     Task<List<TEntity>> GetAllAsync(List<int> ids);
     Task<List<TEntity>> GetAllAsync();
-    Task<PageResponse<TEntity>> GetAllAsync(PageRequest pageRequest);
+    Task<Paged<TEntity>> GetAllAsync(PageRequest pageRequest);
     IQueryable<TEntity> GetQueryable();
     Task<int> CreateAsync(TEntity entity);
     Task<List<int>> CreateBatchAsync(List<TEntity> entities);

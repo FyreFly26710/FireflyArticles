@@ -1,4 +1,4 @@
-using FF.Articles.Backend.Common.Dtos;
+using FF.Articles.Backend.Common.ApiDtos;
 using FF.Articles.Backend.Identity.API.Models.Entities;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -17,7 +17,7 @@ public class IdentityUtils
     {
         // Remove password from user object
         user.UserPassword = string.Empty;
-        var userDto = new UserDto()
+        var userDto = new UserApiDto()
         {
             UserId = user.Id,
             CreateTime = user.CreateTime,

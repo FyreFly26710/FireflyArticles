@@ -1,4 +1,4 @@
-﻿using FF.Articles.Backend.Common.Dtos;
+﻿using FF.Articles.Backend.Common.ApiDtos;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
@@ -15,6 +15,6 @@ namespace FF.Articles.Backend.Common.Utils;
 
 public class UserUtil
 {
-    public static UserDto GetUserFromHttpRequest(HttpRequest request)
-        => JsonSerializer.Deserialize<UserDto>(request.HttpContext.User.FindFirst("user").Value);
+    public static UserApiDto GetUserFromHttpRequest(HttpRequest request)
+        => JsonSerializer.Deserialize<UserApiDto>(request.HttpContext.User.FindFirst("user").Value);
 }

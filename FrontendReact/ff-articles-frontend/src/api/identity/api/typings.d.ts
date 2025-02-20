@@ -1,25 +1,32 @@
 declare namespace API {
+  type apiUserDeleteByIdParams = {
+    id: number;
+  };
+
+  type apiUserGetByIdParams = {
+    id: number;
+  };
+
+  type apiUserGetByPageParams = {
+    PageNumber?: number;
+    PageSize?: number;
+    SortField?: string;
+    SortOrder?: string;
+  };
+
   type BooleanApiResponse = {
     code?: number;
-    data?: boolean;
     message?: string;
-  };
-
-  type DeleteByIdRequest = {
-    id?: number;
-  };
-
-  type getAdminGetDtoIdParams = {
-    id: number;
+    data?: boolean;
   };
 
   type Int32ApiResponse = {
     code?: number;
-    data?: number;
     message?: string;
+    data?: number;
   };
 
-  type LoginUserResponse = {
+  type LoginUserDto = {
     id?: number;
     userAccount?: string;
     userName?: string;
@@ -30,20 +37,13 @@ declare namespace API {
     createTime?: string;
   };
 
-  type LoginUserResponseApiResponse = {
+  type LoginUserDtoApiResponse = {
     code?: number;
-    data?: LoginUserResponse;
     message?: string;
+    data?: LoginUserDto;
   };
 
-  type PageRequest = {
-    pageNumber?: number;
-    pageSize?: number;
-    sortField?: string;
-    sortOrder?: string;
-  };
-
-  type UserDto = {
+  type UserApiDto = {
     userId?: number;
     createTime?: string;
     userAccount?: string;
@@ -54,24 +54,13 @@ declare namespace API {
     userRole?: string;
   };
 
-  type UserDtoApiResponse = {
+  type UserApiDtoApiResponse = {
     code?: number;
-    data?: UserDto;
     message?: string;
+    data?: UserApiDto;
   };
 
-  type UserLoginRequest = {
-    userAccount?: string;
-    userPassword?: string;
-  };
-
-  type UserRegisterRequest = {
-    userAccount?: string;
-    userPassword?: string;
-    confirmPassword?: string;
-  };
-
-  type UserResponse = {
+  type UserDto = {
     id?: number;
     userAccount?: string;
     userName?: string;
@@ -83,17 +72,28 @@ declare namespace API {
     updateTime?: string;
   };
 
-  type UserResponsePageResponse = {
+  type UserDtoPaged = {
     pageIndex?: number;
     pageSize?: number;
-    recordCount?: number;
-    data?: UserResponse[];
+    counts?: number;
+    data?: UserDto[];
   };
 
-  type UserResponsePageResponseApiResponse = {
+  type UserDtoPagedApiResponse = {
     code?: number;
-    data?: UserResponsePageResponse;
     message?: string;
+    data?: UserDtoPaged;
+  };
+
+  type UserLoginRequest = {
+    userAccount?: string;
+    userPassword?: string;
+  };
+
+  type UserRegisterRequest = {
+    userAccount?: string;
+    userPassword?: string;
+    confirmPassword?: string;
   };
 
   type UserUpdateRequest = {

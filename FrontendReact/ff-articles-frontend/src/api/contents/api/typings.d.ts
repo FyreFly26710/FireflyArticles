@@ -1,4 +1,45 @@
 declare namespace API {
+  type apiArticleDeleteByIdParams = {
+    id: number;
+  };
+
+  type apiArticleGetByIdParams = {
+    id: number;
+  };
+
+  type apiArticleGetByPageParams = {
+    IncludeUser?: boolean;
+    PageNumber?: number;
+    PageSize?: number;
+    SortField?: string;
+    SortOrder?: string;
+  };
+
+  type apiTagDeleteByIdParams = {
+    id: number;
+  };
+
+  type apiTagGetByIdParams = {
+    id: number;
+  };
+
+  type apiTopicDeleteByIdParams = {
+    id: number;
+  };
+
+  type apiTopicGetByIdParams = {
+    id: number;
+  };
+
+  type apiTopicGetByPageParams = {
+    IncludeUser?: boolean;
+    IncludeArticles?: boolean;
+    PageNumber?: number;
+    PageSize?: number;
+    SortField?: string;
+    SortOrder?: string;
+  };
+
   type ArticleAddRequest = {
     title?: string;
     content?: string;
@@ -7,6 +48,41 @@ declare namespace API {
     tagIds?: number[];
     sortNumber?: number;
     isHidden?: number;
+  };
+
+  type ArticleDto = {
+    articleId?: number;
+    createTime?: string;
+    updateTime?: string;
+    title?: string;
+    content?: string;
+    abstraction?: string;
+    userId?: number;
+    user?: UserApiDto;
+    topicId?: number;
+    topicTitle?: string;
+    tags?: string[];
+    sortNumber?: number;
+    isHidden?: number;
+  };
+
+  type ArticleDtoApiResponse = {
+    code?: number;
+    message?: string;
+    data?: ArticleDto;
+  };
+
+  type ArticleDtoPaged = {
+    pageIndex?: number;
+    pageSize?: number;
+    counts?: number;
+    data?: ArticleDto[];
+  };
+
+  type ArticleDtoPagedApiResponse = {
+    code?: number;
+    message?: string;
+    data?: ArticleDtoPaged;
   };
 
   type ArticleEditRequest = {
@@ -20,100 +96,42 @@ declare namespace API {
     isHidden?: number;
   };
 
-  type ArticleResponse = {
-    articleId?: number;
-    createTime?: string;
-    updateTime?: string;
-    title?: string;
-    content?: string;
-    abstraction?: string;
-    userId?: number;
-    user?: UserDto;
-    topicId?: number;
-    topicTitle?: string;
-    tags?: string[];
-    sortNumber?: number;
-    isHidden?: number;
-  };
-
-  type ArticleResponseApiResponse = {
-    code?: number;
-    data?: ArticleResponse;
-    message?: string;
-  };
-
-  type ArticleResponsePageResponse = {
-    pageIndex?: number;
-    pageSize?: number;
-    recordCount?: number;
-    data?: ArticleResponse[];
-  };
-
-  type ArticleResponsePageResponseApiResponse = {
-    code?: number;
-    data?: ArticleResponsePageResponse;
-    message?: string;
-  };
-
   type BooleanApiResponse = {
     code?: number;
-    data?: boolean;
     message?: string;
-  };
-
-  type DeleteByIdRequest = {
-    id?: number;
-  };
-
-  type getArticleGetIdParams = {
-    id: number;
-  };
-
-  type getTagGetIdParams = {
-    id: number;
-  };
-
-  type getTopicGetIdParams = {
-    id: number;
+    data?: boolean;
   };
 
   type Int32ApiResponse = {
     code?: number;
-    data?: number;
     message?: string;
-  };
-
-  type PageRequest = {
-    pageNumber?: number;
-    pageSize?: number;
-    sortField?: string;
-    sortOrder?: string;
+    data?: number;
   };
 
   type TagAddRequest = {
     tagName?: string;
   };
 
+  type TagDto = {
+    tagId?: number;
+    tagName?: string;
+  };
+
+  type TagDtoApiResponse = {
+    code?: number;
+    message?: string;
+    data?: TagDto;
+  };
+
+  type TagDtoListApiResponse = {
+    code?: number;
+    message?: string;
+    data?: TagDto[];
+  };
+
   type TagEditRequest = {
     tagId?: number;
     tagName?: string;
-  };
-
-  type TagResponse = {
-    tagId?: number;
-    tagName?: string;
-  };
-
-  type TagResponseApiResponse = {
-    code?: number;
-    data?: TagResponse;
-    message?: string;
-  };
-
-  type TagResponseListApiResponse = {
-    code?: number;
-    data?: TagResponse[];
-    message?: string;
   };
 
   type TopicAddRequest = {
@@ -123,6 +141,40 @@ declare namespace API {
     topicImage?: string;
     sortNumber?: number;
     isHidden?: number;
+  };
+
+  type TopicDto = {
+    topicId?: number;
+    createTime?: string;
+    updateTime?: string;
+    title?: string;
+    content?: string;
+    abstraction?: string;
+    topicImage?: string;
+    userId?: number;
+    user?: UserApiDto;
+    sortNumber?: number;
+    isHidden?: number;
+    articles?: ArticleDto[];
+  };
+
+  type TopicDtoApiResponse = {
+    code?: number;
+    message?: string;
+    data?: TopicDto;
+  };
+
+  type TopicDtoPaged = {
+    pageIndex?: number;
+    pageSize?: number;
+    counts?: number;
+    data?: TopicDto[];
+  };
+
+  type TopicDtoPagedApiResponse = {
+    code?: number;
+    message?: string;
+    data?: TopicDtoPaged;
   };
 
   type TopicEditRequest = {
@@ -135,41 +187,7 @@ declare namespace API {
     isHidden?: number;
   };
 
-  type TopicResponse = {
-    topicId?: number;
-    createTime?: string;
-    updateTime?: string;
-    title?: string;
-    content?: string;
-    abstraction?: string;
-    topicImage?: string;
-    userId?: number;
-    user?: UserDto;
-    sortNumber?: number;
-    isHidden?: number;
-    articles?: ArticleResponsePageResponse;
-  };
-
-  type TopicResponseApiResponse = {
-    code?: number;
-    data?: TopicResponse;
-    message?: string;
-  };
-
-  type TopicResponsePageResponse = {
-    pageIndex?: number;
-    pageSize?: number;
-    recordCount?: number;
-    data?: TopicResponse[];
-  };
-
-  type TopicResponsePageResponseApiResponse = {
-    code?: number;
-    data?: TopicResponsePageResponse;
-    message?: string;
-  };
-
-  type UserDto = {
+  type UserApiDto = {
     userId?: number;
     createTime?: string;
     userAccount?: string;

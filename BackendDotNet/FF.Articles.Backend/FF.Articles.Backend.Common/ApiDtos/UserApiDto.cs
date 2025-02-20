@@ -1,11 +1,11 @@
 ﻿using FF.Articles.Backend.Common.Bases;
 
-namespace FF.Articles.Backend.Common.Dtos;
+namespace FF.Articles.Backend.Common.ApiDtos;
 
 /// <summary>
 /// Transfer user data between API microservices
 /// </summary>
-public class UserDto
+public class UserApiDto
 {
     public int UserId { get; set; }
     public DateTime? CreateTime { get; set; }

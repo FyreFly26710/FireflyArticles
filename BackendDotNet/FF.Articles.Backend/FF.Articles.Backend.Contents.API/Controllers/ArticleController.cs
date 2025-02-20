@@ -1,11 +1,10 @@
 ﻿using AutoMapper;
 using FF.Articles.Backend.Common.Exceptions;
-using FF.Articles.Backend.Common.Requests;
 using FF.Articles.Backend.Common.Responses;
 using FF.Articles.Backend.Common.Utils;
+using FF.Articles.Backend.Contents.API.Models.Dtos;
 using FF.Articles.Backend.Contents.API.Models.Entities;
 using FF.Articles.Backend.Contents.API.Models.Requests.Articles;
-using FF.Articles.Backend.Contents.API.Models.Responses;
 using FF.Articles.Backend.Contents.API.RemoteServices.Interfaces;
 using FF.Articles.Backend.Contents.API.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -14,7 +13,7 @@ using System.Linq;
 
 namespace FF.Articles.Backend.Contents.API.Controllers;
 [ApiController]
-[Route("api/contents/article")]
+[Route("api/contents/articles")]
 public class ArticleController(ILogger<ArticleController> _logger, IMapper _mapper,
     IArticleService _articleService,
     ITopicService _topicService,
@@ -22,64 +21,48 @@ public class ArticleController(ILogger<ArticleController> _logger, IMapper _mapp
     IIdentityRemoteService _identityRemoteService)
     : ControllerBase
 {
-    /// <summary>
-    /// Get article response by id
-    /// </summary>
-    [HttpGet("get/{id}")]
-    public async Task<ApiResponse<ArticleResponse>> GetById(int id)
+    [HttpGet("{id}")]
+    public async Task<ApiResponse<ArticleDto>> GetById(int id)
     {
         if (id <= 0)
-            return ResultUtil.Error<ArticleResponse>(ErrorCode.PARAMS_ERROR, "Invalid article id");
+            return ResultUtil.Error<ArticleDto>(ErrorCode.PARAMS_ERROR, "Invalid article id");
         var article = await _articleService.GetByIdAsync(id);
         if (article == null)
-            return ResultUtil.Error<ArticleResponse>(ErrorCode.NOT_FOUND_ERROR, "Article not found");
-        var articleResponse = _mapper.Map<ArticleResponse>(article);
+            return ResultUtil.Error<ArticleDto>(ErrorCode.NOT_FOUND_ERROR, "Article not found");
+        var articleResponse = _mapper.Map<ArticleDto>(article);
         articleResponse.User = await _identityRemoteService.GetUserByIdAsync(article.UserId);
         Topic? topic = await _topicService.GetByIdAsync(article.TopicId);
         articleResponse.TopicTitle = topic?.Title??"Topic Not Found";
         return ResultUtil.Success(articleResponse);
     }
 
-    /// <summary>
-    /// Get article response by page
-    /// </summary>
-    [HttpPost("get-page")]
-    public async Task<ApiResponse<PageResponse<ArticleResponse>>> GetByPage(PageRequest pageRequest)
+    [HttpGet]
+    public async Task<ApiResponse<Paged<ArticleDto>>> GetByPage([FromQuery]ArticlePageRequest pageRequest)
     {
         if (pageRequest == null || pageRequest.PageSize > 200)
-            return ResultUtil.Error<PageResponse<ArticleResponse>>(ErrorCode.PARAMS_ERROR, "Invalid page request");
+            return ResultUtil.Error<Paged<ArticleDto>>(ErrorCode.PARAMS_ERROR, "Invalid page request");
         if(pageRequest.SortField == null)
         {
             pageRequest.SortField = "SortNumber";
         }
         var articles = await _articleService.GetAllAsync(pageRequest);
-        var articleList = _mapper.Map<List<ArticleResponse>>(articles.Data);
-        // to do: improve get user logic
+        var articleList = _mapper.Map<List<ArticleDto>>(articles.Data);
         foreach (var article in articleList)
         {
-            article.User = await _identityRemoteService.GetUserByIdAsync(article.UserId);
+            if (pageRequest.IncludeUser)
+            {
+                article.User = await _identityRemoteService.GetUserByIdAsync(article.UserId);
+            }
             Topic? topic = await _topicService.GetByIdAsync(article.TopicId);
             article.TopicTitle = topic?.Title ?? "Invalid topic";
+            article.Tags = _articleTagService.GetArticleTags(article.ArticleId);
         }
-        var res = new PageResponse<ArticleResponse>()
-        {
-            Data = articleList,
-            PageIndex = articles.PageIndex,
-            PageSize = articles.PageSize,
-            RecordCount = articles.RecordCount
-        };
+        var res = new Paged<ArticleDto>(articles.GetPageInfo(), articleList);
         return ResultUtil.Success(res);
     }
 
-
-
-
-    #region DB Modification
-    /// <summary>
-    /// Add article
-    /// </summary>
-    [HttpPost("add")]
-    public async Task<ApiResponse<int>> AddArticle([FromBody] ArticleAddRequest articleAddRequest)
+    [HttpPut]
+    public async Task<ApiResponse<int>> AddByRequest([FromBody] ArticleAddRequest articleAddRequest)
     {
         if (articleAddRequest == null)
             return ResultUtil.Error<int>(ErrorCode.PARAMS_ERROR);
@@ -92,47 +75,39 @@ public class ArticleController(ILogger<ArticleController> _logger, IMapper _mapp
 
         return ResultUtil.Success(article.Id);
     }
-    /// <summary>
-    /// Edit article
-    /// </summary>
-    /// <param name="articleEditRequest"></param>
-    /// <returns></returns>
-    [HttpPost("edit")]
-    public async Task<ApiResponse<int>> EditArticle([FromBody] ArticleEditRequest articleEditRequest)
+
+    [HttpPost]
+    public async Task<ApiResponse<bool>> EditByRequest([FromBody] ArticleEditRequest articleEditRequest)
     {
         if (articleEditRequest == null)
-            return ResultUtil.Error<int>(ErrorCode.PARAMS_ERROR);
+            return ResultUtil.Error<bool>(ErrorCode.PARAMS_ERROR);
 
         var article = await _articleService.GetByIdAsTrackingAsync(articleEditRequest.ArticleId);
         if (article == null)
-            return ResultUtil.Error<int>(ErrorCode.PARAMS_ERROR, "Article not found");
+            return ResultUtil.Error<bool>(ErrorCode.PARAMS_ERROR, "Article not found");
 
-        if (articleEditRequest.IsHidden != 0) article.IsHidden = articleEditRequest.IsHidden;
-        if (!string.IsNullOrWhiteSpace(articleEditRequest.Title)) article.Title = articleEditRequest.Title;
-        if (!string.IsNullOrWhiteSpace(articleEditRequest.Content)) article.Content = articleEditRequest.Content;
-        if (!string.IsNullOrWhiteSpace(articleEditRequest.Abstraction)) article.Abstraction = articleEditRequest.Abstraction;
+        // update not null fields
+        if (articleEditRequest.IsHidden != null) article.IsHidden = (int)articleEditRequest.IsHidden;
+        if (articleEditRequest.Title!=null) article.Title = articleEditRequest.Title;
+        if (articleEditRequest.Content != null) article.Content = articleEditRequest.Content;
+        if (articleEditRequest.Abstraction != null) article.Abstraction = articleEditRequest.Abstraction;
         //todo: check if topic exists
-        if (articleEditRequest.TopicId > 0) article.TopicId = articleEditRequest.TopicId;
-        if (articleEditRequest.SortNumber > 0) article.SortNumber = articleEditRequest.SortNumber;
-        await _articleTagService.EditArticleTags(article.Id, articleEditRequest.TagIds);
+        if (articleEditRequest.TopicId!=null) article.TopicId = (int)articleEditRequest.TopicId;
+        if (articleEditRequest.SortNumber != null) article.SortNumber = (int)articleEditRequest.SortNumber;
+        if (articleEditRequest.TagIds != null) await _articleTagService.EditArticleTags(article.Id, articleEditRequest.TagIds);
         await _articleService.UpdateAsync(article);
 
-        return ResultUtil.Success(article.Id);
-    }
-    /// <summary>
-    /// Delete article
-    /// </summary>
-    /// <param name="deleteByIdRequest"></param>
-    /// <returns></returns>
-    [HttpPost("delete")]
-    public async Task<ApiResponse<bool>> DeleteArticle([FromBody] DeleteByIdRequest deleteByIdRequest)
-    {
-        if (deleteByIdRequest.Id <= 0)
-            return ResultUtil.Error<bool>(ErrorCode.PARAMS_ERROR, "Invalid article id");
-        await _articleService.DeleteAsync(deleteByIdRequest.Id);
-        await _articleTagService.RemoveArticleTags(deleteByIdRequest.Id);
         return ResultUtil.Success(true);
     }
 
-    #endregion
+    [HttpDelete("{id}")]
+    public async Task<ApiResponse<bool>> DeleteById(int id)
+    {
+        if (id <= 0)
+            return ResultUtil.Error<bool>(ErrorCode.PARAMS_ERROR, "Invalid article id");
+        await _articleService.DeleteAsync(id);
+        await _articleTagService.RemoveArticleTags(id);
+        return ResultUtil.Success(true);
+    }
+
 }

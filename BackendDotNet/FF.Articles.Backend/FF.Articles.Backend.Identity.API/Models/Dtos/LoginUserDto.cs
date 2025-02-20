@@ -3,10 +3,11 @@ using System;
 namespace FF.Articles.Backend.Identity.API.Models.Responses;
 
 /// <summary>
-/// This reponse is for admins to get user information
+/// This reponse is for default login users
 /// </summary>
-public class UserResponse
+public class LoginUserDto
 {
+
     public int Id { get; set; }
     public string UserAccount { get; set; }
     public string? UserName { get; set; }
@@ -15,6 +16,5 @@ public class UserResponse
     public string? UserProfile { get; set; }
     public string UserRole { get; set; }
     public DateTime CreateTime { get; set; }
-    public DateTime UpdateTime { get; set; }
-
+    //public DateTime UpdateTime { get; set; }
 }

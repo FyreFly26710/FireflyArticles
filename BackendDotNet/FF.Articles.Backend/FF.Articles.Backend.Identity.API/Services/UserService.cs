@@ -44,7 +44,7 @@ public class UserService(IdentityDbContext _context, ILogger<UserService> _logge
 
     }
 
-    public async Task<LoginUserResponse> UserLogin(string userAccount, string userPassword, HttpRequest request)
+    public async Task<LoginUserDto> UserLogin(string userAccount, string userPassword, HttpRequest request)
     {
         validateAccount(userAccount, userPassword);
 
@@ -60,7 +60,7 @@ public class UserService(IdentityDbContext _context, ILogger<UserService> _logge
         }
 
         await IdentityUtils.SignIn(user, request.HttpContext);
-        return _mapper.Map<LoginUserResponse>(user);
+        return _mapper.Map<LoginUserDto>(user);
     }
 
     public User GetLoginUser(HttpRequest request)

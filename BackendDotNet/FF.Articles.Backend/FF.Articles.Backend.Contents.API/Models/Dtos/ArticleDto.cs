@@ -1,7 +1,7 @@
-﻿using FF.Articles.Backend.Common.Dtos;
+﻿using FF.Articles.Backend.Common.ApiDtos;
 
-namespace FF.Articles.Backend.Contents.API.Models.Responses;
-public class ArticleResponse
+namespace FF.Articles.Backend.Contents.API.Models.Dtos;
+public class ArticleDto
 {
     public int ArticleId { get; set; }
     public DateTime? CreateTime { get; set; }
@@ -11,10 +11,10 @@ public class ArticleResponse
     public string Content { get; set; }
     public string Abstraction { get; set; }
     public int UserId { get; set; }
-    public UserDto? User { get; set; }
+    public UserApiDto? User { get; set; }
     public int TopicId { get; set; }
     public string TopicTitle { get; set; } = string.Empty;
-    public List<string> Tags { get; set; } = new ();
+    public List<string> Tags { get; set; } = new();
     public int SortNumber { get; set; }
     public int IsHidden { get; set; }
 }

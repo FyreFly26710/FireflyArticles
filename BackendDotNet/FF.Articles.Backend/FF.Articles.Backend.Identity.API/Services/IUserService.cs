@@ -10,7 +10,7 @@ public interface IUserService : IBaseService<User, IdentityDbContext>
 {
     Task<int> UserRegister(string userAccount, string userPassword, string checkPassword);
 
-    Task<LoginUserResponse> UserLogin(string userAccount, string userPassword, HttpRequest request);
+    Task<LoginUserDto> UserLogin(string userAccount, string userPassword, HttpRequest request);
 
     User GetLoginUser(HttpRequest request);
 

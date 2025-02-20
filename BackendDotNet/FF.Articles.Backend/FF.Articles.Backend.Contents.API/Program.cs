@@ -5,6 +5,7 @@ using FF.Articles.Backend.Contents.API.RemoteServices.Interfaces;
 using FF.Articles.Backend.Contents.API.Services;
 using FF.Articles.Backend.Contents.API.Services.Interfaces;
 using FF.Articles.Backend.ServiceDefaults;
+using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -32,8 +33,19 @@ builder.Services.AddScoped<IIdentityRemoteService, IdentityRemoteService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
+//builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.CustomOperationIds(apiDesc =>
+    {
+        if (apiDesc.ActionDescriptor is ControllerActionDescriptor descriptor)
+        {
+            var resource = descriptor.ControllerName.Replace("Controller", "");
+            return $"api{resource}{descriptor.ActionName}"; 
+        }
+        return null;
+    });
+});
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
