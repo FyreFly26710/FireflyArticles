@@ -9,7 +9,7 @@ import "./index.css";
 import { apiTopicGetById } from "@/api/contents/api/topic";
 import ArticleList from "@/components/ArticleList";
 
-export default async function BankPage({ params }: { params: { topicId: number } }) {
+export default async function TopicPage({ params }: { params: { topicId: number } }) {
 
     const { topicId } = params;
 
@@ -35,7 +35,7 @@ export default async function BankPage({ params }: { params: { topicId: number }
     }
 
     return (
-        <div id="bankPage" className="max-width-content">
+        <div id="topicPage" className="max-width-content">
             <Card>
                 <Meta
                     avatar={<Avatar src={topic?.topicImage} size={72} />}
@@ -66,7 +66,7 @@ export default async function BankPage({ params }: { params: { topicId: number }
             <div style={{ marginBottom: 16 }} />
             <ArticleList
                 articleList={topic.articles || []}
-                cardTitle={`Question List (${topic.articles?.length || 0})`}
+                cardTitle={`Article List (${topic.articles?.length || 0})`}
             />
         </div>
     );

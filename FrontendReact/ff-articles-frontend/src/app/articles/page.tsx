@@ -9,25 +9,25 @@ import ArticleTable from "@/components/ArticleTable";
 export default async function ArticlesPage({ searchParams }) {
     // get searchText from URL
     const { q: searchText } = searchParams;
-    let questionList:any = [];
+    let articleLilst:any = [];
     let total = 0;
 
     try {
-        const questionRes = await apiArticleGetByPage({
+        const articleRes = await apiArticleGetByPage({
             PageSize: 12
         });
-        questionList = questionRes.data.data ?? [];
+        articleLilst = articleRes.data.data ?? [];
         //@ts-ignore
-        total = questionRes.data.counts ?? 0;
+        total = articleRes.data.counts ?? 0;
     } catch (e:any) {
-        console.error("Failed fetching questions, " + e.message);
+        console.error("Failed fetching articles, " + e.message);
     }
 
     return (
         <div id="articlesPage" className="max-width-content">
             <Title level={3}>Articles list</Title>
             <ArticleTable
-                defaultArticleList={questionList}
+                defaultArticleList={articleLilst}
                 defaultTotal={total}
             />
         </div>
