@@ -8,10 +8,9 @@ import { PageContainer, ProTable } from "@ant-design/pro-components";
 import { Button, message, Space, Typography } from "antd";
 import React, { useRef, useState } from "react";
 import './index.css';
-import { postTopicGetPage, postTopicOpenApiDelete } from "@/api/contents/api/topic";
-import { postArticleGetPage, postArticleOpenApiDelete } from "@/api/contents/api/article";
 import TagList from "@/components/TagList";
 import MdEditor from "@/components/MdEditor";
+import { apiArticleDeleteById, apiArticleGetByPage } from "@/api/contents/api/article";
 
 
 const ArticleAdminPage: React.FC = () => {
@@ -20,18 +19,18 @@ const ArticleAdminPage: React.FC = () => {
     // Whether to show the update modal
     const [updateModalVisible, setUpdateModalVisible] = useState<boolean>(false);
     const actionRef = useRef<ActionType>();
-    const [currentRow, setCurrentRow] = useState<API.ArticleResponse>();
+    const [currentRow, setCurrentRow] = useState<API.ArticleDto>();
 
     /**
      * Delete a node
      *
      * @param row
      */
-    const handleDelete = async (row: API.ArticleResponse) => {
+    const handleDelete = async (row: API.ArticleDto) => {
         const hide = message.loading("Deleting");
         if (!row) return true;
         try {
-            await postArticleOpenApiDelete({
+            await apiArticleDeleteById({
                 id: row.articleId as any,
             });
             hide();
@@ -48,7 +47,7 @@ const ArticleAdminPage: React.FC = () => {
     /**
      * Table column configuration
      */
-    const columns: ProColumns<API.ArticleResponse>[] = [
+    const columns: ProColumns<API.ArticleDto>[] = [
         {
             title: "ID",
             dataIndex: "articleId",
@@ -161,7 +160,7 @@ const ArticleAdminPage: React.FC = () => {
 
     return (
         <PageContainer>
-            <ProTable<API.ArticleResponse>
+            <ProTable<API.ArticleDto>
                 headerTitle={"Query Table"}
                 actionRef={actionRef}
                 rowKey="key"
@@ -183,18 +182,20 @@ const ArticleAdminPage: React.FC = () => {
                 request={async (params, sort, filter) => {
                     const sortField = Object.keys(sort)?.[0];
                     const sortOrder = sort?.[sortField] ?? undefined;
-                    //@ts-ignore
-                    const { data, code } = await postArticleGetPage({
-                        ...params,
+                    const response = await apiArticleGetByPage({
+                        PageNumber:params.current,
+                        PageSize:params.pageSize,
                         sortField,
                         sortOrder,
                         ...filter,
-                    } as API.PageRequest);
-
+                    } as API.apiArticleGetByPageParams);
+                    //@ts-ignore
+                    const { data, code } = response;
                     return {
                         success: code === 0,
                         data: data?.data || [],
-                        total: Number(data?.total) || 0,
+                        //@ts-ignore
+                        total: Number(data?.counts) || 0,
                     };
                 }}
                 columns={columns}

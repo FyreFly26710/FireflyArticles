@@ -1,12 +1,12 @@
-import { postArticleAdd } from '@/api/contents/api/article';
-import { postTopicAdd } from '@/api/contents/api/topic';
+
+import { apiArticleAddByRequest } from '@/api/contents/api/article';
 import { ProColumns, ProTable } from '@ant-design/pro-components';
 import { message, Modal } from 'antd';
 import React from 'react';
 
 interface Props {
     visible: boolean;
-    columns: ProColumns<API.ArticleResponse>[];
+    columns: ProColumns<API.ArticleDto>[];
     onSubmit: (values: API.ArticleAddRequest) => void;
     onCancel: () => void;
 }
@@ -14,7 +14,7 @@ interface Props {
 const handleAdd = async (fields: API.ArticleAddRequest) => {
     const hide = message.loading('Adding');
     try {
-        await postArticleAdd(fields);
+        await apiArticleAddByRequest(fields);
         hide();
         message.success('Success');
         return true;

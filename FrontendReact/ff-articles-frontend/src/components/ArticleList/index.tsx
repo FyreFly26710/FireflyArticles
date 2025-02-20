@@ -5,7 +5,7 @@ import Link from "next/link";
 
 interface Props {
     topicId?: number;
-    articleList: API.ArticleResponse[];
+    articleList: API.ArticleDto[];
     cardTitle?: string;
 }
 
@@ -19,14 +19,14 @@ const ArticleList = (props: Props) => {
     };
 
     return (
-        <Card className="question-list" title={cardTitle}>
+        <Card className="article-list" title={cardTitle}>
             <List
                 dataSource={articleList}
-                renderItem={(item: API.ArticleResponse) => (
+                renderItem={(item: API.ArticleDto) => (
                     <List.Item extra={tagList(item.tags)}>
                         <List.Item.Meta
                             title={<Link
-                                href={topicId ? `/bank/${topicId}/question/${item.articleId}` : `/question/${item.articleId}`}>
+                                href={topicId ? `/topic/${topicId}/article/${item.articleId}` : `/article/${item.articleId}`}>
                                 {item.title}
                             </Link>}
                         />

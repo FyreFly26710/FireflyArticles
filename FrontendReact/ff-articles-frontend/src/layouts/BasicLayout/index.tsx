@@ -9,11 +9,11 @@ import Link from "next/link";
 import menus from "../../../config/menus";
 import { AppDispatch, RootState } from "@/stores";
 import { useDispatch, useSelector } from "react-redux";
-import { postUserLogout } from "@/api/identity/api/user";
 import { setLoginUser } from "@/stores/loginUser";
 import { DEFAULT_USER } from "@/constants/user";
 import { UserOutlined } from "@ant-design/icons";
 import getAccessibleMenus from "@/access/menuAccess";
+import { apiAuthLogout } from '@/api/identity/api/auth';
 
 
 interface Props {
@@ -32,7 +32,7 @@ export default function BasicLayout({ children }: Props) {
      */
     const userLogout = async () => {
         try {
-            await postUserLogout();
+            await apiAuthLogout();
             message.success("Logout successfully");
             dispatch(setLoginUser(DEFAULT_USER));
             router.push("/user/login");
@@ -68,7 +68,7 @@ export default function BasicLayout({ children }: Props) {
                     size: "small",
                     title: loginUser.userName || "Bird",
                     render: (props, dom) => {
-                        return (
+                        return loginUser.id ? (
                             <Dropdown
                                 menu={{
                                     items: [
@@ -95,6 +95,9 @@ export default function BasicLayout({ children }: Props) {
                             >
                                 {dom}
                             </Dropdown>
+
+                        ) : (
+                            <div onClick={() => router.push("/user/login")}>{dom}</div>
                         );
                     },
                 }}

@@ -1,12 +1,12 @@
-import { postAdminUpdate } from '@/api/identity/api/admin';
+import { apiUserUpdateByRequest } from '@/api/identity/api/user';
 import { ProColumns, ProTable } from '@ant-design/pro-components';
 import { message, Modal } from 'antd';
 import React from 'react';
 
 interface Props {
-    oldData?: API.UserResponse; 
+    oldData?: API.UserDto; 
     visible: boolean; 
-    columns: ProColumns<API.UserResponse>[]; 
+    columns: ProColumns<API.UserDto>[]; 
     onSubmit: (values: API.UserUpdateRequest) => void; 
     onCancel: () => void; 
 }
@@ -19,7 +19,7 @@ interface Props {
 const handleUpdate = async (fields: API.UserUpdateRequest) => {
     const hide = message.loading('Updating...');
     try {
-        await postAdminUpdate(fields);
+        await apiUserUpdateByRequest(fields);
         hide();
         message.success('Update successful');
         return true;

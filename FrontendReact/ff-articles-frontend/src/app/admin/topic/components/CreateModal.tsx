@@ -1,11 +1,11 @@
-import { postTopicAdd } from '@/api/contents/api/topic';
+import { apiTopicAddByRequest } from '@/api/contents/api/topic';
 import { ProColumns, ProTable } from '@ant-design/pro-components';
 import { message, Modal } from 'antd';
 import React from 'react';
 
 interface Props {
     visible: boolean;
-    columns: ProColumns<API.TopicResponse>[];
+    columns: ProColumns<API.TopicDto>[];
     onSubmit: (values: API.TopicAddRequest) => void;
     onCancel: () => void;
 }
@@ -13,7 +13,7 @@ interface Props {
 const handleAdd = async (fields: API.TopicAddRequest) => {
     const hide = message.loading('Adding');
     try {
-        await postTopicAdd(fields);
+        await apiTopicAddByRequest(fields);
         hide();
         message.success('Success');
         return true;

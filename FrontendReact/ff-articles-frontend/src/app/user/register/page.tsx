@@ -8,7 +8,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import "./index.css";
-import {postUserRegister} from "@/api/identity/api/user";
+import { apiAuthRegister } from "@/api/identity/api/auth";
 
 /**
  * User registration page
@@ -24,7 +24,7 @@ const UserRegisterPage: React.FC = (props) => {
      */
     const doSubmit = async (values: any) => {
         try {
-            const res = await postUserRegister(values);
+            const res = await apiAuthRegister(values);
             if (res.data) {
                 message.success("Registration successful, please log in");
                 // Go to login page

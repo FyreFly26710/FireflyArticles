@@ -1,24 +1,25 @@
+// @ts-nocheck
+
 "use server";
 import Title from "antd/es/typography/Title";
-import {Avatar, Button, Card} from "antd";
+import { Avatar, Button, Card } from "antd";
 import Meta from "antd/es/card/Meta";
 import Paragraph from "antd/es/typography/Paragraph";
 import "./index.css";
-import TopicList from "@/components/TopicList";
+import { apiTopicGetById } from "@/api/contents/api/topic";
 import ArticleList from "@/components/ArticleList";
-import { getTopicGetId } from "@/api/contents/api/topic";
 
-export default async function BankPage({params}:{params:{topicId:number}}) {
+export default async function BankPage({ params }: { params: { topicId: number } }) {
 
-    const {topicId} = params;
+    const { topicId } = params;
 
     let topic = undefined;
 
     try {
-        const topicRes = await getTopicGetId({
+        const topicRes = await apiTopicGetById({
             id: (topicId),
         });
-        topic = topicRes.data.data;
+        topic = topicRes.data;
         console.log(topic);
     } catch (e: any) {
         console.error("Failed fetching topics, " + e.message);
@@ -28,18 +29,18 @@ export default async function BankPage({params}:{params:{topicId:number}}) {
         return <div>Failed fetching topics, please refresh.</div>;
     }
 
-    let firstArticle = 1;
-    // if (topic.data?.articles?.data && topic.data.articles.data.length > 0) {
-    //     firstArticle = topic.data.articles[0];
-    // }
+    let firstArticle: API.ArticleDto | undefined = undefined;
+    if (topic.articles && topic.articles.length > 0) {
+        firstArticle = topic.articles[0];
+    }
 
     return (
         <div id="bankPage" className="max-width-content">
             <Card>
                 <Meta
-                    avatar={<Avatar src={topic?.topicImage} size={72}/>}
+                    avatar={<Avatar src={topic?.topicImage} size={72} />}
                     title={
-                        <Title level={3} style={{marginBottom: 0}}>
+                        <Title level={3} style={{ marginBottom: 0 }}>
                             {topic.title}
                         </Title>
                     }
@@ -47,28 +48,27 @@ export default async function BankPage({params}:{params:{topicId:number}}) {
                         <>
                             <Paragraph type="secondary">{topic.abstraction}</Paragraph>
                             <Button type="primary"
-                                    shape="round"
-                                    // href={
-                                    //     firstArticle
-                                    //         ? `/bank/${topicId}/question/${firstArticle.articleId}`
-                                    //         : '/'
-                                    // }
-                                    
-                                    target="_blank"
-                                    disabled={!firstArticle}
-                                    >
+                                shape="round"
+                                href={
+                                    firstArticle
+                                        ? `/topic/${topicId}/article/${firstArticle.articleId}`
+                                        : '/'
+                                }
+                                target="_blank"
+                                disabled={!firstArticle}
+                            >
                                 Begin
                             </Button>
                         </>
                     }
                 ></Meta>
             </Card>
-            <div style={{marginBottom: 16}}/>
-            {/* <ArticleList
+            <div style={{ marginBottom: 16 }} />
+            <ArticleList
                 articleList={topic.articles || []}
                 cardTitle={`Question List (${topic.articles?.length || 0})`}
                 topicId={(topicId)}
-            /> */}
+            />
         </div>
     );
 }

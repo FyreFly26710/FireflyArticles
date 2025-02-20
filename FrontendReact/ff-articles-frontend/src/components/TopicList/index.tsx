@@ -4,7 +4,7 @@ import "./index.css";
 import Link from "next/link";
 
 interface Props {
-  topicList: API.TopicResponse[];
+  topicList: API.TopicDto[];
 }
 
 const TopicList = (props: Props) => {
@@ -15,10 +15,10 @@ const TopicList = (props: Props) => {
       <List
         grid={{gutter: 16, column: 4, xs: 1, sm: 2, md: 3, lg: 3, }}
         dataSource={topicList}
-        renderItem={(item: API.TopicResponse) => (
+        renderItem={(item: API.TopicDto) => (
           <List.Item>
             <Card>
-              <Link href={`/bank/${item.topicId}`}>
+              <Link href={`/topic/${item.topicId}`}>
                 <Card.Meta
                   avatar={<Avatar src={item.topicImage} />}
                   title={item.title}

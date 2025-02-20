@@ -6,11 +6,11 @@ import BasicLayout from "@/layouts/BasicLayout";
 import {useCallback, useEffect} from "react";
 import {Provider, useDispatch} from "react-redux";
 import store, {AppDispatch} from "@/stores";
-import {postUserGetLoginUser} from "@/api/identity/api/user";
 import {setLoginUser} from "@/stores/loginUser";
 import AccessLayout from "@/access/AccessLayout";
 import enGB from 'antd/locale/en_GB';
 import { ConfigProvider } from "antd";
+import { apiAuthGetLoginUser } from "@/api/identity/api/auth";
 
 const InitLayout: React.FC<
     Readonly<{
@@ -22,7 +22,7 @@ const InitLayout: React.FC<
     const doInitLoginUser = useCallback(async () => {
 
         // Get user information
-        const res = await postUserGetLoginUser();
+        const res = await apiAuthGetLoginUser();
         if (res.data) {
             // @ts-ignore
             dispatch(setLoginUser(res.data));

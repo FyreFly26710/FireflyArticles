@@ -11,7 +11,7 @@ import { AppDispatch } from "@/stores";
 import { setLoginUser } from "@/stores/loginUser";
 import { useDispatch } from "react-redux";
 import "./index.css";
-import {postUserLogin} from "@/api/identity/api/user";
+import { apiAuthLogin } from "@/api/identity/api/auth";
 
 /**
  * User login page
@@ -28,7 +28,7 @@ const UserLoginPage: React.FC = (props) => {
      */
     const doSubmit = async (values: any) => {
         try {
-            const res = await postUserLogin(values);
+            const res = await apiAuthLogin(values);
             if (res.data) {
                 message.success("Login successful!");
                 // Save user login state

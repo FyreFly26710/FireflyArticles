@@ -8,7 +8,7 @@ import { PageContainer, ProTable } from "@ant-design/pro-components";
 import { Button, message, Space, Typography } from "antd";
 import React, { useRef, useState } from "react";
 import './index.css';
-import { postTopicGetPage, postTopicOpenApiDelete } from "@/api/contents/api/topic";
+import { apiTopicDeleteById, apiTopicGetByPage } from "@/api/contents/api/topic";
 
 
 const TopicAdminPage: React.FC = () => {
@@ -17,18 +17,18 @@ const TopicAdminPage: React.FC = () => {
     // Whether to show the update modal
     const [updateModalVisible, setUpdateModalVisible] = useState<boolean>(false);
     const actionRef = useRef<ActionType>();
-    const [currentRow, setCurrentRow] = useState<API.TopicResponse>();
+    const [currentRow, setCurrentRow] = useState<API.TopicDto>();
 
     /**
      * Delete a node
      *
      * @param row
      */
-    const handleDelete = async (row: API.TopicResponse) => {
+    const handleDelete = async (row: API.TopicDto) => {
         const hide = message.loading("Deleting");
         if (!row) return true;
         try {
-            await postTopicOpenApiDelete({
+            await apiTopicDeleteById({
                 id: row.topicId as any,
             });
             hide();
@@ -45,7 +45,7 @@ const TopicAdminPage: React.FC = () => {
     /**
      * Table column configuration
      */
-    const columns: ProColumns<API.TopicResponse>[] = [
+    const columns: ProColumns<API.TopicDto>[] = [
         {
             title: "ID",
             dataIndex: "topicId",
@@ -118,7 +118,7 @@ const TopicAdminPage: React.FC = () => {
 
     return (
         <PageContainer>
-            <ProTable<API.TopicResponse>
+            <ProTable<API.TopicDto>
                 headerTitle={"Query Table"}
                 actionRef={actionRef}
                 rowKey="key"
@@ -127,30 +127,32 @@ const TopicAdminPage: React.FC = () => {
                 }}
                 toolBarRender={() => [
                     <Button
-                        type="primary"
-                        key="primary"
-                        onClick={() => {
-                            setCreateModalVisible(true);
-                        }}
+                    type="primary"
+                    key="primary"
+                    onClick={() => {
+                        setCreateModalVisible(true);
+                    }}
                     >
                         <PlusOutlined /> New
                     </Button>,
                 ]}
+                //@ts-ignore
                 request={async (params, sort, filter) => {
                     const sortField = Object.keys(sort)?.[0];
                     const sortOrder = sort?.[sortField] ?? undefined;
                     //@ts-ignore
-                    const { data, code } = await postTopicGetPage({
+                    const { data, code } = await apiTopicGetByPage({
                         ...params,
                         sortField,
                         sortOrder,
                         ...filter,
-                    } as API.PageRequest);
+                    } as API.apiTopicGetByPageParams);
 
                     return {
                         success: code === 0,
-                        data: data?.records || data?.data ||[],
-                        total: Number(data?.total) || 0,
+                        data: data?.data ||[],
+                        //@ts-ignore
+                        total: Number(data?.counts) || 0,
                     };
                 }}
                 columns={columns}

@@ -1,12 +1,12 @@
 "use server";
-import { postTopicGetPage } from "@/api/contents/api/topic";
 import "./index.css";
-import { postArticleGetPage } from "@/api/contents/api/article";
 import { Divider, Flex } from "antd";
 import Title from "antd/es/typography/Title";
 import Link from "antd/es/typography/Link";
 import TopicList from "@/components/TopicList";
 import ArticleList from "@/components/ArticleList";
+import { apiTopicGetByPage } from "@/api/contents/api/topic";
+import { apiArticleGetByPage } from "@/api/contents/api/article";
 
 //export const dynamic = 'force-dynamic';
 
@@ -14,8 +14,8 @@ export default async function HomePage() {
     let topicList:any = [];
     let articleList:any = [];
     try {
-        const res = await postTopicGetPage({
-            pageSize: 12,
+        const res = await apiTopicGetByPage({
+            PageSize: 12,
         });
         topicList = res.data.data ?? [];
     } catch (e:any) {
@@ -23,8 +23,8 @@ export default async function HomePage() {
     }
 
     try {
-        const res = await postArticleGetPage({
-            pageSize: 12,
+        const res = await apiArticleGetByPage({
+            PageSize: 12,
         });
         articleList = res.data.data ?? [];
     } catch (e:any) {

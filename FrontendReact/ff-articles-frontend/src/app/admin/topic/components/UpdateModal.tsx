@@ -1,13 +1,13 @@
-import { postTagEdit } from '@/api/contents/api/tag';
-import { postTopicEdit } from '@/api/contents/api/topic';
+
+import { apiTopicEditByRequest } from '@/api/contents/api/topic';
 import { ProColumns, ProTable } from '@ant-design/pro-components';
 import { message, Modal } from 'antd';
 import React from 'react';
 
 interface Props {
-    oldData?: API.TopicResponse;
+    oldData?: API.TopicDto;
     visible: boolean;
-    columns: ProColumns<API.TopicResponse>[];
+    columns: ProColumns<API.TopicDto>[];
     onSubmit: (values: API.TopicEditRequest) => void;
     onCancel: () => void;
 }
@@ -15,7 +15,7 @@ interface Props {
 const handleUpdate = async (fields: API.TopicEditRequest) => {
     const hide = message.loading('Adding');
     try {
-        await postTopicEdit(fields);
+        await apiTopicEditByRequest(fields);
         hide();
         message.success('Successful');
         return true;

@@ -1,24 +1,24 @@
 "use client";
-import { postAdminList, postAdminOpenApiDelete } from '@/api/identity/api/admin';
 import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { PageContainer, ProTable } from '@ant-design/pro-components';
 import { Button, message, Space, Typography } from 'antd';
 import React, { useRef, useState } from 'react';
 import UpdateModal from './components/UpdateModal';
+import { apiUserDeleteById, apiUserGetByPage } from '@/api/identity/api/user';
 
 const UserAdminPage: React.FC = () => {
     const [createModalVisible, setCreateModalVisible] = useState<boolean>(false);
     const [updateModalVisible, setUpdateModalVisible] = useState<boolean>(false);
     const actionRef = useRef<ActionType>();
-    const [currentRow, setCurrentRow] = useState<API.UserResponse>();
+    const [currentRow, setCurrentRow] = useState<API.UserDto>();
 
 
-    const handleDelete = async (row: API.UserResponse) => {
+    const handleDelete = async (row: API.UserDto) => {
         const hide = message.loading('Deleting');
         if (!row) return true;
         try {
-            await postAdminOpenApiDelete({
+            await apiUserDeleteById({
                 id: row.id as any,
             });
             hide();
@@ -33,7 +33,7 @@ const UserAdminPage: React.FC = () => {
     };
 
 
-    const columns: ProColumns<API.UserResponse>[] = [
+    const columns: ProColumns<API.UserDto>[] = [
         {
             title: 'id',
             dataIndex: 'id',
@@ -121,7 +121,7 @@ const UserAdminPage: React.FC = () => {
     ];
     return (
         <PageContainer>
-            <ProTable<API.UserResponse>
+            <ProTable<API.UserDto>
                 headerTitle={'User Table'}
                 actionRef={actionRef}
                 rowKey="key"
@@ -144,17 +144,17 @@ const UserAdminPage: React.FC = () => {
                     const sortField = Object.keys(sort)?.[0];
                     const sortOrder = sort?.[sortField] ?? undefined;
                     // @ts-ignore
-                    const { data, code } = await postAdminList({
+                    const { data, code } = await apiUserGetByPage({
                         ...params,
                         sortField,
                         sortOrder,
                         ...filter,
-                    } as API.PageRequest);
-
+                    } as API.apiUserGetByPageParams);
                     return {
                         success: code === 0,
                         data: data?.data || [],
-                        total: Number(data?.total) || 0,
+                        // @ts-ignore
+                        total: Number(data?.counts) || 0,
                     };
                 }}
                 columns={columns}

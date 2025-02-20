@@ -6,7 +6,7 @@ import TagList from "../TagList";
 import MdViewer from "../MdViewer";
 
 interface Props {
-    article: API.ArticleResponse;
+    article: API.ArticleDto;
 }
 
 
