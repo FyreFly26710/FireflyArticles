@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-"use server";
+"use client";
 import Title from "antd/es/typography/Title";
 import { Avatar, Button, Card } from "antd";
 import Meta from "antd/es/card/Meta";
@@ -67,7 +67,6 @@ export default async function BankPage({ params }: { params: { topicId: number }
             <ArticleList
                 articleList={topic.articles || []}
                 cardTitle={`Question List (${topic.articles?.length || 0})`}
-                topicId={(topicId)}
             />
         </div>
     );

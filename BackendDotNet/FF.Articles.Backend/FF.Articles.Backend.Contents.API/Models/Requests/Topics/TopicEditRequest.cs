@@ -2,11 +2,11 @@
 public class TopicEditRequest
 {
     public int TopicId { get; set; }
-    public string Title { get; set; } = string.Empty;
-    public string Content { get; set; } = string.Empty;
-    public string Abstraction { get; set; } = string.Empty;
-    public string TopicImage { get; set; } = string.Empty;
-    public int SortNumber { get; set; }
-    public int IsHidden { get; set; }
+    public string? Title { get; set; }
+    public string? Content { get; set; }
+    public string? Abstraction { get; set; }
+    public string? TopicImage { get; set; }
+    public int? SortNumber { get; set; }
+    public int? IsHidden { get; set; }
 }
 

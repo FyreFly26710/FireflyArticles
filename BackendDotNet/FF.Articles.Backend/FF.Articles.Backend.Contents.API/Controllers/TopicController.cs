@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using FF.Articles.Backend.Common.Constants;
 using FF.Articles.Backend.Common.Exceptions;
 using FF.Articles.Backend.Common.Responses;
 using FF.Articles.Backend.Common.Utils;
@@ -9,6 +10,7 @@ using FF.Articles.Backend.Contents.API.Models.Requests.Topics;
 using FF.Articles.Backend.Contents.API.RemoteServices.Interfaces;
 using FF.Articles.Backend.Contents.API.Services;
 using FF.Articles.Backend.Contents.API.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 
@@ -24,81 +26,51 @@ public class TopicController(ILogger<TopicController> _logger, IMapper _mapper,
     [HttpGet("{id}")]
     public async Task<ApiResponse<TopicDto>> GetById(int id)
     {
-        if (id <= 0)
-            return ResultUtil.Error<TopicDto>(ErrorCode.PARAMS_ERROR, "Invalid topic id");
         var topic = await _topicService.GetByIdAsync(id);
         if (topic == null)
             return ResultUtil.Error<TopicDto>(ErrorCode.NOT_FOUND_ERROR, "Topic not found");
-        var topicResponse = _mapper.Map<TopicDto>(topic);
-        topicResponse.User = await _identityRemoteService.GetUserByIdAsync(topic.UserId);
-        List<Article> articles = _articleService.GetQueryable().Where(x => x.TopicId == topicResponse.TopicId).OrderBy(x => x.SortNumber).ToList();
-        topicResponse.Articles = _mapper.Map<List<ArticleDto>>(articles);
-        return ResultUtil.Success(topicResponse);
+        TopicDto topicDto = await _topicService.GetTopicDto(topic);
+        return ResultUtil.Success(topicDto);
     }
     [HttpGet]
     public async Task<ApiResponse<Paged<TopicDto>>> GetByPage([FromQuery] TopicPageRequest pageRequest)
     {
         if (pageRequest == null || pageRequest.PageSize > 200)
             return ResultUtil.Error<Paged<TopicDto>>(ErrorCode.PARAMS_ERROR, "Invalid page request");
-        if (pageRequest.SortField == null)
-        {
-            pageRequest.SortField = "SortNumber";
-        }
+        pageRequest.SortField = pageRequest.SortField ?? "SortNumber";
+
         Paged<Topic> topics = await _topicService.GetAllAsync(pageRequest);
         Paged<TopicDto> res = new(topics.GetPageInfo());
-        List <TopicDto> topicList = _mapper.Map<List<TopicDto>>(topics.Data);
-        foreach (var topic in topicList)
+        foreach (var topic in topics.Data)
         {
-            if (pageRequest.IncludeUser) topic.User = await _identityRemoteService.GetUserByIdAsync(topic.UserId);
-            if (pageRequest.IncludeArticles)
-            {
-                List<Article> articles = _articleService.GetQueryable().Where(x => x.TopicId == topic.TopicId).OrderBy(x => x.SortNumber).ToList();
-                topic.Articles = _mapper.Map<List<ArticleDto>>(articles);
-            }
+            TopicDto topicDto = await _topicService.GetTopicDto(topic, pageRequest.IncludeUser, pageRequest.IncludeArticles);
+            res.Data.Add(topicDto);
         }
-        res.Data = topicList;
         return ResultUtil.Success(res);
     }
 
     [HttpPut]
+    [Authorize(Roles = UserConstant.ADMIN_ROLE)]
     public async Task<ApiResponse<int>> AddByRequest([FromBody] TopicAddRequest topicAddRequest)
     {
-        if (topicAddRequest == null)
-            return ResultUtil.Error<int>(ErrorCode.PARAMS_ERROR);
         var topic = _mapper.Map<Topic>(topicAddRequest);
         var userDto = UserUtil.GetUserFromHttpRequest(Request);
         topic.UserId = userDto.UserId;
         int topicId = await _topicService.CreateAsync(topic);
-        return ResultUtil.Success(topic.Id);
+        return ResultUtil.Success(topicId);
     }
 
     [HttpPost]
+    [Authorize(Roles = UserConstant.ADMIN_ROLE)]
     public async Task<ApiResponse<bool>> EditByRequest([FromBody] TopicEditRequest topicEditRequest)
-    {
-        if (topicEditRequest == null)
-            return ResultUtil.Error<bool>(ErrorCode.PARAMS_ERROR);
-
-        var topic = await _topicService.GetByIdAsTrackingAsync(topicEditRequest.TopicId);
-        if (topic == null)
-            return ResultUtil.Error<bool>(ErrorCode.PARAMS_ERROR, "Topic not found");
-
-        if (topicEditRequest.IsHidden != 0) topic.IsHidden = topicEditRequest.IsHidden;
-        if (!string.IsNullOrWhiteSpace(topicEditRequest.Title)) topic.Title = topicEditRequest.Title;
-        if (!string.IsNullOrWhiteSpace(topicEditRequest.Content)) topic.Content = topicEditRequest.Content;
-        if (!string.IsNullOrWhiteSpace(topicEditRequest.Abstraction)) topic.Abstraction = topicEditRequest.Abstraction;
-        if (topicEditRequest.SortNumber > 0) topic.SortNumber = topicEditRequest.SortNumber;
-        await _topicService.UpdateAsync(topic);
-
-        return ResultUtil.Success(true);
-    }
+        => ResultUtil.Success(await _topicService.EditArticleByRequest(topicEditRequest));
+    
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = UserConstant.ADMIN_ROLE)]
+    // Related Articles will not be deleted
     public async Task<ApiResponse<bool>> DeleteById(int id)
-    {
-        if (id <= 0)
-            return ResultUtil.Error<bool>(ErrorCode.PARAMS_ERROR, "Invalid topic id");
-        await _topicService.DeleteAsync(id);
-        return ResultUtil.Success(true);
-    }
+        => ResultUtil.Success(await _topicService.DeleteAsync(id));
+    
 
 }

@@ -14,7 +14,7 @@ const ArticleCard = (props: Props) => {
     const { article } = props;
 
     return (
-        <div className="article-card max-width-content">
+        <div className="article-card">
             <Card bordered={false} className="header-card" >
                 <Title level={1} style={{ fontSize: 24 }}>
                     {article.title}

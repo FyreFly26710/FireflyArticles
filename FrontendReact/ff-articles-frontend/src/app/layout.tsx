@@ -46,9 +46,8 @@ export default function RootLayout({
         <html lang="en">
         <body>
         <ConfigProvider locale={enGB}>
-
         <AntdRegistry>
-            <Provider store={store}>s
+            <Provider store={store}>
                 <InitLayout>
                     <BasicLayout>
                         <AccessLayout>{children}</AccessLayout>

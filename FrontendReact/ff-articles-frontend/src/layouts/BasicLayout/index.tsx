@@ -42,13 +42,7 @@ export default function BasicLayout({ children }: Props) {
         return;
     };
     return (
-        <div
-            id="basicLayout"
-            style={{
-                height: '100vh',
-                overflow: 'auto',
-            }}
-        >
+        <div id="basicLayout">
             <ProLayout
                 title="FireFly Articles"
                 layout="top"

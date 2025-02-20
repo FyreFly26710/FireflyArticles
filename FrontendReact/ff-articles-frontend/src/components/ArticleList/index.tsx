@@ -4,14 +4,12 @@ import "./index.css";
 import Link from "next/link";
 
 interface Props {
-    topicId?: number;
     articleList: API.ArticleDto[];
     cardTitle?: string;
 }
 
 const ArticleList = (props: Props) => {
-    const {articleList = [], cardTitle, topicId} = props;
-
+    const {articleList = [], cardTitle} = props;
     const tagList = (tags: string[] = []) => {
         return tags.map((tag) => {
             return <Tag key={tag}>{tag}</Tag>;
@@ -26,7 +24,7 @@ const ArticleList = (props: Props) => {
                     <List.Item extra={tagList(item.tags)}>
                         <List.Item.Meta
                             title={<Link
-                                href={topicId ? `/topic/${topicId}/article/${item.articleId}` : `/article/${item.articleId}`}>
+                                href={`/topic/${item.topicId}/article/${item.articleId}`}>
                                 {item.title}
                             </Link>}
                         />

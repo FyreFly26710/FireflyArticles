@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using FF.Articles.Backend.Common.Constants;
 using FF.Articles.Backend.Common.Exceptions;
 using FF.Articles.Backend.Common.Responses;
 using FF.Articles.Backend.Common.Utils;
@@ -7,6 +8,7 @@ using FF.Articles.Backend.Contents.API.Models.Entities;
 using FF.Articles.Backend.Contents.API.Models.Requests.Articles;
 using FF.Articles.Backend.Contents.API.Models.Requests.Tags;
 using FF.Articles.Backend.Contents.API.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FF.Articles.Backend.Contents.API.Controllers;
@@ -20,8 +22,6 @@ public class TagController(ILogger<ArticleController> _logger, IMapper _mapper,
     [HttpGet("{id}")]
     public async Task<ApiResponse<TagDto>> GetById(int id)
     {
-        if (id <= 0)
-            return ResultUtil.Error<TagDto>(ErrorCode.PARAMS_ERROR, "Invalid tag id");
         var tag = await _tagService.GetByIdAsync(id);
         if (tag == null)
             return ResultUtil.Error<TagDto>(ErrorCode.NOT_FOUND_ERROR, "Tag not found");
@@ -36,6 +36,7 @@ public class TagController(ILogger<ArticleController> _logger, IMapper _mapper,
         return ResultUtil.Success(tagResponse);
     }
     [HttpPut]
+    [Authorize(Roles = UserConstant.ADMIN_ROLE)]
     public async Task<ApiResponse<int>> AddByRequest([FromBody] TagAddRequest tagAddRequest)
     {
         if (tagAddRequest == null)
@@ -45,10 +46,9 @@ public class TagController(ILogger<ArticleController> _logger, IMapper _mapper,
         return ResultUtil.Success(tagId);
     }
     [HttpPost]
+    [Authorize(Roles = UserConstant.ADMIN_ROLE)]
     public async Task<ApiResponse<bool>> EditByRequest([FromBody] TagEditRequest tagEditRequest)
     {
-        if (tagEditRequest == null)
-            return ResultUtil.Error<bool>(ErrorCode.PARAMS_ERROR);
         var tag = await _tagService.GetByIdAsTrackingAsync(tagEditRequest.TagId);
         if (tag == null)
             return ResultUtil.Error<bool>(ErrorCode.PARAMS_ERROR, "Tag not found");
@@ -60,11 +60,10 @@ public class TagController(ILogger<ArticleController> _logger, IMapper _mapper,
         return ResultUtil.Success(true);
     }
     [HttpDelete("{id}")]
+    [Authorize(Roles = UserConstant.ADMIN_ROLE)]
     public async Task<ApiResponse<bool>> DeleteById(int id)
     {
-        if (id <= 0)
-            return ResultUtil.Error<bool>(ErrorCode.PARAMS_ERROR);
-        await _tagService.HardDeleteAsync(id);
+        await _tagService.DeleteAsync(id);
         return ResultUtil.Success(true);
     }
 }
