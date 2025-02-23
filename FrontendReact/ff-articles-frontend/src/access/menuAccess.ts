@@ -6,7 +6,7 @@ import menus from "../../config/menus";
  * @param loginUser
  * @param menuItems
  */
-const getAccessibleMenus = (loginUser: API.LoginUserResponse, menuItems = menus) => {
+const getAccessibleMenus = (loginUser: API.LoginUserDto, menuItems = menus) => {
     return menuItems.filter((item) => {
         if (!checkAccess(loginUser, item.access)) {
             return false;

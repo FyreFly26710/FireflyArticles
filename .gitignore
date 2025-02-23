@@ -4,6 +4,7 @@ bin
 obj
 
 .github
+publish/
 
 # Ignore user-specific files
 *.user

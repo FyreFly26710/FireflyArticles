@@ -1,11 +1,11 @@
 import { baseURL } from "@/config";
 import axios, { AxiosResponse } from "axios";
 const DevBaseUrl =  "http://localhost:21000/";
-const TestBaseUrl = baseURL
+const TestBaseUrl = "https://demo.firefly-26710.com:8443"
 
 // create Axios
 const myAxios = axios.create({
-    baseURL: DevBaseUrl,
+    baseURL: TestBaseUrl,
     timeout: 20000,
     withCredentials: true,
 });

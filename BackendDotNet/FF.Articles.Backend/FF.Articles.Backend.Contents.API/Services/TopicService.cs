@@ -20,9 +20,10 @@ public class TopicService(ContentsDbContext _context, ILogger<TopicService> _log
         if (includeUser) topicDto.User = await _identityRemoteService.GetUserByIdAsync(topic.UserId);
         if (IncludeArticles)
         {
-            IEnumerable<Article> articles = _context.Set<Article>().AsQueryable()
+            List<Article> articles = _context.Set<Article>().AsQueryable()
                 .Where(x => x.TopicId == topicDto.TopicId)
-                .OrderBy(x => x.SortNumber);
+                .OrderBy(x => x.SortNumber)
+                .ToList();
 
             topicDto.Articles = await _articleService.GetArticleDtos(articles, includeUser);
         }

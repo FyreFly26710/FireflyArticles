@@ -6,7 +6,7 @@ import ACCESS_ENUM from "@/access/accessEnum";
  * @param needAccess The required permission
  * @return boolean Whether the user has the permission
  */
-const checkAccess = (loginUser: API.LoginUserResponse, needAccess = ACCESS_ENUM.NOT_LOGIN) => {
+const checkAccess = (loginUser: API.LoginUserDto, needAccess = ACCESS_ENUM.NOT_LOGIN) => {
     const loginUserAccess = loginUser?.userRole ?? ACCESS_ENUM.NOT_LOGIN;
     if (needAccess === ACCESS_ENUM.NOT_LOGIN) {
         return true;

@@ -39,7 +39,8 @@ public static class AuthenticationExtensions
                     builder.AllowAnyHeader()
                            .AllowAnyMethod()
                            //.AllowAnyOrigin()
-                           .WithOrigins("http://localhost:3000","http://localhost:22000", "http://localhost:23000")
+                           .WithOrigins("https://demo.firefly-26710.com:8443/",
+                                "http://localhost:3000","http://localhost:22000", "http://localhost:23000")
                            .AllowCredentials();
                 });
         });
