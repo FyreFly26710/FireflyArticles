@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-"use client";
+//"use client";
 import Title from "antd/es/typography/Title";
 import { Avatar, Button, Card } from "antd";
 import Meta from "antd/es/card/Meta";

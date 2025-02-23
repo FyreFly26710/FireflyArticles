@@ -1,4 +1,3 @@
-"use server";
 import "./index.css";
 import { Divider, Flex } from "antd";
 import Title from "antd/es/typography/Title";
@@ -8,7 +7,7 @@ import ArticleList from "@/components/ArticleList";
 import { apiTopicGetByPage } from "@/api/contents/api/topic";
 import { apiArticleGetByPage } from "@/api/contents/api/article";
 
-//export const dynamic = 'force-dynamic';
+export const dynamic = 'force-dynamic';
 
 export default async function HomePage() {
     let topicList:any = [];
