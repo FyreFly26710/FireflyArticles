@@ -15,7 +15,7 @@ using Microsoft.EntityFrameworkCore;
 namespace FF.Articles.Backend.Identity.API.Services;
 
 public class UserService(IdentityDbContext _context, ILogger<UserService> _logger, IMapper _mapper)
-    : CacheService<User, IdentityDbContext>(_context, _logger), IUserService
+    : BaseService<User, IdentityDbContext>(_context, _logger), IUserService
 {
     private const string SALT = "Firefly";
 

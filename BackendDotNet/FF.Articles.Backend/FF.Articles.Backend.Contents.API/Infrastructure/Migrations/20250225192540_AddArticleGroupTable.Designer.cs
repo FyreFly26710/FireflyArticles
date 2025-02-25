@@ -4,6 +4,7 @@ using FF.Articles.Backend.Contents.API.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FF.Articles.Backend.Contents.API.Infrastructure.Migrations
 {
     [DbContext(typeof(ContentsDbContext))]
-    partial class ContentsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250225192540_AddArticleGroupTable")]
+    partial class AddArticleGroupTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -38,10 +41,6 @@ namespace FF.Articles.Backend.Contents.API.Infrastructure.Migrations
                         .HasColumnType("nvarchar(4000)")
                         .HasDefaultValue("");
 
-                    b.Property<string>("ArticleType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Content")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
@@ -50,6 +49,9 @@ namespace FF.Articles.Backend.Contents.API.Infrastructure.Migrations
 
                     b.Property<DateTime?>("CreateTime")
                         .HasColumnType("datetime2");
+
+                    b.Property<int>("HierachyType")
+                        .HasColumnType("int");
 
                     b.Property<int?>("IsDelete")
                         .ValueGeneratedOnAdd()
@@ -60,9 +62,6 @@ namespace FF.Articles.Backend.Contents.API.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasDefaultValue(0);
-
-                    b.Property<int?>("ParentArticleId")
-                        .HasColumnType("int");
 
                     b.Property<int>("SortNumber")
                         .HasColumnType("int");
@@ -87,6 +86,28 @@ namespace FF.Articles.Backend.Contents.API.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Article", "Contents");
+                });
+
+            modelBuilder.Entity("FF.Articles.Backend.Contents.API.Models.Entities.ArticleGroup", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ArticleId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ParentArticleId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SortNumber")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ArticleGroup", "Contents");
                 });
 
             modelBuilder.Entity("FF.Articles.Backend.Contents.API.Models.Entities.ArticleTag", b =>

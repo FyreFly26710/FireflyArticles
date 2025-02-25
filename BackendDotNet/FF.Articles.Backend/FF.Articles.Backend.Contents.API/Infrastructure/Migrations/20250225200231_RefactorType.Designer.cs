@@ -4,6 +4,7 @@ using FF.Articles.Backend.Contents.API.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FF.Articles.Backend.Contents.API.Infrastructure.Migrations
 {
     [DbContext(typeof(ContentsDbContext))]
-    partial class ContentsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250225200231_RefactorType")]
+    partial class RefactorType
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -38,10 +41,6 @@ namespace FF.Articles.Backend.Contents.API.Infrastructure.Migrations
                         .HasColumnType("nvarchar(4000)")
                         .HasDefaultValue("");
 
-                    b.Property<string>("ArticleType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Content")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
@@ -50,6 +49,10 @@ namespace FF.Articles.Backend.Contents.API.Infrastructure.Migrations
 
                     b.Property<DateTime?>("CreateTime")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("HierachyType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("IsDelete")
                         .ValueGeneratedOnAdd()

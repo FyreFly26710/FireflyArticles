@@ -7,7 +7,7 @@ using FF.Articles.Backend.Contents.API.Services.Interfaces;
 
 namespace FF.Articles.Backend.Contents.API.Services;
 public class ArticleTagService(ContentsDbContext _context, ILogger<ArticleTagService> _logger, IMapper _mapper)
-: CacheService<ArticleTag, ContentsDbContext>(_context, _logger), IArticleTagService
+: BaseService<ArticleTag, ContentsDbContext>(_context, _logger), IArticleTagService
 {
     public async Task<bool> EditArticleTags(int articleId, List<int> tagIds)
     {

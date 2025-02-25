@@ -10,6 +10,11 @@ public class ArticleDto
     public string Title { get; set; }
     public string Content { get; set; }
     public string Abstraction { get; set; }
+    /// <summary>
+    /// 1: article, 2: sub article, 3: topic article
+    /// </summary>
+    public string ArticleType { get; set; }
+    public List<ArticleDto> SubArticles { get; set; } = new();
     public int UserId { get; set; }
     public UserApiDto? User { get; set; }
     public int TopicId { get; set; }

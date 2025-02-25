@@ -43,7 +43,7 @@ public class ArticleController(ILogger<ArticleController> _logger, IMapper _mapp
             pageRequest.SortField = "SortNumber";
         }
         var pagedArticles = await _articleService.GetAllAsync(pageRequest);
-        var articleList = await _articleService.GetArticleDtos(pagedArticles.Data, pageRequest.IncludeUser);
+        var articleList = await _articleService.GetArticleDtos(pagedArticles.Data, pageRequest);
         var res = new Paged<ArticleDto>(pagedArticles.GetPageInfo(), articleList);
         return ResultUtil.Success(res);
     }

@@ -6,6 +6,6 @@ using FF.Articles.Backend.Contents.API.Services.Interfaces;
 
 namespace FF.Articles.Backend.Contents.API.Services;
 public class TagService(ContentsDbContext _context, ILogger<TagService> _logger, IMapper _mapper)
-: CacheService<Tag, ContentsDbContext>(_context, _logger), ITagService
+: BaseService<Tag, ContentsDbContext>(_context, _logger), ITagService
 {
 }

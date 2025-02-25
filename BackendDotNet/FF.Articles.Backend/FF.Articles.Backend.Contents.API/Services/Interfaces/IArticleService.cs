@@ -8,8 +8,9 @@ using FF.Articles.Backend.Contents.API.Models.Requests.Articles;
 namespace FF.Articles.Backend.Contents.API.Services.Interfaces;
 public interface IArticleService : IBaseService<Article, ContentsDbContext>
 {
-    Task<ArticleDto> GetArticleDto(Article article, bool includeUser = true);
-    Task<List<ArticleDto>> GetArticleDtos(IEnumerable<Article> articles, bool includeUser = true);
+    Task<ArticleDto> GetArticleDto(Article article);
+    Task<ArticleDto> GetArticleDto(Article article,ArticlePageRequest articleRequest);
+    Task<List<ArticleDto>> GetArticleDtos(IEnumerable<Article> articles, ArticlePageRequest articleRequest);
     Task<bool> EditArticleByRequest(ArticleEditRequest articleEditRequest);
     Task<bool> DeleteArticleById(int id);
 }

@@ -2,6 +2,7 @@
 using FF.Articles.Backend.Common.Bases;
 using FF.Articles.Backend.Common.Exceptions;
 using FF.Articles.Backend.Common.Responses;
+using FF.Articles.Backend.Contents.API.Constants;
 using FF.Articles.Backend.Contents.API.Infrastructure;
 using FF.Articles.Backend.Contents.API.Models.Dtos;
 using FF.Articles.Backend.Contents.API.Models.Entities;
@@ -14,24 +15,42 @@ public class ArticleService(ContentsDbContext _context, ILogger<ArticleService> 
     IArticleTagService _articleTagService,
     IIdentityRemoteService _identityRemoteService
 )
-: CacheService<Article, ContentsDbContext>(_context, _logger), IArticleService
+: BaseService<Article, ContentsDbContext>(_context, _logger), IArticleService
 {
-    public async Task<ArticleDto> GetArticleDto(Article article, bool includeUser = true)
+    public async Task<ArticleDto> GetArticleDto(Article article) => await GetArticleDto(article, new ArticlePageRequest());
+
+    public async Task<ArticleDto> GetArticleDto(Article article, ArticlePageRequest articleRequest)
     {
         var articleDto = _mapper.Map<ArticleDto>(article);
-        if(includeUser) 
+        if (articleRequest.IncludeUser)
             articleDto.User = await _identityRemoteService.GetUserByIdAsync(article.UserId);
+        //only support 1 level sub articles
+        // todo: remove ArticleType constraint and support more levels
+        if (articleRequest.IncludeSubArticles && article.ArticleType == ArticleTypes.Article)
+        {
+            List<Article> subArticles = this.GetQueryable()
+                .Where(x => x.ParentArticleId == articleDto.ArticleId
+                    //&& x.TopicId == articleDto.TopicId
+                    )
+                .OrderBy(x => x.SortNumber)
+                .ToList();
+            articleDto.SubArticles = await GetArticleDtos(subArticles, articleRequest);
+        }
+        if(!articleRequest.IncludeContent)
+        {
+            articleDto.Content = string.Empty;
+        }
         Topic? topic = await _context.Set<Topic>().FindAsync(article.TopicId);
         articleDto.TopicTitle = topic?.Title ?? "Default Topic";
         articleDto.Tags = _articleTagService.GetArticleTags(articleDto.ArticleId);
         return articleDto;
     }
-    public async Task<List<ArticleDto>> GetArticleDtos(IEnumerable<Article> articles, bool includeUser = true)
+    public async Task<List<ArticleDto>> GetArticleDtos(IEnumerable<Article> articles, ArticlePageRequest articleRequest)
     {
         List<ArticleDto> articleDtos = new();
         foreach (var article in articles)
         {
-            articleDtos.Add(await GetArticleDto(article, includeUser));
+            articleDtos.Add(await GetArticleDto(article, articleRequest));
         }
         return articleDtos;
     }
@@ -47,6 +66,8 @@ public class ArticleService(ContentsDbContext _context, ILogger<ArticleService> 
         if (articleEditRequest.Abstraction != null) article.Abstraction = articleEditRequest.Abstraction;
         //todo: check if topic exists
         if (articleEditRequest.TopicId != null) article.TopicId = (int)articleEditRequest.TopicId;
+        if (articleEditRequest.ArticleType != null) article.ArticleType = (string)articleEditRequest.ArticleType;
+        if (articleEditRequest.ParentArticleId != null) article.ParentArticleId = (int)articleEditRequest.ParentArticleId;
         if (articleEditRequest.SortNumber != null) article.SortNumber = (int)articleEditRequest.SortNumber;
         if (articleEditRequest.TagIds != null) await _articleTagService.EditArticleTags(article.Id, articleEditRequest.TagIds);
         await this.UpdateAsync(article);

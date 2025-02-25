@@ -18,9 +18,7 @@ namespace FF.Articles.Backend.Contents.API.Controllers;
 [ApiController]
 [Route("api/contents/topics")]
 public class TopicController(ILogger<TopicController> _logger, IMapper _mapper,
-    ITopicService _topicService,
-    IArticleService _articleService,
-    IIdentityRemoteService _identityRemoteService)
+    ITopicService _topicService)
     : ControllerBase
 {
     [HttpGet("{id}")]
@@ -43,7 +41,7 @@ public class TopicController(ILogger<TopicController> _logger, IMapper _mapper,
         Paged<TopicDto> res = new(topics.GetPageInfo());
         foreach (var topic in topics.Data)
         {
-            TopicDto topicDto = await _topicService.GetTopicDto(topic, pageRequest.IncludeUser, pageRequest.IncludeArticles);
+            TopicDto topicDto = await _topicService.GetTopicDto(topic, pageRequest);
             res.Data.Add(topicDto);
         }
         return ResultUtil.Success(res);

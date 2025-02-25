@@ -8,13 +8,13 @@ public class TopicDto
     public DateTime? UpdateTime { get; set; }
 
     public string Title { get; set; }
-    public string Content { get; set; }
     public string Abstraction { get; set; }
+    public string Category { get; set; }
     public string TopicImage { get; set; }
     public int UserId { get; set; }
     public UserApiDto? User { get; set; }
     public int SortNumber { get; set; }
     public int IsHidden { get; set; }
-    public List<ArticleDto>? Articles { get; set; }
+    public List<ArticleMiniDto>? Articles { get; set; }
 }
 
