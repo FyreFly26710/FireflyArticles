@@ -19,6 +19,6 @@ public class ContentsMappingProfile : Profile
         CreateMap<TagEditRequest, Tag>().ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.TagId));
         CreateMap<Tag, TagDto>().ForMember(dest => dest.TagId, opt => opt.MapFrom(src => src.Id));
         //CreateMap<ArticlePageRequest, TopicPageRequest>();
-        CreateMap<ArticleDto, ArticleMiniDto>().ForMember(dest=>dest.SubArticles, opt=>opt.Ignore());
+        CreateMap<ArticleDto, ArticleMiniDto>().ForMember(dest => dest.SubArticles, opt => opt.MapFrom(src => src.SubArticles));
     }
 }

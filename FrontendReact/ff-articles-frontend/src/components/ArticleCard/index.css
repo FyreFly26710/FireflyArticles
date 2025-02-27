@@ -1,4 +1,6 @@
-
+.ant-card .ant-card-body{
+    padding: 12px !important;
+}
 .article-card {
     flex-direction: column;
     width: 100%;
@@ -7,11 +9,16 @@
 .header-card {
     width: 100%;
     box-sizing: border-box;
+    height: 200px; 
+    overflow-y: auto;
 }
 
-.content-card {
-    min-height: calc(100vh - 260px);
+.content-card { 
     width: 100%;
-    padding: 16px;
+    min-height: calc(100vh - 295px);
     box-sizing: border-box;
+}
+
+.ant-btn-compact-item:not(.ant-btn-compact-last-item) {
+    width: 100px !important;
 }

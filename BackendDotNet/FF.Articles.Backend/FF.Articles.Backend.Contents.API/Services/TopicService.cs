@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using FF.Articles.Backend.Common.Bases;
 using FF.Articles.Backend.Common.Exceptions;
+using FF.Articles.Backend.Contents.API.Constants;
 using FF.Articles.Backend.Contents.API.Infrastructure;
 using FF.Articles.Backend.Contents.API.Models.Dtos;
 using FF.Articles.Backend.Contents.API.Models.Entities;
@@ -23,7 +24,7 @@ public class TopicService(ContentsDbContext _context, ILogger<TopicService> _log
         if (topicRequest.IncludeArticles)
         {
             List<Article> articles = _context.Set<Article>().AsQueryable()
-                .Where(x => x.TopicId == topicDto.TopicId)
+                .Where(x => x.TopicId == topicDto.TopicId && x.ArticleType == ArticleTypes.Article)
                 .OrderBy(x => x.SortNumber)
                 .ToList();
             //var articleRequest = _mapper.Map<ArticlePageRequest>(topicRequest);

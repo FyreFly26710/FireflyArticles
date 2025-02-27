@@ -30,13 +30,14 @@ public class ArticleService(ContentsDbContext _context, ILogger<ArticleService> 
         {
             List<Article> subArticles = this.GetQueryable()
                 .Where(x => x.ParentArticleId == articleDto.ArticleId
+                    && x.ArticleType == ArticleTypes.SubArticle
                     //&& x.TopicId == articleDto.TopicId
                     )
                 .OrderBy(x => x.SortNumber)
                 .ToList();
             articleDto.SubArticles = await GetArticleDtos(subArticles, articleRequest);
         }
-        if(!articleRequest.IncludeContent)
+        if (!articleRequest.IncludeContent)
         {
             articleDto.Content = string.Empty;
         }

@@ -33,7 +33,7 @@ export default function ArticleTable(props: Props) {
       valueType: "text",
       hideInSearch: true,
       render(_, record) {
-        return <Link href={`/article/${record.articleId}`}>{record.title}</Link>;
+        return <Link href={`/topic/${record.topicId}/article/${record.articleId}`}>{record.title}</Link>;
       },
     },
     {

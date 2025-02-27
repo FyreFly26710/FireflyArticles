@@ -7,7 +7,7 @@ import { apiTopicGetByPage } from "@/api/contents/api/topic";
 
 export default async function TopicsPage() {
     const pageSize = 200;
-    let topicList:any = [];
+    let topicList:API.TopicDto[]|any = [];
     try {
         const res = await apiTopicGetByPage({
             PageSize: pageSize,

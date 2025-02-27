@@ -3,6 +3,7 @@ using FF.Articles.Backend.Common.Constants;
 using FF.Articles.Backend.Common.Exceptions;
 using FF.Articles.Backend.Common.Responses;
 using FF.Articles.Backend.Common.Utils;
+using FF.Articles.Backend.Contents.API.Constants;
 using FF.Articles.Backend.Contents.API.Models.Dtos;
 using FF.Articles.Backend.Contents.API.Models.Entities;
 using FF.Articles.Backend.Contents.API.Models.Requests.Articles;
@@ -24,8 +25,6 @@ public class ArticleController(ILogger<ArticleController> _logger, IMapper _mapp
     [HttpGet("{id}")]
     public async Task<ApiResponse<ArticleDto>> GetById(int id)
     {
-        if (id <= 0)
-            return ResultUtil.Error<ArticleDto>(ErrorCode.PARAMS_ERROR, "Invalid article id");
         var article = await _articleService.GetByIdAsync(id);
         if (article == null)
             return ResultUtil.Error<ArticleDto>(ErrorCode.NOT_FOUND_ERROR, "Article not found");
@@ -43,7 +42,8 @@ public class ArticleController(ILogger<ArticleController> _logger, IMapper _mapp
             pageRequest.SortField = "SortNumber";
         }
         var pagedArticles = await _articleService.GetAllAsync(pageRequest);
-        var articleList = await _articleService.GetArticleDtos(pagedArticles.Data, pageRequest);
+        var articleDto = pagedArticles.Data.Where(x => x.ArticleType == ArticleTypes.Article);
+        var articleList = await _articleService.GetArticleDtos(articleDto, pageRequest);
         var res = new Paged<ArticleDto>(pagedArticles.GetPageInfo(), articleList);
         return ResultUtil.Success(res);
     }

@@ -1,5 +1,14 @@
-.md-editor{
-    .bytemd-toolbar-icon.bytemd-tippy.bytemd-tippy-right:last-child {
+.md-editor {
+    .bytemd-toolbar-icon.bytemd-tippy.bytemd-tippy-right:nth-last-child(1),
+    .bytemd-toolbar-icon.bytemd-tippy.bytemd-tippy-right:nth-last-child(2) {
         display: none;
     }
+}
+
+
+.bytemd,
+.bytemd-body,
+.bytemd-preview {
+    height: 100%;
+    min-height: 300px;
 }

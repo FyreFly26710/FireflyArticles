@@ -9,6 +9,8 @@ declare namespace API {
 
   type apiArticleGetByPageParams = {
     IncludeUser?: boolean;
+    IncludeSubArticles?: boolean;
+    IncludeContent?: boolean;
     PageNumber?: number;
     PageSize?: number;
     SortField?: string;
@@ -34,6 +36,8 @@ declare namespace API {
   type apiTopicGetByPageParams = {
     IncludeUser?: boolean;
     IncludeArticles?: boolean;
+    IncludeSubArticles?: boolean;
+    IncludeContent?: boolean;
     PageNumber?: number;
     PageSize?: number;
     SortField?: string;
@@ -44,6 +48,8 @@ declare namespace API {
     title?: string;
     content?: string;
     abstraction?: string;
+    articleType?: string;
+    parentArticleId?: number;
     topicId?: number;
     tagIds?: number[];
     sortNumber?: number;
@@ -57,6 +63,9 @@ declare namespace API {
     title?: string;
     content?: string;
     abstraction?: string;
+    articleType?: string;
+    parentArticleId?: number;
+    subArticles?: ArticleDto[];
     userId?: number;
     user?: UserApiDto;
     topicId?: number;
@@ -90,8 +99,21 @@ declare namespace API {
     title?: string;
     content?: string;
     abstraction?: string;
+    articleType?: string;
+    parentArticleId?: number;
     topicId?: number;
     tagIds?: number[];
+    sortNumber?: number;
+    isHidden?: number;
+  };
+
+  type ArticleMiniDto = {
+    articleId?: number;
+    title?: string;
+    abstraction?: string;
+    parentArticleId?: number;
+    subArticles?: ArticleMiniDto[];
+    topicId?: number;
     sortNumber?: number;
     isHidden?: number;
   };
@@ -136,9 +158,9 @@ declare namespace API {
 
   type TopicAddRequest = {
     title?: string;
-    content?: string;
     abstraction?: string;
     topicImage?: string;
+    category?: string;
     sortNumber?: number;
     isHidden?: number;
   };
@@ -148,14 +170,14 @@ declare namespace API {
     createTime?: string;
     updateTime?: string;
     title?: string;
-    content?: string;
     abstraction?: string;
+    category?: string;
     topicImage?: string;
     userId?: number;
     user?: UserApiDto;
     sortNumber?: number;
     isHidden?: number;
-    articles?: ArticleDto[];
+    articles?: ArticleMiniDto[];
   };
 
   type TopicDtoApiResponse = {
@@ -180,9 +202,9 @@ declare namespace API {
   type TopicEditRequest = {
     topicId?: number;
     title?: string;
-    content?: string;
     abstraction?: string;
     topicImage?: string;
+    category?: string;
     sortNumber?: number;
     isHidden?: number;
   };

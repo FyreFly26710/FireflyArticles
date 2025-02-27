@@ -5,7 +5,7 @@ const TestBaseUrl = "https://demo.firefly-26710.com:8443"
 
 // create Axios
 const myAxios = axios.create({
-    baseURL: TestBaseUrl,
+    baseURL: DevBaseUrl,
     timeout: 20000,
     withCredentials: true,
 });

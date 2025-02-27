@@ -23,7 +23,7 @@ const MdEditor = (props: Props) => {
             <Editor
                 value={value}
                 placeholder={placeholder}
-                mode="tab"
+                mode="split"
                 plugins={plugins}
                 onChange={onChange}
             />
