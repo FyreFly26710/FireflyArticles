@@ -65,9 +65,8 @@ public class ArticleService(ContentsDbContext _context, ILogger<ArticleService> 
         if (articleEditRequest.Title != null) article.Title = articleEditRequest.Title;
         if (articleEditRequest.Content != null) article.Content = articleEditRequest.Content;
         if (articleEditRequest.Abstraction != null) article.Abstraction = articleEditRequest.Abstraction;
-        //todo: check if topic exists
         if (articleEditRequest.TopicId != null) article.TopicId = (int)articleEditRequest.TopicId;
-        if (articleEditRequest.ArticleType != null) article.ArticleType = (string)articleEditRequest.ArticleType;
+        if (articleEditRequest.ArticleType != null) article.ArticleType = articleEditRequest.ArticleType;
         if (articleEditRequest.ParentArticleId != null) article.ParentArticleId = (int)articleEditRequest.ParentArticleId;
         if (articleEditRequest.SortNumber != null) article.SortNumber = (int)articleEditRequest.SortNumber;
         if (articleEditRequest.TagIds != null) await _articleTagService.EditArticleTags(article.Id, articleEditRequest.TagIds);

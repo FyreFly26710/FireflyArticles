@@ -17,11 +17,13 @@ using System.Linq;
 namespace FF.Articles.Backend.Contents.API.Controllers;
 [ApiController]
 [Route("api/contents/articles")]
-public class ArticleController(ILogger<ArticleController> _logger, IMapper _mapper,
+public class ArticleController(IMapper _mapper,
     IArticleService _articleService,
     IArticleTagService _articleTagService)
     : ControllerBase
 {
+
+    #region REST API
     [HttpGet("{id}")]
     public async Task<ApiResponse<ArticleDto>> GetById(int id)
     {
@@ -79,5 +81,5 @@ public class ArticleController(ILogger<ArticleController> _logger, IMapper _mapp
         await _articleService.DeleteArticleById(id);
         return ResultUtil.Success(true);
     }
-
+    #endregion
 }

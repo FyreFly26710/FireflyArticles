@@ -1,8 +1,17 @@
 import ArticlePage from "@/app/topic/[topicId]/article/[articleId]/page";
 
-export default function TopicPage({ params,}: { params: { topicId: number };}) {
+export default function TopicPage({
+  params,
+  searchParams,
+}: {
+  params: { topicId: number };
+  searchParams: { newArticle?: string };
+}) {
   const { topicId } = params;
-  return <ArticlePage params={{ topicId, articleId: 0}} />;
+  
+  const newArticle = searchParams.newArticle === 'true';
+
+  return <ArticlePage params={{ topicId, articleId: 0, isNewArticle: newArticle }} />;
 }
 
 

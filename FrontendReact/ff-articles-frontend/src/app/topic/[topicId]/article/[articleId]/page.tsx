@@ -6,13 +6,13 @@ import Sider from "antd/es/layout/Sider";
 import Title from "antd/es/typography/Title";
 import { Content } from "antd/es/layout/layout";
 import ArticleCard from "@/components/ArticleCard";
-import { apiTopicGetById } from "@/api/contents/api/topic";
+import { apiTopicGetById, apiTopicGetByPage } from "@/api/contents/api/topic";
 import { apiArticleGetById } from "@/api/contents/api/article";
-import { Children } from "react";
 import { FileAddOutlined, PlusCircleOutlined, PlusSquareOutlined } from "@ant-design/icons";
+import { apiTagGetAll } from "@/api/contents/api/tag";
 
-export default async function ArticlePage({ params }: { params: { topicId: number, articleId: number } }) {
-    const { topicId, articleId } = params;
+export default async function ArticlePage({ params }: { params: { topicId: number, articleId: number, isNewArticle:boolean } }) {
+    const { topicId, articleId, isNewArticle } = params;
 
     let topic: API.TopicDto | undefined;
     try {
@@ -29,22 +29,48 @@ export default async function ArticlePage({ params }: { params: { topicId: numbe
         return <div>Failed fetching topics, please refresh page.</div>;
     }
 
+    let topicList: API.TopicDto[] | undefined;
+    try {
+        const topicListRes = await apiTopicGetByPage({
+            PageNumber: 1,
+            PageSize: 100,
+            IncludeArticles: false,
+            IncludeSubArticles: false,
+            IncludeContent: false,
+            IncludeUser: false,
+        });
+        // @ts-ignore
+        topicList = topicListRes.data.data;
+    } catch (e: any) {
+        console.error("Failed fetching topics, " + e.message);
+    }
+    let tagList: API.TagDto[] | undefined;
+    try {
+        const tagRes = await apiTagGetAll();
+        // @ts-ignore
+        tagList = tagRes.data;
+    } catch (e: any) {
+        console.error("Failed fetching tags, " + e.message);
+    }
+
     let article: API.ArticleDto | undefined;
     try {
         // get topic article
-        // if (articleId === 0) {
-        //     articleId = topic.articles[0].articleId;
-        // }
-        const articleRes = await apiArticleGetById({
-            id: (articleId),
-        });
-        // @ts-ignore
-        article = articleRes.data;
+        if (isNewArticle){
+            article = {articleType:"Article", topicId:topicId, title: topic.title } as API.ArticleDto;
+        }
+        else if (articleId === 0) {
+            article = { articleType:"TopicArticle",topicId:topicId, title: topic.title, abstraction: topic.abstraction, content: "" } as API.ArticleDto;
+        }
+        else if (articleId !== 0) {
+            const articleRes = await apiArticleGetById({
+                id: (articleId),
+            });
+            // @ts-ignore
+            article = articleRes.data;
+        }
     } catch (e: any) {
         console.error("Failed fetching articles, " + e.message);
-    }
-    if (articleId === 0) {
-        article = { title: topic.title, abstraction: topic.abstraction, content: "" } as API.ArticleDto;
     }
 
     if (!article) {
@@ -97,7 +123,7 @@ export default async function ArticlePage({ params }: { params: { topicId: numbe
                             />
                         </ConfigProvider>
                         <div style={{ margin: "auto 20px 20px 20px", textAlign: "right", fontSize: "16px" }}>
-                            <Link href={`/topic/${topicId}`} style={{ color: "GrayText" }}>
+                            <Link href={`/topic/${topicId}?newArticle=true`} style={{ color: "GrayText" }}>
                                 <PlusSquareOutlined />{" "} New Page
                             </Link>
                         </div>
@@ -105,8 +131,14 @@ export default async function ArticlePage({ params }: { params: { topicId: numbe
 
                 </Sider>
                 <ArticleCard
-                    article={article}>
+                    isNewArticle={isNewArticle}
+                    article={article}
+                    topic={topic || []}
+                    topicList={topicList || []}
+                    tagList={tagList || []}
+                >
                 </ArticleCard>
+
             </Flex>
         </div>
     );

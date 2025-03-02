@@ -9,13 +9,13 @@
 .header-card {
     width: 100%;
     box-sizing: border-box;
-    height: 200px; 
+    height: 170px; 
     overflow-y: auto;
 }
 
 .content-card { 
     width: 100%;
-    min-height: calc(100vh - 295px);
+    min-height: calc(100vh - 265px);
     box-sizing: border-box;
 }
 

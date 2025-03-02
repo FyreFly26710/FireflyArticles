@@ -1,60 +1,66 @@
 "use client";
 
-import { useState } from "react";
-import { Button, Card, Dropdown, Flex, Input, MenuProps } from "antd";
+import { useEffect, useState } from "react";
+import { Button, Card, Dropdown, Flex, Input, MenuProps, message } from "antd";
 import Title from "antd/es/typography/Title";
 import MdViewer from "../MdViewer";
 import MdEditor from "../MdEditor";
 import TagList from "../TagList";
 import "./index.css";
+import ArticleFormModal from "../ArticleFormModal";
+import { apiArticleEditByRequest } from "@/api/contents/api/article";
+import { useRouter } from "next/navigation";
+import { log } from "console";
+
 
 const { TextArea } = Input;
 
 interface Props {
+    isNewArticle: boolean | undefined;
     article: API.ArticleDto;
+    topic: API.TopicDto;
+    topicList: API.TopicDto[];
+    tagList: API.TagDto[];
 }
 
 const ArticleCard = (props: Props) => {
-    const { article } = props;
+    const [updateModalVisible, setUpdateModalVisible] = useState<boolean>(false);
 
-    // State for edit mode and storing updates
+    const { isNewArticle, topic, topicList, tagList } = props;
+    const [article, setArticle] = useState(props.article);
+    const parentArticleList = topic.articles;
     const [isEditing, setIsEditing] = useState(false);
     const [editedContent, setEditedContent] = useState(article.content);
     const [editedAbstraction, setEditedAbstraction] = useState(article.abstraction);
     const [isSaving, setIsSaving] = useState(false);
+    const isTopic = article.articleType === "TopicArticle";
 
-    // Handle abstraction text change
-    const handleAbstractionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        setEditedAbstraction(e.target.value);
-    };
-
-    // Handle content change in markdown editor
-    const handleContentChange = (newContent: string) => {
-        setEditedContent(newContent);
-    };
-
-    // Save function (replace with API call)
+    
     const handleSave = async () => {
         setIsSaving(true);
+        const hide = message.loading('Updating...');
 
         try {
-            // TODO: Call API to save changes
-            console.log("Saving:", { editedAbstraction, editedContent });
-
-            // Simulate API call delay
-            await new Promise((resolve) => setTimeout(resolve, 1000));
-
-            // Exit edit mode after saving
+            await apiArticleEditByRequest({
+                articleId: article.articleId,
+                content: editedContent,
+                abstraction: editedAbstraction
+            });
+            hide();
             setIsEditing(false);
-        } catch (error) {
-            console.error("Failed to save:", error);
+            message.success('Update successful!');
+            window.location.reload();
+        } catch (error: any) {
+            hide();
+            message.error('Update failed: ' + error.message);
         } finally {
             setIsSaving(false);
         }
     };
+    
 
     const onMenuClick: MenuProps['onClick'] = (e) => {
-        console.log('click', e);
+        if (e.key === '1') { setUpdateModalVisible(true); }
     };
 
     const items = [
@@ -65,40 +71,52 @@ const ArticleCard = (props: Props) => {
         {
             key: '2',
             label: 'Download',
+
         },
     ];
     const handleCancel = () => {
-        setEditedAbstraction(article.abstraction); 
-        setEditedContent(article.content); 
-        setIsEditing(false); 
+        setEditedAbstraction(article.abstraction);
+        setEditedContent(article.content);
+        setIsEditing(false);
     };
-    
+    useEffect(() => {
+        console.log(article);
+        if(isNewArticle){
+            setUpdateModalVisible(true);
+        }
+    }, [isNewArticle]);
 
     return (
         <div className="article-card">
             <Card className="header-card">
                 <Flex justify="flex-start">
                     <Title style={{ fontSize: 24, flexGrow: 1, marginTop: 0 }}>
-                        {article.title}
+                        {isTopic?"Topic: ":""}{article.title}
                     </Title>
 
-                    <Flex gap={12}>
-                        {isEditing && (
-                            <>
-                                <Button color="default" variant="filled" style={{width: 100}}
-                                    onClick={handleCancel}>Cancel</Button>
-                                <Button color="default" variant="solid" style={{width: 100}}
-                                    onClick={handleSave}>Save</Button>
-                            </>
-                        )}
-                        {!isEditing && (
-                            <Dropdown.Button menu={{ items, onClick: onMenuClick }}
-                                onClick={() => setIsEditing(true)} style={{width: 100}}
-                            >
-                                Edit
-                            </Dropdown.Button>
-                        )}
-                    </Flex>
+                    {
+                        (isNewArticle || isTopic) ? (
+                            <></>
+                        ) : (
+                            <Flex gap={12}>
+                                {isEditing && (
+                                    <>
+                                        <Button color="default" variant="filled" style={{ width: 100 }} onClick={handleCancel}>
+                                            Cancel
+                                        </Button>
+                                        <Button color="default" variant="solid" style={{ width: 100 }} onClick={handleSave}>
+                                            Save
+                                        </Button>
+                                    </>
+                                )}
+                                {!isEditing && (
+                                    <Dropdown.Button menu={{ items, onClick: onMenuClick }} onClick={() => setIsEditing(true)} style={{ width: 100 }}>
+                                        Edit
+                                    </Dropdown.Button>
+                                )}
+                            </Flex>)
+                    }
+
                 </Flex>
                 <TagList tagList={article.tags} />
                 <div style={{ marginBottom: 16 }} />
@@ -107,8 +125,7 @@ const ArticleCard = (props: Props) => {
                         showCount
                         maxLength={300}
                         value={editedAbstraction}
-                        onChange={handleAbstractionChange}
-                        placeholder="Edit abstraction..."
+                        onChange={(e) => setEditedAbstraction(e.target.value)}
                         style={{ height: 80, resize: "none" }}
                     />
                 ) : (
@@ -120,13 +137,25 @@ const ArticleCard = (props: Props) => {
                 {isEditing ? (
                     <MdEditor
                         value={editedContent}
-                        onChange={handleContentChange}
-                        placeholder="Edit article content..."
+                        onChange={(value) => setEditedContent(value)}
                     />
                 ) : (
                     <MdViewer value={article.content} />
                 )}
             </Card>
+            <ArticleFormModal
+                isCreate={isNewArticle}
+                parentArticleList={parentArticleList}
+                topicList={topicList}
+                tagList={tagList}
+                currentArticle={article}
+                visible={updateModalVisible}
+                onSubmit={() => { setUpdateModalVisible(false); window.location.reload(); }}
+                onCancel={() => {
+                    setUpdateModalVisible(false);
+                }}
+            />
+
         </div>
     );
 };

@@ -63,12 +63,14 @@ const ArticleAdminPage: React.FC = () => {
             title: "Description",
             dataIndex: "abstraction",
             valueType: "text",
+            hideInForm: true,
         },
         {
             title: "Content",
             dataIndex: "content",
             valueType: "text",
             hideInTable: true,
+            hideInForm: true,
             hideInSearch: true,
             renderFormItem: (item,
                 {
@@ -79,6 +81,7 @@ const ArticleAdminPage: React.FC = () => {
             },
         },
         {
+            //pass topic id
             title: "Topic",
             dataIndex: "topicTitle",
             valueType: "text",
@@ -89,10 +92,10 @@ const ArticleAdminPage: React.FC = () => {
                 const tagList = record.topicTitle ? [record.topicTitle] : [];
                 return <TagList tagList={tagList} />;
             },
-            hideInForm: true,
             sorter: true,
         },
         {
+            //pass tag list
             title: "Tags",
             dataIndex: "tags",
             valueType: "text",
@@ -103,13 +106,11 @@ const ArticleAdminPage: React.FC = () => {
                 const tagList = record.tags ? record.tags : [];
                 return <TagList tagList={tagList} />;
             },
-            hideInForm: true,
         },
         {
             title: "Sort Num",
             dataIndex: "sortNumber",
             valueType: "text",
-
             sorter: true,
         },
         {
@@ -117,7 +118,6 @@ const ArticleAdminPage: React.FC = () => {
             dataIndex: "isHidden",
             valueType: "text",
             hideInSearch: true,
-            hideInForm: true,
         },
         {
             title: "Created Time",
