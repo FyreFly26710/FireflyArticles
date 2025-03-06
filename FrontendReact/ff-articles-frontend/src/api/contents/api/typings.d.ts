@@ -57,7 +57,7 @@ declare namespace API {
   };
 
   type ArticleDto = {
-    articleId?: number;
+    articleId: number;
     createTime?: string;
     updateTime?: string;
     title?: string;

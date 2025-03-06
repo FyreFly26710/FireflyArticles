@@ -24,10 +24,12 @@ builder.Services.AddDbContext<IdentityDbContext>(options =>
     .LogTo(Console.WriteLine, LogLevel.Information)
     .EnableSensitiveDataLogging();
 });
+builder.Services.AddHttpClient();
 
 builder.Services.AddAutoMapper(typeof(UserMappingProfile));
 
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IOAuthService, OAuthService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

@@ -21,7 +21,7 @@ public static class AuthenticationExtensions
                 //options.ExpireTimeSpan = TimeSpan.FromDays(7); // optional
                 options.Cookie.HttpOnly = true;
                 options.Cookie.SecurePolicy = CookieSecurePolicy.None;
-                options.Cookie.SameSite = SameSiteMode.Lax; 
+                options.Cookie.SameSite = SameSiteMode.Lax;
             });
         builder.Services.AddDataProtection()
             .PersistKeysToFileSystem(new DirectoryInfo(@"D:\202502"))
@@ -40,7 +40,7 @@ public static class AuthenticationExtensions
                            .AllowAnyMethod()
                            //.AllowAnyOrigin()
                            .WithOrigins("https://demo.firefly-26710.com:8443/",
-                                "http://localhost:3000","http://localhost:22000", "http://localhost:23000")
+                                "http://localhost:3000", "http://localhost:22000", "http://localhost:23000")
                            .AllowCredentials();
                 });
         });

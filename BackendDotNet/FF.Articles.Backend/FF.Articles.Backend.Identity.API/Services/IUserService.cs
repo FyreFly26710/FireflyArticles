@@ -13,6 +13,7 @@ public interface IUserService : IBaseService<User, IdentityDbContext>
     Task<LoginUserDto> UserLogin(string userAccount, string userPassword, HttpRequest request);
 
     User GetLoginUser(HttpRequest request);
+    Task<User> GetUserByEmail(string email);
 
     bool IsAdmin(HttpRequest request);
 

@@ -1,12 +1,10 @@
 import { apiArticleEditByRequest } from '@/api/contents/api/article';
-import { Form, Input, Modal, Select, Button, message, Switch, InputNumber, Tag } from 'antd';
-import { useRouter } from 'next/navigation';
+import { Button, Form, Input, InputNumber, message, Modal, Select } from 'antd';
 import React, { useEffect, useState } from 'react';
 
 const { Option } = Select;
 
 interface Props {
-    isCreate: boolean | undefined;
     parentArticleList: API.ArticleMiniDto[] | [] | undefined;
     topicList: API.TopicDto[] | [];
     tagList: API.TagDto[] | [];
@@ -17,10 +15,9 @@ interface Props {
 }
 
 const ArticleFormModal: React.FC<Props> = (props) => {
-    const { isCreate, parentArticleList, topicList,currentArticle, tagList, visible, onSubmit, onCancel } = props;
+    const { parentArticleList, topicList, currentArticle, tagList, visible, onSubmit, onCancel } = props;
     const [form] = Form.useForm();
     const [isParentDisabled, setIsParentDisabled] = useState(false);
-    const router = useRouter();
     const filterParentArticleList = parentArticleList?.filter(a => a.articleId !== currentArticle.articleId);
 
     useEffect(() => {
@@ -75,7 +72,7 @@ const ArticleFormModal: React.FC<Props> = (props) => {
     return (
         <Modal
             destroyOnClose
-            title={isCreate ? 'Update Article' : 'New Article'}
+            title='Update Article'
             open={visible}
             footer={null}
             onCancel={onCancel}
@@ -86,14 +83,11 @@ const ArticleFormModal: React.FC<Props> = (props) => {
                 wrapperCol={{ span: 18 }}
                 onFinish={handleFinish}
             >
-                {isCreate ?
-                    <Form.Item label='Article ID' name='articleId'>
-                        <Input disabled />
-                    </Form.Item>
-                    : <></>
-                }
-                <Form.Item label='Topic' name='topicId'>
-                    <Select allowClear>
+                <Form.Item label='Article ID' name='articleId'>
+                    <Input disabled />
+                </Form.Item>
+                <Form.Item label="Topic" name="topicId">
+                    <Select disabled value={currentArticle.topicId}>
                         {Array.isArray(topicList) &&
                             topicList.map((topic) => (
                                 <Option key={topic.topicId} value={topic.topicId}>
@@ -102,6 +96,7 @@ const ArticleFormModal: React.FC<Props> = (props) => {
                             ))}
                     </Select>
                 </Form.Item>
+
                 <Form.Item label='Title' name='title' rules={[{ required: true, message: 'Title is required' }]} >
                     <Input />
                 </Form.Item>
@@ -134,7 +129,7 @@ const ArticleFormModal: React.FC<Props> = (props) => {
                         <Option value='SubArticle'>SubArticle</Option>
                     </Select>
                 </Form.Item>
-                <Form.Item label='Parent Article' name='parentArticleId'>
+                <Form.Item label='Parent Article' name='parentArticleId' rules={[{ required: true, message: 'Parent Article is required' }]}>
                     <Select allowClear disabled={isParentDisabled}>
                         {filterParentArticleList?.map((article) => (
                             <Option key={article.articleId} value={article.articleId}>
@@ -151,10 +146,8 @@ const ArticleFormModal: React.FC<Props> = (props) => {
                         <Button onClick={() => resetForm(currentArticle)}>Reset</Button>
                         <div>
                             <Button style={{ marginLeft: 20 }} onClick={() => {
-                                if (isCreate) {
-                                    router.push(`/topic/${currentArticle.topicId}`)
-                                }
                                 onCancel();
+                                resetForm(currentArticle);
                             }}>Cancel</Button>
                             <Button style={{ marginLeft: 20 }} type='primary' htmlType='submit'>Update</Button>
                         </div>

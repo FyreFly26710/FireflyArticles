@@ -73,7 +73,7 @@ public class UserService(IdentityDbContext _context, ILogger<UserService> _logge
         }
         // need to get latest state of user??
         // user = _context.Users.Find(user.Id);
-        
+
         return _mapper.Map<User>(user);
     }
 
@@ -122,5 +122,16 @@ public class UserService(IdentityDbContext _context, ILogger<UserService> _logge
         {
             throw new ApiException(ErrorCode.PARAMS_ERROR, "Password length less than 8");
         }
+    }
+
+    public async Task<User> GetUserByEmail(string email)
+    {
+        var user = await this.GetQueryable()
+            .FirstOrDefaultAsync(u => email.ToLower()==(u.UserEmail ?? "").ToLower());
+        if (user == null)
+        {
+            user = new User() { Id = -1, UserAccount = email, UserRole = "user", UserName = "Guest" };
+        }
+        return user;
     }
 }

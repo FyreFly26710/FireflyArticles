@@ -5,10 +5,7 @@ import { apiArticleGetByPage } from "@/api/contents/api/article";
 import ArticleTable from "@/components/ArticleTable";
 
 
-// @ts-ignore
-export default async function ArticlesPage({ searchParams }) {
-    // get searchText from URL
-    const { q: searchText } = searchParams;
+export default async function ArticlesPage() {
     let articleLilst:any = [];
     let total = 0;
 

@@ -1,9 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { CSSProperties } from "react";
 import { LoginForm, ProForm, ProFormText } from "@ant-design/pro-form";
-import { message } from "antd";
-import { LockOutlined, UserOutlined } from "@ant-design/icons";
+import { Flex, message, Space } from "antd";
+import { AlipayCircleOutlined, GithubOutlined, GoogleCircleFilled, GoogleOutlined, LockOutlined, TaobaoCircleOutlined, TwitchOutlined, UserOutlined, WechatOutlined, WeiboCircleOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -12,6 +12,7 @@ import { setLoginUser } from "@/stores/loginUser";
 import { useDispatch } from "react-redux";
 import "./index.css";
 import { apiAuthLogin } from "@/api/identity/api/auth";
+import GoogleLoginButton from "@/components/GmailLoginBtn";
 
 /**
  * User login page
@@ -57,7 +58,14 @@ const UserLoginPage: React.FC = (props) => {
                         submitText: "Login",
                     },
                 }}
+                actions={
+                    <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                        <GoogleLoginButton />
+                    </div>
+
+                }
             >
+
                 <ProFormText
                     name="userAccount"
                     fieldProps={{
@@ -87,12 +95,8 @@ const UserLoginPage: React.FC = (props) => {
                         },
                     ]}
                 />
-                <div
-                    style={{
-                        marginBlockEnd: 24,
-                        textAlign: "end",
-                    }}
-                >
+
+                <div style={{ marginBlockEnd: 24, textAlign: "end", }}>
                     Don&#39;t have an account yet?{" "}
                     <Link prefetch={false} href={"/user/register"}>
                         Register

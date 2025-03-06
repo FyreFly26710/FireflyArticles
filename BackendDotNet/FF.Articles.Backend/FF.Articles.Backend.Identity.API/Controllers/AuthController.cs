@@ -1,16 +1,13 @@
-﻿using Azure.Core;
-using FF.Articles.Backend.Common.Exceptions;
+﻿using FF.Articles.Backend.Common.Exceptions;
 using FF.Articles.Backend.Common.Responses;
 using FF.Articles.Backend.Common.Utils;
 using FF.Articles.Backend.Identity.API.Models.Requests;
 using FF.Articles.Backend.Identity.API.Models.Responses;
 using Microsoft.AspNetCore.Mvc;
 using AutoMapper;
-using FF.Articles.Backend.Identity.API.Models.Entities;
 using Microsoft.AspNetCore.Authorization;
 using FF.Articles.Backend.Identity.API.Utils;
 using FF.Articles.Backend.Identity.API.Services;
-using FF.Articles.Backend.Common.Constants;
 
 namespace FF.Articles.Backend.Identity.API.Controllers;
 
@@ -19,7 +16,12 @@ namespace FF.Articles.Backend.Identity.API.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/identity/auth")]
-public class AuthController(IUserService _userService, ILogger<AuthController> _logger, IMapper _mapper)
+public class AuthController(
+    IUserService _userService,
+    IOAuthService _oAuthService, 
+    ILogger<AuthController> _logger, 
+    IMapper _mapper, 
+    IConfiguration _config)
     : ControllerBase
 {
 
@@ -68,5 +70,27 @@ public class AuthController(IUserService _userService, ILogger<AuthController> _
         var loginUserResponse = _mapper.Map<LoginUserDto>(user);
         return ResultUtil.Success(loginUserResponse);
     }
+    [HttpGet("signin-google")]
+    public async Task<IActionResult> SignInGoogle([FromQuery] string code)
+    {
+        if (string.IsNullOrEmpty(code))
+        {
+            return BadRequest("Authorization code is missing.");
+        }
+
+        var tokenResponse = await _oAuthService.GetGmailToken(code);
+
+        var userInfo = await _oAuthService.GetUserInfoFromGmailToken(tokenResponse.AccessToken);
+
+        var user = await _userService.GetUserByEmail(userInfo.Email);
+
+        await IdentityUtils.SignIn(user, HttpContext);
+
+        // Redirect to home
+        string? homePage = _config["URL:ClientApp"];
+        return Redirect(homePage??"/");
+    }
+
+
 
 }

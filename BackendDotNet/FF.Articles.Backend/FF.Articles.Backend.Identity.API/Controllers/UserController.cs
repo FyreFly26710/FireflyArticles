@@ -4,13 +4,9 @@ using FF.Articles.Backend.Common.Constants;
 using FF.Articles.Backend.Common.Exceptions;
 using FF.Articles.Backend.Common.Responses;
 using FF.Articles.Backend.Common.Utils;
-using FF.Articles.Backend.Identity.API.Models.Entities;
-using FF.Articles.Backend.Identity.API.Models.Requests;
 using FF.Articles.Backend.Identity.API.Models.Responses;
 using FF.Articles.Backend.Identity.API.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FF.Articles.Backend.Identity.API.Controllers;
@@ -52,20 +48,22 @@ public class UserController(IUserService _userService, ILogger<UserController> _
         await _userService.DeleteAsync(id);
         return ResultUtil.Success(true);
     }
-    [HttpPost]
-    [Authorize(Roles = UserConstant.ADMIN_ROLE)]
-    public async Task<ApiResponse<bool>> UpdateByRequest([FromBody] UserUpdateRequest request)
-    {
-        if (request == null)
-            return ResultUtil.Error<bool>(ErrorCode.PARAMS_ERROR, "Invalid user");
 
-        User? user = await _userService.GetByIdAsTrackingAsync(request.Id);
-        if (user == null)
-            return ResultUtil.Error<bool>(ErrorCode.PARAMS_ERROR, "User not found");
+    // Disable edit user endpoint, edit in database directly
+    // [HttpPost]
+    // [Authorize(Roles = UserConstant.ADMIN_ROLE)]
+    // public async Task<ApiResponse<bool>> UpdateByRequest([FromBody] UserUpdateRequest request)
+    // {
+    //     if (request == null)
+    //         return ResultUtil.Error<bool>(ErrorCode.PARAMS_ERROR, "Invalid user");
 
-        _mapper.Map(request, user);
-        await _userService.UpdateAsync(user);
-        return ResultUtil.Success(true);
-    }
+    //     User? user = await _userService.GetByIdAsTrackingAsync(request.Id);
+    //     if (user == null)
+    //         return ResultUtil.Error<bool>(ErrorCode.PARAMS_ERROR, "User not found");
+
+    //     _mapper.Map(request, user);
+    //     await _userService.UpdateAsync(user);
+    //     return ResultUtil.Success(true);
+    // }
 
 }

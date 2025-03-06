@@ -16,8 +16,9 @@ node_modules
 .idea/
 
 # Ignore environment files
-FrontendReact/ff-articles-frontend/.env
-FrontendReact/ff-articles-frontend/src/config.js
+FrontendReact/ff-articles-frontend/.env*
+appsettings.Development.json
+appsettings.Production.json
 
 # Ignore openapi config
 # FrontendReact/ff-articles-frontend/openapi.config.ts

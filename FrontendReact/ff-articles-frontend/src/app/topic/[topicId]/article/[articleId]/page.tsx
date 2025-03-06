@@ -1,144 +1,28 @@
 
 "use server";
-import Link from "next/link";
-import { Button, ConfigProvider, Flex, Layout, Menu, MenuProps, Popover, Tooltip } from "antd";
-import Sider from "antd/es/layout/Sider";
-import Title from "antd/es/typography/Title";
-import { Content } from "antd/es/layout/layout";
-import ArticleCard from "@/components/ArticleCard";
-import { apiTopicGetById, apiTopicGetByPage } from "@/api/contents/api/topic";
-import { apiArticleGetById } from "@/api/contents/api/article";
-import { FileAddOutlined, PlusCircleOutlined, PlusSquareOutlined } from "@ant-design/icons";
-import { apiTagGetAll } from "@/api/contents/api/tag";
+import ArticleCard from "@/app/topic/components/ArticleCard";
+import ArticleSider from "@/app/topic/components/ArticleSider";
+import { fetchArticle, fetchTags, fetchTopic, fetchTopicArticle, fetchTopicList } from "@/app/topic/utils/fetcher";
+import { Flex } from "antd";
 
-export default async function ArticlePage({ params }: { params: { topicId: number, articleId: number, isNewArticle:boolean } }) {
-    const { topicId, articleId, isNewArticle } = params;
+export default async function ArticlePage({ params }: { params: { topicId: number, articleId: number } }) {
+    const { topicId, articleId } = params;
+    const topic = await fetchTopic(topicId);
+    if (!topic) return <div>Failed fetching topics, please refresh page.</div>;
 
-    let topic: API.TopicDto | undefined;
-    try {
-        const topicRes = await apiTopicGetById({
-            id: (topicId),
-        });
-        // @ts-ignore
-        topic = topicRes.data;
-        console.log(topic);
-    } catch (e: any) {
-        console.error("Failed fetching topics, " + e.message);
-    }
-    if (!topic) {
-        return <div>Failed fetching topics, please refresh page.</div>;
-    }
+    const [topicList, tagList, article] = await Promise.all([
+        fetchTopicList(),
+        fetchTags(),
+        fetchArticle(articleId),
+    ]);
 
-    let topicList: API.TopicDto[] | undefined;
-    try {
-        const topicListRes = await apiTopicGetByPage({
-            PageNumber: 1,
-            PageSize: 100,
-            IncludeArticles: false,
-            IncludeSubArticles: false,
-            IncludeContent: false,
-            IncludeUser: false,
-        });
-        // @ts-ignore
-        topicList = topicListRes.data.data;
-    } catch (e: any) {
-        console.error("Failed fetching topics, " + e.message);
-    }
-    let tagList: API.TagDto[] | undefined;
-    try {
-        const tagRes = await apiTagGetAll();
-        // @ts-ignore
-        tagList = tagRes.data;
-    } catch (e: any) {
-        console.error("Failed fetching tags, " + e.message);
-    }
-
-    let article: API.ArticleDto | undefined;
-    try {
-        // get topic article
-        if (isNewArticle){
-            article = {articleType:"Article", topicId:topicId, title: topic.title } as API.ArticleDto;
-        }
-        else if (articleId === 0) {
-            article = { articleType:"TopicArticle",topicId:topicId, title: topic.title, abstraction: topic.abstraction, content: "" } as API.ArticleDto;
-        }
-        else if (articleId !== 0) {
-            const articleRes = await apiArticleGetById({
-                id: (articleId),
-            });
-            // @ts-ignore
-            article = articleRes.data;
-        }
-    } catch (e: any) {
-        console.error("Failed fetching articles, " + e.message);
-    }
-
-    if (!article) {
-        return <div>Failed fetching articles, please refresh page.</div>;
-    }
-
-
-
-    type MenuItem = Required<MenuProps>['items'][number];
-
-    function getItem(a: API.ArticleMiniDto): MenuItem {
-        return {
-            key: a.articleId,
-            label: (
-                <Popover placement="bottomLeft" content={a.title} arrow={{ pointAtCenter: true }}>
-                    <Link href={`/topic/${a.topicId}/article/${a.articleId}`}>{a.title}</Link>
-                </Popover>
-            ),
-            children: a.subArticles && a.subArticles.length > 0
-                ? a.subArticles.map((sub) => getItem(sub))
-                : undefined,
-        } as MenuItem;
-    }
-    const articleMenuItemList = (topic.articles || []).map(getItem);
+    if (!article) return <div>Failed fetching article, please refresh page.</div>;
 
     return (
         <div id="articlePage" className="max-width-content">
             <Flex gap={12}>
-                <Sider theme="light" breakpoint="lg" collapsedWidth="0" width={220}>
-                    <Flex vertical style={{ height: "100%" }}>
-                        <Title level={4} style={{ margin: "5px 20px" }}>
-                            <Link href={`/topic/${topicId}`} style={{ color: "black" }}>{topic.title}</Link>
-                        </Title>
-
-                        {/* TODO: Make theme global */}
-                        <ConfigProvider
-                            theme={{
-                                components: {
-                                    Menu: {
-                                        subMenuItemBg: "transparent",
-                                    },
-                                },
-                            }}
-                        >
-                            <Menu
-                                items={articleMenuItemList}
-                                mode="inline"
-                                selectedKeys={[String(article.articleId)]}
-                                defaultOpenKeys={[String(article.parentArticleId ?? article.articleId)]}
-                            />
-                        </ConfigProvider>
-                        <div style={{ margin: "auto 20px 20px 20px", textAlign: "right", fontSize: "16px" }}>
-                            <Link href={`/topic/${topicId}?newArticle=true`} style={{ color: "GrayText" }}>
-                                <PlusSquareOutlined />{" "} New Page
-                            </Link>
-                        </div>
-                    </Flex>
-
-                </Sider>
-                <ArticleCard
-                    isNewArticle={isNewArticle}
-                    article={article}
-                    topic={topic || []}
-                    topicList={topicList || []}
-                    tagList={tagList || []}
-                >
-                </ArticleCard>
-
+                <ArticleSider topic={topic} parentArticleId={article.parentArticleId} articleId={article.articleId} />
+                <ArticleCard article={article} topic={topic} topicList={topicList || []} tagList={tagList || []} />
             </Flex>
         </div>
     );

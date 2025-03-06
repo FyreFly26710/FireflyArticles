@@ -2,6 +2,7 @@ using FF.Articles.Backend.Common.ApiDtos;
 using FF.Articles.Backend.Identity.API.Models.Entities;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
 using System.Security.Claims;
 using System.Text.Json;
 
@@ -52,5 +53,6 @@ public class IdentityUtils
 
     public static async Task SignOutUser(HttpRequest httpRequest)
         => await httpRequest.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
 
 }
