@@ -103,9 +103,22 @@ public abstract class BaseService<TEntity, TContext>(TContext _context, ILogger<
     public virtual async Task<List<TEntity>> GetAllAsync() => await _context.Set<TEntity>().ToListAsync();
     public virtual async Task<List<TEntity>> GetAllAsync(List<int> ids)
         => await _context.Set<TEntity>().Where(e => ids.Contains(e.Id)).ToListAsync();
-    public virtual async Task<Paged<TEntity>> GetAllAsync(PageRequest pageRequest)
+    public virtual async Task<Paged<TEntity>> GetAllAsync(PageRequest pageRequest) =>
+        await GetPagedAsync(_context.Set<TEntity>(), pageRequest);
+
+    public virtual async Task<Paged<TEntity>> GetPagedAsync(IQueryable<TEntity> query, PageRequest pageRequest)
     {
-        var query = _context.Set<TEntity>().AsQueryable();
+        // Get total count before applying pagination
+        int totalCount = await query.CountAsync();
+        // Apply pagination
+        query = ApplyPageRequestQuery(query, pageRequest);
+        // Execuate query
+        var data = await query.ToListAsync();
+
+        return new Paged<TEntity>(pageRequest.PageNumber, pageRequest.PageSize, totalCount, data);
+    }
+    public virtual IQueryable<TEntity> ApplyPageRequestQuery(IQueryable<TEntity> query, PageRequest pageRequest)
+    {
         // Apply sorting if a SortField is provided
         if (!string.IsNullOrWhiteSpace(pageRequest.SortField))
         {
@@ -119,14 +132,9 @@ public abstract class BaseService<TEntity, TContext>(TContext _context, ILogger<
                     : query.OrderByDescending(e => EF.Property<object>(e, propertyInfo.Name));
             }
         }
-        // Get total count before applying pagination
-        int totalCount = await query.CountAsync();
+
         // Apply pagination
-        var data = await query
-            .Skip((pageRequest.PageNumber - 1) * pageRequest.PageSize)
-            .Take(pageRequest.PageSize)
-            .ToListAsync();
-        return new Paged<TEntity>(pageRequest.PageNumber, pageRequest.PageSize, totalCount, data);
+        return query.Skip((pageRequest.PageNumber - 1) * pageRequest.PageSize).Take(pageRequest.PageSize);
     }
 
     public virtual async Task<List<int>> CreateBatchAsync(List<TEntity> entities) => throw new NotImplementedException();

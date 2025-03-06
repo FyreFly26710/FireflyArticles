@@ -21,7 +21,7 @@ http {
 
     server {
         listen       80;
-        server_name demo.firefly-26710.com;
+        server_name xxxx.com;
 
 
         location / {
@@ -63,10 +63,10 @@ http {
     server {
        listen       443 ssl;
        listen       8443 ssl;
-       server_name  demo.firefly-26710.com;
+       server_name  xxxx.com;
 
-       ssl_certificate      E:/web/ssl/ca/_.firefly-26710.com.pem;
-       ssl_certificate_key  E:/web/ssl/ca/_.firefly-26710.com.key;
+       ssl_certificate      E:/web/ssl/ca/_.xxxx.com.pem;
+       ssl_certificate_key  E:/web/ssl/ca/_.xxxx.com.key;
 
     #    ssl_session_cache    shared:SSL:1m;
     #    ssl_session_timeout  5m;

@@ -35,18 +35,32 @@ public class ArticleController(IMapper _mapper,
     }
 
     [HttpGet]
-    public async Task<ApiResponse<Paged<ArticleDto>>> GetByPage([FromQuery]ArticlePageRequest pageRequest)
+    public async Task<ApiResponse<Paged<ArticleDto>>> GetByPage([FromQuery] ArticlePageRequest pageRequest)
     {
         if (pageRequest == null || pageRequest.PageSize > 200)
             return ResultUtil.Error<Paged<ArticleDto>>(ErrorCode.PARAMS_ERROR, "Invalid page request");
-        if(pageRequest.SortField == null)
+        if (pageRequest.SortField == null)
         {
             pageRequest.SortField = "SortNumber";
         }
-        var pagedArticles = await _articleService.GetAllAsync(pageRequest);
-        var articleDto = pagedArticles.Data.Where(x => x.ArticleType == ArticleTypes.Article);
-        var articleList = await _articleService.GetArticleDtos(articleDto, pageRequest);
-        var res = new Paged<ArticleDto>(pagedArticles.GetPageInfo(), articleList);
+        // var pagedArticles = await _articleService.GetAllAsync(pageRequest);
+        // var articleDto = pagedArticles.Data.ToList();
+        // if (pageRequest.DisplaySubArticles)
+        // {
+        //     articleDto = articleDto.Where(x => x.ArticleType == ArticleTypes.Article).ToList();
+        // }
+        // var articleList = await _articleService.GetArticleDtos(articleDto, pageRequest);
+        // var res = new Paged<ArticleDto>(pagedArticles.GetPageInfo(), articleList);
+        var query = _articleService.GetQueryable();
+        if (pageRequest.DisplaySubArticles)
+        {
+            query = query.Where(x => x.ArticleType == ArticleTypes.Article);
+        }
+        query = await _articleService.ApplySearchQuery(query, pageRequest);
+
+        var pagedData = await _articleService.GetPagedAsync(query,pageRequest);
+        var articleList = await _articleService.GetArticleDtos(pagedData.Data, pageRequest);
+        var res = new Paged<ArticleDto>(pagedData.GetPageInfo(), articleList);
         return ResultUtil.Success(res);
     }
 
@@ -70,7 +84,7 @@ public class ArticleController(IMapper _mapper,
     [Authorize(Roles = UserConstant.ADMIN_ROLE)]
     public async Task<ApiResponse<bool>> EditByRequest([FromBody] ArticleEditRequest articleEditRequest)
         => ResultUtil.Success(await _articleService.EditArticleByRequest(articleEditRequest));
-    
+
 
     [HttpDelete("{id}")]
     [Authorize(Roles = UserConstant.ADMIN_ROLE)]

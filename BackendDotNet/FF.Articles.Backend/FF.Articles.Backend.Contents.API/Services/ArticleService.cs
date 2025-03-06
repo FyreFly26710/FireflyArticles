@@ -9,6 +9,7 @@ using FF.Articles.Backend.Contents.API.Models.Entities;
 using FF.Articles.Backend.Contents.API.Models.Requests.Articles;
 using FF.Articles.Backend.Contents.API.RemoteServices.Interfaces;
 using FF.Articles.Backend.Contents.API.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace FF.Articles.Backend.Contents.API.Services;
 public class ArticleService(ContentsDbContext _context, ILogger<ArticleService> _logger, IMapper _mapper,
@@ -81,6 +82,50 @@ public class ArticleService(ContentsDbContext _context, ILogger<ArticleService> 
         await this.DeleteAsync(id);
         await _articleTagService.RemoveArticleTags(id);
         return true;
+    }
+
+    public async Task<IQueryable<Article>> ApplySearchQuery(IQueryable<Article> query, ArticlePageRequest pageRequest)
+    {
+        var keyword = pageRequest.Title;
+        List<string>? topics = pageRequest.Topics;
+        var tagIds = pageRequest.TagIds;
+
+        if (!string.IsNullOrEmpty(keyword))
+        {
+            query = query.Where(a => EF.Functions.Like(a.Title, $"%{keyword}%"));
+        }
+
+        if (topics != null && topics.Count > 0)
+        {
+            List<int> topicIds = await _context.Set<Topic>()
+                .Where(t => topics.Contains(t.Title))
+                .Select(t => t.Id)
+                .ToListAsync();
+            query = query.Where(a => topicIds.Contains(a.TopicId));
+        }
+
+        if (tagIds != null && tagIds.Count > 0)
+        {
+            query = from a in query
+                    join at in _context.Set<ArticleTag>() on a.Id equals at.ArticleId
+                    where tagIds.Contains(at.TagId)
+                    select a;
+        }
+    //   Executed DbCommand (36ms) [Parameters=[@__Format_1='%C%' (Size = 1000), @__topicIds_2='[1,2,3,4]' (Size = 4000), @__tagIds_3='[1,2,3,4,5]' (Size = 4000), @__p_4='0', @__p_5='20'], CommandType='Text', CommandTimeout='30']
+    //   SELECT [a].[Id], [a].[Abstraction], [a].[ArticleType], [a].[Content], [a].[CreateTime], [a].[IsDelete], [a].[IsHidden], [a].[ParentArticleId], [a].[SortNumber], [a].[Title], [a].[TopicId], [a].[UpdateTime], [a].[UserId]
+    //   FROM [Contents].[Article] AS [a]
+    //   INNER JOIN [Contents].[ArticleTag] AS [a0] ON [a].[Id] = [a0].[ArticleId]
+    //   WHERE [a].[IsDelete] = 0 AND [a].[ArticleType] = N'Article' AND [a].[Title] LIKE @__Format_1 AND [a].[TopicId] IN (
+    //       SELECT [t].[value]
+    //       FROM OPENJSON(@__topicIds_2) WITH ([value] int '$') AS [t]
+    //   ) AND [a0].[TagId] IN (
+    //       SELECT [t0].[value]
+    //       FROM OPENJSON(@__tagIds_3) WITH ([value] int '$') AS [t0]
+    //   )
+    //   ORDER BY [a].[SortNumber]
+    //   OFFSET @__p_4 ROWS FETCH NEXT @__p_5 ROWS ONLY
+        return query;
+
     }
 }
 

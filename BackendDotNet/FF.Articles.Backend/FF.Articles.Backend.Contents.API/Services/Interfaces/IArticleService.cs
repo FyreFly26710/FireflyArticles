@@ -13,4 +13,5 @@ public interface IArticleService : IBaseService<Article, ContentsDbContext>
     Task<List<ArticleDto>> GetArticleDtos(IEnumerable<Article> articles, ArticlePageRequest articleRequest);
     Task<bool> EditArticleByRequest(ArticleEditRequest articleEditRequest);
     Task<bool> DeleteArticleById(int id);
+    Task<IQueryable<Article>> ApplySearchQuery(IQueryable<Article> query, ArticlePageRequest pageRequest);
 }

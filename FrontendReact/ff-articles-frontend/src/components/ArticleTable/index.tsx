@@ -41,6 +41,11 @@ export default function ArticleTable(props: Props) {
       dataIndex: "searchText",
       valueType: "text",
       hideInTable: true,
+    },    
+    {
+      title: "Topic",
+      dataIndex: "topicTitle",
+      valueType: "select",
     },
     {
       title: "Tags",
@@ -51,6 +56,12 @@ export default function ArticleTable(props: Props) {
       },
       render: (_, record) => <TagList tagList={record.tags} />,
     },
+    {
+      title:"Intro",
+      dataIndex:"abstraction",
+      ellipsis:true,
+      hideInSearch:true
+    }
   ];
 
   return (
@@ -60,6 +71,8 @@ export default function ArticleTable(props: Props) {
         size="large"
         search={{
           labelWidth: "auto",
+          // optionRender: false,
+          collapsed: false,
         }}
         form={{
           initialValues: {}, 
@@ -83,16 +96,17 @@ export default function ArticleTable(props: Props) {
             }
           }
 
-          const sortField = Object.keys(sort)?.[0] || "createTime";
-          const sortOrder = sort?.[sortField] || "descend";
-          //@ts-ignore
-          const { data, code } = await apiArticleGetByPage({
-            ...params,
-            sortField,
-            sortOrder,
-            ...filter,
+          const response = await apiArticleGetByPage({
+            PageNumber:params.current,
+            PageSize:params.pageSize,
+            SortField:"SortNumber",
+            SortOrder:"ascend",
+            IncludeContent:false,
+            IncludeSubArticles:false,
+            IncludeUser:false
           } as API.apiArticleGetByPageParams);
-
+          //@ts-ignore
+          const { data, code } = response;
           const newData = data?.data || [];
           //@ts-ignore
           const newTotal = data?.counts || 0;

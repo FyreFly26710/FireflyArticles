@@ -15,6 +15,8 @@ public interface IBaseService<TEntity, TContext> where TEntity : BaseEntity wher
     Task<List<TEntity>> GetAllAsync(List<int> ids);
     Task<List<TEntity>> GetAllAsync();
     Task<Paged<TEntity>> GetAllAsync(PageRequest pageRequest);
+    Task<Paged<TEntity>> GetPagedAsync(IQueryable<TEntity> query, PageRequest pageRequest);
+    IQueryable<TEntity> ApplyPageRequestQuery(IQueryable<TEntity> query,PageRequest pageRequest);
     IQueryable<TEntity> GetQueryable();
     Task<int> CreateAsync(TEntity entity);
     Task<List<int>> CreateBatchAsync(List<TEntity> entities);
