@@ -15,6 +15,9 @@ node_modules
 .next/
 .idea/
 
+# Ignore generated codes
+generate/
+
 # Ignore environment files
 FrontendReact/ff-articles-frontend/.env*
 appsettings.Development.json

@@ -1,4 +1,3 @@
-import { apiUserUpdateByRequest } from '@/api/identity/api/user';
 import { ProColumns, ProTable } from '@ant-design/pro-components';
 import { message, Modal } from 'antd';
 import React from 'react';
@@ -19,9 +18,11 @@ interface Props {
 const handleUpdate = async (fields: API.UserUpdateRequest) => {
     const hide = message.loading('Updating...');
     try {
-        await apiUserUpdateByRequest(fields);
+        //await apiUserUpdateByRequest(fields);
+        // hide();
+        // message.success('Update successful');
         hide();
-        message.success('Update successful');
+        message.error('Update function is disabled')
         return true;
     } catch (error: any) {
         hide();

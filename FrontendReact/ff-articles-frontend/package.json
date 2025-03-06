@@ -2,11 +2,11 @@
   "name": "ff-articles-frontend",
   "version": "0.1.0",
   "private": true,
-"scripts": {
-  "dev": "cross-env NEXT_PUBLIC_CONFIG=development next dev",
-  "build": "cross-env NEXT_PUBLIC_CONFIG=production next build",
-  "openapi": "ts-node openapi.config.ts"
-},
+  "scripts": {
+    "dev": "cross-env NEXT_PUBLIC_CONFIG=development next dev",
+    "build": "cross-env NEXT_PUBLIC_CONFIG=production next build",
+    "openapi": "ts-node openapi.config.ts"
+  },
   "dependencies": {
     "@ant-design/icons": "^5.6.1",
     "@ant-design/nextjs-registry": "^1.0.2",
@@ -18,10 +18,12 @@
     "@bytemd/react": "^1.22.0",
     "@emotion/css": "^11.13.5",
     "@reduxjs/toolkit": "^2.5.1",
+    "@types/qs": "^6.9.18",
     "antd": "^5.24.0",
     "axios": "^1.7.9",
     "github-markdown-css": "^5.8.1",
     "next": "14.2.6",
+    "qs": "^6.14.0",
     "react": "^18",
     "react-dom": "^18",
     "react-redux": "^9.2.0"

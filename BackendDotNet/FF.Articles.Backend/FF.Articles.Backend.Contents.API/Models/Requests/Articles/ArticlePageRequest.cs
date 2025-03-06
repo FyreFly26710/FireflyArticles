@@ -16,8 +16,8 @@ namespace FF.Articles.Backend.Contents.API.Models.Requests.Articles
         public bool DisplaySubArticles {get; set; } = false;
 
         #region Search fields
-        public string? Title {get; set; }
-        public List<string>? Topics {get; set; }
+        public string? Keyword {get; set; }
+        public List<int>? TopicIds {get; set; }
         public List<int>? TagIds {get; set;}
 
         #endregion

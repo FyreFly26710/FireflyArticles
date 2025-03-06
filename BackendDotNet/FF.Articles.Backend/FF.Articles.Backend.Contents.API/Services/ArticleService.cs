@@ -86,8 +86,8 @@ public class ArticleService(ContentsDbContext _context, ILogger<ArticleService> 
 
     public async Task<IQueryable<Article>> ApplySearchQuery(IQueryable<Article> query, ArticlePageRequest pageRequest)
     {
-        var keyword = pageRequest.Title;
-        List<string>? topics = pageRequest.Topics;
+        var keyword = pageRequest.Keyword;
+        List<int>? topicIds = pageRequest.TopicIds;
         var tagIds = pageRequest.TagIds;
 
         if (!string.IsNullOrEmpty(keyword))
@@ -95,12 +95,8 @@ public class ArticleService(ContentsDbContext _context, ILogger<ArticleService> 
             query = query.Where(a => EF.Functions.Like(a.Title, $"%{keyword}%"));
         }
 
-        if (topics != null && topics.Count > 0)
+        if (topicIds != null && topicIds.Count > 0)
         {
-            List<int> topicIds = await _context.Set<Topic>()
-                .Where(t => topics.Contains(t.Title))
-                .Select(t => t.Id)
-                .ToListAsync();
             query = query.Where(a => topicIds.Contains(a.TopicId));
         }
 
@@ -111,6 +107,7 @@ public class ArticleService(ContentsDbContext _context, ILogger<ArticleService> 
                     where tagIds.Contains(at.TagId)
                     select a;
         }
+        return query;
     //   Executed DbCommand (36ms) [Parameters=[@__Format_1='%C%' (Size = 1000), @__topicIds_2='[1,2,3,4]' (Size = 4000), @__tagIds_3='[1,2,3,4,5]' (Size = 4000), @__p_4='0', @__p_5='20'], CommandType='Text', CommandTimeout='30']
     //   SELECT [a].[Id], [a].[Abstraction], [a].[ArticleType], [a].[Content], [a].[CreateTime], [a].[IsDelete], [a].[IsHidden], [a].[ParentArticleId], [a].[SortNumber], [a].[Title], [a].[TopicId], [a].[UpdateTime], [a].[UserId]
     //   FROM [Contents].[Article] AS [a]
@@ -124,7 +121,6 @@ public class ArticleService(ContentsDbContext _context, ILogger<ArticleService> 
     //   )
     //   ORDER BY [a].[SortNumber]
     //   OFFSET @__p_4 ROWS FETCH NEXT @__p_5 ROWS ONLY
-        return query;
 
     }
 }

@@ -27,6 +27,7 @@ const ArticleList = (props: Props) => {
                                 href={`/topic/${item.topicId}/article/${item.articleId}`}>
                                 {item.title}
                             </Link>}
+                            description={item.abstraction}
                         />
                     </List.Item>
                 )}

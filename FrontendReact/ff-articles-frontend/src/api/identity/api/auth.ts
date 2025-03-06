@@ -2,7 +2,7 @@
 /* eslint-disable */
 import request from "@/libs/request";
 
-/** 此处后端没有提供注释 POST /api/identity/auth/getLoginUser */
+/**POST /api/identity/auth/getLoginUser */
 export async function apiAuthGetLoginUser(options?: { [key: string]: any }) {
   return request<API.LoginUserDtoApiResponse>(
     "/api/identity/auth/getLoginUser",
@@ -13,7 +13,7 @@ export async function apiAuthGetLoginUser(options?: { [key: string]: any }) {
   );
 }
 
-/** 此处后端没有提供注释 POST /api/identity/auth/login */
+/**POST /api/identity/auth/login */
 export async function apiAuthLogin(
   body: API.UserLoginRequest,
   options?: { [key: string]: any }
@@ -28,7 +28,7 @@ export async function apiAuthLogin(
   });
 }
 
-/** 此处后端没有提供注释 POST /api/identity/auth/logout */
+/**POST /api/identity/auth/logout */
 export async function apiAuthLogout(options?: { [key: string]: any }) {
   return request<API.BooleanApiResponse>("/api/identity/auth/logout", {
     method: "POST",
@@ -36,7 +36,7 @@ export async function apiAuthLogout(options?: { [key: string]: any }) {
   });
 }
 
-/** 此处后端没有提供注释 POST /api/identity/auth/register */
+/**POST /api/identity/auth/register */
 export async function apiAuthRegister(
   body: API.UserRegisterRequest,
   options?: { [key: string]: any }

@@ -11,6 +11,10 @@ declare namespace API {
     IncludeUser?: boolean;
     IncludeSubArticles?: boolean;
     IncludeContent?: boolean;
+    DisplaySubArticles?: boolean;
+    Keyword?: string;
+    TopicIds?: number[];
+    TagIds?: number[];
     PageNumber?: number;
     PageSize?: number;
     SortField?: string;

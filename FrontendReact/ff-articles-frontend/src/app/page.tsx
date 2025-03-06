@@ -24,6 +24,10 @@ export default async function HomePage() {
     try {
         const res = await apiArticleGetByPage({
             PageSize: 12,
+            IncludeContent:false,
+            IncludeSubArticles:false,
+            IncludeUser:false,
+            DisplaySubArticles:true,
         });
         articleList = res.data.data ?? [];
     } catch (e:any) {

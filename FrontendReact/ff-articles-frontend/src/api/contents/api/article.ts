@@ -1,10 +1,10 @@
 // @ts-ignore
 /* eslint-disable */
 import request from "@/libs/request";
+import qs from "qs";
 
-/** 此处后端没有提供注释 GET /api/contents/articles */
+/**GET /api/contents/articles */
 export async function apiArticleGetByPage(
-  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
   params: API.apiArticleGetByPageParams,
   options?: { [key: string]: any }
 ) {
@@ -12,12 +12,19 @@ export async function apiArticleGetByPage(
     method: "GET",
     params: {
       ...params,
+    },    
+    paramsSerializer: (params) => {
+      return qs.stringify(params, {
+        arrayFormat: 'repeat',
+        encode: false,
+        indices: false
+      });
     },
     ...(options || {}),
   });
 }
 
-/** 此处后端没有提供注释 PUT /api/contents/articles */
+/**PUT /api/contents/articles */
 export async function apiArticleAddByRequest(
   body: API.ArticleAddRequest,
   options?: { [key: string]: any }
@@ -32,7 +39,7 @@ export async function apiArticleAddByRequest(
   });
 }
 
-/** 此处后端没有提供注释 POST /api/contents/articles */
+/**POST /api/contents/articles */
 export async function apiArticleEditByRequest(
   body: API.ArticleEditRequest,
   options?: { [key: string]: any }
@@ -47,9 +54,8 @@ export async function apiArticleEditByRequest(
   });
 }
 
-/** 此处后端没有提供注释 GET /api/contents/articles/${param0} */
+/**GET /api/contents/articles/${param0} */
 export async function apiArticleGetById(
-  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
   params: API.apiArticleGetByIdParams,
   options?: { [key: string]: any }
 ) {
@@ -64,9 +70,8 @@ export async function apiArticleGetById(
   );
 }
 
-/** 此处后端没有提供注释 DELETE /api/contents/articles/${param0} */
+/**DELETE /api/contents/articles/${param0} */
 export async function apiArticleDeleteById(
-  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
   params: API.apiArticleDeleteByIdParams,
   options?: { [key: string]: any }
 ) {
