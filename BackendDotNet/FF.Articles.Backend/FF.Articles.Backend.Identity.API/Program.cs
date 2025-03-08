@@ -11,12 +11,7 @@ using Microsoft.AspNetCore.Mvc.Controllers;
 var builder = WebApplication.CreateBuilder(args);
 
 
-builder.AddServiceDefaults();
-
-// builder.Services.AddHttpsRedirection(options => {
-//     options.RedirectStatusCode = StatusCodes.Status307TemporaryRedirect;
-//     options.HttpsPort = 22000; 
-// });
+builder.AddServiceDefaults(builder.Configuration);
 
 builder.Services.AddDbContext<IdentityDbContext>(options =>
 {
@@ -33,7 +28,6 @@ builder.Services.AddScoped<IOAuthService, OAuthService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-//builder.Services.AddSwaggerGen();
 builder.Services.AddSwaggerGen(c =>
 {
     c.CustomOperationIds(apiDesc =>

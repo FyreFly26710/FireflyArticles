@@ -87,7 +87,7 @@ public class AuthController(
         await IdentityUtils.SignIn(user, HttpContext);
 
         // Redirect to home
-        string? homePage = _config["URL:ClientApp"];
+        string? homePage = _config["Domain:Home"];
         return Redirect(homePage??"/");
     }
 

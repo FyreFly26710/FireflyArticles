@@ -1,10 +1,7 @@
- ## Backend apis:
-Build: `dotnet publish -c Release -m:8 -o ./publish`
-Start: 
-dotnet FF.Articles.Backend.Contents.API.dll --urls "http://*:23000"
-dotnet FF.Articles.Backend.Identity.API.dll --urls "http://*:22000"
-
-Stop: 
+## Backend apis:
+Build: `
+dotnet publish D:\projects\FireflyArticles\BackendDotNet\FF.Articles.Backend\FF.Articles.Backend.sln -c Release -o D:\projects\FireflyArticles\BackendDotNet\FF.Articles.Backend\publish
+`
 
 ## Frontend ui:
 - update next.config.mjs
@@ -12,3 +9,7 @@ Stop:
     src/public => src/.next/standalone
     src/.next/static = >src/.next/standalone/.next
 - 'node server.js'
+
+Start:
+Exec bat
+start nginx

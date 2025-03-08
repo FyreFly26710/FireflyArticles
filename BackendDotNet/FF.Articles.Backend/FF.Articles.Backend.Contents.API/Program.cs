@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.AddServiceDefaults();
+builder.AddServiceDefaults(builder.Configuration);
 // builder.Services.AddHttpsRedirection(options => {
 //     options.RedirectStatusCode = StatusCodes.Status307TemporaryRedirect;
 //     options.HttpsPort = 23000; 

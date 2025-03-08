@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -20,8 +21,8 @@ public static class AuthenticationExtensions
                 options.Cookie.Name = "AuthCookie";
                 //options.ExpireTimeSpan = TimeSpan.FromDays(7); // optional
                 options.Cookie.HttpOnly = true;
-                options.Cookie.SecurePolicy = CookieSecurePolicy.None;
-                options.Cookie.SameSite = SameSiteMode.Lax;
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                options.Cookie.SameSite = SameSiteMode.None;
             });
         builder.Services.AddDataProtection()
             .PersistKeysToFileSystem(new DirectoryInfo(@"D:\202502"))
@@ -29,18 +30,21 @@ public static class AuthenticationExtensions
         return builder;
     }
 
-    public static WebApplicationBuilder AddCors(this WebApplicationBuilder builder)
+    public static WebApplicationBuilder AddCors(this WebApplicationBuilder builder, IConfiguration configuration)
     {
         builder.Services.AddCors(options =>
         {
+            string url = configuration["Domain:Home"]??"";
             options.AddPolicy("AllowedOrigins",
                 builder =>
                 {
                     builder.AllowAnyHeader()
                            .AllowAnyMethod()
-                           //.AllowAnyOrigin()
-                           .WithOrigins("https://demo.firefly-26710.com:8443/",
-                                "http://localhost:3000", "http://localhost:22000", "http://localhost:23000")
+                           .WithOrigins(configuration["Domain:Home"]??"",
+                                "http://localhost:3000", 
+                                "http://localhost:21000", 
+                                "http://localhost:22000", 
+                                "http://localhost:23000")
                            .AllowCredentials();
                 });
         });

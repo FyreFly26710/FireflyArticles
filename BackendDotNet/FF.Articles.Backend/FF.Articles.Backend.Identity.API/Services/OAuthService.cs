@@ -26,7 +26,7 @@ public class OAuthService(IConfiguration _configuration): IOAuthService
         var content = new FormUrlEncodedContent(requestBody);
         var response = await httpClient.PostAsync(tokenEndpoint, content);
 
-        response.EnsureSuccessStatusCode();
+        //response.EnsureSuccessStatusCode();
 
         var responseContent = await response.Content.ReadAsStringAsync();
         var tokenResponse = JsonSerializer.Deserialize<TokenResponse>(responseContent);
@@ -42,7 +42,7 @@ public class OAuthService(IConfiguration _configuration): IOAuthService
         httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", gmailToken);
         var response = await httpClient.GetAsync(userInfoEndpoint);
 
-        response.EnsureSuccessStatusCode();
+        //response.EnsureSuccessStatusCode();
 
         var responseContent = await response.Content.ReadAsStringAsync();
         var userInfo = JsonSerializer.Deserialize<UserInfo>(responseContent);

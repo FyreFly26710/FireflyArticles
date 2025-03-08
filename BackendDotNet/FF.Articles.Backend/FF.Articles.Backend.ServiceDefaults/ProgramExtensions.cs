@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
@@ -14,11 +15,11 @@ using System.Threading.Tasks;
 namespace FF.Articles.Backend.ServiceDefaults;
 public static class ProgramExtensions
 {
-    public static WebApplicationBuilder AddServiceDefaults(this WebApplicationBuilder builder)
+    public static WebApplicationBuilder AddServiceDefaults(this WebApplicationBuilder builder, IConfiguration configuration)
     {
 
         builder.AddLogger();
-        builder.AddCors();
+        builder.AddCors(configuration);
         builder.AddCookieAuth();
         builder.Services.AddHttpClient();
 

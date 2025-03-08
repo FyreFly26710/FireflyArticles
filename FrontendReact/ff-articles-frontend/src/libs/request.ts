@@ -1,10 +1,11 @@
 import axios, { AxiosResponse } from "axios";
 const DevBaseUrl = "http://localhost:21000/";
 const ProdBaseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+const url = ProdBaseUrl??DevBaseUrl;
 
 // create Axios
 const myAxios = axios.create({
-    baseURL: DevBaseUrl,
+    baseURL: url,
     timeout: 20000,
     withCredentials: true,
 });
