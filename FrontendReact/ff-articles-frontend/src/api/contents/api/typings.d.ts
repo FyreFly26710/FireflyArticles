@@ -8,6 +8,7 @@ declare namespace API {
   };
 
   type apiArticleGetByPageParams = {
+    ArticleId?: number;
     IncludeUser?: boolean;
     IncludeSubArticles?: boolean;
     IncludeContent?: boolean;
@@ -38,6 +39,7 @@ declare namespace API {
   };
 
   type apiTopicGetByPageParams = {
+    TopicId?: number;
     IncludeUser?: boolean;
     IncludeArticles?: boolean;
     IncludeSubArticles?: boolean;
@@ -163,6 +165,7 @@ declare namespace API {
   type TopicAddRequest = {
     title?: string;
     abstraction?: string;
+    content?: string;
     topicImage?: string;
     category?: string;
     sortNumber?: number;
@@ -175,6 +178,7 @@ declare namespace API {
     updateTime?: string;
     title?: string;
     abstraction?: string;
+    content?: string;
     category?: string;
     topicImage?: string;
     userId?: number;
@@ -207,6 +211,7 @@ declare namespace API {
     topicId?: number;
     title?: string;
     abstraction?: string;
+    content?: string;
     topicImage?: string;
     category?: string;
     sortNumber?: number;

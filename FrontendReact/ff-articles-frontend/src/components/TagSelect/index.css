@@ -1,0 +1,14 @@
+.tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.tag-list .ant-tag {
+    margin-right: 0;
+    transition: all 0.3s;
+}
+
+.tag-list .ant-tag:hover {
+    opacity: 0.8;
+}

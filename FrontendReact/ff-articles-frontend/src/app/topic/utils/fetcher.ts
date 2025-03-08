@@ -66,14 +66,12 @@ export async function fetchArticle(articleId: number): Promise<API.ArticleDto | 
 export async function fetchTopicArticle(topic: API.TopicDto)
     : Promise<API.ArticleDto | undefined> {
     try {
-        // to do, api to get topic article
-        //const articleRes = await apiArticleGetById({ id: articleId });
         return {
             articleType: "TopicArticle",
             topicId: topic.topicId,
             title: topic.title,
             abstraction: topic.abstraction,
-            content: ""
+            content: topic.content,
         } as API.ArticleDto;
     } catch (e: any) {
         console.error("Failed fetching topic article:", e.message);

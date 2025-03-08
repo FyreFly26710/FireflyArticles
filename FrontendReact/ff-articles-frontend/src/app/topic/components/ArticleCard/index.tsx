@@ -6,11 +6,15 @@ import Title from "antd/es/typography/Title";
 import "./index.css";
 import { apiArticleAddByRequest, apiArticleEditByRequest } from "@/api/contents/api/article";
 import TagList from "@/components/TagList";
-import MdViewer from "@/components/MdViewer";
 import MdEditor from "@/components/MdEditor";
-import ArticleFormModal from "@/app/topic/components/ArticleFormModal";
+import ArticleFormModal from "@/components/ArticleFormModal";
 import { useRouter } from "next/navigation";
 
+import dynamic from 'next/dynamic'
+
+const MdViewer = dynamic(() => import('@/components/MdViewer'), {
+    ssr: false
+})
 
 const { TextArea } = Input;
 
@@ -18,7 +22,7 @@ interface Props {
     isNewArticle?: boolean | undefined;
     redirectArticleId?: number | undefined;
     article: API.ArticleDto;
-    topic: API.TopicDto;
+    topic: API.TopicDto | undefined;
     topicList: API.TopicDto[];
     tagList: API.TagDto[];
 }
@@ -27,7 +31,7 @@ const ArticleCard = (props: Props) => {
     const [updateModalVisible, setUpdateModalVisible] = useState<boolean>(false);
 
     const { isNewArticle, topic, article, topicList, tagList, redirectArticleId } = props;
-    const parentArticleList = topic.articles;
+    const parentArticleList = topic?.articles;
     const [isEditing, setIsEditing] = useState(false);
     const [editedTitle, setEditedTitle] = useState(article.title);
     const [editedContent, setEditedContent] = useState(article.content);
@@ -53,7 +57,7 @@ const ArticleCard = (props: Props) => {
                 hide();
                 setIsEditing(false);
                 message.success('Update successful!');
-                router.push(`/topic/${topic.topicId}/article/${id}`);
+                router.push(`/topic/${topic?.topicId}/article/${id}`);
             }
             if (!isNewArticle) {
                 await apiArticleEditByRequest({
@@ -69,7 +73,8 @@ const ArticleCard = (props: Props) => {
             }
         } catch (error: any) {
             hide();
-            message.error('Update failed: ' + error.message);
+            console.log(error)
+            message.error('Update failed');
         } finally {
             setIsSaving(false);
         }
@@ -98,8 +103,8 @@ const ArticleCard = (props: Props) => {
         setIsEditing(false);
         if (isNewArticle) {
             const url = String(redirectArticleId) === String(0)
-                ? `/topic/${topic.topicId}`
-                : `/topic/${topic.topicId}/article/${redirectArticleId}`;
+                ? `/topic/${topic?.topicId}`
+                : `/topic/${topic?.topicId}/article/${redirectArticleId}`;
             router.push(url);
         }
     };
@@ -112,41 +117,45 @@ const ArticleCard = (props: Props) => {
     return (
         <div className="article-card">
             <Card className="header-card">
-                <Flex justify="flex-start">
-                    {isEditing ? (
-                        <Input placeholder="Please enter a title"
-                            variant="underlined"
-                            value={editedTitle}
-                            onChange={(e) => setEditedTitle(e.target.value)}
-                            style={{ fontSize: 20, flexGrow: 1, marginTop: 0 }}
-                        />
-                    ) : (
-                        <Title style={{ fontSize: 24, flexGrow: 1, marginTop: 0 }}>
-                            <Avatar src={topic.topicImage} /> {isTopic ?  "Topic: " : ""}{article.title}
-                        </Title>
-                    )}
+                <Flex justify="space-between">
+                    <div style={{ paddingLeft: 20, width: '100%' }}>
+                        {isEditing ? (
+                            <Input placeholder="Please enter a title"
+                                variant="underlined"
+                                value={editedTitle}
+                                onChange={(e) => setEditedTitle(e.target.value)}
+                                style={{ fontSize: 20, flexGrow: 1, marginTop: 0 }}
+                            />
+                        ) : (
+                            <Title style={{ fontSize: 24, flexGrow: 1, marginTop: 0 }}>
+                                {topic && <Avatar src={topic.topicImage} size={24} style={{ marginRight: 8, marginTop: 0 }} />}
+                                {isTopic ? "Topic: " : ""}{article.title}
+                            </Title>
+                        )}
+                    </div>
+                    <div>
 
-
-                    {
-                        !isTopic &&
-                        <Flex gap={12}>
-                            {isEditing && (
-                                <>
-                                    <Button color="default" variant="filled" style={{ width: 80 }} onClick={handleCancel}>
-                                        Cancel
-                                    </Button>
-                                    <Button color="primary" variant="solid" style={{ width: 80 }} onClick={handleSave}>
-                                        Save
-                                    </Button>
-                                </>
-                            )}
-                            {!isEditing && (
-                                <Dropdown.Button menu={{ items, onClick: onMenuClick }} onClick={() => setIsEditing(true)} style={{ width: 100 }}>
-                                    Edit
-                                </Dropdown.Button>
-                            )}
-                        </Flex>
-                    }
+                        {
+                            !isTopic &&
+                            <Flex gap={12}>
+                                {isEditing && (
+                                    <>
+                                        <Button color="default" variant="filled" style={{ width: 80 }} onClick={handleCancel}>
+                                            Cancel
+                                        </Button>
+                                        <Button color="primary" variant="solid" style={{ width: 80 }} onClick={handleSave}>
+                                            Save
+                                        </Button>
+                                    </>
+                                )}
+                                {!isEditing && (
+                                    <Dropdown.Button menu={{ items, onClick: onMenuClick }} onClick={() => setIsEditing(true)} style={{ width: 100 }}>
+                                        Edit
+                                    </Dropdown.Button>
+                                )}
+                            </Flex>
+                        }
+                    </div>
 
                 </Flex>
                 {!isEditing && <TagList tagList={article.tags} />}
@@ -176,7 +185,6 @@ const ArticleCard = (props: Props) => {
             </Card>
             <ArticleFormModal
                 parentArticleList={parentArticleList}
-                topicList={topicList}
                 tagList={tagList}
                 currentArticle={article}
                 visible={updateModalVisible}

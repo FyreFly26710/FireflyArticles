@@ -1,5 +1,4 @@
 import { Tag } from "antd";
-import "./index.css";
 
 interface Props {
     tagList?: string[];

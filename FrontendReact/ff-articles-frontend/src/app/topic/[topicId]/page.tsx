@@ -10,13 +10,17 @@ export default async function TopicPage({ params }: { params: { topicId: number}
     const topic = await fetchTopic(topicId);
     if (!topic) return <div>Failed fetching topics, please refresh page.</div>;
 
-    const [topicList, tagList, article] = await Promise.all([
+    const [topicList, tagList] = await Promise.all([
         fetchTopicList(),
         fetchTags(),
-        fetchTopicArticle(topic),
     ]);
-    if (!article) return <div>Failed fetching article, please refresh page.</div>;
-
+    const article = {
+        articleType: "TopicArticle",
+        topicId: topic.topicId,
+        title: topic.title,
+        abstraction: topic.abstraction,
+        content: topic.content,
+    } as API.ArticleDto;
 
     return (
         <div id="articlePage" className="max-width-content">

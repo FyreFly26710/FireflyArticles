@@ -38,7 +38,7 @@ export default function ArticleTable(props: Props) {
     {
       title: "Article",
       dataIndex: "title",
-      width:100,
+      width: 100,
       ellipsis: true,
       valueType: "text",
       hideInSearch: true,
@@ -49,14 +49,14 @@ export default function ArticleTable(props: Props) {
     {
       title: "Description",
       dataIndex: "abstraction",
-      width:120,
+      width: 120,
       ellipsis: true,
       hideInSearch: true
     },
     {
       title: "Topic",
       dataIndex: "topicTitle",
-      width:60,
+      width: 60,
       ellipsis: true,
       valueType: "select",
       fieldProps: {
@@ -68,10 +68,11 @@ export default function ArticleTable(props: Props) {
         showSearch: true,
       },
       render: (_, record) => record.topicTitle,
+
     },
     {
       title: "Tags",
-      width:120,
+      width: 120,
       ellipsis: true,
       dataIndex: "tagList",
       valueType: "select",
@@ -95,7 +96,7 @@ export default function ArticleTable(props: Props) {
         search={{
           labelWidth: "auto",
           collapsed: false,
-          collapseRender:false,
+          collapseRender: false,
         }}
         form={{
           initialValues: {},
@@ -128,7 +129,7 @@ export default function ArticleTable(props: Props) {
           const selectedTagIds = Array.isArray(params.tagList)
             ? params.tagList
             : [params.tagList];
-          
+
           const response = await apiArticleGetByPage({
             PageNumber: params.current,
             PageSize: params.pageSize,
@@ -136,7 +137,7 @@ export default function ArticleTable(props: Props) {
             SortOrder: sortOrder,
             Keyword: params.keyword,
             TopicIds: selectedTopicIds.filter(Boolean),
-            TagIds: selectedTagIds.filter(Boolean), 
+            TagIds: selectedTagIds.filter(Boolean),
             IncludeContent: false,
             IncludeSubArticles: false,
             IncludeUser: false,

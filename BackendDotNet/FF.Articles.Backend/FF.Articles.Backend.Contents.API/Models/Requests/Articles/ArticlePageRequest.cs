@@ -4,6 +4,7 @@ namespace FF.Articles.Backend.Contents.API.Models.Requests.Articles
 {
     public class ArticlePageRequest:PageRequest
     {
+        public int? ArticleId { get; set; } = null;
         public bool IncludeUser { get; set; } = true;
         /// <summary>
         /// Inlcude sub articles as children

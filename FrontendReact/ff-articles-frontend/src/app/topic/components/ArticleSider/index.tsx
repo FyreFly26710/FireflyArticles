@@ -1,9 +1,10 @@
 "use client";
 
-import { PlusSquareOutlined } from "@ant-design/icons";
-import { Avatar, ConfigProvider, Flex, Menu, MenuProps, Typography } from "antd";
+import { MenuFoldOutlined, MenuUnfoldOutlined, PlusSquareOutlined } from "@ant-design/icons";
+import { Avatar, Button, ConfigProvider, Flex, Menu, MenuProps, Typography } from "antd";
 import Sider from "antd/es/layout/Sider";
 import Link from "next/link";
+import { useState } from "react";
 
 const { Title } = Typography;
 
@@ -14,6 +15,8 @@ type ArticleSiderProps = {
 };
 
 export default function ArticleSider({ topic, parentArticleId, articleId }: ArticleSiderProps) {
+    const [collapsed, setCollapsed] = useState(false);
+
     type MenuItem = Required<MenuProps>["items"][number];
 
     function getItem(a: API.ArticleMiniDto): MenuItem {
@@ -29,8 +32,10 @@ export default function ArticleSider({ topic, parentArticleId, articleId }: Arti
     const articleMenuItemList = (topic.articles || []).map(getItem);
 
     return (
-        <Sider theme="light" breakpoint="lg" collapsedWidth="0" width={220}>
+        <Sider theme="light" breakpoint="lg" collapsedWidth="0" width={220} collapsible
+            zeroWidthTriggerStyle={{ top: 0 }}>
             <Flex vertical style={{ height: "100%" }}>
+
                 <Title level={4} style={{ margin: "5px 20px" }}>
                     <Link href={`/topic/${topic.topicId}`} style={{ color: "black" }}>
                         {topic.title}

@@ -1,4 +1,5 @@
 "use server";
+
 import Title from "antd/es/typography/Title";
 import "./index.css";
 import { apiArticleGetByPage } from "@/api/contents/api/article";
@@ -6,45 +7,40 @@ import ArticleTable from "@/components/ArticleTable";
 import { apiTopicGetByPage } from "@/api/contents/api/topic";
 import { apiTagGetAll } from "@/api/contents/api/tag";
 
-
 export default async function ArticlesPage() {
-    let articleList:any = [];
-    let topicList:any = [];
-    let tagList:any = [];
-
+    let articleList: API.ArticleDto[] = [];
+    let topicList: API.TopicDto[] = [];
+    let tagList: API.TagDto[] = [];
     let total = 0;
 
     try {
-        const articleRes = await apiArticleGetByPage({
-            PageSize: 12,
-            IncludeContent:false,
-            IncludeSubArticles:false,
-            IncludeUser:false,
-            DisplaySubArticles:true,
-        });
-        articleList = articleRes.data.data ?? [];
+        const [articleRes, topicRes, tagRes] = await Promise.all([
+            apiArticleGetByPage({
+                PageSize: 12,
+                IncludeContent: false,
+                IncludeSubArticles: false,
+                IncludeUser: false,
+                DisplaySubArticles: true,
+            }),
+            apiTopicGetByPage({
+                PageSize: 100,
+                IncludeContent: false,
+                IncludeArticles: false,
+                IncludeSubArticles: false,
+                IncludeUser: false,
+            }),
+            apiTagGetAll()
+        ]);
         //@ts-ignore
-        total = articleRes.data.counts ?? 0;
-    } catch (e:any) {
-        console.error("Failed fetching articles, " + e.message);
-    }
-    try {
-        const topicRes = await apiTopicGetByPage({
-            PageSize: 100,
-            IncludeContent:false,
-            IncludeArticles:false,
-            IncludeSubArticles:false,
-            IncludeUser:false,
-        });
-        topicList = topicRes.data.data ?? [];
-    } catch (e:any) {
-        console.error("Failed topics, " + e.message);
-    }
-    try {
-        const tagRes = await apiTagGetAll();
+        articleList = articleRes.data?.data ?? [];
+        //@ts-ignore
+        total = articleRes.data?.counts ?? 0;
+        //@ts-ignore
+        topicList = topicRes.data?.data ?? [];
+        //@ts-ignore
         tagList = tagRes.data ?? [];
-    } catch (e:any) {
-        console.error("Failed tags, " + e.message);
+    } catch (e: any) {
+        console.error("Failed fetching data:", e.message);
     }
 
     return (

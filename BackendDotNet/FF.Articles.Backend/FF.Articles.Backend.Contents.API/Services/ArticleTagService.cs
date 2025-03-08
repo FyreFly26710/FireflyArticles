@@ -37,6 +37,15 @@ public class ArticleTagService(ContentsDbContext _context, ILogger<ArticleTagSer
         }
         return true;
     }
+    public async Task<bool> RemoveTag(int tagId)
+    {
+        List<ArticleTag> articleTags = this.GetQueryable().Where(at => at.TagId == tagId).ToList();
+        foreach (var at in articleTags)
+        {
+            await this.HardDeleteAsync(at.Id);
+        }
+        return true;
+    }
     public List<String> GetArticleTags(int articleId)
     {
         List<ArticleTag> articleTags = this.GetQueryable().Where(at => at.ArticleId == articleId).ToList();

@@ -66,11 +66,11 @@ export default function BasicLayout({ children }: Props) {
                             <Dropdown
                                 menu={{
                                     items: [
-                                        {
-                                            key: "userCenter",
-                                            icon: <UserOutlined />,
-                                            label: "User Center",
-                                        },
+                                        // {
+                                        //     key: "userCenter",
+                                        //     icon: <UserOutlined />,
+                                        //     label: "User Center",
+                                        // },
                                         {
                                             key: "logout",
                                             icon: <LogoutOutlined />,
@@ -100,7 +100,7 @@ export default function BasicLayout({ children }: Props) {
                     return [
                         <a
                             key="github"
-                            href="https://github.com/FyreFly26710/ideabank"
+                            href="https://github.com/FyreFly26710/FireflyArticles"
                             target="_blank"
                         >
                             <GithubFilled key="GithubFilled" />

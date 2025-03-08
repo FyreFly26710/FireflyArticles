@@ -62,26 +62,57 @@ public class ArticleService(ContentsDbContext _context, ILogger<ArticleService> 
         if (article == null)
             throw new ApiException(ErrorCode.NOT_FOUND_ERROR, "Article not found");
         // update not null fields
-        if (articleEditRequest.IsHidden != null) article.IsHidden = (int)articleEditRequest.IsHidden;
-        if (articleEditRequest.Title != null) article.Title = articleEditRequest.Title;
-        if (articleEditRequest.Content != null) article.Content = articleEditRequest.Content;
-        if (articleEditRequest.Abstraction != null) article.Abstraction = articleEditRequest.Abstraction;
-        if (articleEditRequest.TopicId != null) article.TopicId = (int)articleEditRequest.TopicId;
-        if (articleEditRequest.ArticleType != null) article.ArticleType = articleEditRequest.ArticleType;
-        if (articleEditRequest.ParentArticleId != null) article.ParentArticleId = (int)articleEditRequest.ParentArticleId;
-        if (articleEditRequest.SortNumber != null) article.SortNumber = (int)articleEditRequest.SortNumber;
+        if (articleEditRequest.IsHidden != null && article.IsHidden != articleEditRequest.IsHidden)
+            article.IsHidden = (int)articleEditRequest.IsHidden;
+        if (articleEditRequest.Title != null && article.Title != articleEditRequest.Title)
+            article.Title = articleEditRequest.Title;
+        if (articleEditRequest.Content != null && article.Content != articleEditRequest.Content)
+            article.Content = articleEditRequest.Content;
+        if (articleEditRequest.Abstraction != null && article.Abstraction != articleEditRequest.Abstraction)
+            article.Abstraction = articleEditRequest.Abstraction;
+        if (articleEditRequest.TopicId != null && article.TopicId != articleEditRequest.TopicId)
+            article.TopicId = (int)articleEditRequest.TopicId;
+        if (articleEditRequest.ArticleType != null && article.ArticleType != articleEditRequest.ArticleType)
+        {
+            if (article.ArticleType == ArticleTypes.Article)
+            {
+                await promoteSubArticlesToArticles(article.Id);
+            }
+            article.ArticleType = articleEditRequest.ArticleType;
+        }
+        if (articleEditRequest.ParentArticleId != null && article.ParentArticleId != articleEditRequest.ParentArticleId)
+        {
+            article.ParentArticleId = (int)articleEditRequest.ParentArticleId;
+        }
+        if (articleEditRequest.SortNumber != null && article.SortNumber != articleEditRequest.SortNumber)
+            article.SortNumber = (int)articleEditRequest.SortNumber;
         if (articleEditRequest.TagIds != null) await _articleTagService.EditArticleTags(article.Id, articleEditRequest.TagIds);
-        await this.UpdateAsync(article);
-
+        //await this.UpdateAsync(article);
+        article.UpdateTime = DateTime.UtcNow;
+        await _context.SaveChangesAsync();
         return true;
     }
     public async Task<bool> DeleteArticleById(int id)
     {
         if (id <= 0)
             throw new ApiException(ErrorCode.PARAMS_ERROR, "Invalid article id");
+        await promoteSubArticlesToArticles(id);
         await this.DeleteAsync(id);
         await _articleTagService.RemoveArticleTags(id);
         return true;
+    }
+    private async Task promoteSubArticlesToArticles(int articleId)
+    {
+        var subArticles = this.GetQueryable().AsTracking()
+            .Where(x => x.ParentArticleId == articleId
+                && x.ArticleType == ArticleTypes.SubArticle);
+        foreach (var subArticle in subArticles)
+        {
+            subArticle.ParentArticleId = null;
+            subArticle.ArticleType = ArticleTypes.Article;
+            subArticle.UpdateTime = DateTime.UtcNow;
+        }
+        await _context.SaveChangesAsync();
     }
 
     public async Task<IQueryable<Article>> ApplySearchQuery(IQueryable<Article> query, ArticlePageRequest pageRequest)
@@ -108,19 +139,19 @@ public class ArticleService(ContentsDbContext _context, ILogger<ArticleService> 
                     select a;
         }
         return query;
-    //   Executed DbCommand (36ms) [Parameters=[@__Format_1='%C%' (Size = 1000), @__topicIds_2='[1,2,3,4]' (Size = 4000), @__tagIds_3='[1,2,3,4,5]' (Size = 4000), @__p_4='0', @__p_5='20'], CommandType='Text', CommandTimeout='30']
-    //   SELECT [a].[Id], [a].[Abstraction], [a].[ArticleType], [a].[Content], [a].[CreateTime], [a].[IsDelete], [a].[IsHidden], [a].[ParentArticleId], [a].[SortNumber], [a].[Title], [a].[TopicId], [a].[UpdateTime], [a].[UserId]
-    //   FROM [Contents].[Article] AS [a]
-    //   INNER JOIN [Contents].[ArticleTag] AS [a0] ON [a].[Id] = [a0].[ArticleId]
-    //   WHERE [a].[IsDelete] = 0 AND [a].[ArticleType] = N'Article' AND [a].[Title] LIKE @__Format_1 AND [a].[TopicId] IN (
-    //       SELECT [t].[value]
-    //       FROM OPENJSON(@__topicIds_2) WITH ([value] int '$') AS [t]
-    //   ) AND [a0].[TagId] IN (
-    //       SELECT [t0].[value]
-    //       FROM OPENJSON(@__tagIds_3) WITH ([value] int '$') AS [t0]
-    //   )
-    //   ORDER BY [a].[SortNumber]
-    //   OFFSET @__p_4 ROWS FETCH NEXT @__p_5 ROWS ONLY
+        //   Executed DbCommand (36ms) [Parameters=[@__Format_1='%C%' (Size = 1000), @__topicIds_2='[1,2,3,4]' (Size = 4000), @__tagIds_3='[1,2,3,4,5]' (Size = 4000), @__p_4='0', @__p_5='20'], CommandType='Text', CommandTimeout='30']
+        //   SELECT [a].[Id], [a].[Abstraction], [a].[ArticleType], [a].[Content], [a].[CreateTime], [a].[IsDelete], [a].[IsHidden], [a].[ParentArticleId], [a].[SortNumber], [a].[Title], [a].[TopicId], [a].[UpdateTime], [a].[UserId]
+        //   FROM [Contents].[Article] AS [a]
+        //   INNER JOIN [Contents].[ArticleTag] AS [a0] ON [a].[Id] = [a0].[ArticleId]
+        //   WHERE [a].[IsDelete] = 0 AND [a].[ArticleType] = N'Article' AND [a].[Title] LIKE @__Format_1 AND [a].[TopicId] IN (
+        //       SELECT [t].[value]
+        //       FROM OPENJSON(@__topicIds_2) WITH ([value] int '$') AS [t]
+        //   ) AND [a0].[TagId] IN (
+        //       SELECT [t0].[value]
+        //       FROM OPENJSON(@__tagIds_3) WITH ([value] int '$') AS [t0]
+        //   )
+        //   ORDER BY [a].[SortNumber]
+        //   OFFSET @__p_4 ROWS FETCH NEXT @__p_5 ROWS ONLY
 
     }
 }

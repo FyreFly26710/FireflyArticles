@@ -9,6 +9,7 @@ import { Button, message, Space, Typography } from "antd";
 import React, { useRef, useState } from "react";
 import './index.css';
 import { apiTopicDeleteById, apiTopicGetByPage } from "@/api/contents/api/topic";
+import MdEditor from "@/components/MdEditor";
 
 
 const TopicAdminPage: React.FC = () => {
@@ -61,6 +62,26 @@ const TopicAdminPage: React.FC = () => {
             title: "Description",
             dataIndex: "abstraction",
             valueType: "text",
+        },        
+        {
+            title: "Category",
+            dataIndex: "category",
+            valueType: "text",
+            sorter: true,
+        },
+        {
+            title: "Content",
+            dataIndex: "content",
+            valueType: "text",
+            hideInSearch: true,
+            hideInTable: true,
+            renderFormItem: (item,
+                {
+                    //@ts-ignore
+                    fieldProps
+                }, form) => {
+                return <MdEditor {...fieldProps} />;
+            },
         },
         {
             title: "Image",
@@ -140,13 +161,19 @@ const TopicAdminPage: React.FC = () => {
                 request={async (params, sort, filter) => {
                     const sortField = Object.keys(sort)?.[0];
                     const sortOrder = sort?.[sortField] ?? undefined;
-                    //@ts-ignore
-                    const { data, code } = await apiTopicGetByPage({
-                        ...params,
-                        sortField,
-                        sortOrder,
-                        ...filter,
+
+                    const res = await apiTopicGetByPage({
+                        PageNumber: params.current,
+                        PageSize: params.pageSize,
+                        SortField: sortField,
+                        SortOrder: sortOrder,
+                        IncludeContent: true,
+                        IncludeSubArticles: false,
+                        IncludeUser: false,
+                        IncludeArticles: false,
                     } as API.apiTopicGetByPageParams);
+                    //@ts-ignore
+                    const { data, code } = res;
 
                     return {
                         success: code === 0,

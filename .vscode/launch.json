@@ -3,7 +3,10 @@
     "compounds": [
         {
             "name": "Launch Both APIs",
-            "configurations": ["IdentityAPI", "ContentsAPI"]
+            "configurations": [
+                "IdentityAPI",
+                "ContentsAPI"
+            ]
         }
     ],
     "configurations": [
@@ -11,13 +14,26 @@
             "name": "IdentityAPI",
             "type": "dotnet",
             "request": "launch",
-            "projectPath": "D:/202502/FireflyArticles/BackendDotNet/FF.Articles.Backend/FF.Articles.Backend.Identity.API/FF.Articles.Backend.Identity.API.csproj"
+            "projectPath": "D:/202502/FireflyArticles/BackendDotNet/FF.Articles.Backend/FF.Articles.Backend.Identity.API/FF.Articles.Backend.Identity.API.csproj",
+
         },
         {
             "name": "ContentsAPI",
             "type": "dotnet",
             "request": "launch",
             "projectPath": "D:/202502/FireflyArticles/BackendDotNet/FF.Articles.Backend/FF.Articles.Backend.Contents.API/FF.Articles.Backend.Contents.API.csproj"
+        },
+        {
+            "name": "Next.js Dev",
+            "type": "node",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/FrontendReact/ff-articles-frontend",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": [
+                "run",
+                "dev"
+            ],
+            "console": "integratedTerminal"
         }
     ]
 }

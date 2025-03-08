@@ -1,7 +1,6 @@
-import { baseURL } from "@/config";
 import axios, { AxiosResponse } from "axios";
-const DevBaseUrl =  "http://localhost:21000/";
-const TestBaseUrl = "https://demo.firefly-26710.com:8443"
+const DevBaseUrl = "http://localhost:21000/";
+const ProdBaseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
 // create Axios
 const myAxios = axios.create({
@@ -13,9 +12,6 @@ const myAxios = axios.create({
 // request interceptors
 myAxios.interceptors.request.use(
     function (config) {
-        // exec before request. do nothing now, can add like log
-        console.log(config.baseURL)
-        console.log(config.url)
         return config;
     },
     function (error) {

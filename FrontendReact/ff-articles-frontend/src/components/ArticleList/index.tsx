@@ -1,6 +1,5 @@
 "use client";
 import {Card, List, Tag} from "antd";
-import "./index.css";
 import Link from "next/link";
 
 interface Props {

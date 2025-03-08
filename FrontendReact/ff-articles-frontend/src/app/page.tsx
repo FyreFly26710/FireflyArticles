@@ -10,27 +10,31 @@ import { apiArticleGetByPage } from "@/api/contents/api/article";
 export const dynamic = 'force-dynamic';
 
 export default async function HomePage() {
-    let topicList:any = [];
-    let articleList:any = [];
+    let topicList: any = [];
+    let articleList: any = [];
     try {
         const res = await apiTopicGetByPage({
             PageSize: 12,
+            IncludeContent: false,
+            IncludeArticles: false,
+            IncludeSubArticles: false,
+            IncludeUser: false,
         });
         topicList = res.data.data ?? [];
-    } catch (e:any) {
+    } catch (e: any) {
         console.error("Failed fetching topics, " + e.message);
     }
 
     try {
         const res = await apiArticleGetByPage({
-            PageSize: 12,
-            IncludeContent:false,
-            IncludeSubArticles:false,
-            IncludeUser:false,
-            DisplaySubArticles:true,
+            PageSize: 10,
+            IncludeContent: false,
+            IncludeSubArticles: false,
+            IncludeUser: false,
+            DisplaySubArticles: false,
         });
         articleList = res.data.data ?? [];
-    } catch (e:any) {
+    } catch (e: any) {
         console.error("Failed fetching articles, " + e.message);
     }
     return (

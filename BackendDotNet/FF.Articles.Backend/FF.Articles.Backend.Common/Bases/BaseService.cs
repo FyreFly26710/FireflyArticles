@@ -46,20 +46,22 @@ public abstract class BaseService<TEntity, TContext>(TContext _context, ILogger<
     }
     public virtual async Task<TEntity?> GetByIdAsTrackingAsync(int id)
         => await _context.Set<TEntity>().AsTracking().FirstOrDefaultAsync(e => e.Id == id);
-    /// <summary>
-    /// the para must be a tracked entity (GetByIdAsTrackingAsync)
-    /// </summary>
+
     public virtual async Task<int> UpdateAsync(TEntity trackedEntity)
     {
         var entry = _context.Entry(trackedEntity);
-        entry.State = EntityState.Modified;
 
-        if (entry.Metadata.FindProperty(nameof(BaseEntity.UpdateTime)) != null)
+        // Check if any properties have been modified
+        if (entry.State == EntityState.Modified || entry.Properties.Any(p => p.IsModified))
         {
-            entry.Property(nameof(BaseEntity.UpdateTime)).CurrentValue = DateTime.UtcNow;
+            if (entry.Metadata.FindProperty(nameof(BaseEntity.UpdateTime)) != null)
+            {
+                entry.Property(nameof(BaseEntity.UpdateTime)).CurrentValue = DateTime.UtcNow;
+            }
+
+            await _context.SaveChangesAsync();
         }
 
-        await _context.SaveChangesAsync();
         return trackedEntity.Id;
     }
 

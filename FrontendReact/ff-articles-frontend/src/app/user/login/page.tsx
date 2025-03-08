@@ -2,7 +2,7 @@
 
 import React, { CSSProperties } from "react";
 import { LoginForm, ProForm, ProFormText } from "@ant-design/pro-form";
-import { Flex, message, Space } from "antd";
+import { Divider, Flex, message, Space } from "antd";
 import { AlipayCircleOutlined, GithubOutlined, GoogleCircleFilled, GoogleOutlined, LockOutlined, TaobaoCircleOutlined, TwitchOutlined, UserOutlined, WechatOutlined, WeiboCircleOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -50,7 +50,7 @@ const UserLoginPage: React.FC = (props) => {
                 logo={
                     <Image src="/assets/logo.png" alt="FF Articles" width={44} height={44} />
                 }
-                title="FF Articles - User Login"
+                title="FF Articles - Login"
                 subTitle="Knowledge sharing platform"
                 onFinish={doSubmit}
                 submitter={{
@@ -58,14 +58,9 @@ const UserLoginPage: React.FC = (props) => {
                         submitText: "Login",
                     },
                 }}
-                actions={
-                    <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                        <GoogleLoginButton />
-                    </div>
-
-                }
             >
-
+                <GoogleLoginButton />
+                <Divider>Or</Divider>
                 <ProFormText
                     name="userAccount"
                     fieldProps={{

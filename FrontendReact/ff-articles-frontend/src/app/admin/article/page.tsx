@@ -1,31 +1,43 @@
 "use client";
-import CreateModal from "./components/CreateModal";
-import UpdateModal from "./components/UpdateModal";
-
-import { PlusOutlined } from "@ant-design/icons";
 import type { ActionType, ProColumns } from "@ant-design/pro-components";
 import { PageContainer, ProTable } from "@ant-design/pro-components";
-import { Button, message, Space, Typography } from "antd";
-import React, { useRef, useState } from "react";
+import { Button, message, Select, Space, Typography } from "antd";
+import React, { useEffect, useRef, useState } from "react";
 import './index.css';
 import TagList from "@/components/TagList";
 import MdEditor from "@/components/MdEditor";
 import { apiArticleDeleteById, apiArticleGetByPage } from "@/api/contents/api/article";
+import { apiTopicGetByPage } from "@/api/contents/api/topic";
+import ArticleFormModal from "@/components/ArticleFormModal";
+import { apiTagGetAll } from "@/api/contents/api/tag";
+import TagModal from "./components/TagModal";
 
 
 const ArticleAdminPage: React.FC = () => {
-    // Whether to show the create modal
-    const [createModalVisible, setCreateModalVisible] = useState<boolean>(false);
-    // Whether to show the update modal
     const [updateModalVisible, setUpdateModalVisible] = useState<boolean>(false);
     const actionRef = useRef<ActionType>();
     const [currentRow, setCurrentRow] = useState<API.ArticleDto>();
-
-    /**
-     * Delete a node
-     *
-     * @param row
-     */
+    //const [topicList, setTopicList] = useState<API.TopicDto[]>([]);
+    // const fetchTopicList = async () => {
+    //     const response = await apiTopicGetByPage({
+    //         PageNumber: 1,
+    //         PageSize: 100,
+    //         IncludeArticles: false,
+    //         IncludeContent: false,
+    //         IncludeSubArticles: false,
+    //         IncludeUser: false,
+    //     });
+    //     const topics = response.data.data || [];
+    //     //@ts-ignore
+    //     setTopicList(topics);
+    // };
+    const [tagList, setTagList] = useState<API.TagDto[]>([]);
+    const fetchTagList = async () => {
+        const response = await apiTagGetAll();
+        const tags = response.data || [];
+        //@ts-ignore
+        setTagList(tags);
+    };
     const handleDelete = async (row: API.ArticleDto) => {
         const hide = message.loading("Deleting");
         if (!row) return true;
@@ -44,9 +56,11 @@ const ArticleAdminPage: React.FC = () => {
         }
     };
 
-    /**
-     * Table column configuration
-     */
+    useEffect(() => {
+        //fetchTopicList();
+        fetchTagList();
+    }, []);
+
     const columns: ProColumns<API.ArticleDto>[] = [
         {
             title: "ID",
@@ -83,11 +97,8 @@ const ArticleAdminPage: React.FC = () => {
         {
             //pass topic id
             title: "Topic",
-            dataIndex: "topicTitle",
+            dataIndex: "topicId",
             valueType: "text",
-            fieldProps: {
-                mode: "tags",
-            },
             render: (_, record) => {
                 const tagList = record.topicTitle ? [record.topicTitle] : [];
                 return <TagList tagList={tagList} />;
@@ -158,6 +169,12 @@ const ArticleAdminPage: React.FC = () => {
         },
     ];
 
+    const [isTagModalVisible, setIsTagModalVisible] = useState(false);
+
+    const handleTagsChange = async () => {
+        await fetchTagList();
+    };
+
     return (
         <PageContainer>
             <ProTable<API.ArticleDto>
@@ -169,13 +186,14 @@ const ArticleAdminPage: React.FC = () => {
                 }}
                 toolBarRender={() => [
                     <Button
-                        type="primary"
+                        color="default"
+                        variant="outlined"
                         key="primary"
                         onClick={() => {
-                            setCreateModalVisible(true);
+                            setIsTagModalVisible(true);
                         }}
                     >
-                        <PlusOutlined /> New
+                        Manage Tags
                     </Button>,
                 ]}
                 //@ts-ignore
@@ -183,8 +201,8 @@ const ArticleAdminPage: React.FC = () => {
                     const sortField = Object.keys(sort)?.[0];
                     const sortOrder = sort?.[sortField] ?? undefined;
                     const response = await apiArticleGetByPage({
-                        PageNumber:params.current,
-                        PageSize:params.pageSize,
+                        PageNumber: params.current,
+                        PageSize: params.pageSize,
                         sortField,
                         sortOrder,
                         ...filter,
@@ -200,29 +218,22 @@ const ArticleAdminPage: React.FC = () => {
                 }}
                 columns={columns}
             />
-            <CreateModal
-                visible={createModalVisible}
-                columns={columns}
-                onSubmit={() => {
-                    setCreateModalVisible(false);
-                    actionRef.current?.reload();
-                }}
-                onCancel={() => {
-                    setCreateModalVisible(false);
-                }}
-            />
-            <UpdateModal
+
+            <ArticleFormModal
+                parentArticleList={[]}
+                tagList={tagList}
+                currentArticle={currentRow as API.ArticleDto}
                 visible={updateModalVisible}
-                columns={columns}
-                oldData={currentRow}
-                onSubmit={() => {
-                    setUpdateModalVisible(false);
-                    setCurrentRow(undefined);
-                    actionRef.current?.reload();
-                }}
-                onCancel={() => {
-                    setUpdateModalVisible(false);
-                }}
+                onSubmit={() => { setUpdateModalVisible(false); actionRef.current?.reload(); }}
+                onCancel={() => { setUpdateModalVisible(false); }}
+            />
+
+            <Button onClick={() => setIsTagModalVisible(true)}>Manage Tags</Button>
+            <TagModal
+                visible={isTagModalVisible}
+                tags={tagList}
+                onCancel={() => setIsTagModalVisible(false)}
+                onTagsChange={handleTagsChange}
             />
         </PageContainer>
     );

@@ -43,12 +43,20 @@ public class TopicService(ContentsDbContext _context, ILogger<TopicService> _log
         if (topic == null)
             throw new ApiException(ErrorCode.NOT_FOUND_ERROR, "Topic not found");
 
-        if (topicEditRequest.IsHidden != null) topic.IsHidden = (int)topicEditRequest.IsHidden;
-        if (topicEditRequest.Title!=null) topic.Title = topicEditRequest.Title;
-        if (topicEditRequest.Abstraction!=null) topic.Abstraction = topicEditRequest.Abstraction;
-        if (topicEditRequest.Category!=null) topic.Category = topicEditRequest.Category;
-        if (topicEditRequest.TopicImage!=null) topic.TopicImage = topicEditRequest.TopicImage;
-        if (topicEditRequest.SortNumber!=null) topic.SortNumber = (int)topicEditRequest.SortNumber;
+        if (topicEditRequest.IsHidden != null && topic.IsHidden != topicEditRequest.IsHidden)
+            topic.IsHidden = (int)topicEditRequest.IsHidden;
+        if (topicEditRequest.Title != null && topic.Title != topicEditRequest.Title)
+            topic.Title = topicEditRequest.Title;
+        if (topicEditRequest.Abstraction != null && topic.Abstraction != topicEditRequest.Abstraction)
+            topic.Abstraction = topicEditRequest.Abstraction;
+        if (topicEditRequest.Content != null && topic.Content != topicEditRequest.Content)
+            topic.Content = topicEditRequest.Content;
+        if (topicEditRequest.Category != null && topic.Category != topicEditRequest.Category)
+            topic.Category = topicEditRequest.Category;
+        if (topicEditRequest.TopicImage != null && topic.TopicImage != topicEditRequest.TopicImage)
+            topic.TopicImage = topicEditRequest.TopicImage;
+        if (topicEditRequest.SortNumber != null && topic.SortNumber != topicEditRequest.SortNumber)
+            topic.SortNumber = (int)topicEditRequest.SortNumber;
         await this.UpdateAsync(topic);
 
         return true;

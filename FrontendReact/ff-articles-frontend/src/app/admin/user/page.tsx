@@ -55,6 +55,9 @@ const UserAdminPage: React.FC = () => {
             title: 'User Email',
             dataIndex: 'userEmail',
             valueType: 'text',
+            hideInSearch: true,
+            hideInForm: true,
+            hideInTable: true,
         },
         {
             title: 'Avatar',
@@ -109,10 +112,11 @@ const UserAdminPage: React.FC = () => {
                             setCurrentRow(record);
                             setUpdateModalVisible(true);
                         }}
+                        disabled={true}
                     >
                         Edit
                     </Typography.Link>
-                    <Typography.Link type="danger" onClick={() => handleDelete(record)}>
+                    <Typography.Link type="danger" onClick={() => handleDelete(record)} disabled={true}>
                         Delete
                     </Typography.Link>
                 </Space>
@@ -135,6 +139,7 @@ const UserAdminPage: React.FC = () => {
                         onClick={() => {
                             setCreateModalVisible(true);
                         }}
+                        disabled={true}
                     >
                         <PlusOutlined /> Create
                     </Button>,

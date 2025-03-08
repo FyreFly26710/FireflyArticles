@@ -1,12 +1,12 @@
 import { apiArticleEditByRequest } from '@/api/contents/api/article';
-import { Button, Form, Input, InputNumber, message, Modal, Select } from 'antd';
+import { Button, Form, Input, InputNumber, message, Modal, Select, Tag } from 'antd';
 import React, { useEffect, useState } from 'react';
+import TagSelect from '../TagSelect';
 
 const { Option } = Select;
 
 interface Props {
     parentArticleList: API.ArticleMiniDto[] | [] | undefined;
-    topicList: API.TopicDto[] | [];
     tagList: API.TagDto[] | [];
     currentArticle: API.ArticleDto;
     visible: boolean;
@@ -15,14 +15,16 @@ interface Props {
 }
 
 const ArticleFormModal: React.FC<Props> = (props) => {
-    const { parentArticleList, topicList, currentArticle, tagList, visible, onSubmit, onCancel } = props;
+    const { parentArticleList, currentArticle, tagList, visible, onSubmit, onCancel } = props;
     const [form] = Form.useForm();
     const [isParentDisabled, setIsParentDisabled] = useState(false);
     const filterParentArticleList = parentArticleList?.filter(a => a.articleId !== currentArticle.articleId);
 
     useEffect(() => {
-        resetForm(currentArticle);
-    }, []);
+        if (visible && currentArticle) {
+            resetForm(currentArticle);
+        }
+    }, [visible, currentArticle]);
 
 
     const resetForm = (article: API.ArticleDto | undefined) => {
@@ -32,23 +34,20 @@ const ArticleFormModal: React.FC<Props> = (props) => {
                 .filter((id): id is number => id !== undefined);
             form.setFieldsValue({
                 ...article,
-                parentArticleId: article.parentArticleId || undefined,
+                parentArticleId: article.parentArticleId || 0,
                 topicId: article.topicId || undefined,
                 isHidden: article.isHidden === 1,
                 tagIds: initialTagIds,
             });
-            setIsParentDisabled(article.articleType === 'Article');
+            setIsParentDisabled(article.articleType === 'Article' || filterParentArticleList?.length === 0);
         }
         else {
             form.resetFields();
             setIsParentDisabled(true);
         }
     }
-
-
-
     const handleArticleTypeChange = (value: string) => {
-        setIsParentDisabled(value === 'Article');
+        setIsParentDisabled(value === 'Article' || filterParentArticleList?.length === 0);
         if (value === 'Article') {
             form.setFieldsValue({ parentArticleId: 0 });
         } else {
@@ -86,15 +85,17 @@ const ArticleFormModal: React.FC<Props> = (props) => {
                 <Form.Item label='Article ID' name='articleId'>
                     <Input disabled />
                 </Form.Item>
-                <Form.Item label="Topic" name="topicId">
-                    <Select disabled value={currentArticle.topicId}>
+                {/* TODO: Add topic selection */}
+                <Form.Item label="Topic" name="topicTitle">
+                    {/* <Select disabled value={true}>
                         {Array.isArray(topicList) &&
                             topicList.map((topic) => (
                                 <Option key={topic.topicId} value={topic.topicId}>
                                     {topic.title}
                                 </Option>
                             ))}
-                    </Select>
+                    </Select> */}
+                    <Input disabled />
                 </Form.Item>
 
                 <Form.Item label='Title' name='title' rules={[{ required: true, message: 'Title is required' }]} >
@@ -109,11 +110,31 @@ const ArticleFormModal: React.FC<Props> = (props) => {
                 <Form.Item label="Tags" name="tagIds">
                     <Select
                         mode="multiple"
-                        optionFilterProp="children"
-                        showSearch
-                        filterOption={(input, option) =>
-                            String(option?.children).toLowerCase().includes(input.toLowerCase())
-                        }
+                        style={{ width: '100%' }}
+                        dropdownStyle={{
+                            padding: 8,
+                            maxWidth: '40vw'
+                        }}
+                        popupMatchSelectWidth={true}
+                        dropdownAlign={{
+                            points: ['tl', 'bl'],
+                            offset: [0, 4],
+                            overflow: {
+                                adjustX: true,
+                                adjustY: true
+                            }
+                        }}
+                        dropdownRender={() => (
+                            <TagSelect
+                                tagData={tagList}
+                                selectedTagIds={form.getFieldValue('tagIds') || []}
+                                onSelectionChange={(selectedIds) => {
+                                    form.setFieldValue('tagIds', selectedIds);
+                                }}
+                            />
+                        )}
+                        value={form.getFieldValue('tagIds') || []}
+                        onChange={(value) => form.setFieldValue('tagIds', value)}
                     >
                         {tagList.map(tag => (
                             <Option key={tag.tagId} value={tag.tagId}>
@@ -124,7 +145,7 @@ const ArticleFormModal: React.FC<Props> = (props) => {
                 </Form.Item>
 
                 <Form.Item label='Article Type' name='articleType'>
-                    <Select onChange={handleArticleTypeChange}>
+                    <Select onChange={handleArticleTypeChange} disabled={filterParentArticleList?.length === 0}>
                         <Option value='Article'>Article</Option>
                         <Option value='SubArticle'>SubArticle</Option>
                     </Select>

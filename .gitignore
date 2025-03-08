@@ -1,5 +1,6 @@
 # Ignore build folders
 .vs
+.vscode
 bin
 obj
 
