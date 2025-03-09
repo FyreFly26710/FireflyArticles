@@ -6,6 +6,8 @@ import TopicList from "@/components/TopicList";
 import { apiTopicGetByPage } from "@/api/contents/api/topic";
 import { Divider } from "antd";
 
+export const dynamic = 'force-dynamic';
+
 // Define category order (lower number = higher priority)
 const CATEGORY_ORDER: Record<string, number> = {
     "Programming language": 1,

@@ -163,7 +163,6 @@ const ArticleCard = (props: Props) => {
                 {isEditing ? (
                     <TextArea
                         showCount
-                        maxLength={300}
                         value={editedAbstraction}
                         onChange={(e) => setEditedAbstraction(e.target.value)}
                         style={{ height: 80, resize: "none" }}
