@@ -1,4 +1,3 @@
-"use server";
 
 import Title from "antd/es/typography/Title";
 import "./index.css";
@@ -6,19 +5,20 @@ import TopicList from "@/components/TopicList";
 import { apiTopicGetByPage } from "@/api/contents/api/topic";
 import { Divider } from "antd";
 
-export const dynamic = 'force-dynamic';
 
 // Define category order (lower number = higher priority)
 const CATEGORY_ORDER: Record<string, number> = {
-    "Programming language": 1,
-    "Other": 2
+    "FF Wiki": 1,
+    "Other": 267100
 };
 
 function compareCategories(a: string, b: string): number {
-    const orderA = CATEGORY_ORDER[a] ?? Number.MAX_SAFE_INTEGER;
-    const orderB = CATEGORY_ORDER[b] ?? Number.MAX_SAFE_INTEGER;
+    const orderA = CATEGORY_ORDER[a] ?? 26710;
+    const orderB = CATEGORY_ORDER[b] ?? 26710;
     return orderA === orderB ? a.localeCompare(b) : orderA - orderB;
 }
+
+export const dynamic = 'force-dynamic';
 
 export default async function TopicsPage() {
     const pageSize = 200;

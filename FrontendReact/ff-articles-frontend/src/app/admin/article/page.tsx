@@ -203,6 +203,10 @@ const ArticleAdminPage: React.FC = () => {
                     const response = await apiArticleGetByPage({
                         PageNumber: params.current,
                         PageSize: params.pageSize,
+                        IncludeContent :false,
+                        IncludeUser:false,
+                        DisplaySubArticles:true,
+                        IncludeSubArticles:false,
                         sortField,
                         sortOrder,
                         ...filter,
@@ -222,6 +226,7 @@ const ArticleAdminPage: React.FC = () => {
             <ArticleFormModal
                 parentArticleList={[]}
                 tagList={tagList}
+                modifyContent={false}
                 currentArticle={currentRow as API.ArticleDto}
                 visible={updateModalVisible}
                 onSubmit={() => { setUpdateModalVisible(false); actionRef.current?.reload(); }}

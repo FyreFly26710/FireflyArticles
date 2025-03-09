@@ -185,6 +185,7 @@ const ArticleCard = (props: Props) => {
             <ArticleFormModal
                 parentArticleList={parentArticleList}
                 tagList={tagList}
+                modifyContent={true}
                 currentArticle={article}
                 visible={updateModalVisible}
                 onSubmit={() => { setUpdateModalVisible(false); window.location.reload(); }}

@@ -9,13 +9,14 @@ interface Props {
     parentArticleList: API.ArticleMiniDto[] | [] | undefined;
     tagList: API.TagDto[] | [];
     currentArticle: API.ArticleDto;
+    modifyContent:boolean;
     visible: boolean;
     onSubmit: (values: API.ArticleEditRequest) => void;
     onCancel: () => void;
 }
 
 const ArticleFormModal: React.FC<Props> = (props) => {
-    const { parentArticleList, currentArticle, tagList, visible, onSubmit, onCancel } = props;
+    const { parentArticleList, currentArticle, tagList, visible, onSubmit, onCancel, modifyContent=true } = props;
     const [form] = Form.useForm();
     const [isParentDisabled, setIsParentDisabled] = useState(false);
     const filterParentArticleList = parentArticleList?.filter(a => a.articleId !== currentArticle.articleId);
@@ -58,7 +59,10 @@ const ArticleFormModal: React.FC<Props> = (props) => {
     const handleFinish = async (values: API.ArticleEditRequest) => {
         const hide = message.loading('Updating...');
         try {
-            await apiArticleEditByRequest({ ...values, isHidden: values.isHidden ? 1 : 0 });
+            await apiArticleEditByRequest({ 
+                ...values,
+                content:modifyContent? values.content : undefined, 
+                isHidden: values.isHidden ? 1 : 0 });
             hide();
             message.success('Update successful!');
             onSubmit(values);
@@ -105,7 +109,7 @@ const ArticleFormModal: React.FC<Props> = (props) => {
                     <Input.TextArea rows={1} />
                 </Form.Item>
                 <Form.Item label='Content' name='content'>
-                    <Input.TextArea rows={2} />
+                    <Input.TextArea disabled={!modifyContent} rows={2} />
                 </Form.Item>
                 <Form.Item label="Tags" name="tagIds">
                     <Select
