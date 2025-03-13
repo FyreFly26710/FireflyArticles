@@ -64,9 +64,9 @@ public class AuthController(
     }
     [HttpPost("getLoginUser")]
     [Authorize]
-    public ApiResponse<LoginUserDto> GetLoginUser()
+    public async Task<ApiResponse<LoginUserDto>> GetLoginUser()
     {
-        var user = _userService.GetLoginUser(Request);
+        var user = await _userService.GetLoginUser(Request);
         var loginUserResponse = user.ToLoginUserDto();
         return ResultUtil.Success(loginUserResponse);
     }

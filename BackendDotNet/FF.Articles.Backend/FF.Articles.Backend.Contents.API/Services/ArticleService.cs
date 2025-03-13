@@ -29,7 +29,7 @@ public class ArticleService(
 
     public async Task<ArticleDto> GetArticleDto(Article article, ArticleQueryRequest articleRequest)
     {
-        var tags = _articleTagService.GetArticleTags(article.Id);
+        var tags = await _articleTagService.GetArticleTags(article.Id);
 
         UserApiDto? user = null;
         if (articleRequest.IncludeUser)
@@ -37,7 +37,7 @@ public class ArticleService(
             user = await _identityRemoteService.GetUserByIdAsync(article.UserId);
         }
 
-        var topic = _topicRepository.GetById(article.TopicId);
+        var topic = await _topicRepository.GetByIdAsync(article.TopicId);
         var topicTitle = topic?.Title;
 
         var articleDto = await buildArticleDto(article, articleRequest, tags, user, topicTitle);
@@ -50,7 +50,7 @@ public class ArticleService(
             return new List<ArticleDto>();
 
         // Get tags for all articles
-        Dictionary<int, List<string>> tagDict = _articleTagService.GetArticleTags([.. articles.Select(a => a.Id).Distinct()]);
+        Dictionary<int, List<string>> tagDict = await _articleTagService.GetArticleTags([.. articles.Select(a => a.Id).Distinct()]);
 
         // Get users if requested
         Dictionary<int, UserApiDto?> userDict = new();

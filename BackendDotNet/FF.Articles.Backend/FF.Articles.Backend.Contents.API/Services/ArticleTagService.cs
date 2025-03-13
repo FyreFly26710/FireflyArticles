@@ -3,6 +3,7 @@ using FF.Articles.Backend.Contents.API.Infrastructure;
 using FF.Articles.Backend.Contents.API.Models.Entities;
 using FF.Articles.Backend.Contents.API.Repositories.Interfaces;
 using FF.Articles.Backend.Contents.API.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace FF.Articles.Backend.Contents.API.Services;
 public class ArticleTagService(
@@ -48,24 +49,34 @@ public class ArticleTagService(
         }
         return true;
     }
-    public List<String> GetArticleTags(int articleId)
+    public async Task<List<String>> GetArticleTags(int articleId)
     {
-        List<ArticleTag> articleTags = [.. _articleTagRepository.GetQueryable().Where(at => at.ArticleId == articleId)];
-        List<String> tagNames = [.. articleTags.Select(at => _tagRepository.GetById(at.TagId)?.TagName ?? "")];
+        var articleTags = await _articleTagRepository.GetQueryable()
+            .Where(at => at.ArticleId == articleId)
+            .ToListAsync();
 
-        return tagNames;
+        if (!articleTags.Any())
+            return new List<string>();
 
-    }
-    public Dictionary<int, List<String>> GetArticleTags(List<int> articleIds)
-    {
-        var articleTags = _articleTagRepository.GetQueryable()
-            .Where(at => articleIds.Contains(at.ArticleId))
+        var tagIds = articleTags.Select(at => at.TagId).ToList();
+
+        var tags = await _tagRepository.GetByIdsAsync(tagIds);
+
+        return tags
+            .Where(t => t != null && !string.IsNullOrEmpty(t.TagName))
+            .Select(t => t.TagName!)
             .ToList();
+    }
+    public async Task<Dictionary<int, List<String>>> GetArticleTags(List<int> articleIds)
+    {
+        var articleTags = await _articleTagRepository.GetQueryable()
+            .Where(at => articleIds.Contains(at.ArticleId))
+            .ToListAsync();
 
         var tagIds = articleTags.Select(at => at.TagId).Distinct().ToList();
-        var tags = _tagRepository.GetQueryable()
+        var tags = await _tagRepository.GetQueryable()
             .Where(t => tagIds.Contains(t.Id))
-            .ToDictionary(t => t.Id, t => t.TagName ?? "");
+            .ToDictionaryAsync(t => t.Id, t => t.TagName ?? "");
 
         return articleTags
             .GroupBy(at => at.ArticleId)

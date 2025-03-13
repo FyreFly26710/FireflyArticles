@@ -8,7 +8,6 @@ public interface IBaseRepository<TEntity, TContext>
 {
     TEntity? GetById(int id);
     Task<TEntity?> GetByIdAsync(int id);
-    TEntity? GetByIdAsTracking(int id);
     Task<TEntity?> GetByIdAsTrackingAsync(int id);
     Task<int> SaveAsync();
     Task<List<TEntity>> GetByIdsAsync(List<int> ids);

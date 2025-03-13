@@ -1,7 +1,5 @@
-using System;
 using System.Security.Cryptography;
 using System.Text;
-using AutoMapper;
 using FF.Articles.Backend.Common.Bases;
 using FF.Articles.Backend.Common.Constants;
 using FF.Articles.Backend.Common.Exceptions;
@@ -65,7 +63,7 @@ public class UserService(IUserRepository _userRepository, ILogger<UserService> _
         return user.ToLoginUserDto();
     }
 
-    public User GetLoginUser(HttpRequest request)
+    public async Task<User> GetLoginUser(HttpRequest request)
     {
         //User? user = request.HttpContext.Session.GetObject<User>(UserConstant.USER_LOGIN_STATE);
         var user = UserUtil.GetUserFromHttpRequest(request);
@@ -73,7 +71,7 @@ public class UserService(IUserRepository _userRepository, ILogger<UserService> _
         {
             throw new ApiException(ErrorCode.NOT_LOGIN_ERROR);
         }
-        User? userEntity = _userRepository.GetById(user.UserId);
+        User? userEntity = await _userRepository.GetByIdAsync(user.UserId);
 
         if (userEntity == null)
         {
@@ -82,7 +80,7 @@ public class UserService(IUserRepository _userRepository, ILogger<UserService> _
         return userEntity;
     }
 
-    public bool IsAdmin(HttpRequest request) => IsAdmin(GetLoginUser(request));
+    public async Task<bool> IsAdmin(HttpRequest request) => IsAdmin(await GetLoginUser(request));
 
     public bool IsAdmin(User user) => user != null && user.UserRole == UserConstant.ADMIN_ROLE;
     private string computeMD5Hash(string input)

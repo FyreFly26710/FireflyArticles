@@ -1,9 +1,5 @@
 using FF.Articles.Backend.Identity.API.Infrastructure;
-using FF.Articles.Backend.Identity.API.MappingProfiles;
 using FF.Articles.Backend.Identity.API.Services;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using FF.Articles.Backend.ServiceDefaults;
 using Microsoft.AspNetCore.Mvc.Controllers;
@@ -22,7 +18,6 @@ builder.Services.AddDbContext<IdentityDbContext>(options =>
 });
 builder.Services.AddHttpClient();
 
-builder.Services.AddAutoMapper(typeof(UserMappingProfile));
 
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IOAuthService, OAuthService>();

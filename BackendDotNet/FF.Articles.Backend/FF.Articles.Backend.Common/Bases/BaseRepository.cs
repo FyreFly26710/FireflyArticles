@@ -47,8 +47,6 @@ public abstract class BaseRepository<TEntity, TContext>
         await _context.SaveChangesAsync();
         return entity.Id;
     }
-    public virtual TEntity? GetByIdAsTracking(int id)
-        => _context.Set<TEntity>().AsTracking().FirstOrDefault(e => e.Id == id);
     public virtual async Task<TEntity?> GetByIdAsTrackingAsync(int id)
         => await _context.Set<TEntity>().AsTracking().FirstOrDefaultAsync(e => e.Id == id);
     public virtual async Task<int> UpdateAsync(TEntity trackedEntity)
