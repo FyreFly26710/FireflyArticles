@@ -17,20 +17,6 @@ const ArticleAdminPage: React.FC = () => {
     const [updateModalVisible, setUpdateModalVisible] = useState<boolean>(false);
     const actionRef = useRef<ActionType>();
     const [currentRow, setCurrentRow] = useState<API.ArticleDto>();
-    //const [topicList, setTopicList] = useState<API.TopicDto[]>([]);
-    // const fetchTopicList = async () => {
-    //     const response = await apiTopicGetByPage({
-    //         PageNumber: 1,
-    //         PageSize: 100,
-    //         IncludeArticles: false,
-    //         IncludeContent: false,
-    //         IncludeSubArticles: false,
-    //         IncludeUser: false,
-    //     });
-    //     const topics = response.data.data || [];
-    //     //@ts-ignore
-    //     setTopicList(topics);
-    // };
     const [tagList, setTagList] = useState<API.TagDto[]>([]);
     const fetchTagList = async () => {
         const response = await apiTagGetAll();
@@ -203,10 +189,7 @@ const ArticleAdminPage: React.FC = () => {
                     const response = await apiArticleGetByPage({
                         PageNumber: params.current,
                         PageSize: params.pageSize,
-                        IncludeContent :false,
-                        IncludeUser:false,
-                        DisplaySubArticles:true,
-                        IncludeSubArticles:false,
+                        DisplaySubArticles: true,
                         sortField,
                         sortOrder,
                         ...filter,

@@ -1,29 +1,48 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ActionType, ProColumns, ProTable } from "@ant-design/pro-components";
 import Link from "next/link";
 import { TablePaginationConfig } from "antd";
 import TagList from "../TagList";
 import { apiArticleGetByPage } from "@/api/contents/api/article";
+import { apiTopicGetByPage } from "@/api/contents/api/topic";
+import { apiTagGetAll } from "@/api/contents/api/tag";
 
 interface Props {
   defaultArticleList?: API.ArticleDto[];
   defaultTotal?: number;
-  topics: API.TopicDto[];
-  tags: API.TagDto[];
 }
 
 /**
  * Article table component
  * @constructor
  */
-export default function ArticleTable(props: Props) {
-  const { defaultArticleList, defaultTotal, topics, tags } = props;
+export default async function ArticleTable(props: Props) {
+  const { defaultArticleList, defaultTotal, } = props;
   const actionRef = useRef<ActionType>();
   const [articleList, setArticleList] = useState<API.ArticleDto[]>(defaultArticleList || []);
   const [total, setTotal] = useState<number>(defaultTotal || 0);
   const [init, setInit] = useState<boolean>(true);
+  const [topics, setTopics] = useState<API.TopicDto[]>([]);
+  const [tags, setTags] = useState<API.TagDto[]>([]);
+
+  const fetchTopicsAndTags = async () => {
+    const [topicsResponse, tagsResponse] = await Promise.all([
+      apiTopicGetByPage({ PageSize: 100 }),
+      apiTagGetAll()
+    ]);
+    //@ts-ignore
+    const topicsData: API.TopicDto[] = topicsResponse.data?.data || [];
+    setTopics(topicsData);
+    //@ts-ignore
+    const tagsData: API.TagDto[] = tagsResponse.data || [];
+    setTags(tagsData);
+  };
+
+  useEffect(() => {
+    fetchTopicsAndTags();
+  }, []);
 
   /**
    * Table column configuration

@@ -168,9 +168,6 @@ const TopicAdminPage: React.FC = () => {
                         SortField: sortField,
                         SortOrder: sortOrder,
                         IncludeContent: true,
-                        IncludeSubArticles: false,
-                        IncludeUser: false,
-                        IncludeArticles: false,
                     } as API.apiTopicGetByPageParams);
                     //@ts-ignore
                     const { data, code } = res;
