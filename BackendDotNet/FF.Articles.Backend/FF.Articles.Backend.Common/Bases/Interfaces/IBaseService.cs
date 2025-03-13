@@ -22,7 +22,6 @@ public interface IBaseService<TEntity, TContext> where TEntity : BaseEntity wher
     Task<int> UpdateAsync(TEntity entity);
     Task<List<int>> UpdateBatchAsync(List<TEntity> entities);
     Task<bool> DeleteAsync(int id);
-    Task<bool> HardDeleteAsync(int id);
     Task<bool> DeleteBatchAsync(List<int> ids);
     // Task<bool> ExistsAsync(int id);
 

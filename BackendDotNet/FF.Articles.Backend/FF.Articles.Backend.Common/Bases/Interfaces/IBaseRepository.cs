@@ -19,6 +19,7 @@ public interface IBaseRepository<TEntity, TContext>
     Task<int> CreateAsync(TEntity entity);
     Task<List<int>> CreateBatchAsync(List<TEntity> entities);
     Task<int> UpdateAsync(TEntity entity);
+    Task<int> UpdateModifiedAsync(TEntity entity);
     Task<List<int>> UpdateBatchAsync(List<TEntity> entities);
     Task<bool> DeleteAsync(int id);
     Task<bool> HardDeleteAsync(int id);

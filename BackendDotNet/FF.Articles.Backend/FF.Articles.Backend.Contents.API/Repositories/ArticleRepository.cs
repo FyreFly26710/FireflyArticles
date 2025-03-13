@@ -12,14 +12,6 @@ public class ArticleRepository : BaseRepository<Article, ContentsDbContext>, IAr
     {
     }
 
-    public List<Article> GetSubArticles(int articleId)
-    {
-        return GetQueryable()
-                .Where(x => x.ParentArticleId == articleId
-                    && x.ArticleType == ArticleTypes.SubArticle)
-                .OrderBy(x => x.SortNumber)
-                .ToList();
-    }
 
 
     public IQueryable<Article> SearchByTagIds(List<int> tagIds, IQueryable<Article> query)
@@ -28,5 +20,19 @@ public class ArticleRepository : BaseRepository<Article, ContentsDbContext>, IAr
                join at in _context.Set<ArticleTag>() on a.Id equals at.ArticleId
                where tagIds.Contains(at.TagId)
                select a;
+    }
+
+    public async Task PromoteSubArticlesToArticles(int articleId)
+    {
+        var subArticles = GetQueryable().AsTracking()
+            .Where(x => x.ParentArticleId == articleId
+                && x.ArticleType == ArticleTypes.SubArticle);
+        foreach (var subArticle in subArticles)
+        {
+            subArticle.ParentArticleId = null;
+            subArticle.ArticleType = ArticleTypes.Article;
+            subArticle.UpdateTime = DateTime.UtcNow;
+        }
+        await SaveAsync();
     }
 }

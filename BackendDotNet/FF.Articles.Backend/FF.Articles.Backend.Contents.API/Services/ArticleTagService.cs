@@ -3,11 +3,13 @@ using FF.Articles.Backend.Contents.API.Infrastructure;
 using FF.Articles.Backend.Contents.API.Models.Entities;
 using FF.Articles.Backend.Contents.API.Repositories.Interfaces;
 using FF.Articles.Backend.Contents.API.Services.Interfaces;
+using FF.Articles.Backend.Contents.API.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
 
 namespace FF.Articles.Backend.Contents.API.Services;
 public class ArticleTagService(
     IArticleTagRepository _articleTagRepository,
+    IContentsUnitOfWork _contentsUnitOfWork,
     ITagRepository _tagRepository,
     ILogger<ArticleTagService> _logger)
 : BaseService<ArticleTag, ContentsDbContext>(_articleTagRepository, _logger), IArticleTagService
@@ -16,37 +18,61 @@ public class ArticleTagService(
     {
         List<ArticleTag> currentArticleTags = _articleTagRepository.GetQueryable().Where(at => at.ArticleId == articleId).ToList();
         List<int> existingTags = _tagRepository.GetQueryable().Select(t => t.Id).ToList();
-
-        foreach (var id in tagIds)
+        await _contentsUnitOfWork.BeginTransactionAsync();
+        try
         {
-            if (existingTags.Contains(id) && !currentArticleTags.Any(at => at.TagId == id))
-                await _articleTagRepository.CreateAsync(new ArticleTag { ArticleId = articleId, TagId = id });
-        }
+            foreach (var id in tagIds)
+            {
+                if (existingTags.Contains(id) && !currentArticleTags.Any(at => at.TagId == id))
+                    await _contentsUnitOfWork.ArticleTagRepository.CreateAsync(new ArticleTag { ArticleId = articleId, TagId = id });
+            }
 
-        foreach (var at in currentArticleTags)
+            foreach (var at in currentArticleTags)
+            {
+                if (!tagIds.Contains(at.TagId))
+                    await _contentsUnitOfWork.ArticleTagRepository.HardDeleteAsync(at.Id);
+            }
+
+            await _contentsUnitOfWork.CommitAsync();
+            return true;
+        }
+        catch (Exception ex)
         {
-            if (!tagIds.Contains(at.TagId))
-                await _articleTagRepository.HardDeleteAsync(at.Id);
+            await _contentsUnitOfWork.RollbackAsync();
+            throw ex;
         }
-
-        return true;
+        finally
+        {
+            _contentsUnitOfWork.Dispose();
+        }
     }
     public async Task<bool> RemoveArticleTags(int articleId)
     {
-        List<ArticleTag> articleTags = _articleTagRepository.GetQueryable().Where(at => at.ArticleId == articleId).ToList();
-        foreach (var at in articleTags)
+        var articleTags = _contentsUnitOfWork.ArticleTagRepository
+            .GetQueryable()
+            .Where(at => at.ArticleId == articleId)
+            .ToList();
+
+        await _contentsUnitOfWork.ExecuteInTransactionAsync(async () =>
         {
-            await _articleTagRepository.HardDeleteAsync(at.Id);
-        }
+            foreach (var at in articleTags)
+            {
+                await _contentsUnitOfWork.ArticleTagRepository.HardDeleteAsync(at.Id);
+            }
+        });
         return true;
     }
+
     public override async Task<bool> DeleteAsync(int id)
     {
         List<ArticleTag> articleTags = _articleTagRepository.GetQueryable().Where(at => at.TagId == id).ToList();
-        foreach (var at in articleTags)
+        await _contentsUnitOfWork.ExecuteInTransactionAsync(async () =>
         {
-            await _articleTagRepository.HardDeleteAsync(at.Id);
-        }
+            foreach (var at in articleTags)
+            {
+                await _contentsUnitOfWork.ArticleTagRepository.HardDeleteAsync(at.Id);
+            }
+        });
         return true;
     }
     public async Task<List<String>> GetArticleTags(int articleId)

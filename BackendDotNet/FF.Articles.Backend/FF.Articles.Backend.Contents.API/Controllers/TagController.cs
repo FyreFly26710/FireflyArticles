@@ -50,7 +50,7 @@ public class TagController(ILogger<ArticleController> _logger,
     [Authorize(Roles = UserConstant.ADMIN_ROLE)]
     public async Task<ApiResponse<bool>> EditByRequest([FromBody] TagEditRequest tagEditRequest)
     {
-        var tag = await _tagService.GetByIdAsTrackingAsync(tagEditRequest.TagId);
+        var tag = await _tagService.GetByIdAsync(tagEditRequest.TagId);
         if (tag == null)
             return ResultUtil.Error<bool>(ErrorCode.PARAMS_ERROR, "Tag not found");
         if (!string.IsNullOrWhiteSpace(tagEditRequest.TagName))

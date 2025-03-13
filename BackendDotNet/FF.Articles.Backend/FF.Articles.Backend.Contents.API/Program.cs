@@ -5,6 +5,7 @@ using FF.Articles.Backend.Contents.API.Repositories;
 using FF.Articles.Backend.Contents.API.Repositories.Interfaces;
 using FF.Articles.Backend.Contents.API.Services;
 using FF.Articles.Backend.Contents.API.Services.Interfaces;
+using FF.Articles.Backend.Contents.API.UnitOfWork;
 using FF.Articles.Backend.ServiceDefaults;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.EntityFrameworkCore;
@@ -36,6 +37,7 @@ builder.Services.AddScoped<ITopicRepository, TopicRepository>();
 builder.Services.AddScoped<ITagRepository, TagRepository>();
 builder.Services.AddScoped<IArticleTagRepository, ArticleTagRepository>();
 
+builder.Services.AddScoped<IContentsUnitOfWork, ContentsUnitOfWork>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

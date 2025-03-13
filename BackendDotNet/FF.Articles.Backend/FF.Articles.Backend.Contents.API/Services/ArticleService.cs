@@ -13,6 +13,7 @@ using FF.Articles.Backend.Contents.API.Models.Requests.Articles;
 using FF.Articles.Backend.Contents.API.RemoteServices.Interfaces;
 using FF.Articles.Backend.Contents.API.Repositories.Interfaces;
 using FF.Articles.Backend.Contents.API.Services.Interfaces;
+using FF.Articles.Backend.Contents.API.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
 
 namespace FF.Articles.Backend.Contents.API.Services;
@@ -21,6 +22,7 @@ public class ArticleService(
         ITopicRepository _topicRepository,
         IIdentityRemoteService _identityRemoteService,
         IArticleTagService _articleTagService,
+        IContentsUnitOfWork _contentsUnitOfWork,
         ILogger<ArticleService> _logger)
 : BaseService<Article, ContentsDbContext>(_articleRepository, _logger), IArticleService
 {
@@ -102,7 +104,11 @@ public class ArticleService(
         List<ArticleDto> articleDtos = new();
         if (articleDto.ArticleType == ArticleTypes.Article)
         {
-            List<Article> subArticles = _articleRepository.GetSubArticles(articleDto.ArticleId);
+            List<Article> subArticles = GetQueryable()
+                                        .Where(x => x.ParentArticleId == articleDto.ArticleId
+                                            && x.ArticleType == ArticleTypes.SubArticle)
+                                        .OrderBy(x => x.SortNumber)
+                                        .ToList();
             articleDtos = await GetArticleDtos(subArticles, articleRequest);
         }
         return articleDtos;
@@ -110,61 +116,56 @@ public class ArticleService(
 
     public async Task<bool> EditArticleByRequest(ArticleEditRequest articleEditRequest)
     {
-        var article = await this.GetByIdAsTrackingAsync(articleEditRequest.ArticleId);
-        if (article == null)
-            throw new ApiException(ErrorCode.NOT_FOUND_ERROR, "Article not found");
-        // update not null fields
-        if (articleEditRequest.IsHidden != null && article.IsHidden != articleEditRequest.IsHidden)
-            article.IsHidden = (int)articleEditRequest.IsHidden;
-        if (articleEditRequest.Title != null && article.Title != articleEditRequest.Title)
-            article.Title = articleEditRequest.Title;
-        if (articleEditRequest.Content != null && article.Content != articleEditRequest.Content)
-            article.Content = articleEditRequest.Content;
-        if (articleEditRequest.Abstraction != null && article.Abstraction != articleEditRequest.Abstraction)
-            article.Abstraction = articleEditRequest.Abstraction;
-        if (articleEditRequest.TopicId != null && article.TopicId != articleEditRequest.TopicId)
-            article.TopicId = (int)articleEditRequest.TopicId;
-        if (articleEditRequest.ArticleType != null && article.ArticleType != articleEditRequest.ArticleType)
+        await _contentsUnitOfWork.ExecuteInTransactionAsync(async () =>
         {
-            if (article.ArticleType == ArticleTypes.Article)
+            var article = await _contentsUnitOfWork.ArticleRepository.GetByIdAsTrackingAsync(articleEditRequest.ArticleId);
+            if (article == null)
+                throw new ApiException(ErrorCode.NOT_FOUND_ERROR, "Article not found");
+            // update not null fields
+            if (articleEditRequest.IsHidden != null && article.IsHidden != articleEditRequest.IsHidden)
+                article.IsHidden = (int)articleEditRequest.IsHidden;
+            if (articleEditRequest.Title != null && article.Title != articleEditRequest.Title)
+                article.Title = articleEditRequest.Title;
+            if (articleEditRequest.Content != null && article.Content != articleEditRequest.Content)
+                article.Content = articleEditRequest.Content;
+            if (articleEditRequest.Abstraction != null && article.Abstraction != articleEditRequest.Abstraction)
+                article.Abstraction = articleEditRequest.Abstraction;
+            if (articleEditRequest.TopicId != null && article.TopicId != articleEditRequest.TopicId)
+                article.TopicId = (int)articleEditRequest.TopicId;
+            if (articleEditRequest.ArticleType != null && article.ArticleType != articleEditRequest.ArticleType)
             {
-                await promoteSubArticlesToArticles(article.Id);
+                if (article.ArticleType == ArticleTypes.Article)
+                {
+                    await _contentsUnitOfWork.ArticleRepository.PromoteSubArticlesToArticles(article.Id);
+                }
+                article.ArticleType = articleEditRequest.ArticleType;
             }
-            article.ArticleType = articleEditRequest.ArticleType;
-        }
-        if (articleEditRequest.ParentArticleId != null && article.ParentArticleId != articleEditRequest.ParentArticleId)
-        {
-            article.ParentArticleId = (int)articleEditRequest.ParentArticleId;
-        }
-        if (articleEditRequest.SortNumber != null && article.SortNumber != articleEditRequest.SortNumber)
-            article.SortNumber = (int)articleEditRequest.SortNumber;
-        if (articleEditRequest.TagIds != null) await _articleTagService.EditArticleTags(article.Id, articleEditRequest.TagIds);
-        //await this.UpdateAsync(article);
-        article.UpdateTime = DateTime.UtcNow;
-        await _articleRepository.SaveAsync();
+            if (articleEditRequest.ParentArticleId != null && article.ParentArticleId != articleEditRequest.ParentArticleId)
+            {
+                article.ParentArticleId = (int)articleEditRequest.ParentArticleId;
+            }
+            if (articleEditRequest.SortNumber != null && article.SortNumber != articleEditRequest.SortNumber)
+                article.SortNumber = (int)articleEditRequest.SortNumber;
+            if (articleEditRequest.TagIds != null) await _articleTagService.EditArticleTags(article.Id, articleEditRequest.TagIds);
+            //article.UpdateTime = DateTime.UtcNow;
+            await _articleRepository.UpdateModifiedAsync(article);
+            await _contentsUnitOfWork.CommitAsync();
+        });
         return true;
     }
+
     public async Task<bool> DeleteArticleById(int id)
     {
         if (id <= 0)
             throw new ApiException(ErrorCode.PARAMS_ERROR, "Invalid article id");
-        await promoteSubArticlesToArticles(id);
-        await this.DeleteAsync(id);
-        await _articleTagService.RemoveArticleTags(id);
-        return true;
-    }
-    private async Task promoteSubArticlesToArticles(int articleId)
-    {
-        var subArticles = this.GetQueryable().AsTracking()
-            .Where(x => x.ParentArticleId == articleId
-                && x.ArticleType == ArticleTypes.SubArticle);
-        foreach (var subArticle in subArticles)
+        await _contentsUnitOfWork.ExecuteInTransactionAsync(async () =>
         {
-            subArticle.ParentArticleId = null;
-            subArticle.ArticleType = ArticleTypes.Article;
-            subArticle.UpdateTime = DateTime.UtcNow;
-        }
-        await _articleRepository.SaveAsync();
+            await _contentsUnitOfWork.ArticleRepository.PromoteSubArticlesToArticles(id);
+            await _contentsUnitOfWork.ArticleRepository.DeleteAsync(id);
+            await _articleTagService.RemoveArticleTags(id);
+            await _contentsUnitOfWork.CommitAsync();
+        });
+        return true;
     }
 
     public async Task<Paged<ArticleDto>> GetArticlesByPageRequest(ArticleQueryRequest pageRequest)

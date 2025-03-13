@@ -49,7 +49,7 @@ public abstract class BaseRepository<TEntity, TContext>
     }
     public virtual async Task<TEntity?> GetByIdAsTrackingAsync(int id)
         => await _context.Set<TEntity>().AsTracking().FirstOrDefaultAsync(e => e.Id == id);
-    public virtual async Task<int> UpdateAsync(TEntity trackedEntity)
+    public virtual async Task<int> UpdateModifiedAsync(TEntity trackedEntity)
     {
         var entry = _context.Entry(trackedEntity);
         // Check if any properties have been modified
@@ -62,6 +62,12 @@ public abstract class BaseRepository<TEntity, TContext>
             await _context.SaveChangesAsync();
         }
         return trackedEntity.Id;
+    }
+    public virtual async Task<int> UpdateAsync(TEntity entity)
+    {
+        _context.Set<TEntity>().Update(entity);
+        await _context.SaveChangesAsync();
+        return entity.Id;
     }
 
 
