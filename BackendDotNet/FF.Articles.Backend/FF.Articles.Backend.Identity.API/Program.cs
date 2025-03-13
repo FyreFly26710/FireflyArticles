@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using FF.Articles.Backend.ServiceDefaults;
 using Microsoft.AspNetCore.Mvc.Controllers;
+using FF.Articles.Backend.Identity.API.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +26,7 @@ builder.Services.AddAutoMapper(typeof(UserMappingProfile));
 
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IOAuthService, OAuthService>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

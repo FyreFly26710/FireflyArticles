@@ -1,6 +1,6 @@
 using System;
 
-namespace FF.Articles.Backend.Identity.API.Models.Responses;
+namespace FF.Articles.Backend.Identity.API.Models.Dtos;
 
 /// <summary>
 /// This reponse is for admins to get user information

@@ -8,6 +8,6 @@ namespace FF.Articles.Backend.Contents.API.Services.Interfaces;
 public interface ITopicService : IBaseService<Topic, ContentsDbContext>
 {
     Task<TopicDto> GetTopicDto(Topic topic);
-    Task<TopicDto> GetTopicDto(Topic topic, TopicPageRequest topicRequest);
-    Task<bool> EditArticleByRequest(TopicEditRequest topicEditRequest);
+    Task<TopicDto> GetTopicDto(Topic topic, TopicQueryRequest topicRequest);
+    Task<bool> EditTopicByRequest(TopicEditRequest topicEditRequest);
 }

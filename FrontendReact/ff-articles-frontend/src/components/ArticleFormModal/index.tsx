@@ -6,17 +6,17 @@ import TagSelect from '../TagSelect';
 const { Option } = Select;
 
 interface Props {
-    parentArticleList: API.ArticleMiniDto[] | [] | undefined;
+    parentArticleList: API.ArticleDto[] | [] | undefined;
     tagList: API.TagDto[] | [];
     currentArticle: API.ArticleDto;
-    modifyContent:boolean;
+    modifyContent: boolean;
     visible: boolean;
     onSubmit: (values: API.ArticleEditRequest) => void;
     onCancel: () => void;
 }
 
 const ArticleFormModal: React.FC<Props> = (props) => {
-    const { parentArticleList, currentArticle, tagList, visible, onSubmit, onCancel, modifyContent=true } = props;
+    const { parentArticleList, currentArticle, tagList, visible, onSubmit, onCancel, modifyContent = true } = props;
     const [form] = Form.useForm();
     const [isParentDisabled, setIsParentDisabled] = useState(false);
     const filterParentArticleList = parentArticleList?.filter(a => a.articleId !== currentArticle.articleId);
@@ -59,10 +59,11 @@ const ArticleFormModal: React.FC<Props> = (props) => {
     const handleFinish = async (values: API.ArticleEditRequest) => {
         const hide = message.loading('Updating...');
         try {
-            await apiArticleEditByRequest({ 
+            await apiArticleEditByRequest({
                 ...values,
-                content:modifyContent? values.content : undefined, 
-                isHidden: values.isHidden ? 1 : 0 });
+                content: modifyContent ? values.content : undefined,
+                isHidden: values.isHidden ? 1 : 0
+            });
             hide();
             message.success('Update successful!');
             onSubmit(values);

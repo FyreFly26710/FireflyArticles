@@ -6,7 +6,7 @@ import { apiTagGetAll } from "@/api/contents/api/tag";
 // Fetch topic by ID
 export async function fetchTopic(topicId: number): Promise<API.TopicDto | undefined> {
     try {
-        const topicRes = await apiTopicGetById({ id: topicId });
+        const topicRes = await apiTopicGetById({ id: topicId, IncludeArticles:true });
         // @ts-ignore
         return topicRes.data;
     } catch (e: any) {
@@ -21,7 +21,7 @@ export async function fetchTopicList(): Promise<API.TopicDto[] | undefined> {
         const topicListRes = await apiTopicGetByPage({
             PageNumber: 1,
             PageSize: 100,
-            IncludeArticles: false,
+            IncludeArticles: true,
             IncludeSubArticles: false,
             IncludeContent: false,
             IncludeUser: false,
@@ -52,7 +52,7 @@ export async function fetchArticle(articleId: number): Promise<API.ArticleDto | 
         // if (isNewArticle) {
         //     return { articleType: "Article", topicId: topicId, title: topic?.title } as API.ArticleDto;
         // } else 
-        const articleRes = await apiArticleGetById({ id: articleId });
+        const articleRes = await apiArticleGetById({ id: articleId, IncludeContent:true });
         // @ts-ignore
         return articleRes.data;
 

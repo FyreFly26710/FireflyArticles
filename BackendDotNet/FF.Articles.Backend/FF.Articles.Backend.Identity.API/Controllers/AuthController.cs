@@ -2,12 +2,13 @@
 using FF.Articles.Backend.Common.Responses;
 using FF.Articles.Backend.Common.Utils;
 using FF.Articles.Backend.Identity.API.Models.Requests;
-using FF.Articles.Backend.Identity.API.Models.Responses;
 using Microsoft.AspNetCore.Mvc;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using FF.Articles.Backend.Identity.API.Utils;
 using FF.Articles.Backend.Identity.API.Services;
+using FF.Articles.Backend.Identity.API.MapperExtensions.Users;
+using FF.Articles.Backend.Identity.API.Models.Dtos;
 
 namespace FF.Articles.Backend.Identity.API.Controllers;
 
@@ -20,7 +21,6 @@ public class AuthController(
     IUserService _userService,
     IOAuthService _oAuthService, 
     ILogger<AuthController> _logger, 
-    IMapper _mapper, 
     IConfiguration _config)
     : ControllerBase
 {
@@ -67,7 +67,7 @@ public class AuthController(
     public ApiResponse<LoginUserDto> GetLoginUser()
     {
         var user = _userService.GetLoginUser(Request);
-        var loginUserResponse = _mapper.Map<LoginUserDto>(user);
+        var loginUserResponse = user.ToLoginUserDto();
         return ResultUtil.Success(loginUserResponse);
     }
     [HttpGet("signin-google")]

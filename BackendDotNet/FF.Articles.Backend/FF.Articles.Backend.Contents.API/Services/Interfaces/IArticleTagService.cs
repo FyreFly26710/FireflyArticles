@@ -7,6 +7,6 @@ public interface IArticleTagService : IBaseService<ArticleTag, ContentsDbContext
 {
     Task<bool> EditArticleTags(int articleId, List<int> tagIds);
     Task<bool> RemoveArticleTags(int articleId);
-    Task<bool> RemoveTag(int tagId);
     List<String> GetArticleTags(int articleId);
+    Dictionary<int, List<String>> GetArticleTags(List<int> articleIds);
 }

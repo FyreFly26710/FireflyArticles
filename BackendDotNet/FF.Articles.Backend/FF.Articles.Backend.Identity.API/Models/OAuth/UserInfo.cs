@@ -1,31 +1,31 @@
 using System;
 using System.Text.Json.Serialization;
 
-namespace FF.Articles.Backend.Identity.API.Models.Gmail;
+namespace FF.Articles.Backend.Identity.API.Models.OAuth;
 
-    public class UserInfo
-    {
-        [JsonPropertyName("id")]
-        public string Id { get; set; }
+public class UserInfo
+{
+    [JsonPropertyName("id")]
+    public string Id { get; set; }
 
-        [JsonPropertyName("email")]
-        public string Email { get; set; }
+    [JsonPropertyName("email")]
+    public string Email { get; set; }
 
-        [JsonPropertyName("verified_email")]
-        public bool VerifiedEmail { get; set; }
+    [JsonPropertyName("verified_email")]
+    public bool VerifiedEmail { get; set; }
 
-        [JsonPropertyName("name")]
-        public string Name { get; set; }
+    [JsonPropertyName("name")]
+    public string Name { get; set; }
 
-        [JsonPropertyName("given_name")]
-        public string GivenName { get; set; }
+    [JsonPropertyName("given_name")]
+    public string GivenName { get; set; }
 
-        [JsonPropertyName("family_name")]
-        public string FamilyName { get; set; }
+    [JsonPropertyName("family_name")]
+    public string FamilyName { get; set; }
 
-        [JsonPropertyName("picture")]
-        public string Picture { get; set; }
+    [JsonPropertyName("picture")]
+    public string Picture { get; set; }
 
-        [JsonPropertyName("locale")]
-        public string Locale { get; set; }
-    }
+    [JsonPropertyName("locale")]
+    public string Locale { get; set; }
+}

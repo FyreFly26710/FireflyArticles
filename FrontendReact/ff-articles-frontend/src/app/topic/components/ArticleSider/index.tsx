@@ -19,7 +19,7 @@ export default function ArticleSider({ topic, parentArticleId, articleId }: Arti
 
     type MenuItem = Required<MenuProps>["items"][number];
 
-    function getItem(a: API.ArticleMiniDto): MenuItem {
+    function getItem(a: API.ArticleDto): MenuItem {
         return {
             key: String(a.articleId),
             label: (

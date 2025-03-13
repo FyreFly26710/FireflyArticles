@@ -23,5 +23,6 @@ public class ArticleDto
     public List<string> Tags { get; set; } = new();
     public int SortNumber { get; set; }
     public int IsHidden { get; set; }
+
 }
 

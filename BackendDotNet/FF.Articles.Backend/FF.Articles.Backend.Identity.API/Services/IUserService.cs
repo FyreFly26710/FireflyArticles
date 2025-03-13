@@ -1,8 +1,8 @@
 using System;
 using FF.Articles.Backend.Common.Bases;
 using FF.Articles.Backend.Identity.API.Infrastructure;
+using FF.Articles.Backend.Identity.API.Models.Dtos;
 using FF.Articles.Backend.Identity.API.Models.Entities;
-using FF.Articles.Backend.Identity.API.Models.Responses;
 
 namespace FF.Articles.Backend.Identity.API.Services;
 

@@ -3,41 +3,38 @@ using FF.Articles.Backend.Common.Bases;
 using FF.Articles.Backend.Common.Exceptions;
 using FF.Articles.Backend.Contents.API.Constants;
 using FF.Articles.Backend.Contents.API.Infrastructure;
+using FF.Articles.Backend.Contents.API.MapperExtensions.Topics;
 using FF.Articles.Backend.Contents.API.Models.Dtos;
 using FF.Articles.Backend.Contents.API.Models.Entities;
-using FF.Articles.Backend.Contents.API.Models.Requests.Articles;
+using FF.Articles.Backend.Contents.API.MapperExtensions.Articles;
 using FF.Articles.Backend.Contents.API.Models.Requests.Topics;
 using FF.Articles.Backend.Contents.API.RemoteServices.Interfaces;
+using FF.Articles.Backend.Contents.API.Repositories.Interfaces;
 using FF.Articles.Backend.Contents.API.Services.Interfaces;
 
 namespace FF.Articles.Backend.Contents.API.Services;
-public class TopicService(ContentsDbContext _context, ILogger<TopicService> _logger, IMapper _mapper,
+public class TopicService(ITopicRepository _topicRepository, ILogger<TopicService> _logger,
+    IArticleRepository _articleRepository,
     IArticleService _articleService,
     IIdentityRemoteService _identityRemoteService)
-: BaseService<Topic, ContentsDbContext>(_context, _logger), ITopicService
+: BaseService<Topic, ContentsDbContext>(_topicRepository, _logger), ITopicService
 {
-    public async Task<TopicDto> GetTopicDto(Topic topic) => await GetTopicDto(topic, new TopicPageRequest());
-    public async Task<TopicDto> GetTopicDto(Topic topic, TopicPageRequest topicRequest)
+    public async Task<TopicDto> GetTopicDto(Topic topic) => await GetTopicDto(topic, new TopicQueryRequest());
+    public async Task<TopicDto> GetTopicDto(Topic topic, TopicQueryRequest topicRequest)
     {
-        var topicDto = _mapper.Map<TopicDto>(topic);
+        var topicDto = topic.ToDto();
         if (topicRequest.IncludeUser) topicDto.User = await _identityRemoteService.GetUserByIdAsync(topic.UserId);
         if (topicRequest.IncludeArticles)
         {
-            List<Article> articles = _context.Set<Article>().AsQueryable()
+            List<Article> articles = _articleRepository.GetQueryable()
                 .Where(x => x.TopicId == topicDto.TopicId && x.ArticleType == ArticleTypes.Article)
                 .OrderBy(x => x.SortNumber)
                 .ToList();
-            //var articleRequest = _mapper.Map<ArticlePageRequest>(topicRequest);
-            var articleRequest = new ArticlePageRequest();
-            articleRequest.IncludeUser = topicRequest.IncludeUser;
-            articleRequest.IncludeSubArticles = topicRequest.IncludeSubArticles;
-            articleRequest.IncludeContent = topicRequest.IncludeContent;
-            var articleDtos = await _articleService.GetArticleDtos(articles, articleRequest);
-            topicDto.Articles = _mapper.Map<List<ArticleMiniDto>>(articleDtos);
+            topicDto.Articles = await _articleService.GetArticleDtos(articles, topicRequest.ToArticlePageRequest());
         }
         return topicDto;
     }
-    public async Task<bool> EditArticleByRequest(TopicEditRequest topicEditRequest)
+    public async Task<bool> EditTopicByRequest(TopicEditRequest topicEditRequest)
     {
         var topic = await this.GetByIdAsTrackingAsync(topicEditRequest.TopicId);
         if (topic == null)

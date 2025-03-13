@@ -5,6 +5,10 @@ declare namespace API {
 
   type apiArticleGetByIdParams = {
     id: number;
+    IncludeUser?: boolean;
+    IncludeSubArticles?: boolean;
+    IncludeContent?: boolean;
+    DisplaySubArticles?: boolean;
   };
 
   type apiArticleGetByPageParams = {
@@ -36,6 +40,10 @@ declare namespace API {
 
   type apiTopicGetByIdParams = {
     id: number;
+    IncludeUser?: boolean;
+    IncludeArticles?: boolean;
+    IncludeSubArticles?: boolean;
+    IncludeContent?: boolean;
   };
 
   type apiTopicGetByPageParams = {
@@ -113,17 +121,6 @@ declare namespace API {
     isHidden?: number;
   };
 
-  type ArticleMiniDto = {
-    articleId?: number;
-    title?: string;
-    abstraction?: string;
-    parentArticleId?: number;
-    subArticles?: ArticleMiniDto[];
-    topicId?: number;
-    sortNumber?: number;
-    isHidden?: number;
-  };
-
   type BooleanApiResponse = {
     code?: number;
     message?: string;
@@ -185,7 +182,7 @@ declare namespace API {
     user?: UserApiDto;
     sortNumber?: number;
     isHidden?: number;
-    articles?: ArticleMiniDto[];
+    articles?: ArticleDto[];
   };
 
   type TopicDtoApiResponse = {

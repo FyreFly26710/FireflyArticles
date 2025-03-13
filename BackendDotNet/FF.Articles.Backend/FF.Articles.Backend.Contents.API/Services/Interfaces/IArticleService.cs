@@ -9,9 +9,9 @@ namespace FF.Articles.Backend.Contents.API.Services.Interfaces;
 public interface IArticleService : IBaseService<Article, ContentsDbContext>
 {
     Task<ArticleDto> GetArticleDto(Article article);
-    Task<ArticleDto> GetArticleDto(Article article,ArticlePageRequest articleRequest);
-    Task<List<ArticleDto>> GetArticleDtos(IEnumerable<Article> articles, ArticlePageRequest articleRequest);
+    Task<ArticleDto> GetArticleDto(Article article, ArticleQueryRequest articleRequest);
+    Task<List<ArticleDto>> GetArticleDtos(IEnumerable<Article> articles, ArticleQueryRequest articleRequest);
     Task<bool> EditArticleByRequest(ArticleEditRequest articleEditRequest);
     Task<bool> DeleteArticleById(int id);
-    Task<IQueryable<Article>> ApplySearchQuery(IQueryable<Article> query, ArticlePageRequest pageRequest);
+    Task<Paged<ArticleDto>> GetArticlesByPageRequest(ArticleQueryRequest pageRequest);
 }

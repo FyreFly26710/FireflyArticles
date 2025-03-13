@@ -4,6 +4,7 @@ using FF.Articles.Backend.Common.Exceptions;
 using FF.Articles.Backend.Common.Responses;
 using FF.Articles.Backend.Common.Utils;
 using FF.Articles.Backend.Contents.API.Constants;
+using FF.Articles.Backend.Contents.API.MapperExtensions.Articles;
 using FF.Articles.Backend.Contents.API.Models.Dtos;
 using FF.Articles.Backend.Contents.API.Models.Entities;
 using FF.Articles.Backend.Contents.API.Models.Requests.Articles;
@@ -17,25 +18,23 @@ using System.Linq;
 namespace FF.Articles.Backend.Contents.API.Controllers;
 [ApiController]
 [Route("api/contents/articles")]
-public class ArticleController(IMapper _mapper,
-    IArticleService _articleService,
-    IArticleTagService _articleTagService)
+public class ArticleController(IArticleService _articleService, IArticleTagService _articleTagService)
     : ControllerBase
 {
 
     #region REST API
     [HttpGet("{id}")]
-    public async Task<ApiResponse<ArticleDto>> GetById(int id)
+    public async Task<ApiResponse<ArticleDto>> GetById(int id, [FromQuery] ArticleQueryRequest request)
     {
         var article = await _articleService.GetByIdAsync(id);
         if (article == null)
             return ResultUtil.Error<ArticleDto>(ErrorCode.NOT_FOUND_ERROR, "Article not found");
-        var articleResponse = await _articleService.GetArticleDto(article);
+        var articleResponse = await _articleService.GetArticleDto(article, request);
         return ResultUtil.Success(articleResponse);
     }
 
     [HttpGet]
-    public async Task<ApiResponse<Paged<ArticleDto>>> GetByPage([FromQuery] ArticlePageRequest pageRequest)
+    public async Task<ApiResponse<Paged<ArticleDto>>> GetByPage([FromQuery] ArticleQueryRequest pageRequest)
     {
         if (pageRequest == null || pageRequest.PageSize > 200)
             return ResultUtil.Error<Paged<ArticleDto>>(ErrorCode.PARAMS_ERROR, "Invalid page request");
@@ -43,25 +42,8 @@ public class ArticleController(IMapper _mapper,
         {
             pageRequest.SortField = "SortNumber";
         }
-        // var pagedArticles = await _articleService.GetAllAsync(pageRequest);
-        // var articleDto = pagedArticles.Data.ToList();
-        // if (pageRequest.DisplaySubArticles)
-        // {
-        //     articleDto = articleDto.Where(x => x.ArticleType == ArticleTypes.Article).ToList();
-        // }
-        // var articleList = await _articleService.GetArticleDtos(articleDto, pageRequest);
-        // var res = new Paged<ArticleDto>(pagedArticles.GetPageInfo(), articleList);
-        var query = _articleService.GetQueryable();
-        if (pageRequest.DisplaySubArticles)
-        {
-            query = query.Where(x => x.ArticleType == ArticleTypes.Article);
-        }
-        query = await _articleService.ApplySearchQuery(query, pageRequest);
-
-        var pagedData = await _articleService.GetPagedAsync(query,pageRequest);
-        var articleList = await _articleService.GetArticleDtos(pagedData.Data, pageRequest);
-        var res = new Paged<ArticleDto>(pagedData.GetPageInfo(), articleList);
-        return ResultUtil.Success(res);
+        var pagedArticles = await _articleService.GetArticlesByPageRequest(pageRequest);
+        return ResultUtil.Success(pagedArticles);
     }
 
     [HttpPut]
@@ -70,7 +52,7 @@ public class ArticleController(IMapper _mapper,
     {
         if (articleAddRequest == null)
             return ResultUtil.Error<int>(ErrorCode.PARAMS_ERROR);
-        var article = _mapper.Map<Article>(articleAddRequest);
+        var article = articleAddRequest.ToEntity();
         var userDto = UserUtil.GetUserFromHttpRequest(Request);
         article.UserId = userDto.UserId;
         //todo: check if topic exists

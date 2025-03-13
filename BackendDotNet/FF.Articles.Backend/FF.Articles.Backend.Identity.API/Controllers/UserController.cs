@@ -4,7 +4,8 @@ using FF.Articles.Backend.Common.Constants;
 using FF.Articles.Backend.Common.Exceptions;
 using FF.Articles.Backend.Common.Responses;
 using FF.Articles.Backend.Common.Utils;
-using FF.Articles.Backend.Identity.API.Models.Responses;
+using FF.Articles.Backend.Identity.API.MapperExtensions.Users;
+using FF.Articles.Backend.Identity.API.Models.Dtos;
 using FF.Articles.Backend.Identity.API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,10 +13,10 @@ using Microsoft.AspNetCore.Mvc;
 namespace FF.Articles.Backend.Identity.API.Controllers;
 [Route("api/identity/users")]
 [ApiController]
-public class UserController(IUserService _userService, ILogger<UserController> _logger, IMapper _mapper)
+public class UserController(IUserService _userService, ILogger<UserController> _logger)
 : ControllerBase
 {
-        //[EnableCors("AllowedBackendUrls")]
+    //[EnableCors("AllowedBackendUrls")]
     [HttpGet("{id}")]
     public async Task<ApiResponse<UserApiDto>> GetById(int id)
     {
@@ -24,7 +25,7 @@ public class UserController(IUserService _userService, ILogger<UserController> _
         var user = await _userService.GetByIdAsync(id);
         if (user == null)
             return ResultUtil.Error<UserApiDto>(ErrorCode.NOT_FOUND_ERROR, "User not found");
-        var userDto = _mapper.Map<UserApiDto>(user);
+        var userDto = user.ToUserApiDto();
         return ResultUtil.Success(userDto);
     }
 
@@ -33,7 +34,7 @@ public class UserController(IUserService _userService, ILogger<UserController> _
     public async Task<ApiResponse<Paged<UserDto>>> GetByPage([FromQuery] PageRequest pageRequest)
     {
         var users = await _userService.GetAllAsync(pageRequest);
-        var useDtos = _mapper.Map<List<UserDto>>(users.Data);
+        var useDtos = users.Data.Select(user => user.ToDto()).ToList();
         var response = new Paged<UserDto>(users.PageIndex, users.PageSize, users.Counts, useDtos);
         return ResultUtil.Success(response);
     }

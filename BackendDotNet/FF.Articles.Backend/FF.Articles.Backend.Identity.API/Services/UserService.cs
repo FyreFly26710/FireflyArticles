@@ -7,15 +7,17 @@ using FF.Articles.Backend.Common.Constants;
 using FF.Articles.Backend.Common.Exceptions;
 using FF.Articles.Backend.Common.Utils;
 using FF.Articles.Backend.Identity.API.Infrastructure;
+using FF.Articles.Backend.Identity.API.MapperExtensions.Users;
+using FF.Articles.Backend.Identity.API.Models.Dtos;
 using FF.Articles.Backend.Identity.API.Models.Entities;
-using FF.Articles.Backend.Identity.API.Models.Responses;
+using FF.Articles.Backend.Identity.API.Repositories;
 using FF.Articles.Backend.Identity.API.Utils;
 using Microsoft.EntityFrameworkCore;
 
 namespace FF.Articles.Backend.Identity.API.Services;
 
-public class UserService(IdentityDbContext _context, ILogger<UserService> _logger, IMapper _mapper)
-    : BaseService<User, IdentityDbContext>(_context, _logger), IUserService
+public class UserService(IUserRepository _userRepository, ILogger<UserService> _logger)
+    : BaseService<User, IdentityDbContext>(_userRepository, _logger), IUserService
 {
     private const string SALT = "Firefly";
 
@@ -60,7 +62,7 @@ public class UserService(IdentityDbContext _context, ILogger<UserService> _logge
         }
 
         await IdentityUtils.SignIn(user, request.HttpContext);
-        return _mapper.Map<LoginUserDto>(user);
+        return user.ToLoginUserDto();
     }
 
     public User GetLoginUser(HttpRequest request)
@@ -71,10 +73,13 @@ public class UserService(IdentityDbContext _context, ILogger<UserService> _logge
         {
             throw new ApiException(ErrorCode.NOT_LOGIN_ERROR);
         }
-        // need to get latest state of user??
-        // user = _context.Users.Find(user.Id);
+        User? userEntity = _userRepository.GetById(user.UserId);
 
-        return _mapper.Map<User>(user);
+        if (userEntity == null)
+        {
+            throw new ApiException(ErrorCode.NOT_FOUND_ERROR, "User not found");
+        }
+        return userEntity;
     }
 
     public bool IsAdmin(HttpRequest request) => IsAdmin(GetLoginUser(request));
@@ -127,7 +132,7 @@ public class UserService(IdentityDbContext _context, ILogger<UserService> _logge
     public async Task<User> GetUserByEmail(string email)
     {
         var user = await this.GetQueryable()
-            .FirstOrDefaultAsync(u => email.ToLower()==(u.UserEmail ?? "").ToLower());
+            .FirstOrDefaultAsync(u => email.ToLower() == (u.UserEmail ?? "").ToLower());
         if (user == null)
         {
             user = new User() { Id = -1, UserAccount = email, UserRole = "user", UserName = "Guest" };

@@ -3,6 +3,7 @@ using FF.Articles.Backend.Common.Constants;
 using FF.Articles.Backend.Common.Exceptions;
 using FF.Articles.Backend.Common.Responses;
 using FF.Articles.Backend.Common.Utils;
+using FF.Articles.Backend.Contents.API.MapperExtensions.Tags;
 using FF.Articles.Backend.Contents.API.Models.Dtos;
 using FF.Articles.Backend.Contents.API.Models.Entities;
 using FF.Articles.Backend.Contents.API.Models.Requests.Articles;
@@ -15,7 +16,7 @@ namespace FF.Articles.Backend.Contents.API.Controllers;
 
 [ApiController]
 [Route("api/contents/tags")]
-public class TagController(ILogger<ArticleController> _logger, IMapper _mapper,
+public class TagController(ILogger<ArticleController> _logger,
     ITagService _tagService)
     : ControllerBase
 {
@@ -25,14 +26,14 @@ public class TagController(ILogger<ArticleController> _logger, IMapper _mapper,
         var tag = await _tagService.GetByIdAsync(id);
         if (tag == null)
             return ResultUtil.Error<TagDto>(ErrorCode.NOT_FOUND_ERROR, "Tag not found");
-        var tagResponse = _mapper.Map<TagDto>(tag);
+        var tagResponse = tag.ToDto();
         return ResultUtil.Success(tagResponse);
     }
     [HttpGet]
     public async Task<ApiResponse<List<TagDto>>> GetAll()
     {
         var tags = await _tagService.GetAllAsync();
-        var tagResponse = _mapper.Map<List<TagDto>>(tags);
+        var tagResponse = tags.Select(t => t.ToDto()).ToList();
         return ResultUtil.Success(tagResponse);
     }
     [HttpPut]
