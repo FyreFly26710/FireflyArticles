@@ -3,14 +3,13 @@ using FF.Articles.Backend.Common.Constants;
 using FF.Articles.Backend.Common.Exceptions;
 using FF.Articles.Backend.Common.Responses;
 using FF.Articles.Backend.Common.Utils;
+using FF.Articles.Backend.Contents.API.Interfaces.Services;
 using FF.Articles.Backend.Contents.API.MapperExtensions.Topics;
 using FF.Articles.Backend.Contents.API.Models.Dtos;
 using FF.Articles.Backend.Contents.API.Models.Entities;
 using FF.Articles.Backend.Contents.API.Models.Requests.Articles;
 using FF.Articles.Backend.Contents.API.Models.Requests.Topics;
-using FF.Articles.Backend.Contents.API.RemoteServices.Interfaces;
 using FF.Articles.Backend.Contents.API.Services;
-using FF.Articles.Backend.Contents.API.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
@@ -52,6 +51,13 @@ public class TopicController(ILogger<TopicController> _logger,
     [Authorize(Roles = UserConstant.ADMIN_ROLE)]
     public async Task<ApiResponse<int>> AddByRequest([FromBody] TopicAddRequest topicAddRequest)
     {
+        string title = topicAddRequest.Title;
+        var existTopic = _topicService.GetQueryable().FirstOrDefault(t => title.Trim().Equals(t.Title.Trim()));
+        if (existTopic != null)
+        {
+            return ResultUtil.Success(existTopic.Id);
+        }
+
         var topic = topicAddRequest.ToEntity();
         var userDto = UserUtil.GetUserFromHttpRequest(Request);
         topic.UserId = userDto.UserId;

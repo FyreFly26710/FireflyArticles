@@ -1,6 +1,6 @@
 ﻿using FF.Articles.Backend.Common.ApiDtos;
 
-namespace FF.Articles.Backend.Contents.API.RemoteServices.Interfaces;
+namespace FF.Articles.Backend.Contents.API.Interfaces.Services.RemoteServices;
 public interface IIdentityRemoteService
 {
     Task<UserApiDto?> GetUserByIdAsync(int userId);

@@ -1,8 +1,8 @@
 using FF.Articles.Backend.Common.Bases;
 using FF.Articles.Backend.Contents.API.Constants;
 using FF.Articles.Backend.Contents.API.Infrastructure;
+using FF.Articles.Backend.Contents.API.Interfaces.Repositories;
 using FF.Articles.Backend.Contents.API.Models.Entities;
-using FF.Articles.Backend.Contents.API.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace FF.Articles.Backend.Contents.API.Repositories;

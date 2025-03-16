@@ -6,13 +6,13 @@ using FF.Articles.Backend.Common.Exceptions;
 using FF.Articles.Backend.Common.Responses;
 using FF.Articles.Backend.Contents.API.Constants;
 using FF.Articles.Backend.Contents.API.Infrastructure;
+using FF.Articles.Backend.Contents.API.Interfaces.Repositories;
+using FF.Articles.Backend.Contents.API.Interfaces.Services;
+using FF.Articles.Backend.Contents.API.Interfaces.Services.RemoteServices;
 using FF.Articles.Backend.Contents.API.MapperExtensions.Articles;
 using FF.Articles.Backend.Contents.API.Models.Dtos;
 using FF.Articles.Backend.Contents.API.Models.Entities;
 using FF.Articles.Backend.Contents.API.Models.Requests.Articles;
-using FF.Articles.Backend.Contents.API.RemoteServices.Interfaces;
-using FF.Articles.Backend.Contents.API.Repositories.Interfaces;
-using FF.Articles.Backend.Contents.API.Services.Interfaces;
 using FF.Articles.Backend.Contents.API.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
 
@@ -118,7 +118,7 @@ public class ArticleService(
     {
         await _contentsUnitOfWork.ExecuteInTransactionAsync(async () =>
         {
-            var article = await _contentsUnitOfWork.ArticleRepository.GetByIdAsTrackingAsync(articleEditRequest.ArticleId);
+            var article = await _contentsUnitOfWork.ArticleRepository.GetByIdAsync(articleEditRequest.ArticleId, true);
             if (article == null)
                 throw new ApiException(ErrorCode.NOT_FOUND_ERROR, "Article not found");
             // update not null fields
@@ -149,7 +149,6 @@ public class ArticleService(
             if (articleEditRequest.TagIds != null) await _articleTagService.EditArticleTags(article.Id, articleEditRequest.TagIds);
             //article.UpdateTime = DateTime.UtcNow;
             await _articleRepository.UpdateModifiedAsync(article);
-            await _contentsUnitOfWork.CommitAsync();
         });
         return true;
     }
@@ -198,6 +197,34 @@ public class ArticleService(
 
         return res;
 
+    }
+    public async Task<bool> EditContentBatch(Dictionary<int, string> batchEditConentRequests)
+    {
+        await _contentsUnitOfWork.ExecuteInTransactionAsync(async () =>
+        {
+            var articles = await _contentsUnitOfWork.ArticleRepository.GetByIdsAsync([.. batchEditConentRequests.Keys], true);
+            if (articles == null || articles.Count != batchEditConentRequests.Count)
+                throw new ApiException(ErrorCode.PARAMS_ERROR, "Invalid article ids");
+            foreach (var article in articles)
+            {
+                article.Content = batchEditConentRequests[article.Id];
+            }
+            await _contentsUnitOfWork.ArticleRepository.UpdateBatchAsync(articles);
+            await _contentsUnitOfWork.CommitAsync();
+        });
+        return true;
+    }
+
+    public async Task<Dictionary<int, string>> CreateBatchAsync(List<ArticleAddRequest> articleAddRequests, int userId)
+    {
+        var result = await _contentsUnitOfWork.ExecuteInTransactionAsync(async () =>
+        {
+            var articles = articleAddRequests.Select(request => request.ToEntity(userId)).ToList();
+            var ids = await _contentsUnitOfWork.ArticleRepository.CreateBatchAsync(articles);
+            // todo: add tags
+            return ids.ToDictionary(id => id, id => articles.First(a => a.Id == id).Title);
+        });
+        return result;
     }
 }
 

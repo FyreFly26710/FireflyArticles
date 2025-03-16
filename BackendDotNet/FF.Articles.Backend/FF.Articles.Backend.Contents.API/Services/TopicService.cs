@@ -8,10 +8,10 @@ using FF.Articles.Backend.Contents.API.Models.Dtos;
 using FF.Articles.Backend.Contents.API.Models.Entities;
 using FF.Articles.Backend.Contents.API.MapperExtensions.Articles;
 using FF.Articles.Backend.Contents.API.Models.Requests.Topics;
-using FF.Articles.Backend.Contents.API.RemoteServices.Interfaces;
-using FF.Articles.Backend.Contents.API.Repositories.Interfaces;
-using FF.Articles.Backend.Contents.API.Services.Interfaces;
 using FF.Articles.Backend.Contents.API.UnitOfWork;
+using FF.Articles.Backend.Contents.API.Interfaces.Services;
+using FF.Articles.Backend.Contents.API.Interfaces.Repositories;
+using FF.Articles.Backend.Contents.API.Interfaces.Services.RemoteServices;
 namespace FF.Articles.Backend.Contents.API.Services;
 public class TopicService(ITopicRepository _topicRepository, ILogger<TopicService> _logger,
     IArticleRepository _articleRepository,
@@ -23,6 +23,7 @@ public class TopicService(ITopicRepository _topicRepository, ILogger<TopicServic
     public async Task<TopicDto> GetTopicDto(Topic topic) => await GetTopicDto(topic, new TopicQueryRequest());
     public async Task<TopicDto> GetTopicDto(Topic topic, TopicQueryRequest topicRequest)
     {
+
         var topicDto = topic.ToDto();
         if (topicRequest.IncludeUser) topicDto.User = await _identityRemoteService.GetUserByIdAsync(topic.UserId);
         if (topicRequest.IncludeArticles)
@@ -39,7 +40,7 @@ public class TopicService(ITopicRepository _topicRepository, ILogger<TopicServic
     {
         await _contentsUnitOfWork.ExecuteInTransactionAsync(async () =>
         {
-            var topic = await _contentsUnitOfWork.TopicRepository.GetByIdAsTrackingAsync(topicEditRequest.TopicId);
+            var topic = await _contentsUnitOfWork.TopicRepository.GetByIdAsync(topicEditRequest.TopicId, true);
             if (topic == null)
                 throw new ApiException(ErrorCode.NOT_FOUND_ERROR, "Topic not found");
             if (topicEditRequest.IsHidden != null && topic.IsHidden != topicEditRequest.IsHidden)

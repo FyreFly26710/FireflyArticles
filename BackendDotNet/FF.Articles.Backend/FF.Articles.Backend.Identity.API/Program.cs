@@ -6,13 +6,13 @@ using Microsoft.AspNetCore.Mvc.Controllers;
 using FF.Articles.Backend.Identity.API.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
+var configuration = builder.Configuration;
 
-
-builder.AddServiceDefaults(builder.Configuration);
+builder.AddServiceDefaults(configuration);
 
 builder.Services.AddDbContext<IdentityDbContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+    options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"))
     .LogTo(Console.WriteLine, LogLevel.Information)
     .EnableSensitiveDataLogging();
 });
@@ -32,7 +32,7 @@ builder.Services.AddSwaggerGen(c =>
         if (apiDesc.ActionDescriptor is ControllerActionDescriptor descriptor)
         {
             var resource = descriptor.ControllerName.Replace("Controller", "");
-            return $"api{resource}{descriptor.ActionName}"; 
+            return $"api{resource}{descriptor.ActionName}";
         }
         return null;
     });

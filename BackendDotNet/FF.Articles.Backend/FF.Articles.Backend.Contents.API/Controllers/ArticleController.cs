@@ -4,12 +4,11 @@ using FF.Articles.Backend.Common.Exceptions;
 using FF.Articles.Backend.Common.Responses;
 using FF.Articles.Backend.Common.Utils;
 using FF.Articles.Backend.Contents.API.Constants;
+using FF.Articles.Backend.Contents.API.Interfaces.Services;
 using FF.Articles.Backend.Contents.API.MapperExtensions.Articles;
 using FF.Articles.Backend.Contents.API.Models.Dtos;
 using FF.Articles.Backend.Contents.API.Models.Entities;
 using FF.Articles.Backend.Contents.API.Models.Requests.Articles;
-using FF.Articles.Backend.Contents.API.RemoteServices.Interfaces;
-using FF.Articles.Backend.Contents.API.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -52,14 +51,24 @@ public class ArticleController(IArticleService _articleService, IArticleTagServi
     {
         if (articleAddRequest == null)
             return ResultUtil.Error<int>(ErrorCode.PARAMS_ERROR);
-        var article = articleAddRequest.ToEntity();
         var userDto = UserUtil.GetUserFromHttpRequest(Request);
-        article.UserId = userDto.UserId;
+        var article = articleAddRequest.ToEntity(userDto.UserId);
         //todo: check if topic exists
         int articleId = await _articleService.CreateAsync(article);
         await _articleTagService.EditArticleTags(articleId, articleAddRequest.TagIds);
 
         return ResultUtil.Success(article.Id);
+    }
+    [HttpPut("/batch")]
+    [Authorize(Roles = UserConstant.ADMIN_ROLE)]
+    public async Task<ApiResponse<Dictionary<int, string>>> AddBatchByRequest([FromBody] List<ArticleAddRequest> articleAddRequests)
+    {
+        if (articleAddRequests == null || articleAddRequests.Count == 0)
+            return ResultUtil.Error<Dictionary<int, string>>(ErrorCode.PARAMS_ERROR, "Invalid article add requests");
+        var userDto = UserUtil.GetUserFromHttpRequest(Request);
+
+        var result = await _articleService.CreateBatchAsync(articleAddRequests, userDto.UserId);
+        return ResultUtil.Success(result);
     }
 
     [HttpPost]
@@ -67,6 +76,15 @@ public class ArticleController(IArticleService _articleService, IArticleTagServi
     public async Task<ApiResponse<bool>> EditByRequest([FromBody] ArticleEditRequest articleEditRequest)
         => ResultUtil.Success(await _articleService.EditArticleByRequest(articleEditRequest));
 
+    [HttpPost("/batch/content")]
+    [Authorize(Roles = UserConstant.ADMIN_ROLE)]
+    public async Task<ApiResponse<bool>> EditContentBatch([FromBody] Dictionary<int, string> batchEditConentRequests)
+    {
+        if (batchEditConentRequests == null || batchEditConentRequests.Count == 0)
+            return ResultUtil.Error<bool>(ErrorCode.PARAMS_ERROR, "Invalid article edit requests");
+        await _articleService.EditContentBatch(batchEditConentRequests);
+        return ResultUtil.Success(true);
+    }
 
     [HttpDelete("{id}")]
     [Authorize(Roles = UserConstant.ADMIN_ROLE)]

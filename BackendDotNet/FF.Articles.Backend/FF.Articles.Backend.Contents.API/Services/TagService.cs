@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 using FF.Articles.Backend.Common.Bases;
 using FF.Articles.Backend.Contents.API.Infrastructure;
+using FF.Articles.Backend.Contents.API.Interfaces.Repositories;
+using FF.Articles.Backend.Contents.API.Interfaces.Services;
 using FF.Articles.Backend.Contents.API.Models.Entities;
-using FF.Articles.Backend.Contents.API.Repositories.Interfaces;
-using FF.Articles.Backend.Contents.API.Services.Interfaces;
 using FF.Articles.Backend.Contents.API.UnitOfWork;
 
 namespace FF.Articles.Backend.Contents.API.Services;

@@ -1,18 +1,20 @@
+using FF.Articles.Backend.AI;
 using FF.Articles.Backend.Contents.API.Infrastructure;
-using FF.Articles.Backend.Contents.API.RemoteServices;
-using FF.Articles.Backend.Contents.API.RemoteServices.Interfaces;
+using FF.Articles.Backend.Contents.API.Interfaces.Repositories;
+using FF.Articles.Backend.Contents.API.Interfaces.Services;
+using FF.Articles.Backend.Contents.API.Interfaces.Services.RemoteServices;
 using FF.Articles.Backend.Contents.API.Repositories;
-using FF.Articles.Backend.Contents.API.Repositories.Interfaces;
 using FF.Articles.Backend.Contents.API.Services;
-using FF.Articles.Backend.Contents.API.Services.Interfaces;
+using FF.Articles.Backend.Contents.API.Services.AIServices;
+using FF.Articles.Backend.Contents.API.Services.RemoteServices;
 using FF.Articles.Backend.Contents.API.UnitOfWork;
 using FF.Articles.Backend.ServiceDefaults;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
-
-builder.AddServiceDefaults(builder.Configuration);
+var configuration = builder.Configuration;
+builder.AddServiceDefaults(configuration);
 // builder.Services.AddHttpsRedirection(options => {
 //     options.RedirectStatusCode = StatusCodes.Status307TemporaryRedirect;
 //     options.HttpsPort = 23000; 
@@ -24,6 +26,8 @@ builder.Services.AddDbContext<ContentsDbContext>(options =>
     .EnableSensitiveDataLogging();
 });
 
+builder.Services.AddDeepSeek(configuration);
+builder.Services.AddScoped<ArticleGenerationService>();
 
 builder.Services.AddScoped<IArticleService, ArticleService>();
 builder.Services.AddScoped<ITagService, TagService>();

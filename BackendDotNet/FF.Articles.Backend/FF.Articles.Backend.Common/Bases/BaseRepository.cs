@@ -25,7 +25,13 @@ public abstract class BaseRepository<TEntity, TContext>
 
     #region single CRUD operations
     public virtual TEntity? GetById(int id) => _context.Set<TEntity>().Find(id);
-    public virtual async Task<TEntity?> GetByIdAsync(int id) => await _context.Set<TEntity>().FindAsync(id);
+    public virtual async Task<TEntity?> GetByIdAsync(int id, bool asTracking = false)
+    {
+        var query = _context.Set<TEntity>().AsQueryable();
+        if (asTracking)
+            query = query.AsTracking();
+        return await query.FirstOrDefaultAsync(e => e.Id == id);
+    }
 
     public virtual async Task<int> CreateAsync(TEntity entity)
     {
@@ -47,8 +53,6 @@ public abstract class BaseRepository<TEntity, TContext>
         await _context.SaveChangesAsync();
         return entity.Id;
     }
-    public virtual async Task<TEntity?> GetByIdAsTrackingAsync(int id)
-        => await _context.Set<TEntity>().AsTracking().FirstOrDefaultAsync(e => e.Id == id);
     public virtual async Task<int> UpdateModifiedAsync(TEntity trackedEntity)
     {
         var entry = _context.Entry(trackedEntity);
@@ -59,21 +63,21 @@ public abstract class BaseRepository<TEntity, TContext>
             {
                 entry.Property(nameof(BaseEntity.UpdateTime)).CurrentValue = DateTime.UtcNow;
             }
-            await _context.SaveChangesAsync();
         }
+        // await _context.SaveChangesAsync();
         return trackedEntity.Id;
     }
     public virtual async Task<int> UpdateAsync(TEntity entity)
     {
         _context.Set<TEntity>().Update(entity);
-        await _context.SaveChangesAsync();
-        return entity.Id;
+        var id = await UpdateModifiedAsync(entity);
+        return id;
     }
 
 
     public virtual async Task<bool> DeleteAsync(int id)
     {
-        var entity = await GetByIdAsTrackingAsync(id);
+        var entity = await GetByIdAsync(id, true);
         if (entity == null)
             return true;
 
@@ -93,7 +97,7 @@ public abstract class BaseRepository<TEntity, TContext>
 
     public virtual async Task<bool> HardDeleteAsync(int id)
     {
-        var entity = await GetByIdAsTrackingAsync(id);
+        var entity = await GetByIdAsync(id, true);
         if (entity == null)
             return false;
 
@@ -107,9 +111,20 @@ public abstract class BaseRepository<TEntity, TContext>
 
     #region batch CRUD operations
 
-    public virtual async Task<List<TEntity>> GetAllAsync() => await _context.Set<TEntity>().ToListAsync();
-    public virtual async Task<List<TEntity>> GetByIdsAsync(List<int> ids)
-        => await _context.Set<TEntity>().Where(e => ids.Contains(e.Id)).ToListAsync();
+    public virtual async Task<List<TEntity>> GetAllAsync(bool asTracking = false)
+    {
+        var query = _context.Set<TEntity>().AsQueryable();
+        if (asTracking)
+            query = query.AsTracking();
+        return await query.ToListAsync();
+    }
+    public virtual async Task<List<TEntity>> GetByIdsAsync(List<int> ids, bool asTracking = false)
+    {
+        var query = _context.Set<TEntity>().AsQueryable();
+        if (asTracking)
+            query = query.AsTracking();
+        return await query.Where(e => ids.Contains(e.Id)).ToListAsync();
+    }
     public virtual async Task<Paged<TEntity>> GetAllAsync(PageRequest pageRequest) =>
         await GetPagedFromQueryAsync(_context.Set<TEntity>(), pageRequest);
 
@@ -144,8 +159,43 @@ public abstract class BaseRepository<TEntity, TContext>
         return query.Skip((pageRequest.PageNumber - 1) * pageRequest.PageSize).Take(pageRequest.PageSize);
     }
 
-    public virtual async Task<List<int>> CreateBatchAsync(List<TEntity> entities) => throw new NotImplementedException();
-    public virtual async Task<List<int>> UpdateBatchAsync(List<TEntity> entities) => throw new NotImplementedException();
+    public virtual async Task<List<int>> CreateBatchAsync(List<TEntity> entities)
+    {
+        if (entities.Count == 0)
+            return new List<int>();
+
+        var entityType = _context.Model.FindEntityType(typeof(TEntity));
+
+        if (entityType?.FindProperty(nameof(BaseEntity.CreateTime)) != null)
+        {
+            foreach (var entity in entities)
+            {
+                if (entity.CreateTime == null)
+                    entity.CreateTime = DateTime.UtcNow;
+            }
+        }
+
+        if (entityType?.FindProperty(nameof(BaseEntity.UpdateTime)) != null)
+        {
+            foreach (var entity in entities)
+            {
+                if (entity.UpdateTime == null)
+                    entity.UpdateTime = DateTime.UtcNow;
+            }
+        }
+
+        await _context.Set<TEntity>().AddRangeAsync(entities);
+        await _context.SaveChangesAsync();
+        return entities.Select(e => e.Id).ToList();
+    }
+    public virtual async Task UpdateBatchAsync(List<TEntity> entities)
+    {
+        foreach (var entity in entities)
+        {
+            await UpdateModifiedAsync(entity);
+        }
+        await _context.SaveChangesAsync();
+    }
     public virtual async Task<bool> DeleteBatchAsync(List<int> ids)
     {
         var entities = await _context.Set<TEntity>().AsTracking()

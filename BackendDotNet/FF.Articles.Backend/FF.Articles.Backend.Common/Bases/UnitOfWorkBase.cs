@@ -71,7 +71,9 @@ public abstract class UnitOfWork<TContext> : IUnitOfWork<TContext>
         try
         {
             if (_transaction != null)
+            {
                 await _transaction.CommitAsync();
+            }
         }
         finally
         {

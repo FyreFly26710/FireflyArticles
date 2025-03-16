@@ -34,17 +34,18 @@ public static class AuthenticationExtensions
     {
         builder.Services.AddCors(options =>
         {
-            string url = configuration["Domain:Home"]??"";
+            string url = configuration["Domain:Home"] ?? "";
             options.AddPolicy("AllowedOrigins",
                 builder =>
                 {
                     builder.AllowAnyHeader()
                            .AllowAnyMethod()
-                           .WithOrigins(configuration["Domain:Home"]??"",
-                                "http://localhost:3000", 
-                                "http://localhost:21000", 
-                                "http://localhost:22000", 
-                                "http://localhost:23000")
+                           .WithOrigins(configuration["Domain:Home"] ?? "",
+                                "http://localhost:3000",
+                                "http://localhost:21000",
+                                "http://localhost:22000",
+                                "http://localhost:23000",
+                                "http://localhost:24000")
                            .AllowCredentials();
                 });
         });
@@ -67,6 +68,7 @@ public static class AuthenticationExtensions
         app.UseCors("AllowedOrigins");
         app.UseAuthentication();
         app.UseAuthorization();
+
     }
 }
 
