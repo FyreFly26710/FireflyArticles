@@ -10,6 +10,7 @@ using FF.Articles.Backend.AI.API.MapperExtensions;
 using FF.Articles.Backend.Common.Exceptions;
 using FF.Articles.Backend.Common.ApiDtos;
 using FF.Articles.Backend.AI.API.Services.Stores;
+using FF.Articles.Backend.Common.Utils;
 namespace FF.Articles.Backend.AI.API.Services;
 
 public class ArticleGenerationService : IArticleGenerationService
@@ -31,9 +32,11 @@ public class ArticleGenerationService : IArticleGenerationService
     // private string topic = "";
     // private bool isFirstRound = true;
     // Round 1
-    public async Task<ArticlesAIResponse> GenerateArticleListsAsync(string topic, int articleCount = 8, CancellationToken cancellationToken = default)
+    public async Task<ArticlesAIResponse> GenerateArticleListsAsync(string topic, HttpRequest httpRequest, int articleCount = 8, CancellationToken cancellationToken = default)
     {
-        var userArticleState = _userArticleStateStore.GetOrAddState(1);
+        var user = UserUtil.GetUserFromHttpRequest(httpRequest);
+        var userArticleState = _userArticleStateStore.GetOrAddState(user.UserId);
+
         var request = new ChatRequest
         {
             Messages = new(){
@@ -53,14 +56,26 @@ public class ArticleGenerationService : IArticleGenerationService
             throw new Exception("Failed to generate article");
         }
         userArticleState.Topic = topic;
+        // Insert topic
+        userArticleState.TopicId = await _contentsApiRemoteService.AddTopicByTitleAsync(userArticleState.Topic, httpRequest);
+        var articleApiRequests = userArticleState.ArticlesAIResponse!.Articles.Select(article => article.ToArticleApiRequest(userArticleState.TopicId)).ToList();
+        var idTitleMap = await _contentsApiRemoteService.AddBatchArticlesAsync(articleApiRequests, httpRequest);
+        userArticleState.IdMap = userArticleState.ArticlesAIResponse.Articles
+            .ToDictionary(
+                aiArticle => aiArticle.Id,
+                aiArticle => idTitleMap
+                    .First(kvp => kvp.Value == aiArticle.Title)
+                    .Key
+            );
         userArticleState.IsFirstRound = false;
         return userArticleState.ArticlesAIResponse;
     }
 
     // round 2
-    public async Task<string> GenerateArticleContentAsync(int articleId, CancellationToken cancellationToken = default)
+    public async Task<string> GenerateArticleContentAsync(int articleId, HttpRequest httpRequest, CancellationToken cancellationToken = default)
     {
-        var userArticleState = _userArticleStateStore.GetOrAddState(1);
+        var user = UserUtil.GetUserFromHttpRequest(httpRequest);
+        var userArticleState = _userArticleStateStore.GetOrAddState(user.UserId);
         if (userArticleState.IsFirstRound)
         {
             throw new ApiException(ErrorCode.SYSTEM_ERROR, "Please generate article lists first");
@@ -81,29 +96,7 @@ public class ArticleGenerationService : IArticleGenerationService
         };
         request.ResponseFormat = new ResponseFormat() { Type = ResponseFormatTypes.Text };
 
-        var chatTask = _deepSeekClient.ChatAsync(request, cancellationToken);
-        if (userArticleState.IdMap.Count == 0)
-        {
-            // Insert topic
-            var topicId = await _contentsApiRemoteService.AddTopicByTitleAsync(userArticleState.Topic);
-            // Insert articles
-            var articleApiRequests = userArticleState.ArticlesAIResponse!.Articles.Select(article => article.ToArticleApiRequest(topicId)).ToList();
-            var addArticlesTask = _contentsApiRemoteService.AddBatchArticlesAsync(articleApiRequests);
-            await Task.WhenAll(addArticlesTask, chatTask);
-            var idTitleMap = await addArticlesTask;
-            userArticleState.IdMap = userArticleState.ArticlesAIResponse.Articles
-                .ToDictionary(
-                    aiArticle => aiArticle.Id,
-                    aiArticle => idTitleMap
-                        .First(kvp => kvp.Value == aiArticle.Title)
-                        .Key
-                );
-        }
-        else
-        {
-            await chatTask;
-        }
-        var response = await chatTask;
+        var response = await _deepSeekClient.ChatAsync(request, cancellationToken);
 
         var content = response?.Choices.First().Message?.Content ?? "";
         if (string.IsNullOrEmpty(content))
@@ -120,8 +113,17 @@ public class ArticleGenerationService : IArticleGenerationService
             // Todo: Add tags
             //Tags = tags,
         };
-        await _contentsApiRemoteService.EditArticleByRequest(editRequest);
+        await _contentsApiRemoteService.EditArticleByRequest(editRequest, httpRequest);
         return content;
+    }
+
+    public async Task BatchGenerateArticleContentAsync(List<int> articleIds, HttpRequest httpRequest, CancellationToken cancellationToken = default)
+    {
+        var tasks = articleIds
+            .Select(id => GenerateArticleContentAsync(id, httpRequest, cancellationToken))
+            .ToList(); 
+
+        await Task.WhenAll(tasks); 
     }
 
 
@@ -149,20 +151,37 @@ public class ArticleGenerationService : IArticleGenerationService
     """;
 
 
-    private string user_ArticleContent(AIGenArticle article) => @$"""
-    Title: {article.Title}
-    Abstraction: {article.Abstraction}
-    Content: 
+    private string user_ArticleContent(AIGenArticle article) => @$"
+    You are a helpful assistant that generates articles based on the title: {article.Title} and key points: {article.Abstraction}  
+    Formatting Requirements:
+    - Strictly use pure markdown syntax ONLY
+    - Omit the article title completely
+    - Never use ```markdown code blocks
+    - Maintain proper heading hierarchy (H2 for sections)
+    - No markdown formatting in introduction/conclusion
 
-    Using above title and abstraction, please write a content for the article in markdown format. (Do not include Title and Abstraction in the content)
-     **Article Structure**:  
-    Use the following structure:  
-    - **Introduction**: Present the context, and relevance (1–2 paragraphs).  
-    - **Section for Each Key Point**:  
-     - Turn each key point into a subheading (H2).  
-     - Expand on the point with 1–3 paragraphs, providing explanations, examples, or relevant details.  
-    - **Conclusion**: Summarize the main takeaways, reiterate the benefits or importance, and (optionally) suggest next steps or references.
-    """;
+    Article Structure:
+    1. **Introduction** (H2 heading)
+    - 1-2 paragraphs establishing context
+    - Clearly state article purpose
+
+    2. **Core Sections** (3-5 H2 sections)
+    - Convert each key points from above to H2 heading
+    - 1-3 paragraphs per section
+    - Include examples/data where applicable
+    - Use bullet points for lists where appropriate
+
+    3. **Conclusion** (H2 heading)
+    - Summarize key insights
+    - Highlight practical applications
+    - Avoid introducing new information
+
+    Content Generation Guidelines:
+    - Write in professional but accessible tone
+    - Maintain academic rigor without jargon
+    - Ensure logical flow between sections
+    - All content must be original analysis
+    - Keep paragraphs under 6 sentences";
     private string format_ArticlesList => """
     Generate a JSON response in this EXACT structure:
     {
@@ -170,7 +189,10 @@ public class ArticleGenerationService : IArticleGenerationService
         {
         "Id": 1,
         "Title": "Article Title",
-        "Abstraction": "**Markdown** content with \\n line breaks"
+        "Abstraction": 
+            "**Key Point** content with two trailing spaces.  "
+            "**Key Point** content with two trailing spaces.  "
+            "**Key Point** content with two trailing spaces.  "
         }
     ],
     "AIMessage": "Your message here"
@@ -189,6 +211,22 @@ public class ArticleGenerationService : IArticleGenerationService
     5. **JSON Syntax:** Ensure all quotes, commas, and brackets are closed. Escape `\n` and `\"` properly.
     """;
     private string format_ArticleContent => """
-    Your response should return a pure markdown text. All your response will be included in the content.
+    Respond ONLY with the raw markdown content following this exact structure:
+    # Introduction
+    [Content...]
+
+    ## [First Key Point]
+    [Content...]
+
+    ## [Second Key Point] 
+    [Content...]
+
+    # Conclusion
+    [Content...]
+
+    DO NOT include: 
+    - Title
+    - Markdown code fences
+    - Any text outside the specified structure
     """;
 }

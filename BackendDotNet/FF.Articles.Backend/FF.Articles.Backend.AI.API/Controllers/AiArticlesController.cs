@@ -11,16 +11,21 @@ public class AiArticlesController(IArticleGenerationService articleGenerationSer
     [HttpPost("generate-article")]
     public async Task<IActionResult> GenerateArticle(string topic, int aricleCount, CancellationToken cancellationToken)
     {
-        var test = UserUtil.GetUserFromHttpRequest(Request);
-        var article = await articleGenerationService.GenerateArticleListsAsync(topic, aricleCount, cancellationToken);
+        var article = await articleGenerationService.GenerateArticleListsAsync(topic, Request, aricleCount, cancellationToken);
         return Ok(article);
     }
 
     [HttpPost("generate-article-content")]
     public async Task<IActionResult> GenerateArticleContent(int articleId, CancellationToken cancellationToken)
     {
-        var content = await articleGenerationService.GenerateArticleContentAsync(articleId, cancellationToken);
+        var content = await articleGenerationService.GenerateArticleContentAsync(articleId, Request, cancellationToken);
         return Ok(content);
+    }
+    [HttpPost("generate-article-content-batch")]
+    public async Task<IActionResult> BatchGenerateArticleContent(List<int> articleIds, CancellationToken cancellationToken)
+    {
+        await articleGenerationService.BatchGenerateArticleContentAsync(articleIds,Request,cancellationToken);
+        return Ok();
     }
 
 }

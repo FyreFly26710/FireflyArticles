@@ -59,7 +59,7 @@ public class ArticleController(IArticleService _articleService, IArticleTagServi
 
         return ResultUtil.Success(article.Id);
     }
-    [HttpPut("/batch")]
+    [HttpPut("batch")]
     [Authorize(Roles = UserConstant.ADMIN_ROLE)]
     public async Task<ApiResponse<Dictionary<int, string>>> AddBatchByRequest([FromBody] List<ArticleAddRequest> articleAddRequests)
     {
@@ -76,7 +76,7 @@ public class ArticleController(IArticleService _articleService, IArticleTagServi
     public async Task<ApiResponse<bool>> EditByRequest([FromBody] ArticleEditRequest articleEditRequest)
         => ResultUtil.Success(await _articleService.EditArticleByRequest(articleEditRequest));
 
-    [HttpPost("/batch/content")]
+    [HttpPost("batch/content")]
     [Authorize(Roles = UserConstant.ADMIN_ROLE)]
     public async Task<ApiResponse<bool>> EditContentBatch([FromBody] Dictionary<int, string> batchEditConentRequests)
     {
