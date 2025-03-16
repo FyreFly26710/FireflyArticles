@@ -18,7 +18,7 @@ interface Props {
  * Article table component
  * @constructor
  */
-export default async function ArticleTable(props: Props) {
+export default function ArticleTable(props: Props) {
   const { defaultArticleList, defaultTotal, } = props;
   const actionRef = useRef<ActionType>();
   const [articleList, setArticleList] = useState<API.ArticleDto[]>(defaultArticleList || []);

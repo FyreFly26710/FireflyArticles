@@ -24,5 +24,6 @@ public class UserArticleState
     // AI generated article id (sort number) => Db article id
     public Dictionary<int, int> IdMap { get; set; } = new();
     public string Topic { get; set; } = "";
+    public int TopicId {get; set; } = 0;
     public bool IsFirstRound { get; set; } = true;
 }

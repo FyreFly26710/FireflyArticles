@@ -17,6 +17,7 @@ public abstract class UnitOfWork<TContext> : IUnitOfWork<TContext>
         {
             await BeginTransactionAsync();
             var result = await action();
+            await SaveChangesAsync();
             await CommitAsync();
             return result;
         }
@@ -37,6 +38,7 @@ public abstract class UnitOfWork<TContext> : IUnitOfWork<TContext>
         {
             await BeginTransactionAsync();
             await action();
+            await SaveChangesAsync();
             await CommitAsync();
         }
         catch (Exception)
@@ -49,22 +51,13 @@ public abstract class UnitOfWork<TContext> : IUnitOfWork<TContext>
             Dispose();
         }
     }
-    public IDbContextTransaction BeginTransaction() => _context.Database.BeginTransaction();
 
-    public async Task<IDbContextTransaction> BeginTransactionAsync() => await _context.Database.BeginTransactionAsync();
-
-    public void Commit()
+    public async Task<IDbContextTransaction> BeginTransactionAsync()
     {
-        try
-        {
-            _transaction?.Commit();
-        }
-        finally
-        {
-            _transaction?.Dispose();
-            _transaction = null;
-        }
+        _transaction = await _context.Database.BeginTransactionAsync();
+        return _transaction;
     }
+
 
     public async Task CommitAsync()
     {
@@ -83,18 +76,6 @@ public abstract class UnitOfWork<TContext> : IUnitOfWork<TContext>
         }
     }
 
-    public void Rollback()
-    {
-        try
-        {
-            _transaction?.Rollback();
-        }
-        finally
-        {
-            _transaction?.Dispose();
-            _transaction = null;
-        }
-    }
 
     public async Task RollbackAsync()
     {
