@@ -16,16 +16,30 @@ using FF.Articles.Backend.Contents.API.Models.Requests.Articles;
 using FF.Articles.Backend.Contents.API.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
 
-namespace FF.Articles.Backend.Contents.API.Services;
-public class ArticleService(
-        IArticleRepository _articleRepository,
-        ITopicRepository _topicRepository,
-        IIdentityRemoteService _identityRemoteService,
-        IArticleTagService _articleTagService,
-        IContentsUnitOfWork _contentsUnitOfWork,
-        ILogger<ArticleService> _logger)
-: BaseService<Article, ContentsDbContext>(_articleRepository, _logger), IArticleService
+namespace FF.Articles.Backend.Contents.API.Services.V2;
+public class ArticleService : BaseService<Article, ContentsDbContext>, IArticleService
 {
+    private readonly IArticleTagService _articleTagService;
+    private readonly IIdentityRemoteService _identityRemoteService;
+    private readonly ITopicRepository _topicRepository;
+    private readonly IContentsUnitOfWork _contentsUnitOfWork;
+    private readonly IArticleRepository _articleRepository;
+
+    public ArticleService(
+        Func<string, IArticleRepository> articleRepository,
+        Func<string, ITopicRepository> topicRepository,
+        Func<string, IIdentityRemoteService> identityRemoteService,
+        Func<string, IArticleTagService> articleTagService,
+        IContentsUnitOfWork contentsUnitOfWork,
+        ILogger<ArticleService> logger
+    ) : base(articleRepository("v2"), logger)
+    {
+        _articleTagService = articleTagService("v2");
+        _identityRemoteService = identityRemoteService("v2");
+        _topicRepository = topicRepository("v2");
+        _contentsUnitOfWork = contentsUnitOfWork;
+        _articleRepository = articleRepository("v2");
+    }
 
     public async Task<ArticleDto> GetArticleDto(Article article) => await GetArticleDto(article, new ArticleQueryRequest());
 
@@ -59,7 +73,7 @@ public class ArticleService(
         if (articleRequest.IncludeUser)
         {
             var userIds = articles.Select(a => a.UserId).Distinct().ToList();
-            var userTasks = userIds.Select(id => _identityRemoteService.GetUserByIdAsync(id));
+            var userTasks = userIds.Select(_identityRemoteService.GetUserByIdAsync);
             var users = await Task.WhenAll(userTasks);
             userDict = articles
                 .ToDictionary(
@@ -86,7 +100,7 @@ public class ArticleService(
         return articleDtos;
     }
 
-    private async Task<ArticleDto> buildArticleDto(Article article, ArticleQueryRequest articleRequest, List<String> tags, UserApiDto? user, string? topicTitle)
+    private async Task<ArticleDto> buildArticleDto(Article article, ArticleQueryRequest articleRequest, List<string> tags, UserApiDto? user, string? topicTitle)
     {
         var articleDto = article.ToDto();
         if (!articleRequest.IncludeContent)
@@ -118,7 +132,7 @@ public class ArticleService(
     {
         await _contentsUnitOfWork.ExecuteInTransactionAsync(async () =>
         {
-            var article = await _contentsUnitOfWork.ArticleRepository.GetByIdAsync(articleEditRequest.ArticleId, true);
+            var article = await _articleRepository.GetByIdAsync(articleEditRequest.ArticleId, true);
             if (article == null)
                 throw new ApiException(ErrorCode.NOT_FOUND_ERROR, "Article not found");
             // update not null fields
@@ -136,7 +150,7 @@ public class ArticleService(
             {
                 if (article.ArticleType == ArticleTypes.Article)
                 {
-                    await _contentsUnitOfWork.ArticleRepository.PromoteSubArticlesToArticles(article.Id);
+                    await _articleRepository.PromoteSubArticlesToArticles(article.Id);
                 }
                 article.ArticleType = articleEditRequest.ArticleType;
             }
@@ -159,8 +173,8 @@ public class ArticleService(
             throw new ApiException(ErrorCode.PARAMS_ERROR, "Invalid article id");
         await _contentsUnitOfWork.ExecuteInTransactionAsync(async () =>
         {
-            await _contentsUnitOfWork.ArticleRepository.PromoteSubArticlesToArticles(id);
-            await _contentsUnitOfWork.ArticleRepository.DeleteAsync(id);
+            await _articleRepository.PromoteSubArticlesToArticles(id);
+            await _articleRepository.DeleteAsync(id);
             await _articleTagService.RemoveArticleTags(id);
             await _contentsUnitOfWork.CommitAsync();
         });
@@ -202,14 +216,14 @@ public class ArticleService(
     {
         await _contentsUnitOfWork.ExecuteInTransactionAsync(async () =>
         {
-            var articles = await _contentsUnitOfWork.ArticleRepository.GetByIdsAsync([.. batchEditConentRequests.Keys], true);
+            var articles = await _articleRepository.GetByIdsAsync([.. batchEditConentRequests.Keys], true);
             if (articles == null || articles.Count != batchEditConentRequests.Count)
                 throw new ApiException(ErrorCode.PARAMS_ERROR, "Invalid article ids");
             foreach (var article in articles)
             {
                 article.Content = batchEditConentRequests[article.Id];
             }
-            await _contentsUnitOfWork.ArticleRepository.UpdateBatchAsync(articles);
+            await _articleRepository.UpdateBatchAsync(articles);
             await _contentsUnitOfWork.CommitAsync();
         });
         return true;
@@ -220,7 +234,7 @@ public class ArticleService(
         var result = await _contentsUnitOfWork.ExecuteInTransactionAsync(async () =>
         {
             var articles = articleAddRequests.Select(request => request.ToEntity(userId)).ToList();
-            var ids = await _contentsUnitOfWork.ArticleRepository.CreateBatchAsync(articles);
+            var ids = await _articleRepository.CreateBatchAsync(articles);
             // todo: add tags
             return ids.ToDictionary(id => id, id => articles.First(a => a.Id == id).Title);
         });

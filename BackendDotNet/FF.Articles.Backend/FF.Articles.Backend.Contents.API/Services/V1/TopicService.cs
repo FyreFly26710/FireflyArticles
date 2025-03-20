@@ -12,14 +12,30 @@ using FF.Articles.Backend.Contents.API.UnitOfWork;
 using FF.Articles.Backend.Contents.API.Interfaces.Services;
 using FF.Articles.Backend.Contents.API.Interfaces.Repositories;
 using FF.Articles.Backend.Contents.API.Interfaces.Services.RemoteServices;
-namespace FF.Articles.Backend.Contents.API.Services;
-public class TopicService(ITopicRepository _topicRepository, ILogger<TopicService> _logger,
-    IArticleRepository _articleRepository,
-    IArticleService _articleService,
-    IIdentityRemoteService _identityRemoteService,
-    IContentsUnitOfWork _contentsUnitOfWork)
-: BaseService<Topic, ContentsDbContext>(_topicRepository, _logger), ITopicService
+namespace FF.Articles.Backend.Contents.API.Services.V1;
+public class TopicService : BaseService<Topic, ContentsDbContext>, ITopicService
 {
+    private readonly ITopicRepository _topicRepository;
+    private readonly IArticleRepository _articleRepository;
+    private readonly IArticleService _articleService;
+    private readonly IIdentityRemoteService _identityRemoteService;
+    private readonly IContentsUnitOfWork _contentsUnitOfWork;
+    public TopicService(
+        Func<string, ITopicRepository> topicRepository,
+        Func<string, IArticleRepository> articleRepository,
+        Func<string, IArticleService> articleService,
+        Func<string, IIdentityRemoteService> identityRemoteService,
+        IContentsUnitOfWork contentsUnitOfWork,
+        ILogger<TopicService> logger
+    )
+    : base(topicRepository("v1"), logger)
+    {
+        _topicRepository = topicRepository("v1");
+        _articleRepository = articleRepository("v1");
+        _articleService = articleService("v1");
+        _identityRemoteService = identityRemoteService("v1");
+        _contentsUnitOfWork = contentsUnitOfWork;
+    }
     public async Task<TopicDto> GetTopicDto(Topic topic) => await GetTopicDto(topic, new TopicQueryRequest());
     public async Task<TopicDto> GetTopicDto(Topic topic, TopicQueryRequest topicRequest)
     {
@@ -40,7 +56,7 @@ public class TopicService(ITopicRepository _topicRepository, ILogger<TopicServic
     {
         await _contentsUnitOfWork.ExecuteInTransactionAsync(async () =>
         {
-            var topic = await _contentsUnitOfWork.TopicRepository.GetByIdAsync(topicEditRequest.TopicId, true);
+            var topic = await _topicRepository.GetByIdAsync(topicEditRequest.TopicId, true);
             if (topic == null)
                 throw new ApiException(ErrorCode.NOT_FOUND_ERROR, "Topic not found");
             if (topicEditRequest.IsHidden != null && topic.IsHidden != topicEditRequest.IsHidden)
@@ -57,7 +73,7 @@ public class TopicService(ITopicRepository _topicRepository, ILogger<TopicServic
                 topic.TopicImage = topicEditRequest.TopicImage;
             if (topicEditRequest.SortNumber != null && topic.SortNumber != topicEditRequest.SortNumber)
                 topic.SortNumber = (int)topicEditRequest.SortNumber;
-            await _contentsUnitOfWork.TopicRepository.UpdateModifiedAsync(topic);
+            await _topicRepository.UpdateModifiedAsync(topic);
         });
         return true;
     }

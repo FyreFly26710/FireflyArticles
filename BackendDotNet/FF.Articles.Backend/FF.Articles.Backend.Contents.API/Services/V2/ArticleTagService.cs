@@ -6,14 +6,24 @@ using FF.Articles.Backend.Contents.API.Models.Entities;
 using FF.Articles.Backend.Contents.API.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
 
-namespace FF.Articles.Backend.Contents.API.Services;
-public class ArticleTagService(
-    IArticleTagRepository _articleTagRepository,
-    IContentsUnitOfWork _contentsUnitOfWork,
-    ITagRepository _tagRepository,
-    ILogger<ArticleTagService> _logger)
-: BaseService<ArticleTag, ContentsDbContext>(_articleTagRepository, _logger), IArticleTagService
+namespace FF.Articles.Backend.Contents.API.Services.V2;
+public class ArticleTagService : BaseService<ArticleTag, ContentsDbContext>, IArticleTagService
 {
+    private readonly IArticleTagRepository _articleTagRepository;
+    private readonly IContentsUnitOfWork _contentsUnitOfWork;
+    private readonly ITagRepository _tagRepository;
+    public ArticleTagService(
+        Func<string, IArticleTagRepository> articleTagRepository,
+        IContentsUnitOfWork contentsUnitOfWork,
+        Func<string, ITagRepository> tagRepository,
+        ILogger<ArticleTagService> logger
+    )
+    : base(articleTagRepository("v2"), logger)
+    {
+        _articleTagRepository = articleTagRepository("v2");
+        _contentsUnitOfWork = contentsUnitOfWork;
+        _tagRepository = tagRepository("v2");
+    }
     public async Task<bool> EditArticleTags(int articleId, List<int> tagIds)
     {
         List<ArticleTag> currentArticleTags = _articleTagRepository.GetQueryable().Where(at => at.ArticleId == articleId).ToList();
@@ -24,13 +34,13 @@ public class ArticleTagService(
             foreach (var id in tagIds)
             {
                 if (existingTags.Contains(id) && !currentArticleTags.Any(at => at.TagId == id))
-                    await _contentsUnitOfWork.ArticleTagRepository.CreateAsync(new ArticleTag { ArticleId = articleId, TagId = id });
+                    await _articleTagRepository.CreateAsync(new ArticleTag { ArticleId = articleId, TagId = id });
             }
 
             foreach (var at in currentArticleTags)
             {
                 if (!tagIds.Contains(at.TagId))
-                    await _contentsUnitOfWork.ArticleTagRepository.HardDeleteAsync(at.Id);
+                    await _articleTagRepository.HardDeleteAsync(at.Id);
             }
 
             await _contentsUnitOfWork.CommitAsync();
@@ -48,7 +58,7 @@ public class ArticleTagService(
     }
     public async Task<bool> RemoveArticleTags(int articleId)
     {
-        var articleTags = _contentsUnitOfWork.ArticleTagRepository
+        var articleTags = _articleTagRepository
             .GetQueryable()
             .Where(at => at.ArticleId == articleId)
             .ToList();
@@ -57,7 +67,7 @@ public class ArticleTagService(
         {
             foreach (var at in articleTags)
             {
-                await _contentsUnitOfWork.ArticleTagRepository.HardDeleteAsync(at.Id);
+                await _articleTagRepository.HardDeleteAsync(at.Id);
             }
         });
         return true;
@@ -70,12 +80,12 @@ public class ArticleTagService(
         {
             foreach (var at in articleTags)
             {
-                await _contentsUnitOfWork.ArticleTagRepository.HardDeleteAsync(at.Id);
+                await _articleTagRepository.HardDeleteAsync(at.Id);
             }
         });
         return true;
     }
-    public async Task<List<String>> GetArticleTags(int articleId)
+    public async Task<List<string>> GetArticleTags(int articleId)
     {
         var articleTags = await _articleTagRepository.GetQueryable()
             .Where(at => at.ArticleId == articleId)
@@ -93,7 +103,7 @@ public class ArticleTagService(
             .Select(t => t.TagName!)
             .ToList();
     }
-    public async Task<Dictionary<int, List<String>>> GetArticleTags(List<int> articleIds)
+    public async Task<Dictionary<int, List<string>>> GetArticleTags(List<int> articleIds)
     {
         var articleTags = await _articleTagRepository.GetQueryable()
             .Where(at => articleIds.Contains(at.ArticleId))

@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using Asp.Versioning;
+using AutoMapper;
 using FF.Articles.Backend.Common.Constants;
 using FF.Articles.Backend.Common.Exceptions;
 using FF.Articles.Backend.Common.Responses;
@@ -14,12 +15,20 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 
-namespace FF.Articles.Backend.Contents.API.Controllers;
+namespace FF.Articles.Backend.Contents.API.Controllers.V1;
+
+[ApiVersion(1.0)]
 [ApiController]
 [Route("api/contents/articles")]
-public class ArticleController(IArticleService _articleService, IArticleTagService _articleTagService)
-    : ControllerBase
+public class ArticleController : ControllerBase
 {
+    private readonly IArticleService _articleService;
+    private readonly IArticleTagService _articleTagService;
+    public ArticleController(Func<string, IArticleService> articleService, Func<string, IArticleTagService> articleTagService)
+    {
+        _articleService = articleService("v1");
+        _articleTagService = articleTagService("v1");
+    }
 
     #region REST API
     [HttpGet("{id}")]
