@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using Asp.Versioning;
+using AutoMapper;
 using FF.Articles.Backend.Common.Constants;
 using FF.Articles.Backend.Common.Exceptions;
 using FF.Articles.Backend.Common.Responses;
@@ -14,13 +15,18 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 
-namespace FF.Articles.Backend.Contents.API.Controllers;
+namespace FF.Articles.Backend.Contents.API.Controllers.V2;
+
+[ApiVersion(2.0)]
 [ApiController]
 [Route("api/contents/topics")]
-public class TopicController(ILogger<TopicController> _logger,
-    ITopicService _topicService)
-    : ControllerBase
+public class TopicController : ControllerBase
 {
+    private readonly ITopicService _topicService;
+    public TopicController(Func<string, ITopicService> topicService)
+    {
+        _topicService = topicService("v2");
+    }
     [HttpGet("{id}")]
     public async Task<ApiResponse<TopicDto>> GetById(int id, [FromQuery] TopicQueryRequest query)
     {

@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using Asp.Versioning;
+using AutoMapper;
 using FF.Articles.Backend.Common.Constants;
 using FF.Articles.Backend.Common.Exceptions;
 using FF.Articles.Backend.Common.Responses;
@@ -12,14 +13,18 @@ using FF.Articles.Backend.Contents.API.Models.Requests.Tags;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace FF.Articles.Backend.Contents.API.Controllers;
+namespace FF.Articles.Backend.Contents.API.Controllers.V1;
 
+[ApiVersion(1.0)]
 [ApiController]
 [Route("api/contents/tags")]
-public class TagController(ILogger<ArticleController> _logger,
-    ITagService _tagService)
-    : ControllerBase
+public class TagController : ControllerBase
 {
+    private readonly ITagService _tagService;
+    public TagController(Func<string, ITagService> tagService)
+    {
+        _tagService = tagService("v1");
+    }
     [HttpGet("{id}")]
     public async Task<ApiResponse<TagDto>> GetById(int id)
     {
