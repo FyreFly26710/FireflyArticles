@@ -3,6 +3,7 @@ using FF.Articles.Backend.Contents.API.Constants;
 using FF.Articles.Backend.Contents.API.Infrastructure;
 using FF.Articles.Backend.Contents.API.Interfaces.Repositories;
 using FF.Articles.Backend.Contents.API.Models.Entities;
+using FF.Articles.Backend.Contents.API.Models.Requests.Articles;
 using Microsoft.EntityFrameworkCore;
 
 namespace FF.Articles.Backend.Contents.API.Repositories.V1;
@@ -14,7 +15,7 @@ public class ArticleRepository : BaseRepository<Article, ContentsDbContext>, IAr
 
 
 
-    public IQueryable<Article> SearchByTagIds(List<int> tagIds, IQueryable<Article> query)
+    public IQueryable<Article> BuildTagIdsSearchQuery(List<int> tagIds, IQueryable<Article> query)
     {
         return from a in query
                join at in _context.Set<ArticleTag>() on a.Id equals at.ArticleId
@@ -34,5 +35,37 @@ public class ArticleRepository : BaseRepository<Article, ContentsDbContext>, IAr
             subArticle.UpdateTime = DateTime.UtcNow;
         }
         await SaveAsync();
+    }
+    public async Task<List<Article>> GetSubArticles(int articleId)
+    {
+        return await GetQueryable().Where(x => x.ParentArticleId == articleId
+                && x.ArticleType == ArticleTypes.SubArticle)
+            .ToListAsync();
+    }
+    public IQueryable<Article> BuildSearchQueryFromRequest(ArticleQueryRequest request)
+    {
+        var keyword = request.Keyword;
+        List<int>? topicIds = request.TopicIds;
+        var tagIds = request.TagIds;
+        var displaySubArticles = request.DisplaySubArticles;
+
+        var query = GetQueryable();
+        if (displaySubArticles)
+        {
+            query = query.Where(x => x.ArticleType == ArticleTypes.Article);
+        }
+        if (!string.IsNullOrEmpty(keyword))
+        {
+            query = query.Where(x => EF.Functions.Like(x.Title, $"%{keyword}%"));
+        }
+        if (topicIds != null && topicIds.Count > 0)
+        {
+            query = query.Where(x => topicIds.Contains(x.TopicId));
+        }
+        if (tagIds != null && tagIds.Count > 0)
+        {
+            query = BuildTagIdsSearchQuery(tagIds, query);
+        }
+        return query;
     }
 }

@@ -23,9 +23,8 @@ public class UserService(IUserRepository _userRepository, ILogger<UserService> _
     {
         validateAccount(userAccount, userPassword, checkPassword);
 
-        var exists = await this.GetQueryable().AnyAsync(u => u.UserAccount == userAccount);
-        //var exists = await _context.Set<User>().AnyAsync(u => u.UserAccount == userAccount);
-        if (exists)
+        var exists = await _userRepository.GetUserByAccount(userAccount);
+        if (exists != null)
         {
             throw new ApiException(ErrorCode.PARAMS_ERROR, "Account already exists");
         }
@@ -51,13 +50,13 @@ public class UserService(IUserRepository _userRepository, ILogger<UserService> _
         string encryptPassword = computeMD5Hash(SALT + userPassword);
 
         // Query the user from the database
-        var user = await this.GetQueryable()
-            .FirstOrDefaultAsync(u => u.UserAccount == userAccount && u.UserPassword == encryptPassword);
+        var user = await _userRepository.GetUserByAccount(userAccount);
 
-        if (user == null)
+        if (user == null || user.UserPassword != encryptPassword)
         {
             throw new ApiException(ErrorCode.PARAMS_ERROR, "userAccount cannot match userPassword");
         }
+
 
         await IdentityUtils.SignIn(user, request.HttpContext);
         return user.ToLoginUserDto();
@@ -129,12 +128,20 @@ public class UserService(IUserRepository _userRepository, ILogger<UserService> _
 
     public async Task<User> GetUserByEmail(string email)
     {
-        var user = await this.GetQueryable()
-            .FirstOrDefaultAsync(u => email.ToLower() == (u.UserEmail ?? "").ToLower());
+        var user = await _userRepository.GetUserByEmail(email);
         if (user == null)
         {
             user = new User() { Id = -1, UserAccount = email, UserRole = "user", UserName = "Guest" };
         }
         return user;
+    }
+
+    public async Task<User?> GetUserByAccount(string account)
+    {
+        if (string.IsNullOrWhiteSpace(account))
+        {
+            return null;
+        }
+        return await _userRepository.GetUserByAccount(account);
     }
 }

@@ -118,11 +118,7 @@ public class ArticleService : BaseService<Article, ContentsDbContext>, IArticleS
         List<ArticleDto> articleDtos = new();
         if (articleDto.ArticleType == ArticleTypes.Article)
         {
-            List<Article> subArticles = GetQueryable()
-                                        .Where(x => x.ParentArticleId == articleDto.ArticleId
-                                            && x.ArticleType == ArticleTypes.SubArticle)
-                                        .OrderBy(x => x.SortNumber)
-                                        .ToList();
+            List<Article> subArticles = await _articleRepository.GetSubArticles(articleDto.ArticleId);
             articleDtos = await GetArticleDtos(subArticles, articleRequest);
         }
         return articleDtos;
@@ -183,28 +179,7 @@ public class ArticleService : BaseService<Article, ContentsDbContext>, IArticleS
 
     public async Task<Paged<ArticleDto>> GetArticlesByPageRequest(ArticleQueryRequest pageRequest)
     {
-        var keyword = pageRequest.Keyword;
-        List<int>? topicIds = pageRequest.TopicIds;
-        var tagIds = pageRequest.TagIds;
-
-        var query = GetQueryable();
-        if (pageRequest.DisplaySubArticles)
-        {
-            query = query.Where(x => x.ArticleType == ArticleTypes.Article);
-        }
-        if (!string.IsNullOrEmpty(keyword))
-        {
-            query = query.Where(x => EF.Functions.Like(x.Title, $"%{keyword}%"));
-        }
-        if (topicIds != null && topicIds.Count > 0)
-        {
-            query = query.Where(x => topicIds.Contains(x.TopicId));
-        }
-        if (tagIds != null && tagIds.Count > 0)
-        {
-            query = _articleRepository.SearchByTagIds(tagIds, query);
-        }
-
+        var query = _articleRepository.BuildSearchQueryFromRequest(pageRequest);
         var pagedData = await _articleRepository.GetPagedFromQueryAsync(query, pageRequest);
         var articleList = await GetArticleDtos(pagedData.Data, pageRequest);
         var res = new Paged<ArticleDto>(pagedData.GetPageInfo(), articleList);
