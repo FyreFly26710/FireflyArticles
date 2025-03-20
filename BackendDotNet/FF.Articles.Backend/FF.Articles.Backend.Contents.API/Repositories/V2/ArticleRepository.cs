@@ -6,7 +6,7 @@ using FF.Articles.Backend.Contents.API.Models.Entities;
 using FF.Articles.Backend.Contents.API.Models.Requests.Articles;
 using Microsoft.EntityFrameworkCore;
 
-namespace FF.Articles.Backend.Contents.API.Repositories.V1;
+namespace FF.Articles.Backend.Contents.API.Repositories.V2;
 public class ArticleRepository : BaseRepository<Article, ContentsDbContext>, IArticleRepository
 {
     public ArticleRepository(ContentsDbContext _context) : base(_context)

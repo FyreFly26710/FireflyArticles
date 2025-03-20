@@ -27,7 +27,7 @@ const TopicList = (props: Props) => {
                       ellipsis={{ rows: 1 }}
                       style={{ marginBottom: 0 }}
                     >
-                      {item.abstraction}
+                      {item.abstract}
                     </Typography.Paragraph>
                   }
                 />

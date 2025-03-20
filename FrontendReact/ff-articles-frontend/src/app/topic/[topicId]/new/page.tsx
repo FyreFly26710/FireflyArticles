@@ -25,13 +25,13 @@ export default async function NewArticlePage({ params, searchParams }: PageProps
     ]);
 
     const nextSortNumber = (topic.articles && topic.articles.length > 0)
-        ? Math.max(...topic.articles.map(article => article.sortNumber ?? 1))+1
+        ? Math.max(...topic.articles.map(article => article.sortNumber ?? 1)) + 1
         : 1;
 
     const article = {
         articleId: 0,
         articleType: "Article",
-        abstraction: "",
+        abstract: "",
         content: "",
         topicId: topicId,
         sortNumber: nextSortNumber,

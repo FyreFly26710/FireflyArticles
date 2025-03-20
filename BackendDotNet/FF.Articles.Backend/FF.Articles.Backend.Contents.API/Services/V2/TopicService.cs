@@ -13,7 +13,7 @@ using FF.Articles.Backend.Contents.API.Interfaces.Services;
 using FF.Articles.Backend.Contents.API.Interfaces.Repositories;
 using FF.Articles.Backend.Contents.API.Interfaces.Services.RemoteServices;
 using Microsoft.EntityFrameworkCore;
-namespace FF.Articles.Backend.Contents.API.Services.V1;
+namespace FF.Articles.Backend.Contents.API.Services.V2;
 public class TopicService : BaseService<Topic, ContentsDbContext>, ITopicService
 {
     private readonly ITopicRepository _topicRepository;

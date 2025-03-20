@@ -12,7 +12,6 @@ namespace FF.Articles.Backend.Contents.API
         {
             RegisteredServices<IArticleService, Services.V1.ArticleService, Services.V2.ArticleService>(services);
             RegisteredServices<ITagService, Services.V1.TagService, Services.V2.TagService>(services);
-            RegisteredServices<IArticleTagService, Services.V1.ArticleTagService, Services.V2.ArticleTagService>(services);
             RegisteredServices<ITopicService, Services.V1.TopicService, Services.V2.TopicService>(services);
 
             RegisteredServices<IIdentityRemoteService, Services.V1.RemoteServices.IdentityRemoteService, Services.V2.RemoteServices.IdentityRemoteService>(services);

@@ -38,7 +38,7 @@ public class ContentsDbContext : DbContext
         {
             entity.ToTable("Article");
             entity.Property(e => e.Title).HasMaxLength(1000).IsRequired().HasDefaultValue("");
-            entity.Property(e => e.Abstraction).HasMaxLength(4000).IsRequired().HasDefaultValue("");
+            entity.Property(e => e.Abstract).HasMaxLength(4000).IsRequired().HasDefaultValue("");
             entity.Property(e => e.Content).HasColumnType("NVARCHAR(MAX)").HasDefaultValue("");
             entity.Property(e => e.IsHidden).IsRequired().HasDefaultValue(0);
 
@@ -52,7 +52,7 @@ public class ContentsDbContext : DbContext
         {
             entity.ToTable("Topic");
             entity.Property(e => e.Title).HasMaxLength(1000).IsRequired().HasDefaultValue("");
-            entity.Property(e => e.Abstraction).HasMaxLength(4000).IsRequired().HasDefaultValue("");
+            entity.Property(e => e.Abstract).HasMaxLength(4000).IsRequired().HasDefaultValue("");
             entity.Property(e => e.IsHidden).IsRequired().HasDefaultValue(0);
 
         });

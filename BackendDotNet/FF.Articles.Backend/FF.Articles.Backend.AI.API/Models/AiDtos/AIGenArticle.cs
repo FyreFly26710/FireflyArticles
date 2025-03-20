@@ -10,6 +10,6 @@ public class AIGenArticle
     [JsonPropertyName("Title")]
     public string Title { get; set; } = "";
 
-    [JsonPropertyName("Abstraction")]
-    public string Abstraction { get; set; } = "";
+    [JsonPropertyName("Abstract")]
+    public string Abstract { get; set; } = "";
 }

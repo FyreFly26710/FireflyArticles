@@ -58,14 +58,16 @@ declare namespace API {
     SortOrder?: string;
   };
 
+  // todo: 
+  // Changed tagIds to tags
   type ArticleAddRequest = {
     title?: string;
     content?: string;
-    abstraction?: string;
+    abstract?: string;
     articleType?: string;
     parentArticleId?: number;
     topicId?: number;
-    tagIds?: number[];
+    tags?: string[];
     sortNumber?: number;
     isHidden?: number;
   };
@@ -76,7 +78,7 @@ declare namespace API {
     updateTime?: string;
     title?: string;
     content?: string;
-    abstraction?: string;
+    abstract?: string;
     articleType?: string;
     parentArticleId?: number;
     subArticles?: ArticleDto[];
@@ -112,11 +114,11 @@ declare namespace API {
     articleId?: number;
     title?: string;
     content?: string;
-    abstraction?: string;
+    abstract?: string;
     articleType?: string;
     parentArticleId?: number;
     topicId?: number;
-    tagIds?: number[];
+    tagNames?: string[];
     sortNumber?: number;
     isHidden?: number;
   };
@@ -161,7 +163,7 @@ declare namespace API {
 
   type TopicAddRequest = {
     title?: string;
-    abstraction?: string;
+    abstract?: string;
     content?: string;
     topicImage?: string;
     category?: string;
@@ -174,7 +176,7 @@ declare namespace API {
     createTime?: string;
     updateTime?: string;
     title?: string;
-    abstraction?: string;
+    abstract?: string;
     content?: string;
     category?: string;
     topicImage?: string;
@@ -207,7 +209,7 @@ declare namespace API {
   type TopicEditRequest = {
     topicId?: number;
     title?: string;
-    abstraction?: string;
+    abstract?: string;
     content?: string;
     topicImage?: string;
     category?: string;

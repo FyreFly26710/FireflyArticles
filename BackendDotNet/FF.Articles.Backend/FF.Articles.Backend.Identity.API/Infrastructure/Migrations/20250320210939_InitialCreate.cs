@@ -6,21 +6,16 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace FF.Articles.Backend.Identity.API.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitDb : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.EnsureSchema(
-                name: "Identity");
-
             migrationBuilder.CreateTable(
-                name: "User",
-                schema: "Identity",
+                name: "Users",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<int>(type: "int", nullable: false),
                     UserAccount = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     UserPassword = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     UserEmail = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -34,7 +29,7 @@ namespace FF.Articles.Backend.Identity.API.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_User", x => x.Id);
+                    table.PrimaryKey("PK_Users", x => x.Id);
                 });
         }
 
@@ -42,8 +37,7 @@ namespace FF.Articles.Backend.Identity.API.Infrastructure.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "User",
-                schema: "Identity");
+                name: "Users");
         }
     }
 }

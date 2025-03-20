@@ -4,7 +4,7 @@ import ArticleSider from "@/app/topic/components/ArticleSider";
 import { fetchArticle, fetchTags, fetchTopic, fetchTopicArticle, fetchTopicList } from "@/app/topic/utils/fetcher";
 import { Flex } from "antd";
 
-export default async function TopicPage({ params }: { params: { topicId: number} }) {
+export default async function TopicPage({ params }: { params: { topicId: number } }) {
     const { topicId } = params;
 
     const topic = await fetchTopic(topicId);
@@ -18,7 +18,7 @@ export default async function TopicPage({ params }: { params: { topicId: number}
         articleType: "TopicArticle",
         topicId: topic.topicId,
         title: topic.title,
-        abstraction: topic.abstraction,
+        abstract: topic.abstract,
         content: topic.content,
     } as API.ArticleDto;
 

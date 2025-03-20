@@ -35,7 +35,7 @@ const ArticleCard = (props: Props) => {
     const [isEditing, setIsEditing] = useState(false);
     const [editedTitle, setEditedTitle] = useState(article.title);
     const [editedContent, setEditedContent] = useState(article.content);
-    const [editedAbstraction, setEditedAbstraction] = useState(article.abstraction);
+    const [editedAbstract, setEditedAbstract] = useState(article.abstract);
     const [isSaving, setIsSaving] = useState(false);
     const isTopic = article.articleType === "TopicArticle";
     const router = useRouter();
@@ -50,7 +50,7 @@ const ArticleCard = (props: Props) => {
                     ...article,
                     title: editedTitle,
                     content: editedContent,
-                    abstraction: editedAbstraction
+                    abstract: editedAbstract
                 })
                 //@ts-ignore
                 const id: number = res.data
@@ -64,7 +64,7 @@ const ArticleCard = (props: Props) => {
                     articleId: article.articleId,
                     title: editedTitle,
                     content: editedContent,
-                    abstraction: editedAbstraction
+                    abstract: editedAbstract
                 });
                 hide();
                 setIsEditing(false);
@@ -98,7 +98,7 @@ const ArticleCard = (props: Props) => {
     ];
     const handleCancel = () => {
         setEditedTitle(article.title);
-        setEditedAbstraction(article.abstraction);
+        setEditedAbstract(article.abstract);
         setEditedContent(article.content);
         setIsEditing(false);
         if (isNewArticle) {
@@ -163,12 +163,12 @@ const ArticleCard = (props: Props) => {
                 {isEditing ? (
                     <TextArea
                         showCount
-                        value={editedAbstraction}
-                        onChange={(e) => setEditedAbstraction(e.target.value)}
+                        value={editedAbstract}
+                        onChange={(e) => setEditedAbstract(e.target.value)}
                         style={{ height: 80, resize: "none" }}
                     />
                 ) : (
-                    <MdViewer value={article.abstraction} />
+                    <MdViewer value={article.abstract} />
                 )}
             </Card>
             <div style={{ marginBottom: 16 }} />

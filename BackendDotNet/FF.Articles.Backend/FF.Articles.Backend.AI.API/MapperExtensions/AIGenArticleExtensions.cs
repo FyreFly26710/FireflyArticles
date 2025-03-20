@@ -12,7 +12,7 @@ public static class AIGenArticleExtensions
         {
             Title = aiGenArticle.Title,
             // Content = aiGenArticle.Content ?? "",
-            Abstraction = aiGenArticle.Abstraction,
+            Abstract = aiGenArticle.Abstract,
             ArticleType = "Article",
             ParentArticleId = null,
             TopicId = topicId,
