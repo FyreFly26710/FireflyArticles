@@ -4,7 +4,7 @@ using FF.Articles.Backend.Contents.API.Interfaces.Repositories;
 using FF.Articles.Backend.Contents.API.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace FF.Articles.Backend.Contents.API.Repositories.V1;
+namespace FF.Articles.Backend.Contents.API.Repositories.V2;
 public class TagRepository : BaseRepository<Tag, ContentsDbContext>, ITagRepository
 {
     public TagRepository(ContentsDbContext _context) : base(_context)
@@ -33,11 +33,11 @@ public class TagRepository : BaseRepository<Tag, ContentsDbContext>, ITagReposit
 
         if (missingNames.Any())
         {
-            foreach (var name in missingNames)
-            {
-                var id = await CreateAsync(new Tag { TagName = name });
-                existingTags.Add(new Tag { Id = id, TagName = name });
-            }
+            // Batch create new tags
+            var newTags = missingNames.Select(name => new Tag { TagName = name }).ToList();
+            await _context.Set<Tag>().AddRangeAsync(newTags);
+            await _context.SaveChangesAsync();
+            existingTags.AddRange(newTags);
         }
 
         return existingTags;

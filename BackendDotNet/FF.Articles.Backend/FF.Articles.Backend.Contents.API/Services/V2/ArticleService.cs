@@ -4,7 +4,6 @@ using FF.Articles.Backend.Common.ApiDtos;
 using FF.Articles.Backend.Common.Bases;
 using FF.Articles.Backend.Common.Exceptions;
 using FF.Articles.Backend.Common.Responses;
-using FF.Articles.Backend.Common.Utils;
 using FF.Articles.Backend.Contents.API.Constants;
 using FF.Articles.Backend.Contents.API.Infrastructure;
 using FF.Articles.Backend.Contents.API.Interfaces.Repositories;
@@ -17,7 +16,7 @@ using FF.Articles.Backend.Contents.API.Models.Requests.Articles;
 using FF.Articles.Backend.Contents.API.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
 
-namespace FF.Articles.Backend.Contents.API.Services.V1;
+namespace FF.Articles.Backend.Contents.API.Services.V2;
 public class ArticleService : BaseService<Article, ContentsDbContext>, IArticleService
 {
     private readonly IIdentityRemoteService _identityRemoteService;

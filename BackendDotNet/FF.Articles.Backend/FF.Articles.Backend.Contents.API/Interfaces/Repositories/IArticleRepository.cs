@@ -8,6 +8,6 @@ public interface IArticleRepository : IBaseRepository<Article, ContentsDbContext
 {
     public IQueryable<Article> BuildTagIdsSearchQuery(List<int> tagIds, IQueryable<Article> query);
     public Task PromoteSubArticlesToArticles(int articleId);
-    public Task<List<Article>> GetSubArticles(int articleId);
     public IQueryable<Article> BuildSearchQueryFromRequest(ArticleQueryRequest request);
+    Task SetTopicIdToZero(int topicId);
 }

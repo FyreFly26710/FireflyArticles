@@ -4,7 +4,7 @@ using FF.Articles.Backend.Contents.API.Interfaces.Repositories;
 using FF.Articles.Backend.Contents.API.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace FF.Articles.Backend.Contents.API.Repositories.V1;
+namespace FF.Articles.Backend.Contents.API.Repositories.V2;
 public class TopicRepository : BaseRepository<Topic, ContentsDbContext>, ITopicRepository
 {
     public TopicRepository(ContentsDbContext _context) : base(_context)

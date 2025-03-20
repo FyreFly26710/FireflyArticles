@@ -9,7 +9,7 @@ public class ArticleDto
 
     public string Title { get; set; }
     public string Content { get; set; }
-    public string Abstraction { get; set; }
+    public string Abstract { get; set; }
     /// <summary>
     /// 1: article, 2: sub article, 3: topic article
     /// </summary>

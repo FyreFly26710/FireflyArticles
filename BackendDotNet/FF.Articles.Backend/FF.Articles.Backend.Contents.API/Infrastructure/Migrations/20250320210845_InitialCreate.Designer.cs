@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FF.Articles.Backend.Contents.API.Infrastructure.Migrations
 {
     [DbContext(typeof(ContentsDbContext))]
-    [Migration("20250225194602_ChangeColumnType")]
-    partial class ChangeColumnType
+    [Migration("20250320210845_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -29,17 +29,18 @@ namespace FF.Articles.Backend.Contents.API.Infrastructure.Migrations
             modelBuilder.Entity("FF.Articles.Backend.Contents.API.Models.Entities.Article", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Abstraction")
+                    b.Property<string>("Abstract")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
                         .HasMaxLength(4000)
                         .HasColumnType("nvarchar(4000)")
                         .HasDefaultValue("");
+
+                    b.Property<string>("ArticleType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Content")
                         .IsRequired()
@@ -50,10 +51,6 @@ namespace FF.Articles.Backend.Contents.API.Infrastructure.Migrations
                     b.Property<DateTime?>("CreateTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("HierachyType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int?>("IsDelete")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
@@ -63,6 +60,9 @@ namespace FF.Articles.Backend.Contents.API.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasDefaultValue(0);
+
+                    b.Property<int?>("ParentArticleId")
+                        .HasColumnType("int");
 
                     b.Property<int>("SortNumber")
                         .HasColumnType("int");
@@ -78,7 +78,6 @@ namespace FF.Articles.Backend.Contents.API.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdateTime")
-                        .IsConcurrencyToken()
                         .HasColumnType("datetime2");
 
                     b.Property<int>("UserId")
@@ -89,35 +88,10 @@ namespace FF.Articles.Backend.Contents.API.Infrastructure.Migrations
                     b.ToTable("Article", "Contents");
                 });
 
-            modelBuilder.Entity("FF.Articles.Backend.Contents.API.Models.Entities.ArticleGroup", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("ArticleId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ParentArticleId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SortNumber")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ArticleGroup", "Contents");
-                });
-
             modelBuilder.Entity("FF.Articles.Backend.Contents.API.Models.Entities.ArticleTag", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("ArticleId")
                         .HasColumnType("int");
@@ -133,10 +107,7 @@ namespace FF.Articles.Backend.Contents.API.Infrastructure.Migrations
             modelBuilder.Entity("FF.Articles.Backend.Contents.API.Models.Entities.Tag", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("TagName")
                         .IsRequired()
@@ -151,12 +122,9 @@ namespace FF.Articles.Backend.Contents.API.Infrastructure.Migrations
             modelBuilder.Entity("FF.Articles.Backend.Contents.API.Models.Entities.Topic", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Abstraction")
+                    b.Property<string>("Abstract")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
                         .HasMaxLength(4000)
@@ -164,6 +132,10 @@ namespace FF.Articles.Backend.Contents.API.Infrastructure.Migrations
                         .HasDefaultValue("");
 
                     b.Property<string>("Category")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Content")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -194,7 +166,6 @@ namespace FF.Articles.Backend.Contents.API.Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("UpdateTime")
-                        .IsConcurrencyToken()
                         .HasColumnType("datetime2");
 
                     b.Property<int>("UserId")

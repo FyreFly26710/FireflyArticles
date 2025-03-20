@@ -23,11 +23,9 @@ namespace FF.Articles.Backend.Contents.API.Controllers.V1;
 public class ArticleController : ControllerBase
 {
     private readonly IArticleService _articleService;
-    private readonly IArticleTagService _articleTagService;
-    public ArticleController(Func<string, IArticleService> articleService, Func<string, IArticleTagService> articleTagService)
+    public ArticleController(Func<string, IArticleService> articleService)
     {
         _articleService = articleService("v1");
-        _articleTagService = articleTagService("v1");
     }
 
     #region REST API
@@ -52,11 +50,12 @@ public class ArticleController : ControllerBase
     [Authorize(Roles = UserConstant.ADMIN_ROLE)]
     public async Task<ApiResponse<int>> AddByRequest([FromBody] ArticleAddRequest articleAddRequest)
     {
-        var article = articleAddRequest.ToEntity(UserUtil.GetUserId(Request));
-        int articleId = await _articleService.CreateAsync(article);
-        await _articleTagService.EditArticleTags(articleId, articleAddRequest.TagIds);
-        return ResultUtil.Success(article.Id);
+        int articleId = await _articleService.CreateByRequest(articleAddRequest, UserUtil.GetUserId(Request));
+        return ResultUtil.Success(articleId);
     }
+    /// <summary>
+    /// Create articles and return a dictionary of article id and title
+    /// </summary>
     [HttpPut("batch")]
     [Authorize(Roles = UserConstant.ADMIN_ROLE)]
     public async Task<ApiResponse<Dictionary<int, string>>> AddBatchByRequest([FromBody] List<ArticleAddRequest> articleAddRequests)

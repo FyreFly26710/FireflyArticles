@@ -6,19 +6,24 @@ public abstract class UnitOfWork<TContext> : IUnitOfWork<TContext>
 {
     private readonly TContext _context;
     private IDbContextTransaction? _transaction;
+    private int _transactionCount = 0; // Track nested transactions
 
     public UnitOfWork(TContext context)
     {
         _context = context;
     }
+
     public async Task<TResult> ExecuteInTransactionAsync<TResult>(Func<Task<TResult>> action)
     {
+        bool isOuterTransaction = await BeginTransactionAsync();
         try
         {
-            await BeginTransactionAsync();
             var result = await action();
             await SaveChangesAsync();
-            await CommitAsync();
+
+            if (isOuterTransaction) // Only commit if this is the outermost transaction
+                await CommitAsync();
+
             return result;
         }
         catch (Exception)
@@ -28,18 +33,21 @@ public abstract class UnitOfWork<TContext> : IUnitOfWork<TContext>
         }
         finally
         {
-            Dispose();
+            if (isOuterTransaction)
+                DisposeTransaction();
         }
     }
 
     public async Task ExecuteInTransactionAsync(Func<Task> action)
     {
+        bool isOuterTransaction = await BeginTransactionAsync();
         try
         {
-            await BeginTransactionAsync();
             await action();
             await SaveChangesAsync();
-            await CommitAsync();
+
+            if (isOuterTransaction)
+                await CommitAsync();
         }
         catch (Exception)
         {
@@ -48,55 +56,53 @@ public abstract class UnitOfWork<TContext> : IUnitOfWork<TContext>
         }
         finally
         {
-            Dispose();
+            if (isOuterTransaction)
+                DisposeTransaction();
         }
     }
 
-    public async Task<IDbContextTransaction> BeginTransactionAsync()
+    private async Task<bool> BeginTransactionAsync()
     {
-        _transaction = await _context.Database.BeginTransactionAsync();
-        return _transaction;
+        if (_transaction == null)
+        {
+            _transaction = await _context.Database.BeginTransactionAsync();
+            _transactionCount = 1; // First transaction
+            return true;
+        }
+        else
+        {
+            _transactionCount++; // Nested transaction
+            return false;
+        }
     }
 
-
-    public async Task CommitAsync()
+    private async Task CommitAsync()
     {
-        try
+        if (_transaction != null && _transactionCount == 1)
         {
-            if (_transaction != null)
-            {
-                await _transaction.CommitAsync();
-            }
+            await _transaction.CommitAsync();
         }
-        finally
+        _transactionCount--;
+    }
+
+    private async Task RollbackAsync()
+    {
+        if (_transaction != null && _transactionCount == 1)
         {
-            if (_transaction != null)
-                await _transaction.DisposeAsync();
+            await _transaction.RollbackAsync();
+        }
+        _transactionCount--;
+    }
+
+    private void DisposeTransaction()
+    {
+        if (_transaction != null && _transactionCount <= 0)
+        {
+            _transaction.Dispose();
             _transaction = null;
         }
     }
 
+    private async Task<int> SaveChangesAsync() => await _context.SaveChangesAsync();
 
-    public async Task RollbackAsync()
-    {
-        try
-        {
-            if (_transaction != null)
-                await _transaction.RollbackAsync();
-        }
-        finally
-        {
-            if (_transaction != null)
-                await _transaction.DisposeAsync();
-            _transaction = null;
-        }
-    }
-
-    public async Task<int> SaveChangesAsync() => await _context.SaveChangesAsync();
-
-    public void Dispose()
-    {
-        _transaction?.Dispose();
-        _context.Dispose();
-    }
 }

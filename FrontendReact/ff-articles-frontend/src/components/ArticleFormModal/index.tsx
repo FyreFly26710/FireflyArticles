@@ -106,7 +106,7 @@ const ArticleFormModal: React.FC<Props> = (props) => {
                 <Form.Item label='Title' name='title' rules={[{ required: true, message: 'Title is required' }]} >
                     <Input />
                 </Form.Item>
-                <Form.Item label='Abstraction' name='abstraction'>
+                <Form.Item label='Abstract' name='abstract'>
                     <Input.TextArea rows={1} />
                 </Form.Item>
                 <Form.Item label='Content' name='content'>

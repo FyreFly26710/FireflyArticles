@@ -67,7 +67,7 @@ export default function ArticleTable(props: Props) {
     },
     {
       title: "Description",
-      dataIndex: "abstraction",
+      dataIndex: "abstract",
       width: 120,
       ellipsis: true,
       hideInSearch: true

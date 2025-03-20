@@ -25,10 +25,7 @@ namespace FF.Articles.Backend.Identity.API.Infrastructure.Migrations
             modelBuilder.Entity("FF.Articles.Backend.Identity.API.Models.Entities.User", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime?>("CreateTime")
                         .HasColumnType("datetime2");
@@ -39,7 +36,6 @@ namespace FF.Articles.Backend.Identity.API.Infrastructure.Migrations
                         .HasDefaultValue(0);
 
                     b.Property<DateTime?>("UpdateTime")
-                        .IsConcurrencyToken()
                         .HasColumnType("datetime2");
 
                     b.Property<string>("UserAccount")

@@ -6,7 +6,7 @@ using FF.Articles.Backend.Contents.API.Interfaces.Services;
 using FF.Articles.Backend.Contents.API.Models.Entities;
 using FF.Articles.Backend.Contents.API.UnitOfWork;
 
-namespace FF.Articles.Backend.Contents.API.Services.V1;
+namespace FF.Articles.Backend.Contents.API.Services.V2;
 public class TagService : BaseService<Tag, ContentsDbContext>, ITagService
 {
     private readonly ITagRepository _tagRepository;

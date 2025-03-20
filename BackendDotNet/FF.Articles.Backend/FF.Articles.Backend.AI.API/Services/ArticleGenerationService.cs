@@ -121,9 +121,9 @@ public class ArticleGenerationService : IArticleGenerationService
     {
         var tasks = articleIds
             .Select(id => GenerateArticleContentAsync(id, httpRequest, cancellationToken))
-            .ToList(); 
+            .ToList();
 
-        await Task.WhenAll(tasks); 
+        await Task.WhenAll(tasks);
     }
 
 
@@ -134,7 +134,7 @@ public class ArticleGenerationService : IArticleGenerationService
         Generate {articleCount} article titles covering the {topic} from beginner to expert level.  
 
         Title: Meaningful title for articles
-        Abstraction:
+        Abstract:
             - Provide 2-3 key points, each in a single concise sentence. 
             - It does not need to be proper full sentences. Just key words and very brief explanation.
      
@@ -144,7 +144,7 @@ public class ArticleGenerationService : IArticleGenerationService
      
         **Example Output Format**:
         Title: Rapid HTML Enhancement & Best Practices
-        Abstraction:
+        Abstract:
         Semantic HTML - Using elements that convey meaning for better accessibility and SEO.
         Metadata & SEO - `<meta> tags`, `<title>`, how HTML influences search engines.
         Accessibility Considerations - `aria-*` attributes, proper use of headings and labels.
@@ -152,7 +152,7 @@ public class ArticleGenerationService : IArticleGenerationService
 
 
     private string user_ArticleContent(AIGenArticle article) => @$"
-    You are a helpful assistant that generates articles based on the title: {article.Title} and key points: {article.Abstraction}  
+    You are a helpful assistant that generates articles based on the title: {article.Title} and key points: {article.Abstract}  
     Formatting Requirements:
     - Strictly use pure markdown syntax ONLY
     - Omit the article title completely
@@ -189,7 +189,7 @@ public class ArticleGenerationService : IArticleGenerationService
         {
         "Id": 1,
         "Title": "Article Title",
-        "Abstraction": 
+        "Abstract": 
             "**Key Point** content with two trailing spaces.  "
             "**Key Point** content with two trailing spaces.  "
             "**Key Point** content with two trailing spaces.  "
@@ -199,12 +199,12 @@ public class ArticleGenerationService : IArticleGenerationService
     }
 
     **RULES:**
-    - Property names MUST be "Articles", "Id", "Title", "Abstraction", "AIMessage" (case-sensitive)
+    - Property names MUST be "Articles", "Id", "Title", "Abstract", "AIMessage" (case-sensitive)
     - "Id" MUST start at 1 and increment
     - Escape line breaks with \\n (double backslash)
     1. **Id Field:** Start at 1 and increment for each article.
     2. **Title:** Clear and concise, describing the article's focus.
-    3. **Abstraction:** Use **Markdown** (bold, lists, etc.) to structure content. Split ideas with `\n`.
+    3. **Abstract:** Use **Markdown** (bold, lists, etc.) to structure content. Split ideas with `\n`.
     4. **AIMessage:** 
     - If the topic is valid: List key subtopics covered and confirm completion.
     - If invalid/off-topic: Leave `Articles` empty and explain why in `AIMessage`.

@@ -6,7 +6,7 @@ public class Article : BaseEntity
 {
     public string Title { get; set; }
     public string Content { get; set; } = "";
-    public string Abstraction { get; set; } = "";
+    public string Abstract { get; set; } = "";
     /// <summary>
     ///  Article = 1, SubArticle = 2, TopicArticle = 3
     /// </summary>

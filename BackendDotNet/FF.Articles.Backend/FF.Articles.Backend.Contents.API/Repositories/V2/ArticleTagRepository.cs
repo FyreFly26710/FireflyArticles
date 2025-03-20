@@ -4,7 +4,7 @@ using FF.Articles.Backend.Contents.API.Interfaces.Repositories;
 using FF.Articles.Backend.Contents.API.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace FF.Articles.Backend.Contents.API.Repositories.V1;
+namespace FF.Articles.Backend.Contents.API.Repositories.V2;
 public class ArticleTagRepository : BaseRepository<ArticleTag, ContentsDbContext>, IArticleTagRepository
 {
     public ArticleTagRepository(ContentsDbContext _context) : base(_context)
@@ -31,14 +31,11 @@ public class ArticleTagRepository : BaseRepository<ArticleTag, ContentsDbContext
     public async Task<bool> EditArticleTags(int articleId, List<int> tagIds)
     {
         List<ArticleTag> currentArticleTags = await GetByArticleId(articleId);
-        //List<int> existingTags = await _context.Set<Tag>().Select(t => t.Id).ToListAsync();
+        List<int> existingTags = await _context.Set<Tag>().Select(t => t.Id).ToListAsync();
         foreach (var id in tagIds)
         {
-            // if (existingTags.Contains(id) && !currentArticleTags.Any(at => at.TagId == id))
-            //     await base.CreateAsync(new ArticleTag { ArticleId = articleId, TagId = id });
-            if (!currentArticleTags.Any(at => at.TagId == id))
+            if (existingTags.Contains(id) && !currentArticleTags.Any(at => at.TagId == id))
                 await base.CreateAsync(new ArticleTag { ArticleId = articleId, TagId = id });
-            
         }
 
         foreach (var at in currentArticleTags)

@@ -61,7 +61,7 @@ const ArticleAdminPage: React.FC = () => {
         },
         {
             title: "Description",
-            dataIndex: "abstraction",
+            dataIndex: "abstract",
             valueType: "text",
             hideInForm: true,
         },

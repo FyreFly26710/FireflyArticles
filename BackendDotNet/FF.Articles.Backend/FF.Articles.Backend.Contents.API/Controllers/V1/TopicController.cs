@@ -43,6 +43,8 @@ public class TopicController : ControllerBase
         Paged<TopicDto> res = new(topics.GetPageInfo());
         foreach (var topic in topics.Data)
         {
+            // Do not include articles in topic list
+            pageRequest.IncludeArticles = false;
             TopicDto topicDto = await _topicService.GetTopicDto(topic, pageRequest);
             res.Data.Add(topicDto);
         }

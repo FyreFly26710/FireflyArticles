@@ -13,15 +13,7 @@ public interface IBaseService<TEntity, TContext> where TEntity : BaseEntity wher
     Task<List<TEntity>> GetByIdsAsync(List<int> ids);
     Task<List<TEntity>> GetAllAsync();
     Task<Paged<TEntity>> GetAllAsync(PageRequest pageRequest);
-    // Task<Paged<TEntity>> GetPagedFromQueryAsync(IQueryable<TEntity> query, PageRequest pageRequest);
-    // IQueryable<TEntity> ApplyPageRequestQuery(IQueryable<TEntity> query, PageRequest pageRequest);
-    //IQueryable<TEntity> GetQueryable();
     Task<int> CreateAsync(TEntity entity);
-    Task<List<int>> CreateBatchAsync(List<TEntity> entities);
-    Task<int> UpdateAsync(TEntity entity);
-    Task UpdateBatchAsync(List<TEntity> entities);
+    Task<bool> UpdateAsync(TEntity entity);
     Task<bool> DeleteAsync(int id);
-    Task<bool> DeleteBatchAsync(List<int> ids);
-    // Task<bool> ExistsAsync(int id);
-
 }

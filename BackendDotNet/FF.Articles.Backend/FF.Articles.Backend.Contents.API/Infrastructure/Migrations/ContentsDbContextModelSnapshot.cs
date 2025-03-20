@@ -26,12 +26,9 @@ namespace FF.Articles.Backend.Contents.API.Infrastructure.Migrations
             modelBuilder.Entity("FF.Articles.Backend.Contents.API.Models.Entities.Article", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Abstraction")
+                    b.Property<string>("Abstract")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
                         .HasMaxLength(4000)
@@ -78,7 +75,6 @@ namespace FF.Articles.Backend.Contents.API.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdateTime")
-                        .IsConcurrencyToken()
                         .HasColumnType("datetime2");
 
                     b.Property<int>("UserId")
@@ -92,10 +88,7 @@ namespace FF.Articles.Backend.Contents.API.Infrastructure.Migrations
             modelBuilder.Entity("FF.Articles.Backend.Contents.API.Models.Entities.ArticleTag", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("ArticleId")
                         .HasColumnType("int");
@@ -111,10 +104,7 @@ namespace FF.Articles.Backend.Contents.API.Infrastructure.Migrations
             modelBuilder.Entity("FF.Articles.Backend.Contents.API.Models.Entities.Tag", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("TagName")
                         .IsRequired()
@@ -129,12 +119,9 @@ namespace FF.Articles.Backend.Contents.API.Infrastructure.Migrations
             modelBuilder.Entity("FF.Articles.Backend.Contents.API.Models.Entities.Topic", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Abstraction")
+                    b.Property<string>("Abstract")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
                         .HasMaxLength(4000)
@@ -176,7 +163,6 @@ namespace FF.Articles.Backend.Contents.API.Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("UpdateTime")
-                        .IsConcurrencyToken()
                         .HasColumnType("datetime2");
 
                     b.Property<int>("UserId")

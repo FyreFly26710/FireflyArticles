@@ -60,9 +60,9 @@ const TopicAdminPage: React.FC = () => {
         },
         {
             title: "Description",
-            dataIndex: "abstraction",
+            dataIndex: "abstract",
             valueType: "text",
-        },        
+        },
         {
             title: "Category",
             dataIndex: "category",
@@ -96,7 +96,7 @@ const TopicAdminPage: React.FC = () => {
             title: "Sort Num",
             dataIndex: "sortNumber",
             valueType: "text",
-            sorter:true,
+            sorter: true,
         },
         {
             title: "Created Time",
@@ -118,7 +118,7 @@ const TopicAdminPage: React.FC = () => {
             title: "Actions",
             dataIndex: "option",
             valueType: "option",
-            width:130,
+            width: 130,
             render: (_, record) => (
                 <Space size="middle">
                     <Typography.Link
@@ -148,11 +148,11 @@ const TopicAdminPage: React.FC = () => {
                 }}
                 toolBarRender={() => [
                     <Button
-                    type="primary"
-                    key="primary"
-                    onClick={() => {
-                        setCreateModalVisible(true);
-                    }}
+                        type="primary"
+                        key="primary"
+                        onClick={() => {
+                            setCreateModalVisible(true);
+                        }}
                     >
                         <PlusOutlined /> New
                     </Button>,
@@ -174,7 +174,7 @@ const TopicAdminPage: React.FC = () => {
 
                     return {
                         success: code === 0,
-                        data: data?.data ||[],
+                        data: data?.data || [],
                         //@ts-ignore
                         total: Number(data?.counts) || 0,
                     };

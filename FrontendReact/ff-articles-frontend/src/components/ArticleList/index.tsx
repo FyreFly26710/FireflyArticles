@@ -1,5 +1,5 @@
 "use client";
-import {Card, List, Tag} from "antd";
+import { Card, List, Tag } from "antd";
 import Link from "next/link";
 
 interface Props {
@@ -8,7 +8,7 @@ interface Props {
 }
 
 const ArticleList = (props: Props) => {
-    const {articleList = [], cardTitle} = props;
+    const { articleList = [], cardTitle } = props;
     const tagList = (tags: string[] = []) => {
         return tags.map((tag) => {
             return <Tag key={tag}>{tag}</Tag>;
@@ -26,7 +26,7 @@ const ArticleList = (props: Props) => {
                                 href={`/topic/${item.topicId}/article/${item.articleId}`}>
                                 {item.title}
                             </Link>}
-                            description={item.abstraction}
+                            description={item.abstract}
                         />
                     </List.Item>
                 )}

@@ -16,4 +16,5 @@ public interface IArticleService : IBaseService<Article, ContentsDbContext>
     Task<Paged<ArticleDto>> GetArticlesByPageRequest(ArticleQueryRequest pageRequest);
     Task<bool> EditContentBatch(Dictionary<int, string> batchEditConentRequests);
     Task<Dictionary<int, string>> CreateBatchAsync(List<ArticleAddRequest> articleAddRequests, int userId);
+    Task<int> CreateByRequest(ArticleAddRequest articleAddRequest, int userId);
 }
