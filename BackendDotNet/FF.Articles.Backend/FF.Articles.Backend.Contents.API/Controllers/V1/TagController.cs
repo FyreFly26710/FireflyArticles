@@ -45,8 +45,6 @@ public class TagController : ControllerBase
     [Authorize(Roles = UserConstant.ADMIN_ROLE)]
     public async Task<ApiResponse<int>> AddByRequest([FromBody] TagAddRequest tagAddRequest)
     {
-        if (tagAddRequest == null)
-            return ResultUtil.Error<int>(ErrorCode.PARAMS_ERROR);
         var tag = new Tag { TagName = tagAddRequest.TagName };
         int tagId = await _tagService.CreateAsync(tag);
         return ResultUtil.Success(tagId);

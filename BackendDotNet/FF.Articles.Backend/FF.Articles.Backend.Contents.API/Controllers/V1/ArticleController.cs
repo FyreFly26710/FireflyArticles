@@ -44,12 +44,6 @@ public class ArticleController : ControllerBase
     [HttpGet]
     public async Task<ApiResponse<Paged<ArticleDto>>> GetByPage([FromQuery] ArticleQueryRequest pageRequest)
     {
-        if (pageRequest == null || pageRequest.PageSize > 200)
-            return ResultUtil.Error<Paged<ArticleDto>>(ErrorCode.PARAMS_ERROR, "Invalid page request");
-        if (pageRequest.SortField == null)
-        {
-            pageRequest.SortField = "SortNumber";
-        }
         var pagedArticles = await _articleService.GetArticlesByPageRequest(pageRequest);
         return ResultUtil.Success(pagedArticles);
     }
@@ -58,51 +52,41 @@ public class ArticleController : ControllerBase
     [Authorize(Roles = UserConstant.ADMIN_ROLE)]
     public async Task<ApiResponse<int>> AddByRequest([FromBody] ArticleAddRequest articleAddRequest)
     {
-        if (articleAddRequest == null)
-            return ResultUtil.Error<int>(ErrorCode.PARAMS_ERROR);
-        var userDto = UserUtil.GetUserFromHttpRequest(Request);
-        var article = articleAddRequest.ToEntity(userDto.UserId);
-        //todo: check if topic exists
+        var article = articleAddRequest.ToEntity(UserUtil.GetUserId(Request));
         int articleId = await _articleService.CreateAsync(article);
         await _articleTagService.EditArticleTags(articleId, articleAddRequest.TagIds);
-
         return ResultUtil.Success(article.Id);
     }
     [HttpPut("batch")]
     [Authorize(Roles = UserConstant.ADMIN_ROLE)]
     public async Task<ApiResponse<Dictionary<int, string>>> AddBatchByRequest([FromBody] List<ArticleAddRequest> articleAddRequests)
     {
-        if (articleAddRequests == null || articleAddRequests.Count == 0)
-            return ResultUtil.Error<Dictionary<int, string>>(ErrorCode.PARAMS_ERROR, "Invalid article add requests");
-        var userDto = UserUtil.GetUserFromHttpRequest(Request);
-
-        var result = await _articleService.CreateBatchAsync(articleAddRequests, userDto.UserId);
+        var result = await _articleService.CreateBatchAsync(articleAddRequests, UserUtil.GetUserId(Request));
         return ResultUtil.Success(result);
     }
 
     [HttpPost]
     [Authorize(Roles = UserConstant.ADMIN_ROLE)]
     public async Task<ApiResponse<bool>> EditByRequest([FromBody] ArticleEditRequest articleEditRequest)
-        => ResultUtil.Success(await _articleService.EditArticleByRequest(articleEditRequest));
+    {
+        var result = await _articleService.EditArticleByRequest(articleEditRequest);
+        return ResultUtil.Success(result);
+    }
 
     [HttpPost("batch/content")]
     [Authorize(Roles = UserConstant.ADMIN_ROLE)]
     public async Task<ApiResponse<bool>> EditContentBatch([FromBody] Dictionary<int, string> batchEditConentRequests)
     {
-        if (batchEditConentRequests == null || batchEditConentRequests.Count == 0)
-            return ResultUtil.Error<bool>(ErrorCode.PARAMS_ERROR, "Invalid article edit requests");
-        await _articleService.EditContentBatch(batchEditConentRequests);
-        return ResultUtil.Success(true);
+        var result = await _articleService.EditContentBatch(batchEditConentRequests);
+        return ResultUtil.Success(result);
     }
 
     [HttpDelete("{id}")]
     [Authorize(Roles = UserConstant.ADMIN_ROLE)]
     public async Task<ApiResponse<bool>> DeleteById(int id)
     {
-        if (id <= 0)
-            return ResultUtil.Error<bool>(ErrorCode.PARAMS_ERROR, "Invalid article id");
-        await _articleService.DeleteArticleById(id);
-        return ResultUtil.Success(true);
+        var result = await _articleService.DeleteArticleById(id);
+        return ResultUtil.Success(result);
     }
     #endregion
 }

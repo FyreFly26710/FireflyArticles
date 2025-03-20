@@ -77,5 +77,6 @@ public class TopicService : BaseService<Topic, ContentsDbContext>, ITopicService
         });
         return true;
     }
+    public async Task<Topic?> GetTopicByTitle(string title) => await _topicRepository.GetTopicByTitle(title);
 }
 

@@ -39,10 +39,6 @@ public class TopicController : ControllerBase
     [HttpGet]
     public async Task<ApiResponse<Paged<TopicDto>>> GetByPage([FromQuery] TopicQueryRequest pageRequest)
     {
-        if (pageRequest == null || pageRequest.PageSize > 200)
-            return ResultUtil.Error<Paged<TopicDto>>(ErrorCode.PARAMS_ERROR, "Invalid page request");
-        pageRequest.SortField ??= "SortNumber";
-
         Paged<Topic> topics = await _topicService.GetAllAsync(pageRequest);
         Paged<TopicDto> res = new(topics.GetPageInfo());
         foreach (var topic in topics.Data)
@@ -58,7 +54,7 @@ public class TopicController : ControllerBase
     public async Task<ApiResponse<int>> AddByRequest([FromBody] TopicAddRequest topicAddRequest)
     {
         string title = topicAddRequest.Title;
-        var existTopic = _topicService.GetQueryable().FirstOrDefault(t => title.Trim().Equals(t.Title.Trim()));
+        var existTopic = await _topicService.GetTopicByTitle(title);
         if (existTopic != null)
         {
             return ResultUtil.Success(existTopic.Id);

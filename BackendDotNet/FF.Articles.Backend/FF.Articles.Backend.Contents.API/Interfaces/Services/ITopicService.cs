@@ -10,4 +10,5 @@ public interface ITopicService : IBaseService<Topic, ContentsDbContext>
     Task<TopicDto> GetTopicDto(Topic topic);
     Task<TopicDto> GetTopicDto(Topic topic, TopicQueryRequest topicRequest);
     Task<bool> EditTopicByRequest(TopicEditRequest topicEditRequest);
+    Task<Topic?> GetTopicByTitle(string title);
 }
