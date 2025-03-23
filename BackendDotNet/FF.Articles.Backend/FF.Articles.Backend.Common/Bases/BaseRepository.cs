@@ -163,14 +163,14 @@ public abstract class BaseRepository<TEntity, TContext>
 
         return hasChanges;
     }
-    public virtual async Task UpdateBatchAsync(List<TEntity> entities)
-    {
-        var dbEntities = await GetByIdsAsync(entities.Select(e => e.Id).ToList());
-        foreach (var entity in entities)
-        {
-            await UpdateAsync(entity, dbEntities.FirstOrDefault(e => e.Id == entity.Id));
-        }
-    }
+    //public virtual async Task UpdateBatchAsync(List<TEntity> entities)
+    //{
+    //    var dbEntities = await GetByIdsAsync(entities.Select(e => e.Id).ToList());
+    //    foreach (var entity in entities)
+    //    {
+    //        await UpdateAsync(entity, dbEntities.FirstOrDefault(e => e.Id == entity.Id));
+    //    }
+    //}
 
     public virtual async Task<bool> DeleteAsync(int id)
     {

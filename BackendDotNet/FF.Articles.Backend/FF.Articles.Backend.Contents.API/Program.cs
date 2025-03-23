@@ -14,8 +14,9 @@ builder.Services.AddDbContext<ContentsDbContext>(options =>
     .LogTo(Console.WriteLine, LogLevel.Information)
     .EnableSensitiveDataLogging();
 });
+var redis = configuration["Redis:ConnectionString"];
 builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
-    ConnectionMultiplexer.Connect(builder.Configuration["Redis:ConnectionString"]));
+    ConnectionMultiplexer.Connect(redis));
 
 
 builder.Services.AddServices();

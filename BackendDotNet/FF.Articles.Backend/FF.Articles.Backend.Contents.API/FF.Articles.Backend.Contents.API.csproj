@@ -24,9 +24,5 @@
 		<ProjectReference Include="..\FF.Articles.Backend.Common\FF.Articles.Backend.Common.csproj" />
 		<ProjectReference Include="..\FF.Articles.Backend.ServiceDefaults\FF.Articles.Backend.ServiceDefaults.csproj" />
 	</ItemGroup>
-	<ItemGroup>
-	  <Folder Include="Controllers\V2\" />
-	  <Folder Include="Interfaces\Services\AIServices\" />
-	</ItemGroup>
 
 </Project>

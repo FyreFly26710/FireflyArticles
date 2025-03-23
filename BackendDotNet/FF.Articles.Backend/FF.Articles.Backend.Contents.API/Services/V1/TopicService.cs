@@ -10,9 +10,9 @@ using FF.Articles.Backend.Contents.API.MapperExtensions.Articles;
 using FF.Articles.Backend.Contents.API.Models.Requests.Topics;
 using FF.Articles.Backend.Contents.API.UnitOfWork;
 using FF.Articles.Backend.Contents.API.Interfaces.Services;
-using FF.Articles.Backend.Contents.API.Interfaces.Repositories;
 using FF.Articles.Backend.Contents.API.Interfaces.Services.RemoteServices;
 using Microsoft.EntityFrameworkCore;
+using FF.Articles.Backend.Contents.API.Interfaces.Repositories.V1;
 namespace FF.Articles.Backend.Contents.API.Services.V1;
 public class TopicService : BaseService<Topic, ContentsDbContext>, ITopicService
 {
@@ -22,19 +22,19 @@ public class TopicService : BaseService<Topic, ContentsDbContext>, ITopicService
     private readonly IIdentityRemoteService _identityRemoteService;
     private readonly IContentsUnitOfWork _contentsUnitOfWork;
     public TopicService(
-        Func<string, ITopicRepository> topicRepository,
-        Func<string, IArticleRepository> articleRepository,
+        ITopicRepository topicRepository,
+        IArticleRepository articleRepository,
         Func<string, IArticleService> articleService,
-        Func<string, IIdentityRemoteService> identityRemoteService,
+        IIdentityRemoteService identityRemoteService,
         IContentsUnitOfWork contentsUnitOfWork,
         ILogger<TopicService> logger
     )
-    : base(topicRepository("v1"), logger)
+    : base(topicRepository, logger)
     {
-        _topicRepository = topicRepository("v1");
-        _articleRepository = articleRepository("v1");
+        _topicRepository = topicRepository;
+        _articleRepository = articleRepository;
         _articleService = articleService("v1");
-        _identityRemoteService = identityRemoteService("v1");
+        _identityRemoteService = identityRemoteService;
         _contentsUnitOfWork = contentsUnitOfWork;
     }
     public async Task<TopicDto> GetTopicDto(Topic topic) => await GetTopicDto(topic, new TopicQueryRequest());

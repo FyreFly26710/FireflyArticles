@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace FF.Articles.Backend.Common.Bases;
-public interface IBaseService<TEntity, TContext> where TEntity : BaseEntity where TContext : DbContext
+public interface IBaseService<TEntity> where TEntity : BaseEntity
 {
     Task<TEntity?> GetByIdAsync(int id);
     Task<List<TEntity>> GetByIdsAsync(List<int> ids);

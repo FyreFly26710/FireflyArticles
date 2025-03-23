@@ -6,7 +6,7 @@ using FF.Articles.Backend.Identity.API.Models.Entities;
 
 namespace FF.Articles.Backend.Identity.API.Services;
 
-public interface IUserService : IBaseService<User, IdentityDbContext>
+public interface IUserService : IBaseService<User>
 {
     Task<int> UserRegister(string userAccount, string userPassword, string checkPassword);
 

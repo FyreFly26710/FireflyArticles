@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using FF.Articles.Backend.Common.Bases;
 using FF.Articles.Backend.Contents.API.Infrastructure;
-using FF.Articles.Backend.Contents.API.Interfaces.Repositories;
+using FF.Articles.Backend.Contents.API.Interfaces.Repositories.V1;
 using FF.Articles.Backend.Contents.API.Interfaces.Services;
 using FF.Articles.Backend.Contents.API.Models.Entities;
 using FF.Articles.Backend.Contents.API.UnitOfWork;
@@ -13,16 +13,16 @@ public class TagService : BaseService<Tag, ContentsDbContext>, ITagService
     private readonly IContentsUnitOfWork _contentsUnitOfWork;
     private readonly IArticleTagRepository _articleTagRepository;
     public TagService(
-        Func<string, ITagRepository> tagRepository,
-        Func<string, IArticleTagRepository> articleTagRepository,
+        ITagRepository tagRepository,
+        IArticleTagRepository articleTagRepository,
         IContentsUnitOfWork contentsUnitOfWork,
         ILogger<TagService> logger
     )
-    : base(tagRepository("v1"), logger)
+    : base(tagRepository, logger)
     {
         _contentsUnitOfWork = contentsUnitOfWork;
-        _tagRepository = tagRepository("v1");
-        _articleTagRepository = articleTagRepository("v1");
+        _tagRepository = tagRepository;
+        _articleTagRepository = articleTagRepository;
     }
     public override async Task<bool> DeleteAsync(int id)
     {

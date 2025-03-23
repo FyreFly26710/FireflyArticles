@@ -2,15 +2,15 @@
 using FF.Articles.Backend.Contents.API.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
 
-namespace FF.Articles.Backend.Contents.API.Controllers.V1;
+namespace FF.Articles.Backend.Contents.API.Controllers.V2;
 
-[ApiVersion(1.0)]
+[ApiVersion(2.0)]
 [ApiController]
 [Route("api/contents/articles")]
 public class ArticleController : ArticleControllerBase
 {
     public ArticleController(Func<string, IArticleService> articleService)
-        : base(articleService, "v1")
+        : base(articleService, "v2")
     {
     }
 

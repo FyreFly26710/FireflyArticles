@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 
 namespace FF.Articles.Backend.Common.Bases;
 public abstract class BaseService<TEntity, TContext>
-    : IBaseService<TEntity, TContext>
+    : IBaseService<TEntity>
     where TEntity : BaseEntity
     where TContext : DbContext
 {
