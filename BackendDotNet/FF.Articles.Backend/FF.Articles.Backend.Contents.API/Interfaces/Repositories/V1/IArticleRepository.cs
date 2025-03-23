@@ -3,7 +3,7 @@ using FF.Articles.Backend.Contents.API.Infrastructure;
 using FF.Articles.Backend.Contents.API.Models.Entities;
 using FF.Articles.Backend.Contents.API.Models.Requests.Articles;
 
-namespace FF.Articles.Backend.Contents.API.Interfaces.Repositories;
+namespace FF.Articles.Backend.Contents.API.Interfaces.Repositories.V1;
 public interface IArticleRepository : IBaseRepository<Article, ContentsDbContext>
 {
     public IQueryable<Article> BuildTagIdsSearchQuery(List<int> tagIds, IQueryable<Article> query);

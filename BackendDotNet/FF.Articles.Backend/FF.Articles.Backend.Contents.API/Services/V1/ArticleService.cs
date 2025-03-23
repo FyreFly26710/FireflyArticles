@@ -7,7 +7,7 @@ using FF.Articles.Backend.Common.Responses;
 using FF.Articles.Backend.Common.Utils;
 using FF.Articles.Backend.Contents.API.Constants;
 using FF.Articles.Backend.Contents.API.Infrastructure;
-using FF.Articles.Backend.Contents.API.Interfaces.Repositories;
+using FF.Articles.Backend.Contents.API.Interfaces.Repositories.V1;
 using FF.Articles.Backend.Contents.API.Interfaces.Services;
 using FF.Articles.Backend.Contents.API.Interfaces.Services.RemoteServices;
 using FF.Articles.Backend.Contents.API.MapperExtensions.Articles;
@@ -28,21 +28,21 @@ public class ArticleService : BaseService<Article, ContentsDbContext>, IArticleS
     private readonly IArticleTagRepository _articleTagRepository;
 
     public ArticleService(
-        Func<string, IArticleRepository> articleRepository,
-        Func<string, ITagRepository> tagRepository,
-        Func<string, ITopicRepository> topicRepository,
-        Func<string, IIdentityRemoteService> identityRemoteService,
-        Func<string, IArticleTagRepository> articleTagRepository,
+        IArticleRepository articleRepository,
+        ITagRepository tagRepository,
+        ITopicRepository topicRepository,
+        IIdentityRemoteService identityRemoteService,
+        IArticleTagRepository articleTagRepository,
         IContentsUnitOfWork contentsUnitOfWork,
         ILogger<ArticleService> logger
-    ) : base(articleRepository("v1"), logger)
+    ) : base(articleRepository, logger)
     {
-        _tagRepository = tagRepository("v1");
-        _identityRemoteService = identityRemoteService("v1");
-        _topicRepository = topicRepository("v1");
+        _tagRepository = tagRepository;
+        _identityRemoteService = identityRemoteService;
+        _topicRepository = topicRepository;
         _contentsUnitOfWork = contentsUnitOfWork;
-        _articleRepository = articleRepository("v1");
-        _articleTagRepository = articleTagRepository("v1");
+        _articleRepository = articleRepository;
+        _articleTagRepository = articleTagRepository;
     }
 
     public async Task<ArticleDto> GetArticleDto(Article article) => await GetArticleDto(article, new ArticleQueryRequest());

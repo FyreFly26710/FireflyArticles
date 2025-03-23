@@ -28,7 +28,7 @@ public interface IBaseRepository<TEntity, TContext>
     /// Otherwise, reset the entry state to unchanged and return false
     /// </summary>
     bool UpdateChecker(TEntity trackedEntity, TEntity dbEntity);
-    Task UpdateBatchAsync(List<TEntity> entities);
+    //Task UpdateBatchAsync(List<TEntity> entities);
     Task<bool> DeleteAsync(int id);
     Task<bool> HardDeleteAsync(int id);
     Task<bool> DeleteBatchAsync(List<int> ids);
