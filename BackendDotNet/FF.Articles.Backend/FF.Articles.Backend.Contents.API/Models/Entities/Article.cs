@@ -17,3 +17,19 @@ public class Article : BaseEntity
     public int SortNumber { get; set; }
     public int IsHidden { get; set; }
 }
+
+public static class ArticleProperty
+{
+    public const string Title = "Title";
+    public const string Content = "Content";
+    public const string Abstract = "Abstract";
+    public const string ArticleType = "ArticleType";
+    public const string ParentArticleId = "ParentArticleId";
+    public const string UserId = "UserId";
+    public const string TopicId = "TopicId";
+    public const string SortNumber = "SortNumber";
+    public const string IsHidden = "IsHidden";
+    public const string CreateTime = "CreateTime";
+    public const string UpdateTime = "UpdateTime";
+    public const string IsDelete = "IsDelete";
+}
