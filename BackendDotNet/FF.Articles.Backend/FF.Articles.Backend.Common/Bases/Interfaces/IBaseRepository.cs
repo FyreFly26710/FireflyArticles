@@ -14,7 +14,7 @@ public interface IBaseRepository<TEntity, TContext>
     IQueryable<TEntity> ApplyPageRequestQuery(IQueryable<TEntity> query, PageRequest pageRequest);
     IQueryable<TEntity> GetQueryable();
     Task<int> CreateAsync(TEntity entity);
-    Task<List<int>> CreateBatchAsync(List<TEntity> entities);
+    Task<List<TEntity>> CreateBatchAsync(List<TEntity> entities);
     /// <summary>
     /// Fetch the original entity from DB <br/>
     /// Attach the incoming entity <br/>

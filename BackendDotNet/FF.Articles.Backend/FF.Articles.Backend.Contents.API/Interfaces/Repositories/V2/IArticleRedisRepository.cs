@@ -9,5 +9,8 @@ namespace FF.Articles.Backend.Contents.API.Interfaces.Repositories.V2
         Task<bool> UpdateAsync(Article newEntity, Article oldEntity);
         Task<List<Article>> GetArticlesByTopicIdAsync(int topicId);
         Task<List<Article>> GetChildArticlesAsync(int parentId);
+        Task PromoteSubArticlesToArticles(int articleId);
+        Task UpdateContentBatchAsync(Dictionary<int, string> batchEditConentRequests);
+        Task SetTopicIdToZero(int topicId);
     }
 }

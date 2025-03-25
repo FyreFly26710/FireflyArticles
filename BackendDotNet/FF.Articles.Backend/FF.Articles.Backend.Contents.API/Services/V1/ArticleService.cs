@@ -217,7 +217,7 @@ public class ArticleService : BaseService<Article, ContentsDbContext>, IArticleS
         var result = await _contentsUnitOfWork.ExecuteInTransactionAsync(async () =>
         {
             var articles = articleAddRequests.Select(request => request.ToEntity(userId)).ToList();
-            var ids = await _articleRepository.CreateBatchAsync(articles);
+            articles = await _articleRepository.CreateBatchAsync(articles);
             // todo: add tags
             var tagNames = articleAddRequests.SelectMany(r => r.Tags)
                 .Select(t => t.ToLower().Trim())
@@ -229,7 +229,7 @@ public class ArticleService : BaseService<Article, ContentsDbContext>, IArticleS
             {
                 await _articleTagRepository.EditArticleTags(article.Id, tagIds);
             }
-            return ids.ToDictionary(id => id, id => articles.First(a => a.Id == id).Title);
+            return articles.ToDictionary(a => a.Id, a => a.Title);
         });
         return result;
     }
