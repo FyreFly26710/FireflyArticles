@@ -65,10 +65,10 @@ public abstract class BaseRepository<TEntity, TContext>
         await _context.Set<TEntity>().AddAsync(entity);
         return entity.Id;
     }
-    public virtual async Task<List<int>> CreateBatchAsync(List<TEntity> entities)
+    public virtual async Task<List<TEntity>> CreateBatchAsync(List<TEntity> entities)
     {
         if (entities.Count == 0)
-            return new List<int>();
+            return new List<TEntity>();
 
         var entityType = _context.Model.FindEntityType(typeof(TEntity));
 
@@ -95,7 +95,7 @@ public abstract class BaseRepository<TEntity, TContext>
         }
         await _context.Set<TEntity>().AddRangeAsync(entities);
         //await _context.SaveChangesAsync();
-        return entities.Select(e => e.Id).ToList();
+        return entities;
     }
 
     /// <summary>

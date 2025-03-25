@@ -100,7 +100,7 @@ public abstract class RedisRepository<TEntity> : IRedisRepository<TEntity>
 
     }
 
-    public async Task<int> CreateBatchAsync(List<TEntity> entities)
+    public async Task<List<TEntity>> CreateBatchAsync(List<TEntity> entities)
     {
         int baseId = await GetNextIdAsync(entities.Count);
 
@@ -121,7 +121,7 @@ public abstract class RedisRepository<TEntity> : IRedisRepository<TEntity>
 
         await _redis.HashSetAsync(EntityKey, entries.ToArray());
         await EnqueueChangesAsync(entities, ChangeType.Create);
-        return entities.Count;
+        return entities;
 
     }
 

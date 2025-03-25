@@ -16,6 +16,25 @@ public class Article : BaseEntity
     public int TopicId { get; set; }
     public int SortNumber { get; set; }
     public int IsHidden { get; set; }
+
+    public Article Clone()
+    {
+        return new Article
+        {
+            Title = Title,
+            Content = Content,
+            Abstract = Abstract,
+            ArticleType = ArticleType,
+            ParentArticleId = ParentArticleId,
+            UserId = UserId,
+            TopicId = TopicId,
+            SortNumber = SortNumber,
+            IsHidden = IsHidden,
+            CreateTime = CreateTime,
+            UpdateTime = UpdateTime,
+            IsDelete = IsDelete
+        };
+    }
 }
 
 public static class ArticleProperty

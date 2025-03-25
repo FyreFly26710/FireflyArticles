@@ -17,7 +17,7 @@ public interface IRedisRepository<TEntity> where TEntity : BaseEntity
     Task<List<TEntity>> GetByIdsAsync(List<int> ids);
     Task<List<TEntity>> GetAllAsync();
     Task<int> CreateAsync(TEntity entity);
-    Task<int> CreateBatchAsync(List<TEntity> entities);
+    Task<List<TEntity>> CreateBatchAsync(List<TEntity> entities);
     Task<bool> UpdateAsync(TEntity entity);
     Task UpdateBatchAsync(List<TEntity> entities);
     Task<bool> DeleteAsync(int id);
