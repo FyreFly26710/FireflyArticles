@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FF.Articles.Backend.Contents.API.Infrastructure.Migrations
 {
     [DbContext(typeof(ContentsDbContext))]
-    [Migration("20250320210845_InitialCreate")]
+    [Migration("20250326203849_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -28,19 +28,22 @@ namespace FF.Articles.Backend.Contents.API.Infrastructure.Migrations
 
             modelBuilder.Entity("FF.Articles.Backend.Contents.API.Models.Entities.Article", b =>
                 {
-                    b.Property<int>("Id")
-                        .HasColumnType("int");
+                    b.Property<long>("Id")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("Abstract")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
-                        .HasMaxLength(4000)
-                        .HasColumnType("nvarchar(4000)")
+                        .HasMaxLength(512)
+                        .HasColumnType("nvarchar(512)")
                         .HasDefaultValue("");
 
                     b.Property<string>("ArticleType")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)")
+                        .HasDefaultValue("Article");
 
                     b.Property<string>("Content")
                         .IsRequired()
@@ -61,43 +64,57 @@ namespace FF.Articles.Backend.Contents.API.Infrastructure.Migrations
                         .HasColumnType("int")
                         .HasDefaultValue(0);
 
-                    b.Property<int?>("ParentArticleId")
-                        .HasColumnType("int");
+                    b.Property<long?>("ParentArticleId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasDefaultValue(0L);
 
                     b.Property<int>("SortNumber")
-                        .HasColumnType("int");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
 
                     b.Property<string>("Title")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)")
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)")
                         .HasDefaultValue("");
 
-                    b.Property<int>("TopicId")
-                        .HasColumnType("int");
+                    b.Property<long>("TopicId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasDefaultValue(0L);
 
                     b.Property<DateTime?>("UpdateTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
+                    b.Property<long>("UserId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasDefaultValue(0L);
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ParentArticleId")
+                        .HasDatabaseName("IX_Article_ParentArticleId");
+
+                    b.HasIndex("TopicId", "SortNumber")
+                        .HasDatabaseName("IX_Article_TopicId_SortNumber");
 
                     b.ToTable("Article", "Contents");
                 });
 
             modelBuilder.Entity("FF.Articles.Backend.Contents.API.Models.Entities.ArticleTag", b =>
                 {
-                    b.Property<int>("Id")
-                        .HasColumnType("int");
+                    b.Property<long>("Id")
+                        .HasColumnType("bigint");
 
-                    b.Property<int>("ArticleId")
-                        .HasColumnType("int");
+                    b.Property<long>("ArticleId")
+                        .HasColumnType("bigint");
 
-                    b.Property<int>("TagId")
-                        .HasColumnType("int");
+                    b.Property<long>("TagId")
+                        .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
@@ -106,13 +123,13 @@ namespace FF.Articles.Backend.Contents.API.Infrastructure.Migrations
 
             modelBuilder.Entity("FF.Articles.Backend.Contents.API.Models.Entities.Tag", b =>
                 {
-                    b.Property<int>("Id")
-                        .HasColumnType("int");
+                    b.Property<long>("Id")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("TagName")
                         .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
 
                     b.HasKey("Id");
 
@@ -121,23 +138,28 @@ namespace FF.Articles.Backend.Contents.API.Infrastructure.Migrations
 
             modelBuilder.Entity("FF.Articles.Backend.Contents.API.Models.Entities.Topic", b =>
                 {
-                    b.Property<int>("Id")
-                        .HasColumnType("int");
+                    b.Property<long>("Id")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("Abstract")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
-                        .HasMaxLength(4000)
-                        .HasColumnType("nvarchar(4000)")
+                        .HasMaxLength(512)
+                        .HasColumnType("nvarchar(512)")
                         .HasDefaultValue("");
 
                     b.Property<string>("Category")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)")
+                        .HasDefaultValue("");
 
                     b.Property<string>("Content")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("NVARCHAR(MAX)")
+                        .HasDefaultValue("");
 
                     b.Property<DateTime?>("CreateTime")
                         .HasColumnType("datetime2");
@@ -153,23 +175,31 @@ namespace FF.Articles.Backend.Contents.API.Infrastructure.Migrations
                         .HasDefaultValue(0);
 
                     b.Property<int>("SortNumber")
-                        .HasColumnType("int");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
 
                     b.Property<string>("Title")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)")
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)")
                         .HasDefaultValue("");
 
                     b.Property<string>("TopicImage")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(2048)
+                        .HasColumnType("nvarchar(2048)")
+                        .HasDefaultValue("");
 
                     b.Property<DateTime?>("UpdateTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
+                    b.Property<long>("UserId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasDefaultValue(0L);
 
                     b.HasKey("Id");
 

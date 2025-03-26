@@ -18,9 +18,9 @@ public class UserController(IUserService _userService, ILogger<UserController> _
 {
     //[EnableCors("AllowedBackendUrls")]
     [HttpGet("{id}")]
-    public async Task<ApiResponse<UserApiDto>> GetById(int id)
+    public async Task<ApiResponse<UserApiDto>> GetById(long id)
     {
-        if (id <= 0)
+        if (id == 0)
             return ResultUtil.Error<UserApiDto>(ErrorCode.PARAMS_ERROR, "Invalid user id");
         var user = await _userService.GetByIdAsync(id);
         if (user == null)
@@ -41,9 +41,9 @@ public class UserController(IUserService _userService, ILogger<UserController> _
 
     [HttpDelete("{id}")]
     [Authorize(Roles = UserConstant.ADMIN_ROLE)]
-    public async Task<ApiResponse<bool>> DeleteById(int id)
+    public async Task<ApiResponse<bool>> DeleteById(long id)
     {
-        if (id <= 0)
+        if (id == 0)
             return ResultUtil.Error<bool>(ErrorCode.PARAMS_ERROR, "Invalid user id");
 
         await _userService.DeleteAsync(id);

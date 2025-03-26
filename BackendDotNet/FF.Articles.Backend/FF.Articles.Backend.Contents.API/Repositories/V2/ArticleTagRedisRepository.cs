@@ -13,13 +13,13 @@ public class ArticleTagRedisRepository : RedisRepository<ArticleTag>, IArticleTa
     {
     }
 
-    public async Task<List<ArticleTag>> GetByArticleId(int articleId)
+    public async Task<List<ArticleTag>> GetByArticleId(long articleId)
     {
         var ids = await GetAllAsync();
         return ids.Where(at => at.ArticleId == articleId).ToList();
     }
 
-    public async Task<Dictionary<int, List<ArticleTag>>> GetArticleTagGroupsByArticleIds(List<int> articleIds)
+    public async Task<Dictionary<long, List<ArticleTag>>> GetArticleTagGroupsByArticleIds(List<long> articleIds)
     {
         var articleTags = await GetAllAsync();
         var articleTagGroups = articleTags
@@ -28,23 +28,23 @@ public class ArticleTagRedisRepository : RedisRepository<ArticleTag>, IArticleTa
             .ToDictionary(g => g.Key, g => g.ToList());
         return articleTagGroups;
     }
-    public async Task<List<ArticleTag>> GetByArticleIds(List<int> articleIds)
+    public async Task<List<ArticleTag>> GetByArticleIds(List<long> articleIds)
     {
         var articleTags = await GetAllAsync();
         return articleTags.Where(at => articleIds.Contains(at.ArticleId)).ToList();
     }
-    public async Task<List<ArticleTag>> GetByTagId(int tagId)
+    public async Task<List<ArticleTag>> GetByTagId(long tagId)
     {
         var articleTags = await GetAllAsync();
         return articleTags.Where(at => at.TagId == tagId).ToList();
     }
-    public async Task<List<ArticleTag>> GetByTagIds(List<int> tagIds)
+    public async Task<List<ArticleTag>> GetByTagIds(List<long> tagIds)
     {
         var articleTags = await GetAllAsync();
         return articleTags.Where(at => tagIds.Contains(at.TagId)).ToList();
     }
 
-    public async Task<bool> EditArticleTags(int articleId, List<int> tagIds)
+    public async Task<bool> EditArticleTags(long articleId, List<long> tagIds)
     {
         List<ArticleTag> currentArticleTags = await GetByArticleId(articleId);
         foreach (var id in tagIds)
@@ -61,14 +61,14 @@ public class ArticleTagRedisRepository : RedisRepository<ArticleTag>, IArticleTa
         }
         return true;
     }
-    public async Task<bool> DeleteByArticleId(int articleId)
+    public async Task<bool> DeleteByArticleId(long articleId)
     {
         var articleTags = await GetByArticleId(articleId);
         await base.DeleteBatchAsync(articleTags.Select(at => at.Id).ToList());
         return true;
     }
 
-    public async Task<bool> DeleteByTagId(int tagId)
+    public async Task<bool> DeleteByTagId(long tagId)
     {
         List<ArticleTag> articleTags = await GetByTagId(tagId);
         await base.DeleteBatchAsync(articleTags.Select(at => at.Id).ToList());

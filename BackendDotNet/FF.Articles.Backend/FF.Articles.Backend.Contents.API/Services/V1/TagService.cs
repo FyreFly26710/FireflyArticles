@@ -24,7 +24,7 @@ public class TagService : BaseService<Tag, ContentsDbContext>, ITagService
         _tagRepository = tagRepository;
         _articleTagRepository = articleTagRepository;
     }
-    public override async Task<bool> DeleteAsync(int id)
+    public override async Task<bool> DeleteAsync(long id)
     {
         if (!await _tagRepository.ExistsAsync(id))
             return true;

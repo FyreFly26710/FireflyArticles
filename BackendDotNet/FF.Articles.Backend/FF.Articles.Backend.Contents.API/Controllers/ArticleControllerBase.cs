@@ -20,7 +20,7 @@ public abstract class ArticleControllerBase : ControllerBase
 
     #region REST API
     [HttpGet("{id}")]
-    public async Task<ApiResponse<ArticleDto>> GetById(int id, [FromQuery] ArticleQueryRequest request)
+    public async Task<ApiResponse<ArticleDto>> GetById(long id, [FromQuery] ArticleQueryRequest request)
     {
         var article = await _articleService.GetByIdAsync(id);
         if (article == null)
@@ -38,17 +38,17 @@ public abstract class ArticleControllerBase : ControllerBase
 
     [HttpPut]
     [Authorize(Roles = UserConstant.ADMIN_ROLE)]
-    public async Task<ApiResponse<int>> AddByRequest([FromBody] ArticleAddRequest articleAddRequest)
+    public async Task<ApiResponse<string>> AddByRequest([FromBody] ArticleAddRequest articleAddRequest)
     {
-        int articleId = await _articleService.CreateByRequest(articleAddRequest, UserUtil.GetUserId(Request));
-        return ResultUtil.Success(articleId);
+        long articleId = await _articleService.CreateByRequest(articleAddRequest, UserUtil.GetUserId(Request));
+        return ResultUtil.Success(articleId.ToString());
     }
     /// <summary>
     /// Create articles and return a dictionary of article id and title
     /// </summary>
     [HttpPut("batch")]
     [Authorize(Roles = UserConstant.ADMIN_ROLE)]
-    public async Task<ApiResponse<Dictionary<int, string>>> AddBatchByRequest([FromBody] List<ArticleAddRequest> articleAddRequests)
+    public async Task<ApiResponse<Dictionary<long, string>>> AddBatchByRequest([FromBody] List<ArticleAddRequest> articleAddRequests)
     {
         var result = await _articleService.CreateBatchAsync(articleAddRequests, UserUtil.GetUserId(Request));
         return ResultUtil.Success(result);
@@ -64,7 +64,7 @@ public abstract class ArticleControllerBase : ControllerBase
 
     [HttpPost("batch/content")]
     [Authorize(Roles = UserConstant.ADMIN_ROLE)]
-    public async Task<ApiResponse<bool>> EditContentBatch([FromBody] Dictionary<int, string> batchEditConentRequests)
+    public async Task<ApiResponse<bool>> EditContentBatch([FromBody] Dictionary<long, string> batchEditConentRequests)
     {
         var result = await _articleService.EditContentBatch(batchEditConentRequests);
         return ResultUtil.Success(result);
@@ -72,7 +72,7 @@ public abstract class ArticleControllerBase : ControllerBase
 
     [HttpDelete("{id}")]
     [Authorize(Roles = UserConstant.ADMIN_ROLE)]
-    public async Task<ApiResponse<bool>> DeleteById(int id)
+    public async Task<ApiResponse<bool>> DeleteById(long id)
     {
         var result = await _articleService.DeleteArticleById(id);
         return ResultUtil.Success(result);

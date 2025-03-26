@@ -12,9 +12,9 @@ public interface IArticleService : IBaseService<Article>
     Task<ArticleDto> GetArticleDto(Article article, ArticleQueryRequest articleRequest);
     Task<List<ArticleDto>> GetArticleDtos(IEnumerable<Article> articles, ArticleQueryRequest articleRequest);
     Task<bool> EditArticleByRequest(ArticleEditRequest articleEditRequest);
-    Task<bool> DeleteArticleById(int id);
+    Task<bool> DeleteArticleById(long id);
     Task<Paged<ArticleDto>> GetArticlesByPageRequest(ArticleQueryRequest pageRequest);
-    Task<bool> EditContentBatch(Dictionary<int, string> batchEditConentRequests);
-    Task<Dictionary<int, string>> CreateBatchAsync(List<ArticleAddRequest> articleAddRequests, int userId);
-    Task<int> CreateByRequest(ArticleAddRequest articleAddRequest, int userId);
+    Task<bool> EditContentBatch(Dictionary<long, string> batchEditConentRequests);
+    Task<Dictionary<long, string>> CreateBatchAsync(List<ArticleAddRequest> articleAddRequests, long userId);
+    Task<long> CreateByRequest(ArticleAddRequest articleAddRequest, long userId);
 }

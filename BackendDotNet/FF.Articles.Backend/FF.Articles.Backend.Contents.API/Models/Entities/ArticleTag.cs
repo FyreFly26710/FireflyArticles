@@ -6,6 +6,6 @@ namespace FF.Articles.Backend.Contents.API.Models.Entities;
 /// </summary>
 public class ArticleTag : BaseEntity
 {
-    public int ArticleId { get; set; }
-    public int TagId { get; set; }
+    public long ArticleId { get; set; }
+    public long TagId { get; set; }
 }

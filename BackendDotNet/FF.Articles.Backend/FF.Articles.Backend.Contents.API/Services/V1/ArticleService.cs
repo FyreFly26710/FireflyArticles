@@ -72,10 +72,10 @@ public class ArticleService : BaseService<Article, ContentsDbContext>, IArticleS
             return new List<ArticleDto>();
 
         // Get tags for all articles
-        Dictionary<int, List<Tag>> tagDict = await _articleTagRepository.GetTagGroupsByArticleIds([.. articles.Select(a => a.Id).Distinct()]);
+        Dictionary<long, List<Tag>> tagDict = await _articleTagRepository.GetTagGroupsByArticleIds([.. articles.Select(a => a.Id).Distinct()]);
 
         // Get users if requested
-        Dictionary<int, UserApiDto?> userDict = new();
+        Dictionary<long, UserApiDto?> userDict = new();
         if (articleRequest.IncludeUser)
         {
             var userIds = articles.Select(a => a.UserId).Distinct().ToList();
@@ -143,7 +143,7 @@ public class ArticleService : BaseService<Article, ContentsDbContext>, IArticleS
             if (articleEditRequest.Abstract != null && article.Abstract != articleEditRequest.Abstract)
                 article.Abstract = articleEditRequest.Abstract;
             if (articleEditRequest.TopicId != null && article.TopicId != articleEditRequest.TopicId)
-                article.TopicId = (int)articleEditRequest.TopicId;
+                article.TopicId = (long)articleEditRequest.TopicId;
             if (articleEditRequest.ArticleType != null && article.ArticleType != articleEditRequest.ArticleType)
             {
                 if (article.ArticleType == ArticleTypes.Article)
@@ -154,7 +154,7 @@ public class ArticleService : BaseService<Article, ContentsDbContext>, IArticleS
             }
             if (articleEditRequest.ParentArticleId != null && article.ParentArticleId != articleEditRequest.ParentArticleId)
             {
-                article.ParentArticleId = (int)articleEditRequest.ParentArticleId;
+                article.ParentArticleId = articleEditRequest.ParentArticleId;
             }
             if (articleEditRequest.SortNumber != null && article.SortNumber != articleEditRequest.SortNumber)
                 article.SortNumber = (int)articleEditRequest.SortNumber;
@@ -169,9 +169,9 @@ public class ArticleService : BaseService<Article, ContentsDbContext>, IArticleS
         return true;
     }
 
-    public async Task<bool> DeleteArticleById(int id)
+    public async Task<bool> DeleteArticleById(long id)
     {
-        if (id <= 0)
+        if (id == 0)
             throw new ApiException(ErrorCode.PARAMS_ERROR, "Invalid article id");
         await _contentsUnitOfWork.ExecuteInTransactionAsync(async () =>
         {
@@ -192,7 +192,7 @@ public class ArticleService : BaseService<Article, ContentsDbContext>, IArticleS
         return res;
 
     }
-    public async Task<bool> EditContentBatch(Dictionary<int, string> batchEditConentRequests)
+    public async Task<bool> EditContentBatch(Dictionary<long, string> batchEditConentRequests)
     {
         await _contentsUnitOfWork.ExecuteInTransactionAsync(async () =>
         {
@@ -212,7 +212,7 @@ public class ArticleService : BaseService<Article, ContentsDbContext>, IArticleS
     /// <summary>
     /// Create articles and return a dictionary of article id and title
     /// </summary>
-    public async Task<Dictionary<int, string>> CreateBatchAsync(List<ArticleAddRequest> articleAddRequests, int userId)
+    public async Task<Dictionary<long, string>> CreateBatchAsync(List<ArticleAddRequest> articleAddRequests, long userId)
     {
         var result = await _contentsUnitOfWork.ExecuteInTransactionAsync(async () =>
         {
@@ -233,7 +233,7 @@ public class ArticleService : BaseService<Article, ContentsDbContext>, IArticleS
         });
         return result;
     }
-    public async Task<int> CreateByRequest(ArticleAddRequest articleAddRequest, int userId)
+    public async Task<long> CreateByRequest(ArticleAddRequest articleAddRequest, long userId)
     {
         var entity = articleAddRequest.ToEntity(userId);
         var result = await _contentsUnitOfWork.ExecuteInTransactionAsync(async () =>

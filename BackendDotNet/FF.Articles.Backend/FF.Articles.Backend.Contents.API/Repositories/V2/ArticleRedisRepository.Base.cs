@@ -1,6 +1,7 @@
 using FF.Articles.Backend.Common.BackgoundJobs;
 using FF.Articles.Backend.Common.Bases;
 using FF.Articles.Backend.Common.Responses;
+using FF.Articles.Backend.Common.Utils;
 using FF.Articles.Backend.Contents.API.Interfaces.Repositories.V2;
 using FF.Articles.Backend.Contents.API.Models.Entities;
 using Microsoft.Extensions.Logging;
@@ -14,32 +15,34 @@ public partial class ArticleRedisRepository
     private readonly ILogger<ArticleRedisRepository> _logger;
 
 
-    public async Task<int> GetNextIdAsync()
-    {
-        return (int)await _redis.StringIncrementAsync(ID_COUNTER);
-    }
+    // public async Task<int> GetNextIdAsync()
+    // {
+    //     return (int)await _redis.StringIncrementAsync(ID_COUNTER);
+    // }
 
-    public async Task<int> GetNextIdAsync(int count)
-    {
-        long startId = await _redis.StringIncrementAsync(ID_COUNTER, count);
-        return (int)(startId - count + 1);
-    }
+    // public async Task<int> GetNextIdAsync(int count)
+    // {
+    //     long startId = await _redis.StringIncrementAsync(ID_COUNTER, count);
+    //     return (int)(startId - count + 1);
+    // }
 
-    public string GetFieldKey(int id) => $"{KEY_PREFIX}{id}";
+    public string GetFieldKey(long id) => $"{KEY_PREFIX}{id}";
 
-    public async Task<bool> ExistsAsync(int id)
+    public async Task<bool> ExistsAsync(long id)
     {
         return await _redis.KeyExistsAsync(GetFieldKey(id));
     }
 
-    public async Task<List<int>> ExistIdsAsync()
+    public async Task<List<long>> ExistIdsAsync()
     {
         var members = await _redis.SetMembersAsync(ARTICLE_IDS_KEY);
-        return members.Select(m => (int)m).ToList();
+        return members.Select(m => (long)m).ToList();
     }
 
-    public async Task<Article?> GetByIdAsync(int id)
+    public async Task<Article?> GetByIdAsync(long id)
     {
+        if (id == 0)
+            return null;
         var key = GetFieldKey(id);
         var hash = await _redis.HashGetAllAsync(key);
 
@@ -49,7 +52,7 @@ public partial class ArticleRedisRepository
     }
 
 
-    public async Task<List<Article>> GetByIdsAsync(List<int> ids)
+    public async Task<List<Article>> GetByIdsAsync(List<long> ids)
     {
         if (ids == null || !ids.Any())
             return new List<Article>();
@@ -86,9 +89,10 @@ public partial class ArticleRedisRepository
         return await GetByIdsAsync(ids);
     }
 
-    public async Task<int> CreateAsync(Article entity)
+    public async Task<long> CreateAsync(Article entity)
     {
-        entity.Id = await GetNextIdAsync();
+        if (entity.Id == 0)
+            entity.Id = EntityUtil.GenerateSnowflakeId();
         entity.CreateTime ??= DateTime.UtcNow;
         entity.UpdateTime ??= DateTime.UtcNow;
 
@@ -106,13 +110,12 @@ public partial class ArticleRedisRepository
 
     public async Task<List<Article>> CreateBatchAsync(List<Article> entities)
     {
-        var baseId = await GetNextIdAsync(entities.Count);
         var tasks = new List<Task>();
 
-        for (int i = 0; i < entities.Count; i++)
+        foreach (var entity in entities)
         {
-            var entity = entities[i];
-            entity.Id = baseId + i;
+            if (string.IsNullOrEmpty(entity.Id.ToString()))
+                entity.Id = EntityUtil.GenerateSnowflakeId();
             entity.CreateTime ??= DateTime.UtcNow;
             entity.UpdateTime ??= DateTime.UtcNow;
 
@@ -121,7 +124,7 @@ public partial class ArticleRedisRepository
 
             tasks.Add(_redis.HashSetAsync(key, hash));
             tasks.Add(_redis.SetAddAsync($"{TOPIC_INDEX}{entity.TopicId}", entity.Id));
-            if (entity.ParentArticleId.HasValue)
+            if (entity.ParentArticleId != null)
             {
                 tasks.Add(_redis.SetAddAsync($"{PARENT_INDEX}{entity.ParentArticleId}", entity.Id));
             }
@@ -153,7 +156,7 @@ public partial class ArticleRedisRepository
         throw new NotImplementedException();
     }
 
-    public async Task<bool> DeleteAsync(int id)
+    public async Task<bool> DeleteAsync(long id)
     {
         var article = await GetByIdAsync(id);
         if (article == null) return false;
@@ -169,7 +172,7 @@ public partial class ArticleRedisRepository
     }
 
 
-    public async Task<bool> DeleteBatchAsync(List<int> ids)
+    public async Task<bool> DeleteBatchAsync(List<long> ids)
     {
         var tasks = new List<Task>();
         foreach (var id in ids)

@@ -1,7 +1,7 @@
 ﻿namespace FF.Articles.Backend.Contents.API.Models.Requests.Topics;
 public class TopicEditRequest
 {
-    public int TopicId { get; set; }
+    public long TopicId { get; set; }
     public string? Title { get; set; }
     public string? Abstract { get; set; }
     public string? Content { get; set; }

@@ -8,7 +8,7 @@ public class Topic : BaseEntity
     public string Abstract { get; set; } = "";
     public string Category { get; set; } = "";
     public string? TopicImage { get; set; }
-    public int UserId { get; set; }
+    public long UserId { get; set; }
     public int SortNumber { get; set; }
     public int IsHidden { get; set; }
 }

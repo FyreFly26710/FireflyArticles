@@ -22,7 +22,7 @@ public class UserUtil
             throw new UnauthorizedAccessException("User not found");
         return JsonSerializer.Deserialize<UserApiDto>(user.Value);
     }
-    public static int GetUserId(HttpRequest request)
+    public static long GetUserId(HttpRequest request)
     {
         var user = GetUserFromHttpRequest(request);
         return user.UserId;

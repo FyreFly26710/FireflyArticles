@@ -19,27 +19,27 @@ namespace FF.Articles.Backend.Identity.API.Controllers;
 [Route("api/identity/auth")]
 public class AuthController(
     IUserService _userService,
-    IOAuthService _oAuthService, 
-    ILogger<AuthController> _logger, 
+    IOAuthService _oAuthService,
+    ILogger<AuthController> _logger,
     IConfiguration _config)
     : ControllerBase
 {
 
     [HttpPost("register")]
-    public async Task<ApiResponse<int>> Register([FromBody] UserRegisterRequest userRegisterRequest)
+    public async Task<ApiResponse<string>> Register([FromBody] UserRegisterRequest userRegisterRequest)
     {
         if (userRegisterRequest == null)
-            return ResultUtil.Error<int>(ErrorCode.PARAMS_ERROR);
+            return ResultUtil.Error<string>(ErrorCode.PARAMS_ERROR);
 
         string userAccount = userRegisterRequest.UserAccount;
         string userPassword = userRegisterRequest.UserPassword;
         string confirmPassword = userRegisterRequest.confirmPassword;
         if (string.IsNullOrWhiteSpace(userAccount) || string.IsNullOrWhiteSpace(userPassword) || string.IsNullOrWhiteSpace(confirmPassword))
-            return ResultUtil.Error<int>(ErrorCode.PARAMS_ERROR, "User account, password, and confirm password cannot be blank.");
+            return ResultUtil.Error<string>(ErrorCode.PARAMS_ERROR, "User account, password, and confirm password cannot be blank.");
 
-        int result = await _userService.UserRegister(userAccount, userPassword, confirmPassword);
+        long result = await _userService.UserRegister(userAccount, userPassword, confirmPassword);
 
-        return ResultUtil.Success(result);
+        return ResultUtil.Success(result.ToString());
     }
     [HttpPost("login")]
     public async Task<ApiResponse<LoginUserDto>> Login([FromBody] UserLoginRequest userLoginRequest)
@@ -88,7 +88,7 @@ public class AuthController(
 
         // Redirect to home
         string? homePage = _config["Domain:Home"];
-        return Redirect(homePage??"/");
+        return Redirect(homePage ?? "/");
     }
 
 

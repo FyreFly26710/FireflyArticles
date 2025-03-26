@@ -20,10 +20,10 @@ public abstract class BaseRepository<TEntity, TContext>
     /// No Tracking by default
     /// </summary>
     public virtual IQueryable<TEntity> GetQueryable() => _context.Set<TEntity>().AsQueryable();
-    public virtual async Task<bool> ExistsAsync(int id) => await _context.Set<TEntity>().AnyAsync(e => e.Id == id);
+    public virtual async Task<bool> ExistsAsync(long id) => await _context.Set<TEntity>().AnyAsync(e => e.Id == id);
     public virtual async Task<bool> SaveChangesAsync() => await _context.SaveChangesAsync() > 0;
 
-    public virtual async Task<TEntity?> GetByIdAsync(int id, bool asTracking = false)
+    public virtual async Task<TEntity?> GetByIdAsync(long id, bool asTracking = false)
     {
         var query = _context.Set<TEntity>().AsQueryable();
         if (asTracking)
@@ -37,7 +37,7 @@ public abstract class BaseRepository<TEntity, TContext>
             query = query.AsTracking();
         return await query.ToListAsync();
     }
-    public virtual async Task<List<TEntity>> GetByIdsAsync(List<int> ids, bool asTracking = false)
+    public virtual async Task<List<TEntity>> GetByIdsAsync(List<long> ids, bool asTracking = false)
     {
         var query = _context.Set<TEntity>().AsQueryable();
         if (asTracking)
@@ -50,9 +50,10 @@ public abstract class BaseRepository<TEntity, TContext>
     }
 
 
-    public virtual async Task<int> CreateAsync(TEntity entity)
+    public virtual async Task<long> CreateAsync(TEntity entity)
     {
-        entity.Id = EntityUtil.GenerateId();
+        if (entity.Id == 0)
+            entity.Id = EntityUtil.GenerateSnowflakeId();
 
         var entityType = _context.Model.FindEntityType(typeof(TEntity));
 
@@ -91,7 +92,8 @@ public abstract class BaseRepository<TEntity, TContext>
         }
         foreach (var entity in entities)
         {
-            entity.Id = EntityUtil.GenerateId();
+            if (entity.Id == 0)
+                entity.Id = EntityUtil.GenerateSnowflakeId();
         }
         await _context.Set<TEntity>().AddRangeAsync(entities);
         //await _context.SaveChangesAsync();
@@ -172,7 +174,7 @@ public abstract class BaseRepository<TEntity, TContext>
     //    }
     //}
 
-    public virtual async Task<bool> DeleteAsync(int id)
+    public virtual async Task<bool> DeleteAsync(long id)
     {
         var entity = await GetByIdAsync(id, true);
         if (entity == null)
@@ -191,7 +193,7 @@ public abstract class BaseRepository<TEntity, TContext>
         return true;
     }
 
-    public virtual async Task<bool> DeleteBatchAsync(List<int> ids)
+    public virtual async Task<bool> DeleteBatchAsync(List<long> ids)
     {
         var entities = await GetByIdsAsync(ids, true);
         var entityType = _context.Model.FindEntityType(typeof(TEntity));
@@ -208,7 +210,7 @@ public abstract class BaseRepository<TEntity, TContext>
         return true;
     }
 
-    public virtual async Task<bool> HardDeleteAsync(int id)
+    public virtual async Task<bool> HardDeleteAsync(long id)
     {
         var entity = await GetByIdAsync(id, true);
         if (entity == null)

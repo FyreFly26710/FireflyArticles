@@ -21,14 +21,14 @@ public class TopicService : RedisService<Topic>, ITopicService
         ITopicRedisRepository topicRedisRepository,
         IArticleRedisRepository articleRedisRepository,
         IIdentityRemoteService identityRemoteService,
-        IArticleService articleService,
+        Func<string, IArticleService> articleService,
         ILogger<TopicService> logger)
         : base(topicRedisRepository, logger)
     {
         _topicRedisRepository = topicRedisRepository;
         _articleRedisRepository = articleRedisRepository;
         _identityRemoteService = identityRemoteService;
-        _articleService = articleService;
+        _articleService = articleService("v2");
     }
 
     public async Task<TopicDto> GetTopicDto(Topic topic) => await GetTopicDto(topic, new TopicQueryRequest());
@@ -75,7 +75,7 @@ public class TopicService : RedisService<Topic>, ITopicService
             .FirstOrDefault(t => t.Title.Trim().ToLower() == title.Trim().ToLower());
         return topics;
     }
-    public async Task<bool> DeleteAsync(int topicId)
+    public async Task<bool> DeleteAsync(long topicId)
     {
         await _articleRedisRepository.SetTopicIdToZero(topicId);
         await _topicRedisRepository.DeleteAsync(topicId);

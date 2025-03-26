@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore;
 using FF.Articles.Backend.Contents.API.Models.Entities;
+using FF.Articles.Backend.Contents.API.Constants;
 
 namespace FF.Articles.Backend.Contents.API.Infrastructure;
 public class ContentsDbContext : DbContext
@@ -37,11 +38,18 @@ public class ContentsDbContext : DbContext
         modelBuilder.Entity<Article>(entity =>
         {
             entity.ToTable("Article");
-            entity.Property(e => e.Title).HasMaxLength(1000).IsRequired().HasDefaultValue("");
-            entity.Property(e => e.Abstract).HasMaxLength(4000).IsRequired().HasDefaultValue("");
+            entity.Property(e => e.Title).HasMaxLength(64).IsRequired().HasDefaultValue("");
+            entity.Property(e => e.Abstract).HasMaxLength(512).IsRequired().HasDefaultValue("");
             entity.Property(e => e.Content).HasColumnType("NVARCHAR(MAX)").HasDefaultValue("");
+            entity.Property(e => e.ArticleType).HasMaxLength(32).IsRequired().HasDefaultValue(ArticleTypes.Article);
+            entity.Property(e => e.ParentArticleId).HasDefaultValue(0L);
+            entity.Property(e => e.UserId).HasDefaultValue(0L);
+            entity.Property(e => e.TopicId).HasDefaultValue(0L);
+            entity.Property(e => e.SortNumber).HasDefaultValue(0);
             entity.Property(e => e.IsHidden).IsRequired().HasDefaultValue(0);
-
+            
+            entity.HasIndex(e => new { e.TopicId, e.SortNumber }).HasDatabaseName("IX_Article_TopicId_SortNumber");
+            entity.HasIndex(e => e.ParentArticleId).HasDatabaseName("IX_Article_ParentArticleId");
         });
     }
     private void ConfigureTopic(ModelBuilder modelBuilder)
@@ -51,10 +59,14 @@ public class ContentsDbContext : DbContext
         modelBuilder.Entity<Topic>(entity =>
         {
             entity.ToTable("Topic");
-            entity.Property(e => e.Title).HasMaxLength(1000).IsRequired().HasDefaultValue("");
-            entity.Property(e => e.Abstract).HasMaxLength(4000).IsRequired().HasDefaultValue("");
+            entity.Property(e => e.Title).HasMaxLength(64).IsRequired().HasDefaultValue("");
+            entity.Property(e => e.Abstract).HasMaxLength(512).IsRequired().HasDefaultValue("");
+            entity.Property(e => e.Content).HasColumnType("NVARCHAR(MAX)").HasDefaultValue("");
+            entity.Property(e => e.Category).HasMaxLength(64).IsRequired().HasDefaultValue("");
+            entity.Property(e => e.TopicImage).HasMaxLength(2048).IsRequired().HasDefaultValue("");
+            entity.Property(e => e.UserId).HasDefaultValue(0L);
+            entity.Property(e => e.SortNumber).HasDefaultValue(0);
             entity.Property(e => e.IsHidden).IsRequired().HasDefaultValue(0);
-
         });
     }
     private void ConfigureTag(ModelBuilder modelBuilder)
@@ -64,7 +76,7 @@ public class ContentsDbContext : DbContext
         modelBuilder.Entity<Tag>(entity =>
         {
             entity.ToTable("Tag");
-            entity.Property(e => e.TagName).HasMaxLength(255).IsRequired();
+            entity.Property(e => e.TagName).HasMaxLength(64).IsRequired();
         });
     }
     private void ConfigureArticleTag(ModelBuilder modelBuilder)

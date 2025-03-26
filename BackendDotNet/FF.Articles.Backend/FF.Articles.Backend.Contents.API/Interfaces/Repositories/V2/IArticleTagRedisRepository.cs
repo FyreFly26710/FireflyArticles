@@ -7,12 +7,12 @@ namespace FF.Articles.Backend.Contents.API.Interfaces.Repositories.V2;
 
 public interface IArticleTagRedisRepository : IRedisRepository<ArticleTag>
 {
-    Task<List<ArticleTag>> GetByArticleId(int articleId);
-    Task<Dictionary<int, List<ArticleTag>>> GetArticleTagGroupsByArticleIds(List<int> articleIds);
-    Task<bool> EditArticleTags(int articleId, List<int> tagIds);
-    Task<bool> DeleteByArticleId(int articleId);
-    Task<bool> DeleteByTagId(int tagId);
-    Task<List<ArticleTag>> GetByTagId(int tagId);
-    Task<List<ArticleTag>> GetByArticleIds(List<int> articleIds);
-    Task<List<ArticleTag>> GetByTagIds(List<int> tagIds);
+    Task<List<ArticleTag>> GetByArticleId(long articleId);
+    Task<Dictionary<long, List<ArticleTag>>> GetArticleTagGroupsByArticleIds(List<long> articleIds);
+    Task<bool> EditArticleTags(long articleId, List<long> tagIds);
+    Task<bool> DeleteByArticleId(long articleId);
+    Task<bool> DeleteByTagId(long tagId);
+    Task<List<ArticleTag>> GetByTagId(long tagId);
+    Task<List<ArticleTag>> GetByArticleIds(List<long> articleIds);
+    Task<List<ArticleTag>> GetByTagIds(List<long> tagIds);
 }

@@ -83,7 +83,7 @@ public class TopicService : BaseService<Topic, ContentsDbContext>, ITopicService
         return await _topicRepository.GetQueryable()
             .FirstOrDefaultAsync(t => t.Title.Trim().ToLower() == title.Trim().ToLower());
     }
-    public override async Task<bool> DeleteAsync(int topicId)
+    public override async Task<bool> DeleteAsync(long topicId)
     {
         await _contentsUnitOfWork.ExecuteInTransactionAsync(async () =>
         {

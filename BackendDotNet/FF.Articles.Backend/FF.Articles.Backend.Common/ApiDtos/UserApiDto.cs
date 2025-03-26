@@ -7,7 +7,7 @@ namespace FF.Articles.Backend.Common.ApiDtos;
 /// </summary>
 public class UserApiDto
 {
-    public int UserId { get; set; }
+    public long UserId { get; set; }
     public DateTime? CreateTime { get; set; }
 
     public string UserAccount { get; set; }

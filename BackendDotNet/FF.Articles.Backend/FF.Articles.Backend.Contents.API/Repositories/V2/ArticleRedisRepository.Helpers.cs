@@ -43,7 +43,7 @@ public partial class ArticleRedisRepository
         };
         return new HashEntry(propertyName, val);
     }
-    private Article GetArticleFromHashEntry(HashEntry[] hash, int id)
+    private Article GetArticleFromHashEntry(HashEntry[] hash, long id)
     {
         var dict = hash.ToDictionary(x => x.Name.ToString(), x => x.Value.ToString());
 
@@ -55,10 +55,10 @@ public partial class ArticleRedisRepository
             Abstract = dict[ArticleProperty.Abstract],
             ArticleType = dict[ArticleProperty.ArticleType],
             ParentArticleId = dict.TryGetValue(ArticleProperty.ParentArticleId, out var parentId) && !string.IsNullOrEmpty(parentId)
-                              ? int.Parse(parentId)
+                              ? long.Parse(parentId)
                               : null,
-            UserId = int.Parse(dict[ArticleProperty.UserId]),
-            TopicId = int.Parse(dict[ArticleProperty.TopicId]),
+            UserId = long.Parse(dict[ArticleProperty.UserId]),
+            TopicId = long.Parse(dict[ArticleProperty.TopicId]),
             SortNumber = int.Parse(dict[ArticleProperty.SortNumber]),
             IsHidden = int.Parse(dict[ArticleProperty.IsHidden]),
             CreateTime = DateTime.Parse(dict[ArticleProperty.CreateTime]),
@@ -79,7 +79,7 @@ public partial class ArticleRedisRepository
         if (oldEntity != null && newEntity == null)
         {
             tasks.Add(batch.SetRemoveAsync($"{TOPIC_INDEX}{oldEntity.TopicId}", oldEntity.Id));
-            if (oldEntity.ParentArticleId.HasValue)
+            if (oldEntity.ParentArticleId != null)
             {
                 tasks.Add(batch.SetRemoveAsync($"{PARENT_INDEX}{oldEntity.ParentArticleId}", oldEntity.Id));
             }
@@ -89,7 +89,7 @@ public partial class ArticleRedisRepository
         else if (newEntity != null && oldEntity == null)
         {
             tasks.Add(batch.SetAddAsync($"{TOPIC_INDEX}{newEntity.TopicId}", newEntity.Id));
-            if (newEntity.ParentArticleId.HasValue)
+            if (newEntity.ParentArticleId != null)
             {
                 tasks.Add(batch.SetAddAsync($"{PARENT_INDEX}{newEntity.ParentArticleId}", newEntity.Id));
             }
@@ -105,11 +105,11 @@ public partial class ArticleRedisRepository
             }
             if (oldEntity.ParentArticleId != newEntity.ParentArticleId)
             {
-                if (oldEntity.ParentArticleId.HasValue)
+                if (oldEntity.ParentArticleId != null)
                 {
                     tasks.Add(batch.SetRemoveAsync($"{PARENT_INDEX}{oldEntity.ParentArticleId}", oldEntity.Id));
                 }
-                if (newEntity.ParentArticleId.HasValue)
+                if (newEntity.ParentArticleId != null)
                 {
                     tasks.Add(batch.SetAddAsync($"{PARENT_INDEX}{newEntity.ParentArticleId}", newEntity.Id));
                 }

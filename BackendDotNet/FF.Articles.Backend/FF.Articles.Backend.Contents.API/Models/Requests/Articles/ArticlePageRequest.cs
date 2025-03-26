@@ -4,7 +4,7 @@ namespace FF.Articles.Backend.Contents.API.Models.Requests.Articles
 {
     public class ArticleQueryRequest : PageRequest
     {
-        public int? ArticleId { get; set; } = null;
+        public long? ArticleId { get; set; } = null;
         public bool IncludeUser { get; set; } = false;
         /// <summary>
         /// Inlcude sub articles as children
@@ -19,8 +19,8 @@ namespace FF.Articles.Backend.Contents.API.Models.Requests.Articles
 
         #region Search fields
         public string? Keyword { get; set; }
-        public List<int>? TopicIds { get; set; }
-        public List<int>? TagIds { get; set; }
+        public List<long>? TopicIds { get; set; }
+        public List<long>? TagIds { get; set; }
 
         #endregion
 

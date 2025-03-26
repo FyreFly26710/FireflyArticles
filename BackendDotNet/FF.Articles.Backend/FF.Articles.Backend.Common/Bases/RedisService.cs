@@ -17,18 +17,18 @@ where TEntity : BaseEntity
     }
 
 
-    public Task<int> CreateAsync(TEntity entity) => _redisRepository.CreateAsync(entity);
+    public Task<long> CreateAsync(TEntity entity) => _redisRepository.CreateAsync(entity);
 
-    public Task<bool> DeleteAsync(int id) => _redisRepository.DeleteAsync(id);
+    public Task<bool> DeleteAsync(long id) => _redisRepository.DeleteAsync(id);
 
     public Task<List<TEntity>> GetAllAsync() => _redisRepository.GetAllAsync();
 
     public Task<Paged<TEntity>> GetAllAsync(PageRequest pageRequest) => _redisRepository.GetPagedAsync(pageRequest);
 
 
-    public Task<TEntity?> GetByIdAsync(int id) => _redisRepository.GetByIdAsync(id);
+    public Task<TEntity?> GetByIdAsync(long id) => _redisRepository.GetByIdAsync(id);
 
-    public Task<List<TEntity>> GetByIdsAsync(List<int> ids) => _redisRepository.GetByIdsAsync(ids);
+    public Task<List<TEntity>> GetByIdsAsync(List<long> ids) => _redisRepository.GetByIdsAsync(ids);
 
     public Task<bool> UpdateAsync(TEntity entity) => _redisRepository.UpdateAsync(entity);
 

@@ -11,9 +11,9 @@ public class Article : BaseEntity
     ///  Article = 1, SubArticle = 2, TopicArticle = 3
     /// </summary>
     public string ArticleType { get; set; } = ArticleTypes.Article;
-    public int? ParentArticleId { get; set; }
-    public int UserId { get; set; }
-    public int TopicId { get; set; }
+    public long? ParentArticleId { get; set; }
+    public long UserId { get; set; }
+    public long TopicId { get; set; }
     public int SortNumber { get; set; }
     public int IsHidden { get; set; }
 

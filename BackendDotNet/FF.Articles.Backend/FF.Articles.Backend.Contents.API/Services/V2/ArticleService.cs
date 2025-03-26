@@ -65,7 +65,7 @@ public class ArticleService : RedisService<Article>, IArticleService
             return new List<ArticleDto>();
 
         // Get tags for all articles
-        Dictionary<int, List<ArticleTag>> articleTagDict = await _articleTagRedisRepository.GetArticleTagGroupsByArticleIds([.. articles.Select(a => a.Id).Distinct()]);
+        Dictionary<long, List<ArticleTag>> articleTagDict = await _articleTagRedisRepository.GetArticleTagGroupsByArticleIds([.. articles.Select(a => a.Id).Distinct()]);
         var tagIds = articleTagDict.Values.SelectMany(at => at.Select(a => a.TagId)).Distinct().ToList();
         var totalTags = await _tagRedisRepository.GetByIdsAsync(tagIds);
         var tagDict = articleTagDict.ToDictionary(
@@ -73,7 +73,7 @@ public class ArticleService : RedisService<Article>, IArticleService
             kvp => kvp.Value.Select(at => totalTags.First(t => t.Id == at.TagId)).ToList()
             );
         // Get users if requested
-        Dictionary<int, UserApiDto?> userDict = new();
+        Dictionary<long, UserApiDto?> userDict = new();
         if (articleRequest.IncludeUser)
         {
             var userIds = articles.Select(a => a.UserId).Distinct().ToList();
@@ -144,7 +144,7 @@ public class ArticleService : RedisService<Article>, IArticleService
         if (articleEditRequest.Abstract != null && article.Abstract != articleEditRequest.Abstract)
             article.Abstract = articleEditRequest.Abstract;
         if (articleEditRequest.TopicId != null && article.TopicId != articleEditRequest.TopicId)
-            article.TopicId = (int)articleEditRequest.TopicId;
+            article.TopicId = (long)articleEditRequest.TopicId;
         if (articleEditRequest.ArticleType != null && article.ArticleType != articleEditRequest.ArticleType)
         {
             if (article.ArticleType == ArticleTypes.Article)
@@ -155,7 +155,7 @@ public class ArticleService : RedisService<Article>, IArticleService
         }
         if (articleEditRequest.ParentArticleId != null && article.ParentArticleId != articleEditRequest.ParentArticleId)
         {
-            article.ParentArticleId = (int)articleEditRequest.ParentArticleId;
+            article.ParentArticleId = articleEditRequest.ParentArticleId;
         }
         if (articleEditRequest.SortNumber != null && article.SortNumber != articleEditRequest.SortNumber)
             article.SortNumber = (int)articleEditRequest.SortNumber;
@@ -169,9 +169,9 @@ public class ArticleService : RedisService<Article>, IArticleService
         return true;
     }
 
-    public async Task<bool> DeleteArticleById(int id)
+    public async Task<bool> DeleteArticleById(long id)
     {
-        if (id <= 0)
+        if (id == 0)
             throw new ArgumentException("Invalid article id", nameof(id));
         await _articleRedisRepository.PromoteSubArticlesToArticles(id);
         await _articleRedisRepository.DeleteAsync(id);
@@ -179,7 +179,7 @@ public class ArticleService : RedisService<Article>, IArticleService
         return true;
     }
 
-    public async Task<bool> EditContentBatch(Dictionary<int, string> batchEditConentRequests)
+    public async Task<bool> EditContentBatch(Dictionary<long, string> batchEditConentRequests)
     {
         var articles = await _articleRedisRepository.GetByIdsAsync(batchEditConentRequests.Keys.ToList());
         if (articles == null || articles.Count != batchEditConentRequests.Count)
@@ -189,7 +189,7 @@ public class ArticleService : RedisService<Article>, IArticleService
         return true;
     }
 
-    public async Task<Dictionary<int, string>> CreateBatchAsync(List<ArticleAddRequest> articleAddRequests, int userId)
+    public async Task<Dictionary<long, string>> CreateBatchAsync(List<ArticleAddRequest> articleAddRequests, long userId)
     {
         var articles = articleAddRequests.Select(request => request.ToEntity(userId)).ToList();
         articles = await _articleRedisRepository.CreateBatchAsync(articles);
@@ -207,7 +207,7 @@ public class ArticleService : RedisService<Article>, IArticleService
         return articles.ToDictionary(a => a.Id, a => a.Title);
     }
 
-    public async Task<int> CreateByRequest(ArticleAddRequest articleAddRequest, int userId)
+    public async Task<long> CreateByRequest(ArticleAddRequest articleAddRequest, long userId)
     {
         var entity = articleAddRequest.ToEntity(userId);
         var id = await _articleRedisRepository.CreateAsync(entity);

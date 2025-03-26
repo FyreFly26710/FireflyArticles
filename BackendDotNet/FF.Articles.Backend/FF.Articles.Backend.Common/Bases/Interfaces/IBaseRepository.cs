@@ -6,14 +6,14 @@ public interface IBaseRepository<TEntity, TContext>
     where TEntity : BaseEntity
     where TContext : DbContext
 {
-    Task<TEntity?> GetByIdAsync(int id, bool asTracking = false);
-    Task<List<TEntity>> GetByIdsAsync(List<int> ids, bool asTracking = false);
+    Task<TEntity?> GetByIdAsync(long id, bool asTracking = false);
+    Task<List<TEntity>> GetByIdsAsync(List<long> ids, bool asTracking = false);
     Task<List<TEntity>> GetAllAsync(bool asTracking = false);
     Task<Paged<TEntity>> GetAllAsync(PageRequest pageRequest);
     Task<Paged<TEntity>> GetPagedFromQueryAsync(IQueryable<TEntity> query, PageRequest pageRequest);
     IQueryable<TEntity> ApplyPageRequestQuery(IQueryable<TEntity> query, PageRequest pageRequest);
     IQueryable<TEntity> GetQueryable();
-    Task<int> CreateAsync(TEntity entity);
+    Task<long> CreateAsync(TEntity entity);
     Task<List<TEntity>> CreateBatchAsync(List<TEntity> entities);
     /// <summary>
     /// Fetch the original entity from DB <br/>
@@ -29,10 +29,10 @@ public interface IBaseRepository<TEntity, TContext>
     /// </summary>
     bool UpdateChecker(TEntity trackedEntity, TEntity dbEntity);
     //Task UpdateBatchAsync(List<TEntity> entities);
-    Task<bool> DeleteAsync(int id);
-    Task<bool> HardDeleteAsync(int id);
-    Task<bool> DeleteBatchAsync(List<int> ids);
-    Task<bool> ExistsAsync(int id);
+    Task<bool> DeleteAsync(long id);
+    Task<bool> HardDeleteAsync(long id);
+    Task<bool> DeleteBatchAsync(List<long> ids);
+    Task<bool> ExistsAsync(long id);
     Task<bool> SaveChangesAsync();
 }
 

@@ -15,7 +15,7 @@ public class ArticleRepository : BaseRepository<Article, ContentsDbContext>, IAr
 
 
 
-    public IQueryable<Article> BuildTagIdsSearchQuery(List<int> tagIds, IQueryable<Article> query)
+    public IQueryable<Article> BuildTagIdsSearchQuery(List<long> tagIds, IQueryable<Article> query)
     {
         return from a in query
                join at in _context.Set<ArticleTag>() on a.Id equals at.ArticleId
@@ -23,7 +23,7 @@ public class ArticleRepository : BaseRepository<Article, ContentsDbContext>, IAr
                select a;
     }
 
-    public async Task PromoteSubArticlesToArticles(int articleId)
+    public async Task PromoteSubArticlesToArticles(long articleId)
     {
         var subArticles = GetQueryable().AsTracking()
             .Where(x => x.ParentArticleId == articleId
@@ -40,7 +40,7 @@ public class ArticleRepository : BaseRepository<Article, ContentsDbContext>, IAr
     public IQueryable<Article> BuildSearchQueryFromRequest(ArticleQueryRequest request)
     {
         var keyword = request.Keyword;
-        List<int>? topicIds = request.TopicIds;
+        List<long>? topicIds = request.TopicIds;
         var tagIds = request.TagIds;
         var displaySubArticles = request.DisplaySubArticles;
 
@@ -63,7 +63,7 @@ public class ArticleRepository : BaseRepository<Article, ContentsDbContext>, IAr
         }
         return query;
     }
-    public async Task SetTopicIdToZero(int topicId)
+    public async Task SetTopicIdToZero(long topicId)
     {
         var articles = await GetQueryable().AsTracking().Where(x => x.TopicId == topicId).ToListAsync();
         foreach (var article in articles)
@@ -71,7 +71,7 @@ public class ArticleRepository : BaseRepository<Article, ContentsDbContext>, IAr
             article.TopicId = 0;
             article.UpdateTime = DateTime.UtcNow;
         }
-        
+
     }
 
 }

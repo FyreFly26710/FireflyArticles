@@ -19,15 +19,15 @@ namespace FF.Articles.Backend.Contents.API.Infrastructure.Migrations
                 schema: "Contents",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false),
-                    Title = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false, defaultValue: ""),
+                    Id = table.Column<long>(type: "bigint", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: false, defaultValue: ""),
                     Content = table.Column<string>(type: "NVARCHAR(MAX)", nullable: false, defaultValue: ""),
-                    Abstract = table.Column<string>(type: "nvarchar(4000)", maxLength: 4000, nullable: false, defaultValue: ""),
-                    ArticleType = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ParentArticleId = table.Column<int>(type: "int", nullable: true),
-                    UserId = table.Column<int>(type: "int", nullable: false),
-                    TopicId = table.Column<int>(type: "int", nullable: false),
-                    SortNumber = table.Column<int>(type: "int", nullable: false),
+                    Abstract = table.Column<string>(type: "nvarchar(512)", maxLength: 512, nullable: false, defaultValue: ""),
+                    ArticleType = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: false, defaultValue: "Article"),
+                    ParentArticleId = table.Column<long>(type: "bigint", nullable: true, defaultValue: 0L),
+                    UserId = table.Column<long>(type: "bigint", nullable: false, defaultValue: 0L),
+                    TopicId = table.Column<long>(type: "bigint", nullable: false, defaultValue: 0L),
+                    SortNumber = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
                     IsHidden = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
                     CreateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UpdateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -43,9 +43,9 @@ namespace FF.Articles.Backend.Contents.API.Infrastructure.Migrations
                 schema: "Contents",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false),
-                    ArticleId = table.Column<int>(type: "int", nullable: false),
-                    TagId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<long>(type: "bigint", nullable: false),
+                    ArticleId = table.Column<long>(type: "bigint", nullable: false),
+                    TagId = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -57,8 +57,8 @@ namespace FF.Articles.Backend.Contents.API.Infrastructure.Migrations
                 schema: "Contents",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false),
-                    TagName = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false)
+                    Id = table.Column<long>(type: "bigint", nullable: false),
+                    TagName = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -70,14 +70,14 @@ namespace FF.Articles.Backend.Contents.API.Infrastructure.Migrations
                 schema: "Contents",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false),
-                    Title = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false, defaultValue: ""),
-                    Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Abstract = table.Column<string>(type: "nvarchar(4000)", maxLength: 4000, nullable: false, defaultValue: ""),
-                    Category = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    TopicImage = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UserId = table.Column<int>(type: "int", nullable: false),
-                    SortNumber = table.Column<int>(type: "int", nullable: false),
+                    Id = table.Column<long>(type: "bigint", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: false, defaultValue: ""),
+                    Content = table.Column<string>(type: "NVARCHAR(MAX)", nullable: false, defaultValue: ""),
+                    Abstract = table.Column<string>(type: "nvarchar(512)", maxLength: 512, nullable: false, defaultValue: ""),
+                    Category = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: false, defaultValue: ""),
+                    TopicImage = table.Column<string>(type: "nvarchar(2048)", maxLength: 2048, nullable: false, defaultValue: ""),
+                    UserId = table.Column<long>(type: "bigint", nullable: false, defaultValue: 0L),
+                    SortNumber = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
                     IsHidden = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
                     CreateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UpdateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -87,6 +87,18 @@ namespace FF.Articles.Backend.Contents.API.Infrastructure.Migrations
                 {
                     table.PrimaryKey("PK_Topic", x => x.Id);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Article_ParentArticleId",
+                schema: "Contents",
+                table: "Article",
+                column: "ParentArticleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Article_TopicId_SortNumber",
+                schema: "Contents",
+                table: "Article",
+                columns: new[] { "TopicId", "SortNumber" });
         }
 
         /// <inheritdoc />

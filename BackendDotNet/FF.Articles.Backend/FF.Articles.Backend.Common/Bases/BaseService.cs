@@ -16,12 +16,12 @@ public abstract class BaseService<TEntity, TContext>
         this._repository = _repository;
         this._logger = _logger;
     }
-    public virtual async Task<TEntity?> GetByIdAsync(int id) => await _repository.GetByIdAsync(id);
+    public virtual async Task<TEntity?> GetByIdAsync(long id) => await _repository.GetByIdAsync(id);
     public virtual async Task<List<TEntity>> GetAllAsync() => await _repository.GetAllAsync();
-    public virtual async Task<List<TEntity>> GetByIdsAsync(List<int> ids) => await _repository.GetByIdsAsync(ids);
+    public virtual async Task<List<TEntity>> GetByIdsAsync(List<long> ids) => await _repository.GetByIdsAsync(ids);
     public virtual async Task<Paged<TEntity>> GetAllAsync(PageRequest pageRequest) => await _repository.GetAllAsync(pageRequest);
 
-    public virtual async Task<int> CreateAsync(TEntity entity)
+    public virtual async Task<long> CreateAsync(TEntity entity)
     {
         var id = await _repository.CreateAsync(entity);
         await _repository.SaveChangesAsync();
@@ -33,7 +33,7 @@ public abstract class BaseService<TEntity, TContext>
         var result = await _repository.SaveChangesAsync();
         return result;
     }
-    public virtual async Task<bool> DeleteAsync(int id)
+    public virtual async Task<bool> DeleteAsync(long id)
     {
         await _repository.DeleteAsync(id);
         await _repository.SaveChangesAsync();

@@ -19,7 +19,7 @@ public class UserService(IUserRepository _userRepository, ILogger<UserService> _
 {
     private const string SALT = "Firefly";
 
-    public async Task<int> UserRegister(string userAccount, string userPassword, string checkPassword)
+    public async Task<long> UserRegister(string userAccount, string userPassword, string checkPassword)
     {
         validateAccount(userAccount, userPassword, checkPassword);
 
@@ -38,7 +38,7 @@ public class UserService(IUserRepository _userRepository, ILogger<UserService> _
             UserPassword = encryptedPassword
         };
 
-        int userId = await this.CreateAsync(user);
+        long userId = await this.CreateAsync(user);
         return userId;
 
     }

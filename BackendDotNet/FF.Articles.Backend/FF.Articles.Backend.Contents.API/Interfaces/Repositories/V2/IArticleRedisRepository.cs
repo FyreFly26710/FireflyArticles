@@ -7,10 +7,10 @@ namespace FF.Articles.Backend.Contents.API.Interfaces.Repositories.V2
     public interface IArticleRedisRepository : IRedisRepository<Article>
     {
         Task<bool> UpdateAsync(Article newEntity, Article oldEntity);
-        Task<List<Article>> GetArticlesByTopicIdAsync(int topicId);
-        Task<List<Article>> GetChildArticlesAsync(int parentId);
-        Task PromoteSubArticlesToArticles(int articleId);
-        Task UpdateContentBatchAsync(Dictionary<int, string> batchEditConentRequests);
-        Task SetTopicIdToZero(int topicId);
+        Task<List<Article>> GetArticlesByTopicIdAsync(long topicId);
+        Task<List<Article>> GetChildArticlesAsync(long parentId);
+        Task PromoteSubArticlesToArticles(long articleId);
+        Task UpdateContentBatchAsync(Dictionary<long, string> batchEditConentRequests);
+        Task SetTopicIdToZero(long topicId);
     }
 }

@@ -15,10 +15,10 @@ public static class ArticleAddRequestExtensions
         });
         _mapper = config.CreateMapper();
     }
-    public static Article ToEntity(this ArticleAddRequest articleAddRequest, int? userId = null)
+    public static Article ToEntity(this ArticleAddRequest articleAddRequest, long? userId = null)
     {
         var article = _mapper.Map<Article>(articleAddRequest);
-        if (userId.HasValue)
+        if (userId != null)
         {
             article.UserId = userId.Value;
         }

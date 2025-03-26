@@ -10,7 +10,7 @@ namespace FF.Articles.Backend.AI.API.Services.RemoteServices;
 
 public class ContentsApiRemoteService(HttpClient _httpClient) : IContentsApiRemoteService
 {
-    public async Task<Dictionary<int, string>> AddBatchArticlesAsync(List<ArticleApiAddRequest> requests, HttpRequest httpRequest)
+    public async Task<Dictionary<long, string>> AddBatchArticlesAsync(List<ArticleApiAddRequest> requests, HttpRequest httpRequest)
     {
         string uri = RemoteApiUriConstant.ArticleBatchUri();
         var httpRequestMessage = CreateHttpRequestMessage(HttpMethod.Put, uri, requests, httpRequest);
@@ -18,12 +18,12 @@ public class ContentsApiRemoteService(HttpClient _httpClient) : IContentsApiRemo
 
         if (!response.IsSuccessStatusCode)
         {
-            return new Dictionary<int, string>();
+            return new Dictionary<long, string>();
         }
-        var res = await response.Content.ReadFromJsonAsync<ApiResponse<Dictionary<int, string>>>();
-        return  res?.Data ?? new();
+        var res = await response.Content.ReadFromJsonAsync<ApiResponse<Dictionary<long, string>>>();
+        return res?.Data ?? new();
     }
-    public async Task<bool> EditContentBatchAsync(Dictionary<int, string> batchEditConentRequests, HttpRequest httpRequest)
+    public async Task<bool> EditContentBatchAsync(Dictionary<long, string> batchEditConentRequests, HttpRequest httpRequest)
     {
         string uri = RemoteApiUriConstant.ArticleBatchEditContentUri();
         var httpRequestMessage = CreateHttpRequestMessage(HttpMethod.Post, uri, batchEditConentRequests, httpRequest);
@@ -48,7 +48,7 @@ public class ContentsApiRemoteService(HttpClient _httpClient) : IContentsApiRemo
         return true;
     }
 
-    public async Task<int> AddTopicByTitleAsync(string title, HttpRequest httpRequest)
+    public async Task<long> AddTopicByTitleAsync(string title, HttpRequest httpRequest)
     {
         var request = new { title };
         string uri = RemoteApiUriConstant.TopicUri();
@@ -59,7 +59,7 @@ public class ContentsApiRemoteService(HttpClient _httpClient) : IContentsApiRemo
         {
             return 0;
         }
-        var res = await response.Content.ReadFromJsonAsync<ApiResponse<int>>();
+        var res = await response.Content.ReadFromJsonAsync<ApiResponse<long>>();
         return res?.Data ?? 0;
     }
 

@@ -3,6 +3,6 @@
 namespace FF.Articles.Backend.Contents.API.Interfaces.Services.RemoteServices;
 public interface IIdentityRemoteService
 {
-    Task<UserApiDto?> GetUserByIdAsync(int userId);
+    Task<UserApiDto?> GetUserByIdAsync(long userId);
 
 }

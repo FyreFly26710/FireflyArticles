@@ -7,7 +7,7 @@ namespace FF.Articles.Backend.Identity.API.Models.Dtos;
 /// </summary>
 public class UserDto
 {
-    public int Id { get; set; }
+    public long Id { get; set; }
     public string UserAccount { get; set; }
     public string? UserName { get; set; }
     public string? UserEmail { get; set; }

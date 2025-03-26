@@ -7,7 +7,7 @@ namespace FF.Articles.Backend.Contents.API.Services.RemoteServices;
 public class IdentityRemoteService(HttpClient _httpClient)
     : IIdentityRemoteService
 {
-    public async Task<UserApiDto?> GetUserByIdAsync(int userId)
+    public async Task<UserApiDto?> GetUserByIdAsync(long userId)
     {
         var response = await _httpClient.GetAsync(RemoteApiUriConstant.GetUserApiDtoById(userId));
         if (!response.IsSuccessStatusCode)

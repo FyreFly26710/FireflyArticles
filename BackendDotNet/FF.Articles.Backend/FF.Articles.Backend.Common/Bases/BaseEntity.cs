@@ -1,8 +1,11 @@
-﻿namespace FF.Articles.Backend.Common.Bases;
+﻿using System.Text.Json.Serialization;
+
+namespace FF.Articles.Backend.Common.Bases;
 
 public abstract class BaseEntity
 {
-    public int Id { get; set; }
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public long Id { get; set; }
 
 
     #region Optional columns

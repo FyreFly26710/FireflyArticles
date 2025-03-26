@@ -11,24 +11,24 @@ public class ArticleTagRepository : BaseRepository<ArticleTag, ContentsDbContext
     {
     }
 
-    public async Task<List<ArticleTag>> GetByArticleId(int articleId)
+    public async Task<List<ArticleTag>> GetByArticleId(long articleId)
     {
         return await base.GetQueryable().Where(at => at.ArticleId == articleId).ToListAsync();
     }
-    public async Task<List<ArticleTag>> GetByArticleIds(List<int> articleIds)
+    public async Task<List<ArticleTag>> GetByArticleIds(List<long> articleIds)
     {
         return await base.GetQueryable().Where(at => articleIds.Contains(at.ArticleId)).ToListAsync();
     }
-    public async Task<List<ArticleTag>> GetByTagId(int tagId)
+    public async Task<List<ArticleTag>> GetByTagId(long tagId)
     {
         return await base.GetQueryable().Where(at => at.TagId == tagId).ToListAsync();
     }
-    public async Task<List<ArticleTag>> GetByTagIds(List<int> tagIds)
+    public async Task<List<ArticleTag>> GetByTagIds(List<long> tagIds)
     {
         return await base.GetQueryable().Where(at => tagIds.Contains(at.TagId)).ToListAsync();
     }
 
-    public async Task<bool> EditArticleTags(int articleId, List<int> tagIds)
+    public async Task<bool> EditArticleTags(long articleId, List<long> tagIds)
     {
         List<ArticleTag> currentArticleTags = await GetByArticleId(articleId);
         //List<int> existingTags = await _context.Set<Tag>().Select(t => t.Id).ToListAsync();
@@ -38,7 +38,7 @@ public class ArticleTagRepository : BaseRepository<ArticleTag, ContentsDbContext
             //     await base.CreateAsync(new ArticleTag { ArticleId = articleId, TagId = id });
             if (!currentArticleTags.Any(at => at.TagId == id))
                 await base.CreateAsync(new ArticleTag { ArticleId = articleId, TagId = id });
-            
+
         }
 
         foreach (var at in currentArticleTags)
@@ -48,21 +48,21 @@ public class ArticleTagRepository : BaseRepository<ArticleTag, ContentsDbContext
         }
         return true;
     }
-    public async Task<bool> DeleteByArticleId(int articleId)
+    public async Task<bool> DeleteByArticleId(long articleId)
     {
         var articleTags = await GetByArticleId(articleId);
         await base.DeleteBatchAsync(articleTags.Select(at => at.Id).ToList());
         return true;
     }
 
-    public async Task<bool> DeleteByTagId(int tagId)
+    public async Task<bool> DeleteByTagId(long tagId)
     {
         List<ArticleTag> articleTags = await GetByTagId(tagId);
         await base.DeleteBatchAsync(articleTags.Select(at => at.Id).ToList());
         return true;
     }
 
-    public async Task<Dictionary<int, List<Tag>>> GetTagGroupsByArticleIds(List<int> articleIds)
+    public async Task<Dictionary<long, List<Tag>>> GetTagGroupsByArticleIds(List<long> articleIds)
     {
         // Get article tags and their corresponding tags using a join
         var query = from at in _context.Set<ArticleTag>()

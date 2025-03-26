@@ -8,7 +8,7 @@ public class IdentityDbContext : DbContext
     public DbSet<User> Users { get; set; }
 
     public IdentityDbContext(DbContextOptions<IdentityDbContext> options)
-        : base(options) 
+        : base(options)
     {
         ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
     }
@@ -29,13 +29,13 @@ public class IdentityDbContext : DbContext
         modelBuilder.Entity<User>(entity =>
         {
             entity.ToTable("Users");
-            entity.Property(u => u.UserAccount).HasMaxLength(255).IsRequired();
-            entity.Property(u => u.UserPassword).HasMaxLength(255).IsRequired();
-            entity.Property(u => u.UserName).HasMaxLength(255);
-            entity.Property(u => u.UserAvatar).HasMaxLength(1024);
-            entity.Property(u => u.UserProfile).HasMaxLength(512);
-            entity.Property(u => u.UserRole).HasMaxLength(50).IsRequired().HasDefaultValue("user"); 
-
+            entity.Property(u => u.UserAccount).HasMaxLength(32).IsRequired();
+            entity.Property(u => u.UserPassword).HasMaxLength(32).IsRequired();
+            entity.Property(u => u.UserEmail).HasMaxLength(128);
+            entity.Property(u => u.UserName).HasMaxLength(32);
+            entity.Property(u => u.UserAvatar).HasMaxLength(2048);
+            entity.Property(u => u.UserProfile).HasMaxLength(2048);
+            entity.Property(u => u.UserRole).HasMaxLength(32).IsRequired().HasDefaultValue("user");
         });
     }
 

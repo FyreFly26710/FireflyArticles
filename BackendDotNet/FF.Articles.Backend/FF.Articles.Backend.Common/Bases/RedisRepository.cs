@@ -3,6 +3,7 @@ using System.Text.Json;
 using FF.Articles.Backend.Common.BackgoundJobs;
 using FF.Articles.Backend.Common.Bases.Interfaces;
 using FF.Articles.Backend.Common.Responses;
+using FF.Articles.Backend.Common.Utils;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 
@@ -25,33 +26,33 @@ public abstract class RedisRepository<TEntity> : IRedisRepository<TEntity>
         _hasTime = hasTime;
     }
     public string EntityKey { get => typeof(TEntity).Name; }
-    public async Task<int> GetNextIdAsync() => (int)await _redis.StringIncrementAsync($"id:{EntityKey}");
+    // public async Task<int> GetNextIdAsync() => (int)await _redis.StringIncrementAsync($"id:{EntityKey}");
 
-    public async Task<int> GetNextIdAsync(int count)
-    {
-        long startId = await _redis.StringIncrementAsync($"id:{EntityKey}", count);
-        long baseId = startId - count + 1;
-        return (int)baseId;
-    }
-
-    public string GetFieldKey(int id) => id.ToString();
-    public virtual async Task<bool> ExistsAsync(int id)
+    // public async Task<int> GetNextIdAsync(int count)
+    // {
+    //     long startId = await _redis.StringIncrementAsync($"id:{EntityKey}", count);
+    //     long baseId = startId - count + 1;
+    //     return (int)baseId;
+    // }
+    
+    public string GetFieldKey(long id) => id.ToString();
+    public virtual async Task<bool> ExistsAsync(long id)
     {
         return await _redis.HashExistsAsync(EntityKey, GetFieldKey(id));
     }
     // Get all ids in the entity
-    public virtual async Task<List<int>> ExistIdsAsync()
+    public virtual async Task<List<long>> ExistIdsAsync()
     {
         var ids = await _redis.HashKeysAsync(EntityKey);
-        return ids.Select(id => int.Parse(id)).ToList();
+        return ids.Select(id => (long)id).ToList();
     }
-    public virtual async Task<TEntity?> GetByIdAsync(int id)
+    public virtual async Task<TEntity?> GetByIdAsync(long id)
     {
         var value = await _redis.HashGetAsync(EntityKey, GetFieldKey(id));
         var entity = value.HasValue ? JsonSerializer.Deserialize<TEntity>(value!) : null;
         return entity;
     }
-    public virtual async Task<List<TEntity>> GetByIdsAsync(List<int> ids)
+    public virtual async Task<List<TEntity>> GetByIdsAsync(List<long> ids)
     {
         if (ids == null || ids.Count == 0)
             return [];
@@ -81,10 +82,11 @@ public abstract class RedisRepository<TEntity> : IRedisRepository<TEntity>
         return entities;
     }
 
-    public virtual async Task<int> CreateAsync(TEntity entity)
+    public virtual async Task<long> CreateAsync(TEntity entity)
     {
 
-        entity.Id = await GetNextIdAsync();
+        if (entity.Id == 0)
+            entity.Id = EntityUtil.GenerateSnowflakeId();
         if (_hasTime)
         {
             entity.CreateTime ??= DateTime.UtcNow;
@@ -102,13 +104,12 @@ public abstract class RedisRepository<TEntity> : IRedisRepository<TEntity>
 
     public async Task<List<TEntity>> CreateBatchAsync(List<TEntity> entities)
     {
-        int baseId = await GetNextIdAsync(entities.Count);
-
         var entries = new List<HashEntry>();
         for (int i = 0; i < entities.Count; i++)
         {
             var entity = entities[i];
-            entity.Id = baseId + i;
+            if (entity.Id == 0)
+                entity.Id = EntityUtil.GenerateSnowflakeId();
             if (_hasTime)
             {
                 entity.CreateTime ??= DateTime.UtcNow;
@@ -176,7 +177,7 @@ public abstract class RedisRepository<TEntity> : IRedisRepository<TEntity>
         await EnqueueChangesAsync(entities, ChangeType.Update);
     }
 
-    public virtual async Task<bool> DeleteAsync(int id)
+    public virtual async Task<bool> DeleteAsync(long id)
     {
         var entity = new TEntity { Id = id };
         await EnqueueChangeAsync(entity, ChangeType.Delete);
@@ -184,7 +185,7 @@ public abstract class RedisRepository<TEntity> : IRedisRepository<TEntity>
         return result;
     }
 
-    public virtual async Task<bool> DeleteBatchAsync(List<int> ids)
+    public virtual async Task<bool> DeleteBatchAsync(List<long> ids)
     {
         var keys = ids.Select(id => (RedisValue)GetFieldKey(id)).ToArray();
         await _redis.HashDeleteAsync(EntityKey, keys);

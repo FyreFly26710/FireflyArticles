@@ -47,7 +47,6 @@ public static class EFCoreUtil
         {
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Id).ValueGeneratedNever();  
-            entity.Property(e => e.IsDelete).HasDefaultValue(0);
         });
         modelBuilder.Entity<TEntity>().Ignore(e => e.UpdateTime);
         modelBuilder.Entity<TEntity>().Ignore(e => e.CreateTime);

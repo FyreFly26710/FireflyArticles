@@ -6,7 +6,7 @@ namespace FF.Articles.Backend.AI.API.MapperExtensions;
 
 public static class AIGenArticleExtensions
 {
-    public static ArticleApiAddRequest ToArticleApiRequest(this AIGenArticle aiGenArticle, int topicId)
+    public static ArticleApiAddRequest ToArticleApiRequest(this AIGenArticle aiGenArticle, long topicId)
     {
         return new ArticleApiAddRequest
         {
@@ -16,7 +16,7 @@ public static class AIGenArticleExtensions
             ArticleType = "Article",
             ParentArticleId = null,
             TopicId = topicId,
-            TagIds = new List<int>(),
+            TagIds = new List<long>(),
             SortNumber = aiGenArticle.Id,
             IsHidden = 0,
         };

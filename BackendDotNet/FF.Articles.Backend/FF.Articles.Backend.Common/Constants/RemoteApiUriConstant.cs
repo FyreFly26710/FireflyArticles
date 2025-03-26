@@ -7,7 +7,7 @@ public static class RemoteApiUriConstant
     /// <summary>
     /// identityApi/api/identity/admin/get-dto/{userId}
     /// </summary>
-    public static string GetUserApiDtoById(int userId) => IdentityBaseUri + $"/api/identity/users/{userId}";
+    public static string GetUserApiDtoById(long userId) => IdentityBaseUri + $"/api/identity/users/{userId}";
     public static string ArticleBatchUri() => ContentsBaseUri + $"/api/contents/articles/batch";
     public static string ArticleUri() => ContentsBaseUri + $"/api/contents/articles/";
     public static string ArticleBatchEditContentUri() => ContentsBaseUri + $"/api/contents/articles/content/batch";

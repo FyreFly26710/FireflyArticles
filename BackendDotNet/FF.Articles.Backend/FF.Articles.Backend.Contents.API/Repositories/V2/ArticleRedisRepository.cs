@@ -25,7 +25,7 @@ namespace FF.Articles.Backend.Contents.API.Repositories.V2
             _logger = logger;
         }
         private const string KEY_PREFIX = "Article:";
-        private const string ID_COUNTER = "Article:IdCounter";
+        // private const string ID_COUNTER = "Article:IdCounter";
         private const string TOPIC_INDEX = "Article:Topic:";
         private const string PARENT_INDEX = "Article:Parent:";
         // Use Set to store all article ids
@@ -82,23 +82,23 @@ namespace FF.Articles.Backend.Contents.API.Repositories.V2
             return true;
         }
 
-        public async Task<List<Article>> GetArticlesByTopicIdAsync(int topicId)
+        public async Task<List<Article>> GetArticlesByTopicIdAsync(long topicId)
         {
             var ids = await _redis.SetMembersAsync($"{TOPIC_INDEX}{topicId}");
-            return await GetByIdsAsync(ids.Select(id => (int)id).ToList());
+            return await GetByIdsAsync(ids.Select(id => (long)id).ToList());
         }
 
 
-        public async Task<List<Article>> GetChildArticlesAsync(int parentId)
+        public async Task<List<Article>> GetChildArticlesAsync(long parentId)
         {
             var ids = await _redis.SetMembersAsync($"{PARENT_INDEX}{parentId}");
-            return await GetByIdsAsync(ids.Select(id => (int)id).ToList());
+            return await GetByIdsAsync(ids.Select(id => (long)id).ToList());
         }
 
-        public async Task PromoteSubArticlesToArticles(int articleId)
+        public async Task PromoteSubArticlesToArticles(long articleId)
         {
             var ids = await _redis.SetMembersAsync($"{PARENT_INDEX}{articleId}");
-            var articles = await GetByIdsAsync(ids.Select(id => (int)id).ToList());
+            var articles = await GetByIdsAsync(ids.Select(id => (long)id).ToList());
             foreach (var article in articles)
             {
                 var oldEntity = article.Clone();
@@ -109,7 +109,7 @@ namespace FF.Articles.Backend.Contents.API.Repositories.V2
             }
         }
 
-        public async Task UpdateContentBatchAsync(Dictionary<int, string> batchEditConentRequests)
+        public async Task UpdateContentBatchAsync(Dictionary<long, string> batchEditConentRequests)
         {
             var articles = await GetByIdsAsync(batchEditConentRequests.Keys.ToList());
             foreach (var request in batchEditConentRequests)
@@ -122,7 +122,7 @@ namespace FF.Articles.Backend.Contents.API.Repositories.V2
                 await EnqueueChangeAsync(articles.First(a => a.Id == request.Key), ChangeType.Update);
             }
         }
-        public async Task SetTopicIdToZero(int topicId)
+        public async Task SetTopicIdToZero(long topicId)
         {
             var articles = (await GetAllAsync()).Where(a => a.TopicId == topicId).ToList();
             foreach (var article in articles)

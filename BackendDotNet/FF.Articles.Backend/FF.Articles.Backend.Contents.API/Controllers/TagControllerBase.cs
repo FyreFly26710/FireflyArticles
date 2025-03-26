@@ -20,7 +20,7 @@ public abstract class TagControllerBase : ControllerBase
         _tagService = tagService(version);
     }
     [HttpGet("{id}")]
-    public async Task<ApiResponse<TagDto>> GetById(int id)
+    public async Task<ApiResponse<TagDto>> GetById(long id)
     {
         var tag = await _tagService.GetByIdAsync(id);
         if (tag == null)
@@ -37,11 +37,11 @@ public abstract class TagControllerBase : ControllerBase
     }
     [HttpPut]
     [Authorize(Roles = UserConstant.ADMIN_ROLE)]
-    public async Task<ApiResponse<int>> AddByRequest([FromBody] TagAddRequest tagAddRequest)
+    public async Task<ApiResponse<string>> AddByRequest([FromBody] TagAddRequest tagAddRequest)
     {
         var tag = new Tag { TagName = tagAddRequest.TagName };
-        int tagId = await _tagService.CreateAsync(tag);
-        return ResultUtil.Success(tagId);
+        long tagId = await _tagService.CreateAsync(tag);
+        return ResultUtil.Success(tagId.ToString());
     }
     [HttpPost]
     [Authorize(Roles = UserConstant.ADMIN_ROLE)]
@@ -59,7 +59,7 @@ public abstract class TagControllerBase : ControllerBase
     }
     [HttpDelete("{id}")]
     [Authorize(Roles = UserConstant.ADMIN_ROLE)]
-    public async Task<ApiResponse<bool>> DeleteById(int id)
+    public async Task<ApiResponse<bool>> DeleteById(long id)
     {
         await _tagService.DeleteAsync(id);
         return ResultUtil.Success(true);

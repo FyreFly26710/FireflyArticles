@@ -20,7 +20,7 @@ public abstract class TopicControllerBase : ControllerBase
         _topicService = topicService(version);
     }
     [HttpGet("{id}")]
-    public async Task<ApiResponse<TopicDto>> GetById(int id, [FromQuery] TopicQueryRequest query)
+    public async Task<ApiResponse<TopicDto>> GetById(long id, [FromQuery] TopicQueryRequest query)
     {
         var topic = await _topicService.GetByIdAsync(id);
         if (topic == null)
@@ -45,20 +45,20 @@ public abstract class TopicControllerBase : ControllerBase
 
     [HttpPut]
     [Authorize(Roles = UserConstant.ADMIN_ROLE)]
-    public async Task<ApiResponse<int>> AddByRequest([FromBody] TopicAddRequest topicAddRequest)
+    public async Task<ApiResponse<string>> AddByRequest([FromBody] TopicAddRequest topicAddRequest)
     {
         string title = topicAddRequest.Title;
         var existTopic = await _topicService.GetTopicByTitle(title);
         if (existTopic != null)
         {
-            return ResultUtil.Success(existTopic.Id);
+            return ResultUtil.Success(existTopic.Id.ToString());
         }
 
         var topic = topicAddRequest.ToEntity();
         var userDto = UserUtil.GetUserFromHttpRequest(Request);
         topic.UserId = userDto.UserId;
-        int topicId = await _topicService.CreateAsync(topic);
-        return ResultUtil.Success(topicId);
+        long topicId = await _topicService.CreateAsync(topic);
+        return ResultUtil.Success(topicId.ToString());
     }
 
     [HttpPost]
@@ -70,7 +70,7 @@ public abstract class TopicControllerBase : ControllerBase
     [HttpDelete("{id}")]
     [Authorize(Roles = UserConstant.ADMIN_ROLE)]
     // Related Articles will not be deleted
-    public async Task<ApiResponse<bool>> DeleteById(int id)
+    public async Task<ApiResponse<bool>> DeleteById(long id)
         => ResultUtil.Success(await _topicService.DeleteAsync(id));
 
 
