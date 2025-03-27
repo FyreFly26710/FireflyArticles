@@ -4,6 +4,7 @@ using FF.Articles.Backend.Common.Responses;
 using FF.Articles.Backend.Contents.API.Constants;
 using FF.Articles.Backend.Contents.API.Interfaces.Repositories.V2;
 using FF.Articles.Backend.Contents.API.Models.Entities;
+using FF.Articles.Backend.Contents.API.Models.Requests.Articles;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 using System.Text.Json;
@@ -26,10 +27,10 @@ namespace FF.Articles.Backend.Contents.API.Repositories.V2
         }
         private const string KEY_PREFIX = "Article:";
         // private const string ID_COUNTER = "Article:IdCounter";
-        private const string TOPIC_INDEX = "Article:Topic:";
-        private const string PARENT_INDEX = "Article:Parent:";
+        //private const string TOPIC_INDEX = "Article:Topic:";
+        //private const string PARENT_INDEX = "Article:Parent:";
         // Use Set to store all article ids
-        private const string ARTICLE_IDS_KEY = "Article:Ids";
+        //private const string ARTICLE_IDS_KEY = "Article:Ids";
 
 
         public string EntityKey => "Article";
@@ -84,20 +85,20 @@ namespace FF.Articles.Backend.Contents.API.Repositories.V2
 
         public async Task<List<Article>> GetArticlesByTopicIdAsync(long topicId)
         {
-            var ids = await _redis.SetMembersAsync($"{TOPIC_INDEX}{topicId}");
+            var ids = await _redis.SetMembersAsync($"{RedisIndex.TOPIC_INDEX}{topicId}");
             return await GetByIdsAsync(ids.Select(id => (long)id).ToList());
         }
 
 
         public async Task<List<Article>> GetChildArticlesAsync(long parentId)
         {
-            var ids = await _redis.SetMembersAsync($"{PARENT_INDEX}{parentId}");
+            var ids = await _redis.SetMembersAsync($"{RedisIndex.PARENT_INDEX}{parentId}");
             return await GetByIdsAsync(ids.Select(id => (long)id).ToList());
         }
 
         public async Task PromoteSubArticlesToArticles(long articleId)
         {
-            var ids = await _redis.SetMembersAsync($"{PARENT_INDEX}{articleId}");
+            var ids = await _redis.SetMembersAsync($"{RedisIndex.PARENT_INDEX}{articleId}");
             var articles = await GetByIdsAsync(ids.Select(id => (long)id).ToList());
             foreach (var article in articles)
             {
@@ -137,6 +138,35 @@ namespace FF.Articles.Backend.Contents.API.Repositories.V2
                 await EnqueueChangeAsync(article, ChangeType.Update);
             }
         }
+        public async Task<List<Article>> GetArticlesFromRequest(ArticleQueryRequest request)
+        {
+            var keyword = request.Keyword;
+            List<long>? topicIds = request.TopicIds;
+            var tagIds = request.TagIds;
+            var displaySubArticles = request.DisplaySubArticles;
+            var articles = new List<Article>();
+            if (topicIds != null && topicIds.Count > 0)
+            {
+                var ids = await _redis.SetMembersAsync(string.Join(",", topicIds.Select(id => $"{RedisIndex.TOPIC_INDEX}{id}")));
+                articles = await GetByIdsAsync(ids.Select(id => (long)id).ToList());
+            }
+            else if (topicIds == null || topicIds.Count == 0)
+            {
+                articles = await GetAllAsync();
+            }
+            // TODO: filter by tagIds
+            if (!string.IsNullOrEmpty(keyword))
+            {
+                articles = articles.Where(x => x.Title.Contains(keyword.Trim(), StringComparison.CurrentCultureIgnoreCase)).ToList();
+            }
 
+            if (!displaySubArticles)
+            {
+                articles = articles.Where(x => x.ArticleType == ArticleTypes.Article).ToList();
+            }
+
+
+            return articles;
+        }
     }
 }

@@ -5,6 +5,7 @@ using FF.Articles.Backend.Contents.API.Interfaces.Repositories.V1;
 using FF.Articles.Backend.Contents.API.Interfaces.Services;
 using FF.Articles.Backend.Contents.API.Models.Entities;
 using FF.Articles.Backend.Contents.API.UnitOfWork;
+using Microsoft.EntityFrameworkCore;
 
 namespace FF.Articles.Backend.Contents.API.Services.V1;
 public class TagService : BaseService<Tag, ContentsDbContext>, ITagService
@@ -34,5 +35,10 @@ public class TagService : BaseService<Tag, ContentsDbContext>, ITagService
             await _tagRepository.DeleteAsync(id);
         });
         return true;
+    }
+    public async Task<Tag?> GetTagByNameAsync(string tagName)
+    {
+        return await _tagRepository.GetQueryable()
+            .FirstOrDefaultAsync(t => t.TagName == tagName);
     }
 }

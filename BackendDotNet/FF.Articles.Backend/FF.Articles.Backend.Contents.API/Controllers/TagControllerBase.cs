@@ -39,8 +39,11 @@ public abstract class TagControllerBase : ControllerBase
     [Authorize(Roles = UserConstant.ADMIN_ROLE)]
     public async Task<ApiResponse<string>> AddByRequest([FromBody] TagAddRequest tagAddRequest)
     {
-        var tag = new Tag { TagName = tagAddRequest.TagName };
-        long tagId = await _tagService.CreateAsync(tag);
+        var tag = await _tagService.GetTagByNameAsync(tagAddRequest.TagName);
+        if (tag != null)
+            return ResultUtil.Error<string>(ErrorCode.PARAMS_ERROR, "Tag already exists");
+        var newTag = new Tag { TagName = tagAddRequest.TagName };
+        long tagId = await _tagService.CreateAsync(newTag);
         return ResultUtil.Success(tagId.ToString());
     }
     [HttpPost]

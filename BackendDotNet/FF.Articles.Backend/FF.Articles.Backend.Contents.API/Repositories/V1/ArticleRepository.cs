@@ -45,7 +45,7 @@ public class ArticleRepository : BaseRepository<Article, ContentsDbContext>, IAr
         var displaySubArticles = request.DisplaySubArticles;
 
         var query = GetQueryable();
-        if (displaySubArticles)
+        if (!displaySubArticles)
         {
             query = query.Where(x => x.ArticleType == ArticleTypes.Article);
         }

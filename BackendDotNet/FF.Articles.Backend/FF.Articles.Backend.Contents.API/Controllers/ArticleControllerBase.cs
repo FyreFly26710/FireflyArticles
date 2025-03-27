@@ -32,7 +32,7 @@ public abstract class ArticleControllerBase : ControllerBase
     [HttpGet]
     public async Task<ApiResponse<Paged<ArticleDto>>> GetByPage([FromQuery] ArticleQueryRequest pageRequest)
     {
-        var pagedArticles = await _articleService.GetArticlesByPageRequest(pageRequest);
+        var pagedArticles = await _articleService.GetPagedArticlesByRequest(pageRequest);
         return ResultUtil.Success(pagedArticles);
     }
 

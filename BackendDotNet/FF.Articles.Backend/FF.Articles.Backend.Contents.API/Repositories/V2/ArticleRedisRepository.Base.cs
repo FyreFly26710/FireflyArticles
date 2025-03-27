@@ -35,7 +35,7 @@ public partial class ArticleRedisRepository
 
     public async Task<List<long>> ExistIdsAsync()
     {
-        var members = await _redis.SetMembersAsync(ARTICLE_IDS_KEY);
+        var members = await _redis.SetMembersAsync(RedisIndex.ARTICLE_IDS_KEY);
         return members.Select(m => (long)m).ToList();
     }
 
@@ -123,10 +123,10 @@ public partial class ArticleRedisRepository
             var hash = GetHashEntries(entity);
 
             tasks.Add(_redis.HashSetAsync(key, hash));
-            tasks.Add(_redis.SetAddAsync($"{TOPIC_INDEX}{entity.TopicId}", entity.Id));
+            tasks.Add(_redis.SetAddAsync($"{RedisIndex.TOPIC_INDEX}{entity.TopicId}", entity.Id));
             if (entity.ParentArticleId != null)
             {
-                tasks.Add(_redis.SetAddAsync($"{PARENT_INDEX}{entity.ParentArticleId}", entity.Id));
+                tasks.Add(_redis.SetAddAsync($"{RedisIndex.PARENT_INDEX}{entity.ParentArticleId}", entity.Id));
             }
         }
 

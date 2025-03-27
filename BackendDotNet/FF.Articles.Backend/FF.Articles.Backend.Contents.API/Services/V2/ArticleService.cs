@@ -122,9 +122,10 @@ public class ArticleService : RedisService<Article>, IArticleService
         return articleDto;
     }
 
-    public async Task<Paged<ArticleDto>> GetArticlesByPageRequest(ArticleQueryRequest pageRequest)
+    public async Task<Paged<ArticleDto>> GetPagedArticlesByRequest(ArticleQueryRequest pageRequest)
     {
-        var pagedData = await _articleRedisRepository.GetPagedAsync(pageRequest);
+        var articles = await _articleRedisRepository.GetArticlesFromRequest(pageRequest);
+        var pagedData = await _articleRedisRepository.GetPagedAsync(pageRequest, articles);
         var articleDtos = await GetArticleDtos(pagedData.Data, pageRequest);
         return new Paged<ArticleDto>(pagedData.GetPageInfo(), articleDtos);
     }

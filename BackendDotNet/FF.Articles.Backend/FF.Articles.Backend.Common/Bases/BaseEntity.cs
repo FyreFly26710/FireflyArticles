@@ -4,7 +4,7 @@ namespace FF.Articles.Backend.Common.Bases;
 
 public abstract class BaseEntity
 {
-    [JsonConverter(typeof(JsonStringEnumConverter))]
+
     public long Id { get; set; }
 
 

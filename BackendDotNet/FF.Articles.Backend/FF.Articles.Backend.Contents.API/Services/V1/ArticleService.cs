@@ -182,7 +182,7 @@ public class ArticleService : BaseService<Article, ContentsDbContext>, IArticleS
         return true;
     }
 
-    public async Task<Paged<ArticleDto>> GetArticlesByPageRequest(ArticleQueryRequest pageRequest)
+    public async Task<Paged<ArticleDto>> GetPagedArticlesByRequest(ArticleQueryRequest pageRequest)
     {
         var query = _articleRepository.BuildSearchQueryFromRequest(pageRequest);
         var pagedData = await _articleRepository.GetPagedFromQueryAsync(query, pageRequest);

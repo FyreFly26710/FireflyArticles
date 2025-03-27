@@ -78,40 +78,40 @@ public partial class ArticleRedisRepository
         // Delete case: only oldEntity exists
         if (oldEntity != null && newEntity == null)
         {
-            tasks.Add(batch.SetRemoveAsync($"{TOPIC_INDEX}{oldEntity.TopicId}", oldEntity.Id));
+            tasks.Add(batch.SetRemoveAsync($"{RedisIndex.TOPIC_INDEX}{oldEntity.TopicId}", oldEntity.Id));
             if (oldEntity.ParentArticleId != null)
             {
-                tasks.Add(batch.SetRemoveAsync($"{PARENT_INDEX}{oldEntity.ParentArticleId}", oldEntity.Id));
+                tasks.Add(batch.SetRemoveAsync($"{RedisIndex.PARENT_INDEX}{oldEntity.ParentArticleId}", oldEntity.Id));
             }
-            tasks.Add(batch.SetRemoveAsync(ARTICLE_IDS_KEY, oldEntity.Id));
+            tasks.Add(batch.SetRemoveAsync(RedisIndex.ARTICLE_IDS_KEY, oldEntity.Id));
         }
         // Create case: only newEntity exists
         else if (newEntity != null && oldEntity == null)
         {
-            tasks.Add(batch.SetAddAsync($"{TOPIC_INDEX}{newEntity.TopicId}", newEntity.Id));
+            tasks.Add(batch.SetAddAsync($"{RedisIndex.TOPIC_INDEX}{newEntity.TopicId}", newEntity.Id));
             if (newEntity.ParentArticleId != null)
             {
-                tasks.Add(batch.SetAddAsync($"{PARENT_INDEX}{newEntity.ParentArticleId}", newEntity.Id));
+                tasks.Add(batch.SetAddAsync($"{RedisIndex.PARENT_INDEX}{newEntity.ParentArticleId}", newEntity.Id));
             }
-            tasks.Add(batch.SetAddAsync(ARTICLE_IDS_KEY, newEntity.Id));
+            tasks.Add(batch.SetAddAsync(RedisIndex.ARTICLE_IDS_KEY, newEntity.Id));
         }
         // Update case: both entities exist
         else if (oldEntity != null && newEntity != null)
         {
             if (oldEntity.TopicId != newEntity.TopicId)
             {
-                tasks.Add(batch.SetRemoveAsync($"{TOPIC_INDEX}{oldEntity.TopicId}", oldEntity.Id));
-                tasks.Add(batch.SetAddAsync($"{TOPIC_INDEX}{newEntity.TopicId}", newEntity.Id));
+                tasks.Add(batch.SetRemoveAsync($"{RedisIndex.TOPIC_INDEX}{oldEntity.TopicId}", oldEntity.Id));
+                tasks.Add(batch.SetAddAsync($"{RedisIndex.TOPIC_INDEX}{newEntity.TopicId}", newEntity.Id));
             }
             if (oldEntity.ParentArticleId != newEntity.ParentArticleId)
             {
                 if (oldEntity.ParentArticleId != null)
                 {
-                    tasks.Add(batch.SetRemoveAsync($"{PARENT_INDEX}{oldEntity.ParentArticleId}", oldEntity.Id));
+                    tasks.Add(batch.SetRemoveAsync($"{RedisIndex.PARENT_INDEX}{oldEntity.ParentArticleId}", oldEntity.Id));
                 }
                 if (newEntity.ParentArticleId != null)
                 {
-                    tasks.Add(batch.SetAddAsync($"{PARENT_INDEX}{newEntity.ParentArticleId}", newEntity.Id));
+                    tasks.Add(batch.SetAddAsync($"{RedisIndex.PARENT_INDEX}{newEntity.ParentArticleId}", newEntity.Id));
                 }
             }
         }

@@ -17,20 +17,20 @@ where TEntity : BaseEntity
     }
 
 
-    public Task<long> CreateAsync(TEntity entity) => _redisRepository.CreateAsync(entity);
+    public virtual Task<long> CreateAsync(TEntity entity) => _redisRepository.CreateAsync(entity);
 
-    public Task<bool> DeleteAsync(long id) => _redisRepository.DeleteAsync(id);
+    public virtual Task<bool> DeleteAsync(long id) => _redisRepository.DeleteAsync(id);
 
-    public Task<List<TEntity>> GetAllAsync() => _redisRepository.GetAllAsync();
+    public virtual Task<List<TEntity>> GetAllAsync() => _redisRepository.GetAllAsync();
 
-    public Task<Paged<TEntity>> GetAllAsync(PageRequest pageRequest) => _redisRepository.GetPagedAsync(pageRequest);
+    public virtual Task<Paged<TEntity>> GetAllAsync(PageRequest pageRequest) => _redisRepository.GetPagedAsync(pageRequest);
 
 
-    public Task<TEntity?> GetByIdAsync(long id) => _redisRepository.GetByIdAsync(id);
+    public virtual Task<TEntity?> GetByIdAsync(long id) => _redisRepository.GetByIdAsync(id);
 
-    public Task<List<TEntity>> GetByIdsAsync(List<long> ids) => _redisRepository.GetByIdsAsync(ids);
+    public virtual Task<List<TEntity>> GetByIdsAsync(List<long> ids) => _redisRepository.GetByIdsAsync(ids);
 
-    public Task<bool> UpdateAsync(TEntity entity) => _redisRepository.UpdateAsync(entity);
+    public virtual Task<bool> UpdateAsync(TEntity entity) => _redisRepository.UpdateAsync(entity);
 
     // public Task<bool> DeleteBatchAsync(List<int> ids) => _redisRepository.DeleteBatchAsync(ids);
     // public Task<int> CreateBatchAsync(List<TEntity> entities) => _redisRepository.CreateBatchAsync(entities);
