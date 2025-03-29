@@ -12,7 +12,7 @@ namespace FF.Articles.Backend.Contents.API
 {
     public static class RegistrationExtensions
     {
-        public static IServiceCollection AddServices(this IServiceCollection services)
+        public static IServiceCollection AddContentsServices(this IServiceCollection services)
         {
             // Controller stays the same, V1 and V2 services share the same interface
             RegisteredServices<IArticleService, Services.V1.ArticleService, Services.V2.ArticleService>(services);

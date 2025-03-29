@@ -31,17 +31,17 @@ public static class ProgramExtensions
         builder.Logging.AddConsole();
         return builder;
     }
-    public static WebApplicationBuilder AddEFSqlServer<TContext>(this WebApplicationBuilder builder, string connectionString) 
-        where TContext:DbContext
-    {
-        builder.Services.AddDbContext<TContext>(options =>
-        {
-            options.UseSqlServer(connectionString)
-            .LogTo(Console.WriteLine, LogLevel.Information)
-            .EnableSensitiveDataLogging();
-        });
-        return builder;
-    }
+    //public static WebApplicationBuilder AddEFSqlServer<TContext>(this WebApplicationBuilder builder, string connectionString) 
+    //    where TContext:DbContext
+    //{
+    //    builder.Services.AddDbContext<TContext>(options =>
+    //    {
+    //        options.UseSqlServer(connectionString)
+    //        .LogTo(Console.WriteLine, LogLevel.Information)
+    //        .EnableSensitiveDataLogging();
+    //    });
+    //    return builder;
+    //}
 
 
 

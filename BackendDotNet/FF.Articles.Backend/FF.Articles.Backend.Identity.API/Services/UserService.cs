@@ -1,5 +1,4 @@
-using System.Security.Cryptography;
-using System.Text;
+using FF.Articles.Backend.Common.ApiDtos;
 using FF.Articles.Backend.Common.Bases;
 using FF.Articles.Backend.Common.Constants;
 using FF.Articles.Backend.Common.Exceptions;
@@ -9,8 +8,12 @@ using FF.Articles.Backend.Identity.API.MapperExtensions.Users;
 using FF.Articles.Backend.Identity.API.Models.Dtos;
 using FF.Articles.Backend.Identity.API.Models.Entities;
 using FF.Articles.Backend.Identity.API.Repositories;
-using FF.Articles.Backend.Identity.API.Utils;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.Json;
 
 namespace FF.Articles.Backend.Identity.API.Services;
 
@@ -21,7 +24,7 @@ public class UserService(IUserRepository _userRepository, ILogger<UserService> _
 
     public async Task<long> UserRegister(string userAccount, string userPassword, string checkPassword)
     {
-        validateAccount(userAccount, userPassword, checkPassword);
+        validateInputs(userAccount, userPassword, checkPassword);
 
         var exists = await _userRepository.GetUserByAccount(userAccount);
         if (exists != null)
@@ -38,14 +41,14 @@ public class UserService(IUserRepository _userRepository, ILogger<UserService> _
             UserPassword = encryptedPassword
         };
 
-        long userId = await this.CreateAsync(user);
+        long userId = await _userRepository.CreateAsync(user);
         return userId;
 
     }
 
     public async Task<LoginUserDto> UserLogin(string userAccount, string userPassword, HttpRequest request)
     {
-        validateAccount(userAccount, userPassword);
+        validateInputs(userAccount, userPassword);
 
         string encryptPassword = computeMD5Hash(SALT + userPassword);
 
@@ -58,7 +61,7 @@ public class UserService(IUserRepository _userRepository, ILogger<UserService> _
         }
 
 
-        await IdentityUtils.SignIn(user, request.HttpContext);
+        await SignInUser(user, request.HttpContext);
         return user.ToLoginUserDto();
     }
 
@@ -91,39 +94,22 @@ public class UserService(IUserRepository _userRepository, ILogger<UserService> _
             return BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
         }
     }
-    private void validateAccount(string userAccount, string userPassword, string confirmPassword)
+    private void validateInputs(string userAccount, string userPassword, string confirmPassword)
     {
-        if (string.IsNullOrWhiteSpace(userAccount) || string.IsNullOrWhiteSpace(userPassword) || string.IsNullOrWhiteSpace(confirmPassword))
-        {
+        validateInputs(userAccount, userPassword);
+        if (string.IsNullOrWhiteSpace(confirmPassword))
             throw new ApiException(ErrorCode.PARAMS_ERROR, "Missing params");
-        }
-        if (userAccount.Length < 4)
-        {
-            throw new ApiException(ErrorCode.PARAMS_ERROR, "Account length less than 4");
-        }
-        if (userPassword.Length < 8 || confirmPassword.Length < 8)
-        {
-            throw new ApiException(ErrorCode.PARAMS_ERROR, "Password length less than 8");
-        }
         if (userPassword != confirmPassword)
-        {
             throw new ApiException(ErrorCode.PARAMS_ERROR, "Passwords do not match");
-        }
     }
-    private void validateAccount(string userAccount, string userPassword)
+    private void validateInputs(string userAccount, string userPassword)
     {
         if (string.IsNullOrWhiteSpace(userAccount) || string.IsNullOrWhiteSpace(userPassword))
-        {
             throw new ApiException(ErrorCode.PARAMS_ERROR, "Missing params");
-        }
         if (userAccount.Length < 4)
-        {
             throw new ApiException(ErrorCode.PARAMS_ERROR, "Account length less than 4");
-        }
         if (userPassword.Length < 8)
-        {
             throw new ApiException(ErrorCode.PARAMS_ERROR, "Password length less than 8");
-        }
     }
 
     public async Task<User> GetUserByEmail(string email)
@@ -136,12 +122,40 @@ public class UserService(IUserRepository _userRepository, ILogger<UserService> _
         return user;
     }
 
-    public async Task<User?> GetUserByAccount(string account)
+    public async Task SignInUser(User user, HttpContext httpContext)
     {
-        if (string.IsNullOrWhiteSpace(account))
+        // hide password from user object
+        user.UserPassword = string.Empty;
+        var userDto = new UserApiDto()
         {
-            return null;
-        }
-        return await _userRepository.GetUserByAccount(account);
+            UserId = user.Id,
+            CreateTime = user.CreateTime,
+            UserAccount = user.UserAccount,
+            UserEmail = user.UserEmail,
+            UserName = user.UserName,
+            UserAvatar = user.UserAvatar,
+            UserProfile = user.UserProfile,
+            UserRole = user.UserRole
+        };
+        string userJson = JsonSerializer.Serialize(userDto);
+        var claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.Name, user.UserName ?? "Guest"),
+            new Claim(ClaimTypes.Role, user.UserRole),
+            new Claim("user", userJson),
+        };
+
+        var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+        await httpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
+            new ClaimsPrincipal(claimsIdentity),
+            new AuthenticationProperties
+            {
+                IsPersistent = true,
+                ExpiresUtc = DateTimeOffset.UtcNow.AddDays(7)
+            });
     }
+    public async Task SignOutUser(HttpRequest httpRequest)
+        => await httpRequest.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
 }

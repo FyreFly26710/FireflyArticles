@@ -11,20 +11,34 @@ namespace FF.Articles.Backend.ServiceDefaults
 {
     public static class ApiVersioningExtensions
     {
+        public static WebApplicationBuilder AddBasicApi(this WebApplicationBuilder builder)
+        {
+            builder.Services.AddEndpointsApiExplorer();
+
+            builder.AddSwaggerDoc();
+
+            return builder;
+        }
+
         public static WebApplicationBuilder AddCustomApiVersioning(this WebApplicationBuilder builder)
         {
+            // Add API versioning
             builder.Services.AddApiVersioning(x =>
             {
-                x.DefaultApiVersion = new ApiVersion(1.0);
+                x.DefaultApiVersion = new ApiVersion(2.0);
                 x.AssumeDefaultVersionWhenUnspecified = true;
                 x.ApiVersionReader = new HeaderApiVersionReader("api-version");
             }).AddMvc().AddApiExplorer();
 
+            // Add Swagger
+            builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
+            builder.AddSwaggerDoc();
+
             return builder;
         }
-        public static WebApplicationBuilder AddApiVersioningSwagger(this WebApplicationBuilder builder)
+
+        private static WebApplicationBuilder AddSwaggerDoc(this WebApplicationBuilder builder)
         {
-            builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
             builder.Services.AddSwaggerGen(c =>
             {
                 c.CustomOperationIds(apiDesc =>
@@ -37,10 +51,9 @@ namespace FF.Articles.Backend.ServiceDefaults
                     return null;
                 });
             });
-
-
             return builder;
         }
+
         public static WebApplication UseCustomSwagger(this WebApplication app)
         {
             app.UseSwagger();
@@ -53,6 +66,13 @@ namespace FF.Articles.Backend.ServiceDefaults
                 }
             });
 
+
+            return app;
+        }
+        public static WebApplication UseBasicSwagger(this WebApplication app)
+        {
+            app.UseSwagger();
+            app.UseSwaggerUI();
 
             return app;
         }

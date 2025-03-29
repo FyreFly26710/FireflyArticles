@@ -16,7 +16,7 @@ public class IdentityDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        //modelBuilder.HasDefaultSchema("Identity");
+        modelBuilder.HasDefaultSchema("Auth");
         ConfigureUser(modelBuilder);
 
 

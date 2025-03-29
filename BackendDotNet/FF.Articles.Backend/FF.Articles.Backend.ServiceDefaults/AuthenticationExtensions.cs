@@ -49,18 +49,6 @@ public static class AuthenticationExtensions
                            .AllowCredentials();
                 });
         });
-        // builder.Services.AddCors(options =>
-        // {
-        //     options.AddPolicy("AllowedBackendUrls",
-        //         builder =>
-        //         {
-        //             builder.AllowAnyHeader()
-        //                    .AllowAnyMethod()
-        //                    //.AllowAnyOrigin()
-        //                    .WithOrigins("http://localhost:3000","http://localhost:22000", "http://localhost:23000")
-        //                    .AllowCredentials();
-        //         });
-        // });
         return builder;
     }
     public static void AddCookieAuthMiddleware(this WebApplication app)

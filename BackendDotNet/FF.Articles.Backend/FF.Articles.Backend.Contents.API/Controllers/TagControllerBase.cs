@@ -31,6 +31,7 @@ public abstract class TagControllerBase : ControllerBase
     [HttpGet]
     public async Task<ApiResponse<List<TagDto>>> GetAll()
     {
+        var user = UserUtil.GetUserFromHttpRequest(Request);
         var tags = await _tagService.GetAllAsync();
         var tagResponse = tags.Select(t => t.ToDto()).ToList();
         return ResultUtil.Success(tagResponse);

@@ -59,7 +59,7 @@ public class AuthController(
     [Authorize]
     public async Task<ApiResponse<bool>> Logout()
     {
-        await IdentityUtils.SignOutUser(Request);
+        await _userService.SignOutUser(Request);
         return ResultUtil.Success(true);
     }
     [HttpPost("getLoginUser")]
@@ -84,7 +84,7 @@ public class AuthController(
 
         var user = await _userService.GetUserByEmail(userInfo.Email);
 
-        await IdentityUtils.SignIn(user, HttpContext);
+        await _userService.SignInUser(user, HttpContext);
 
         // Redirect to home
         string? homePage = _config["Domain:Home"];

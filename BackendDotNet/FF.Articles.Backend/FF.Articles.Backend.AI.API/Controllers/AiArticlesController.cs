@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace FF.Articles.Backend.AI.API.Controllers;
 
 [ApiController]
-[Route("api/ai/[controller]")]
+[Route("api/ai/articles")]
 public class AiArticlesController(IArticleGenerationService articleGenerationService) : ControllerBase
 {
 
@@ -24,7 +24,7 @@ public class AiArticlesController(IArticleGenerationService articleGenerationSer
     [HttpPost("generate-article-content-batch")]
     public async Task<IActionResult> BatchGenerateArticleContent(List<int> articleIds, CancellationToken cancellationToken)
     {
-        await articleGenerationService.BatchGenerateArticleContentAsync(articleIds,Request,cancellationToken);
+        await articleGenerationService.BatchGenerateArticleContentAsync(articleIds, Request, cancellationToken);
         return Ok();
     }
 

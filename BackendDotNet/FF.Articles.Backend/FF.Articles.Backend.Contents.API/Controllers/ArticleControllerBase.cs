@@ -36,7 +36,7 @@ public abstract class ArticleControllerBase : ControllerBase
         return ResultUtil.Success(pagedArticles);
     }
 
-    [HttpPut]
+    [HttpPost]
     [Authorize(Roles = UserConstant.ADMIN_ROLE)]
     public async Task<ApiResponse<string>> AddByRequest([FromBody] ArticleAddRequest articleAddRequest)
     {
@@ -46,7 +46,7 @@ public abstract class ArticleControllerBase : ControllerBase
     /// <summary>
     /// Create articles and return a dictionary of article id and title
     /// </summary>
-    [HttpPut("batch")]
+    [HttpPost("batch")]
     [Authorize(Roles = UserConstant.ADMIN_ROLE)]
     public async Task<ApiResponse<Dictionary<long, string>>> AddBatchByRequest([FromBody] List<ArticleAddRequest> articleAddRequests)
     {
@@ -54,7 +54,7 @@ public abstract class ArticleControllerBase : ControllerBase
         return ResultUtil.Success(result);
     }
 
-    [HttpPost]
+    [HttpPut]
     [Authorize(Roles = UserConstant.ADMIN_ROLE)]
     public async Task<ApiResponse<bool>> EditByRequest([FromBody] ArticleEditRequest articleEditRequest)
     {
@@ -62,7 +62,7 @@ public abstract class ArticleControllerBase : ControllerBase
         return ResultUtil.Success(result);
     }
 
-    [HttpPost("batch/content")]
+    [HttpPut("batch/content")]
     [Authorize(Roles = UserConstant.ADMIN_ROLE)]
     public async Task<ApiResponse<bool>> EditContentBatch([FromBody] Dictionary<long, string> batchEditConentRequests)
     {

@@ -19,6 +19,7 @@ public abstract class TopicControllerBase : ControllerBase
     {
         _topicService = topicService(version);
     }
+
     [HttpGet("{id}")]
     public async Task<ApiResponse<TopicDto>> GetById(long id, [FromQuery] TopicQueryRequest query)
     {
@@ -28,6 +29,7 @@ public abstract class TopicControllerBase : ControllerBase
         TopicDto topicDto = await _topicService.GetTopicDto(topic, query);
         return ResultUtil.Success(topicDto);
     }
+
     [HttpGet]
     public async Task<ApiResponse<Paged<TopicDto>>> GetByPage([FromQuery] TopicQueryRequest pageRequest)
     {
@@ -43,7 +45,7 @@ public abstract class TopicControllerBase : ControllerBase
         return ResultUtil.Success(res);
     }
 
-    [HttpPut]
+    [HttpPost]
     [Authorize(Roles = UserConstant.ADMIN_ROLE)]
     public async Task<ApiResponse<string>> AddByRequest([FromBody] TopicAddRequest topicAddRequest)
     {
@@ -61,7 +63,7 @@ public abstract class TopicControllerBase : ControllerBase
         return ResultUtil.Success(topicId.ToString());
     }
 
-    [HttpPost]
+    [HttpPut]
     [Authorize(Roles = UserConstant.ADMIN_ROLE)]
     public async Task<ApiResponse<bool>> EditByRequest([FromBody] TopicEditRequest topicEditRequest)
         => ResultUtil.Success(await _topicService.EditTopicByRequest(topicEditRequest));
