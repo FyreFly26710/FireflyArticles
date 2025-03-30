@@ -14,7 +14,7 @@ public interface IArticleService : IBaseService<Article>
     Task<bool> EditArticleByRequest(ArticleEditRequest articleEditRequest);
     Task<bool> DeleteArticleById(long id);
     Task<Paged<ArticleDto>> GetPagedArticlesByRequest(ArticleQueryRequest pageRequest);
-    Task<bool> EditContentBatch(Dictionary<long, string> batchEditConentRequests);
+    //Task<bool> EditContentBatch(Dictionary<long, string> batchEditConentRequests);
     Task<Dictionary<long, string>> CreateBatchAsync(List<ArticleAddRequest> articleAddRequests, long userId);
     Task<long> CreateByRequest(ArticleAddRequest articleAddRequest, long userId);
 }

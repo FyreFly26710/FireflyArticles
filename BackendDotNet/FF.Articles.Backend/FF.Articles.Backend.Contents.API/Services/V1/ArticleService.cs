@@ -192,22 +192,22 @@ public class ArticleService : BaseService<Article, ContentsDbContext>, IArticleS
         return res;
 
     }
-    public async Task<bool> EditContentBatch(Dictionary<long, string> batchEditConentRequests)
-    {
-        await _contentsUnitOfWork.ExecuteInTransactionAsync(async () =>
-        {
-            var articles = await _articleRepository.GetByIdsAsync([.. batchEditConentRequests.Keys], true);
-            if (articles == null || articles.Count != batchEditConentRequests.Count)
-                throw new ApiException(ErrorCode.PARAMS_ERROR, "Invalid article ids");
-            foreach (var article in articles)
-            {
-                article.Content = batchEditConentRequests[article.Id];
-                article.UpdateTime = DateTime.UtcNow;
-            }
-            //await _articleRepository.UpdateBatchAsync(articles);
-        });
-        return true;
-    }
+    //public async Task<bool> EditContentBatch(Dictionary<long, string> batchEditConentRequests)
+    //{
+    //    await _contentsUnitOfWork.ExecuteInTransactionAsync(async () =>
+    //    {
+    //        var articles = await _articleRepository.GetByIdsAsync([.. batchEditConentRequests.Keys], true);
+    //        if (articles == null || articles.Count != batchEditConentRequests.Count)
+    //            throw new ApiException(ErrorCode.PARAMS_ERROR, "Invalid article ids");
+    //        foreach (var article in articles)
+    //        {
+    //            article.Content = batchEditConentRequests[article.Id];
+    //            article.UpdateTime = DateTime.UtcNow;
+    //        }
+    //        //await _articleRepository.UpdateBatchAsync(articles);
+    //    });
+    //    return true;
+    //}
 
     /// <summary>
     /// Create articles and return a dictionary of article id and title

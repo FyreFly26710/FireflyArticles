@@ -4,6 +4,7 @@ using FF.Articles.Backend.Contents.API.Constants;
 namespace FF.Articles.Backend.Contents.API.Models.Requests.Articles;
 public class ArticleAddRequest
 {
+    public long? Id { get; set; }
     public string Title { get; set; }
     public string Content { get; set; } = string.Empty;
     public string Abstract { get; set; } = string.Empty;

@@ -3,6 +3,7 @@
 namespace FF.Articles.Backend.Contents.API.Models.Requests.Topics;
 public class TopicAddRequest
 {
+    public long? Id { get; set; }
     public string Title { get; set; }
     public string Abstract { get; set; } = string.Empty;
     public string Content { get; set; } = string.Empty;

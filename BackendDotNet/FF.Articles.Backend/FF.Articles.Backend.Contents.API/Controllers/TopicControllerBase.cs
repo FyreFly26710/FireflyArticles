@@ -24,8 +24,7 @@ public abstract class TopicControllerBase : ControllerBase
     public async Task<ApiResponse<TopicDto>> GetById(long id, [FromQuery] TopicQueryRequest query)
     {
         var topic = await _topicService.GetByIdAsync(id);
-        if (topic == null)
-            return ResultUtil.Error<TopicDto>(ErrorCode.NOT_FOUND_ERROR, "Topic not found");
+        if (topic == null) throw new ApiException(ErrorCode.NOT_FOUND_ERROR, "Topic not found");
         TopicDto topicDto = await _topicService.GetTopicDto(topic, query);
         return ResultUtil.Success(topicDto);
     }
@@ -51,10 +50,7 @@ public abstract class TopicControllerBase : ControllerBase
     {
         string title = topicAddRequest.Title;
         var existTopic = await _topicService.GetTopicByTitle(title);
-        if (existTopic != null)
-        {
-            return ResultUtil.Success(existTopic.Id.ToString());
-        }
+        if (existTopic != null) throw new ApiException(ErrorCode.PARAMS_ERROR, "Topic already exists");
 
         var topic = topicAddRequest.ToEntity();
         var userDto = UserUtil.GetUserFromHttpRequest(Request);

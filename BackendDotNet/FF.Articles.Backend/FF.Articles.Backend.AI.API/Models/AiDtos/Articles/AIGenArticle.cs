@@ -12,4 +12,6 @@ public class AIGenArticle
 
     [JsonPropertyName("Abstract")]
     public string Abstract { get; set; } = "";
+    [JsonPropertyName("Tags")]
+    public List<string> Tags { get; set; } = new();
 }

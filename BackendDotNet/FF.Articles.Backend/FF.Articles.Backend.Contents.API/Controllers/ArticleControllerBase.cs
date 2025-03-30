@@ -23,8 +23,7 @@ public abstract class ArticleControllerBase : ControllerBase
     public async Task<ApiResponse<ArticleDto>> GetById(long id, [FromQuery] ArticleQueryRequest request)
     {
         var article = await _articleService.GetByIdAsync(id);
-        if (article == null)
-            return ResultUtil.Error<ArticleDto>(ErrorCode.NOT_FOUND_ERROR, "Article not found");
+        if (article == null) throw new ApiException(ErrorCode.NOT_FOUND_ERROR, "Article not found");
         var articleResponse = await _articleService.GetArticleDto(article, request);
         return ResultUtil.Success(articleResponse);
     }
@@ -62,13 +61,13 @@ public abstract class ArticleControllerBase : ControllerBase
         return ResultUtil.Success(result);
     }
 
-    [HttpPut("batch/content")]
-    [Authorize(Roles = UserConstant.ADMIN_ROLE)]
-    public async Task<ApiResponse<bool>> EditContentBatch([FromBody] Dictionary<long, string> batchEditConentRequests)
-    {
-        var result = await _articleService.EditContentBatch(batchEditConentRequests);
-        return ResultUtil.Success(result);
-    }
+    //[HttpPut("batch/content")]
+    //[Authorize(Roles = UserConstant.ADMIN_ROLE)]
+    //public async Task<ApiResponse<bool>> EditContentBatch([FromBody] Dictionary<long, string> batchEditConentRequests)
+    //{
+    //    var result = await _articleService.EditContentBatch(batchEditConentRequests);
+    //    return ResultUtil.Success(result);
+    //}
 
     [HttpDelete("{id}")]
     [Authorize(Roles = UserConstant.ADMIN_ROLE)]

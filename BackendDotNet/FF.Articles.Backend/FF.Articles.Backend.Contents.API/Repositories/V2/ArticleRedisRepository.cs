@@ -110,19 +110,19 @@ namespace FF.Articles.Backend.Contents.API.Repositories.V2
             }
         }
 
-        public async Task UpdateContentBatchAsync(Dictionary<long, string> batchEditConentRequests)
-        {
-            var articles = await GetByIdsAsync(batchEditConentRequests.Keys.ToList());
-            foreach (var request in batchEditConentRequests)
-            {
-                var hash = new List<HashEntry>();
-                hash.Add(new HashEntry(ArticleProperty.Content, request.Value));
-                hash.Add(new HashEntry(ArticleProperty.UpdateTime, DateTime.UtcNow.ToString("O")));
-                await _redis.HashSetAsync(GetFieldKey(request.Key), hash.ToArray());
-                //await UpdateIndexAsync(oldEntity, newEntity);
-                await EnqueueChangeAsync(articles.First(a => a.Id == request.Key), ChangeType.Update);
-            }
-        }
+        //public async Task UpdateContentBatchAsync(Dictionary<long, string> batchEditConentRequests)
+        //{
+        //    var articles = await GetByIdsAsync(batchEditConentRequests.Keys.ToList());
+        //    foreach (var request in batchEditConentRequests)
+        //    {
+        //        var hash = new List<HashEntry>();
+        //        hash.Add(new HashEntry(ArticleProperty.Content, request.Value));
+        //        hash.Add(new HashEntry(ArticleProperty.UpdateTime, DateTime.UtcNow.ToString("O")));
+        //        await _redis.HashSetAsync(GetFieldKey(request.Key), hash.ToArray());
+        //        //await UpdateIndexAsync(oldEntity, newEntity);
+        //        await EnqueueChangeAsync(articles.First(a => a.Id == request.Key), ChangeType.Update);
+        //    }
+        //}
         public async Task SetTopicIdToZero(long topicId)
         {
             var articles = (await GetAllAsync()).Where(a => a.TopicId == topicId).ToList();

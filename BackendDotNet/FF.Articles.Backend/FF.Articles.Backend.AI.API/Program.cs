@@ -5,6 +5,7 @@ using FF.Articles.Backend.AI.API.Interfaces.Services.RemoteServices;
 using FF.Articles.Backend.AI.API.Services;
 using FF.Articles.Backend.AI.API.Services.RemoteServices;
 using FF.Articles.Backend.AI.API.Services.Stores;
+using FF.Articles.Backend.Common.Middlewares;
 using FF.Articles.Backend.ServiceDefaults;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -27,6 +28,8 @@ builder.Services.AddControllers();
 builder.AddBasicApi();
 
 var app = builder.Build();
+
+app.UseMiddleware<GlobalExceptionMiddleware>();
 
 app.UseBasicSwagger();
 

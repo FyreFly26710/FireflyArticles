@@ -22,7 +22,7 @@ export async function apiTopicAddByRequest(
   options?: { [key: string]: any }
 ) {
   return request<API.Int32ApiResponse>("/api/contents/topics", {
-    method: "PUT",
+    method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
@@ -37,7 +37,7 @@ export async function apiTopicEditByRequest(
   options?: { [key: string]: any }
 ) {
   return request<API.BooleanApiResponse>("/api/contents/topics", {
-    method: "POST",
+    method: "PUT",
     headers: {
       "Content-Type": "application/json",
     },

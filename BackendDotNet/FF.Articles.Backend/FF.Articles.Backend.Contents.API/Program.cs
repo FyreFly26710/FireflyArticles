@@ -1,3 +1,4 @@
+using FF.Articles.Backend.Common.Middlewares;
 using FF.Articles.Backend.Contents.API;
 using FF.Articles.Backend.Contents.API.Infrastructure;
 using FF.Articles.Backend.Contents.API.Infrastructure.Migrations;
@@ -28,6 +29,8 @@ builder.AddCustomApiVersioning();
 await ContentsDbSeed.InitializeDatabase(builder);
 
 var app = builder.Build();
+
+app.UseMiddleware<GlobalExceptionMiddleware>();
 
 app.UseCustomSwagger();
 

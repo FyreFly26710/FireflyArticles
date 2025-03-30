@@ -23,37 +23,34 @@ public abstract class TagControllerBase : ControllerBase
     public async Task<ApiResponse<TagDto>> GetById(long id)
     {
         var tag = await _tagService.GetByIdAsync(id);
-        if (tag == null)
-            return ResultUtil.Error<TagDto>(ErrorCode.NOT_FOUND_ERROR, "Tag not found");
+        if (tag == null) throw new ApiException(ErrorCode.NOT_FOUND_ERROR, "Tag not found");
         var tagResponse = tag.ToDto();
         return ResultUtil.Success(tagResponse);
     }
     [HttpGet]
     public async Task<ApiResponse<List<TagDto>>> GetAll()
     {
-        var user = UserUtil.GetUserFromHttpRequest(Request);
+        //var user = UserUtil.GetUserFromHttpRequest(Request);
         var tags = await _tagService.GetAllAsync();
         var tagResponse = tags.Select(t => t.ToDto()).ToList();
         return ResultUtil.Success(tagResponse);
     }
-    [HttpPut]
+    [HttpPost]
     [Authorize(Roles = UserConstant.ADMIN_ROLE)]
     public async Task<ApiResponse<string>> AddByRequest([FromBody] TagAddRequest tagAddRequest)
     {
         var tag = await _tagService.GetTagByNameAsync(tagAddRequest.TagName);
-        if (tag != null)
-            return ResultUtil.Error<string>(ErrorCode.PARAMS_ERROR, "Tag already exists");
+        if (tag != null) throw new ApiException(ErrorCode.PARAMS_ERROR, "Tag already exists");
         var newTag = new Tag { TagName = tagAddRequest.TagName };
         long tagId = await _tagService.CreateAsync(newTag);
         return ResultUtil.Success(tagId.ToString());
     }
-    [HttpPost]
+    [HttpPut]
     [Authorize(Roles = UserConstant.ADMIN_ROLE)]
     public async Task<ApiResponse<bool>> EditByRequest([FromBody] TagEditRequest tagEditRequest)
     {
         var tag = await _tagService.GetByIdAsync(tagEditRequest.TagId);
-        if (tag == null)
-            return ResultUtil.Error<bool>(ErrorCode.PARAMS_ERROR, "Tag not found");
+        if (tag == null) throw new ApiException(ErrorCode.PARAMS_ERROR, "Tag not found");
         if (!string.IsNullOrWhiteSpace(tagEditRequest.TagName))
         {
             tag.TagName = tagEditRequest.TagName;

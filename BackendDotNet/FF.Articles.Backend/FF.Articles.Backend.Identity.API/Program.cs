@@ -1,3 +1,4 @@
+using FF.Articles.Backend.Common.Middlewares;
 using FF.Articles.Backend.Identity.API.Infrastructure;
 using FF.Articles.Backend.Identity.API.Repositories;
 using FF.Articles.Backend.Identity.API.Services;
@@ -31,6 +32,8 @@ builder.Services.AddControllers();
 builder.AddBasicApi();
 
 var app = builder.Build();
+
+app.UseMiddleware<GlobalExceptionMiddleware>();
 
 app.UseBasicSwagger();
 

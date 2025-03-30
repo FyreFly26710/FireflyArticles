@@ -67,7 +67,6 @@ public class UserService(IUserRepository _userRepository, ILogger<UserService> _
 
     public async Task<User> GetLoginUser(HttpRequest request)
     {
-        //User? user = request.HttpContext.Session.GetObject<User>(UserConstant.USER_LOGIN_STATE);
         var user = UserUtil.GetUserFromHttpRequest(request);
         if (user == null)
         {

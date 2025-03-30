@@ -9,16 +9,18 @@ namespace FF.Articles.Backend.Identity.API.Infrastructure
     {
         public static async Task InitialiseDatabase(WebApplicationBuilder builder)
         {
-            bool hasPendingMigrations = false;
+            bool? hasPendingMigrations = false;
             using (var scope = builder.Services.BuildServiceProvider().CreateScope())
             {
                 var dbContext = scope.ServiceProvider.GetRequiredService<IdentityDbContext>();
 
-                hasPendingMigrations = dbContext.Database.GetPendingMigrations().Any();
+                var pendingMigrations = dbContext.Database.GetPendingMigrations();
 
+                hasPendingMigrations = pendingMigrations?.Any();               
+                
                 dbContext.Database.Migrate();
             }
-            if (hasPendingMigrations)
+            if (hasPendingMigrations == true)
             {
                 using (var scope = builder.Services.BuildServiceProvider().CreateScope())
                 {

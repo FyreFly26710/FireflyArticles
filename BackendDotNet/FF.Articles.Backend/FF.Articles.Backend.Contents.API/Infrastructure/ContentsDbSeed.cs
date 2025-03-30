@@ -9,18 +9,20 @@ public static class ContentsDbSeed
     public static async Task InitializeDatabase(WebApplicationBuilder builder)
     {
         // Apply pending migrations
-        bool hasPendingMigrations = false;
+        bool? hasPendingMigrations = false;
         using (var scope = builder.Services.BuildServiceProvider().CreateScope())
         {
             var dbContext = scope.ServiceProvider.GetRequiredService<ContentsDbContext>();
 
-            hasPendingMigrations = dbContext.Database.GetPendingMigrations().Any();
+            var pendingMigrations = dbContext.Database.GetPendingMigrations();
+
+            hasPendingMigrations = pendingMigrations?.Any();
 
             dbContext.Database.Migrate();
         }
 
         // If there are pending migrations, seed the database
-        if (hasPendingMigrations)
+        if (hasPendingMigrations == true)
         {
             using (var scope = builder.Services.BuildServiceProvider().CreateScope())
             {

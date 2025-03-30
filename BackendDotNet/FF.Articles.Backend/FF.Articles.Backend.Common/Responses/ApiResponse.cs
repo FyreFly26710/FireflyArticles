@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using FF.Articles.Backend.Common.Exceptions;
 
 namespace FF.Articles.Backend.Common.Responses;
 /// <summary>
@@ -16,6 +17,8 @@ public class ApiResponse<T>
     /// </summary>
     public int Code { get; set; }
 
+    public string? RequestId { get; set; }
+
     public string Message { get; set; }
 
     public T? Data { get; set; }
@@ -26,5 +29,19 @@ public class ApiResponse<T>
         Data = data;
         Message = message;
     }
-
+    public ApiResponse()
+    {
+        Code = 200;
+        Message = "OK";
+    }
+    public ApiResponse(ApiException apiException)
+    {
+        Code = apiException.Code;
+        Message = apiException.Message;
+    }
+    public ApiResponse(ErrorCode errorCode)
+    {
+        Code = errorCode.Code;
+        Message = errorCode.Message;
+    }
 }

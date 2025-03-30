@@ -180,15 +180,15 @@ public class ArticleService : RedisService<Article>, IArticleService
         return true;
     }
 
-    public async Task<bool> EditContentBatch(Dictionary<long, string> batchEditConentRequests)
-    {
-        var articles = await _articleRedisRepository.GetByIdsAsync(batchEditConentRequests.Keys.ToList());
-        if (articles == null || articles.Count != batchEditConentRequests.Count)
-            throw new ArgumentException("Invalid article ids");
+    //public async Task<bool> EditContentBatch(Dictionary<long, string> batchEditConentRequests)
+    //{
+    //    var articles = await _articleRedisRepository.GetByIdsAsync(batchEditConentRequests.Keys.ToList());
+    //    if (articles == null || articles.Count != batchEditConentRequests.Count)
+    //        throw new ArgumentException("Invalid article ids");
 
-        await _articleRedisRepository.UpdateContentBatchAsync(batchEditConentRequests);
-        return true;
-    }
+    //    await _articleRedisRepository.UpdateContentBatchAsync(batchEditConentRequests);
+    //    return true;
+    //}
 
     public async Task<Dictionary<long, string>> CreateBatchAsync(List<ArticleAddRequest> articleAddRequests, long userId)
     {

@@ -11,7 +11,7 @@ namespace FF.Articles.Backend.Contents.API.Interfaces.Repositories.V2
         Task<List<Article>> GetArticlesByTopicIdAsync(long topicId);
         Task<List<Article>> GetChildArticlesAsync(long parentId);
         Task PromoteSubArticlesToArticles(long articleId);
-        Task UpdateContentBatchAsync(Dictionary<long, string> batchEditConentRequests);
+        //Task UpdateContentBatchAsync(Dictionary<long, string> batchEditConentRequests);
         Task SetTopicIdToZero(long topicId);
         Task<List<Article>> GetArticlesFromRequest(ArticleQueryRequest request);
     }

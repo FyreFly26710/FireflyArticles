@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Concurrent;
 using FF.Articles.Backend.AI.API.Models.AiDtos;
+using FF.Articles.Backend.AI.Models;
+using FF.Articles.Backend.Common.ApiDtos;
 
 namespace FF.Articles.Backend.AI.API.Services.Stores;
 public class UserArticleStateStore
@@ -20,10 +22,9 @@ public class UserArticleStateStore
 
 public class UserArticleState
 {
+    public List<Message> HistroyMessages { get; set; } = new();
     public ArticlesAIResponse? ArticlesAIResponse { get; set; }
-    // AI generated article id (sort number) => Db article id
-    public Dictionary<int, long> IdMap { get; set; } = new();
     public string Topic { get; set; } = "";
-    public long TopicId { get; set; } = 0;
     public bool IsFirstRound { get; set; } = true;
+    public List<ArticleApiAddRequest> ApiAddRequests { get; set; } = new();
 }

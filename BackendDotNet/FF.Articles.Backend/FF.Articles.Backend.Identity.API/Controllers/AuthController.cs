@@ -1,14 +1,12 @@
 ﻿using FF.Articles.Backend.Common.Exceptions;
 using FF.Articles.Backend.Common.Responses;
 using FF.Articles.Backend.Common.Utils;
-using FF.Articles.Backend.Identity.API.Models.Requests;
-using Microsoft.AspNetCore.Mvc;
-using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
-using FF.Articles.Backend.Identity.API.Utils;
-using FF.Articles.Backend.Identity.API.Services;
 using FF.Articles.Backend.Identity.API.MapperExtensions.Users;
 using FF.Articles.Backend.Identity.API.Models.Dtos;
+using FF.Articles.Backend.Identity.API.Models.Requests;
+using FF.Articles.Backend.Identity.API.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace FF.Articles.Backend.Identity.API.Controllers;
 
@@ -28,14 +26,13 @@ public class AuthController(
     [HttpPost("register")]
     public async Task<ApiResponse<string>> Register([FromBody] UserRegisterRequest userRegisterRequest)
     {
-        if (userRegisterRequest == null)
-            return ResultUtil.Error<string>(ErrorCode.PARAMS_ERROR);
+        if (userRegisterRequest == null) throw new ApiException(ErrorCode.PARAMS_ERROR, "User register request is null");
 
         string userAccount = userRegisterRequest.UserAccount;
         string userPassword = userRegisterRequest.UserPassword;
         string confirmPassword = userRegisterRequest.confirmPassword;
         if (string.IsNullOrWhiteSpace(userAccount) || string.IsNullOrWhiteSpace(userPassword) || string.IsNullOrWhiteSpace(confirmPassword))
-            return ResultUtil.Error<string>(ErrorCode.PARAMS_ERROR, "User account, password, and confirm password cannot be blank.");
+            throw new ApiException(ErrorCode.PARAMS_ERROR, "User account, password, and confirm password cannot be blank.");
 
         long result = await _userService.UserRegister(userAccount, userPassword, confirmPassword);
 
@@ -44,13 +41,12 @@ public class AuthController(
     [HttpPost("login")]
     public async Task<ApiResponse<LoginUserDto>> Login([FromBody] UserLoginRequest userLoginRequest)
     {
-        if (userLoginRequest == null)
-            return ResultUtil.Error<LoginUserDto>(ErrorCode.PARAMS_ERROR);
+        if (userLoginRequest == null) throw new ApiException(ErrorCode.PARAMS_ERROR, "User login request is null");
 
         string userAccount = userLoginRequest.UserAccount;
         string userPassword = userLoginRequest.UserPassword;
         if (string.IsNullOrWhiteSpace(userAccount) || string.IsNullOrWhiteSpace(userPassword))
-            return ResultUtil.Error<LoginUserDto>(ErrorCode.PARAMS_ERROR, "User account and password cannot be blank.");
+            throw new ApiException(ErrorCode.PARAMS_ERROR, "User account and password cannot be blank.");
 
         LoginUserDto result = await _userService.UserLogin(userAccount, userPassword, Request);
         return ResultUtil.Success(result);
@@ -73,10 +69,7 @@ public class AuthController(
     [HttpGet("signin-google")]
     public async Task<IActionResult> SignInGoogle([FromQuery] string code)
     {
-        if (string.IsNullOrEmpty(code))
-        {
-            return BadRequest("Authorization code is missing.");
-        }
+        if (string.IsNullOrEmpty(code)) throw new ApiException(ErrorCode.PARAMS_ERROR, "Authorization code is missing.");
 
         var tokenResponse = await _oAuthService.GetGmailToken(code);
 

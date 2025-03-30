@@ -30,7 +30,7 @@ export async function apiArticleAddByRequest(
   options?: { [key: string]: any }
 ) {
   return request<API.Int32ApiResponse>("/api/contents/articles", {
-    method: "PUT",
+    method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
@@ -45,7 +45,7 @@ export async function apiArticleEditByRequest(
   options?: { [key: string]: any }
 ) {
   return request<API.BooleanApiResponse>("/api/contents/articles", {
-    method: "POST",
+    method: "PUT",
     headers: {
       "Content-Type": "application/json",
     },

@@ -1,6 +1,7 @@
 using System;
 using FF.Articles.Backend.AI.API.Models.AiDtos;
 using FF.Articles.Backend.Common.ApiDtos;
+using FF.Articles.Backend.Common.Utils;
 
 namespace FF.Articles.Backend.AI.API.MapperExtensions;
 
@@ -10,13 +11,14 @@ public static class AIGenArticleExtensions
     {
         return new ArticleApiAddRequest
         {
+            Id = EntityUtil.GenerateSnowflakeId(),
             Title = aiGenArticle.Title,
-            // Content = aiGenArticle.Content ?? "",
+            //Content = aiGenArticle.Content ?? "",
             Abstract = aiGenArticle.Abstract,
             ArticleType = "Article",
             ParentArticleId = null,
             TopicId = topicId,
-            TagIds = new List<long>(),
+            Tags = aiGenArticle.Tags,
             SortNumber = aiGenArticle.Id,
             IsHidden = 0,
         };

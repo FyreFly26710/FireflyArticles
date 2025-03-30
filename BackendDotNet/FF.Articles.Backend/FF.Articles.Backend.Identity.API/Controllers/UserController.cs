@@ -20,11 +20,9 @@ public class UserController(IUserService _userService, ILogger<UserController> _
     [HttpGet("{id}")]
     public async Task<ApiResponse<UserApiDto>> GetById(long id)
     {
-        if (id == 0)
-            return ResultUtil.Error<UserApiDto>(ErrorCode.PARAMS_ERROR, "Invalid user id");
+        if (id == 0) throw new ApiException(ErrorCode.PARAMS_ERROR, "Invalid user id");
         var user = await _userService.GetByIdAsync(id);
-        if (user == null)
-            return ResultUtil.Error<UserApiDto>(ErrorCode.NOT_FOUND_ERROR, "User not found");
+        if (user == null) throw new ApiException(ErrorCode.NOT_FOUND_ERROR, "User not found");
         var userDto = user.ToUserApiDto();
         return ResultUtil.Success(userDto);
     }
@@ -43,8 +41,7 @@ public class UserController(IUserService _userService, ILogger<UserController> _
     [Authorize(Roles = UserConstant.ADMIN_ROLE)]
     public async Task<ApiResponse<bool>> DeleteById(long id)
     {
-        if (id == 0)
-            return ResultUtil.Error<bool>(ErrorCode.PARAMS_ERROR, "Invalid user id");
+        if (id == 0) throw new ApiException(ErrorCode.PARAMS_ERROR, "Invalid user id");
 
         await _userService.DeleteAsync(id);
         return ResultUtil.Success(true);

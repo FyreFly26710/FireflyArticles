@@ -25,96 +25,73 @@ public class ArticleGenerationService : IArticleGenerationService
         _contentsApiRemoteService = contentsApiRemoteService;
         _userArticleStateStore = userArticleStateStore;
     }
-
-    // private ArticlesAIResponse? articlesAiResponse = null;
-    // // AI generated article id (sort number) => Db article id
-    // private Dictionary<int, int> idMap = new();
-    // private string topic = "";
-    // private bool isFirstRound = true;
     // Round 1
     public async Task<ArticlesAIResponse> GenerateArticleListsAsync(string topic, HttpRequest httpRequest, int articleCount = 8, CancellationToken cancellationToken = default)
     {
         var user = UserUtil.GetUserFromHttpRequest(httpRequest);
         var userArticleState = _userArticleStateStore.GetOrAddState(user.UserId);
 
-        var request = new ChatRequest
-        {
-            Messages = new(){
+        userArticleState.HistroyMessages = [
                 Message.NewSystemMessage(format_ArticlesList),
                 Message.NewSystemMessage(system_ArticleList),
                 Message.NewUserMessage(@$"Topic: {topic}; ArticleCount: {articleCount}"),
-            },
-            Stream = false
+            ];
+
+        var request = new ChatRequest
+        {
+            Messages = userArticleState.HistroyMessages,
+            ResponseFormat = new ResponseFormat() { Type = ResponseFormatTypes.JsonObject }
         };
-        request.ResponseFormat = new ResponseFormat() { Type = ResponseFormatTypes.JsonObject };
 
         var response = await _deepSeekClient.ChatAsync(request, cancellationToken);
         var jsonContent = response?.Choices.First().Message?.Content ?? "";
-        userArticleState.ArticlesAIResponse = JsonSerializer.Deserialize<ArticlesAIResponse>(jsonContent);
-        if (userArticleState.ArticlesAIResponse is null)
-        {
-            throw new Exception("Failed to generate article");
-        }
-        userArticleState.Topic = topic;
+        var articlesResponse = JsonSerializer.Deserialize<ArticlesAIResponse>(jsonContent);
+        if (articlesResponse is null) throw new Exception("Failed to generate article");
+
         // Insert topic
-        userArticleState.TopicId = await _contentsApiRemoteService.AddTopicByTitleAsync(userArticleState.Topic, httpRequest);
-        var articleApiRequests = userArticleState.ArticlesAIResponse!.Articles.Select(article => article.ToArticleApiRequest(userArticleState.TopicId)).ToList();
-        var idTitleMap = await _contentsApiRemoteService.AddBatchArticlesAsync(articleApiRequests, httpRequest);
-        userArticleState.IdMap = userArticleState.ArticlesAIResponse.Articles
-            .ToDictionary(
-                aiArticle => aiArticle.Id,
-                aiArticle => idTitleMap
-                    .First(kvp => kvp.Value == aiArticle.Title)
-                    .Key
-            );
+        var topicId = await _contentsApiRemoteService.AddTopicByTitleAsync(topic, httpRequest);
+
+        // Update state
+        userArticleState.ArticlesAIResponse = articlesResponse;
+        userArticleState.Topic = topic;
         userArticleState.IsFirstRound = false;
-        return userArticleState.ArticlesAIResponse;
+        userArticleState.ApiAddRequests = articlesResponse.Articles.Select(a=>a.ToArticleApiRequest(topicId)).ToList();
+
+        return articlesResponse;
     }
 
     // round 2
-    public async Task<string> GenerateArticleContentAsync(int articleId, HttpRequest httpRequest, CancellationToken cancellationToken = default)
+    public async Task<ArticleApiAddRequest> GenerateArticleContentAsync(int articleId, HttpRequest httpRequest, CancellationToken cancellationToken = default)
     {
         var user = UserUtil.GetUserFromHttpRequest(httpRequest);
-        var userArticleState = _userArticleStateStore.GetOrAddState(user.UserId);
-        if (userArticleState.IsFirstRound)
-        {
-            throw new ApiException(ErrorCode.SYSTEM_ERROR, "Please generate article lists first");
-        }
+        if (user is null) throw new ApiException(ErrorCode.SYSTEM_ERROR, "Please login");
 
-        var selectedArticle = userArticleState.ArticlesAIResponse?.Articles.FirstOrDefault(a => a.Id == articleId);
-        if (selectedArticle is null)
-        {
-            throw new ApiException(ErrorCode.SYSTEM_ERROR, "Failed to generate article");
-        }
+        var userArticleState = _userArticleStateStore.GetOrAddState(user.UserId);
+        if (userArticleState.IsFirstRound) throw new ApiException(ErrorCode.SYSTEM_ERROR, "Please generate article lists first");
+
+        var selectedArticle = userArticleState.ApiAddRequests.FirstOrDefault(a => a.SortNumber == articleId);
+        if (selectedArticle is null) throw new ApiException(ErrorCode.SYSTEM_ERROR, "Failed to find article");
+
         var request = new ChatRequest
         {
-            Messages = new(){
-                // Todo: Add history messages?
-                Message.NewUserMessage(user_ArticleContent(selectedArticle)),
+            Messages = [
+                //..userArticleState.HistroyMessages,
+                Message.NewUserMessage(user_ArticleContent(selectedArticle.Title, selectedArticle.Abstract)),
                 Message.NewSystemMessage(format_ArticleContent),
-            },
+            ],
+            ResponseFormat = new ResponseFormat() { Type = ResponseFormatTypes.Text }
         };
-        request.ResponseFormat = new ResponseFormat() { Type = ResponseFormatTypes.Text };
 
         var response = await _deepSeekClient.ChatAsync(request, cancellationToken);
 
         var content = response?.Choices.First().Message?.Content ?? "";
-        if (string.IsNullOrEmpty(content))
-        {
-            throw new ApiException(ErrorCode.SYSTEM_ERROR, "Failed to generate article");
-        }
+        if (string.IsNullOrEmpty(content)) throw new ApiException(ErrorCode.SYSTEM_ERROR, "Failed to generate article");
 
-        // Update article
-        var dbArticleId = userArticleState.IdMap[articleId];
-        var editRequest = new ArticleApiEditRequest
-        {
-            ArticleId = dbArticleId,
-            Content = content,
-            // Todo: Add tags
-            //Tags = tags,
-        };
-        await _contentsApiRemoteService.EditArticleByRequest(editRequest, httpRequest);
-        return content;
+        // Add article
+        selectedArticle.Content = content;
+        await _contentsApiRemoteService.AddArticleAsync(selectedArticle, httpRequest);
+
+        return selectedArticle;
     }
 
     public async Task BatchGenerateArticleContentAsync(List<int> articleIds, HttpRequest httpRequest, CancellationToken cancellationToken = default)
@@ -137,10 +114,10 @@ public class ArticleGenerationService : IArticleGenerationService
         Abstract:
             - Provide 2-3 key points, each in a single concise sentence. 
             - It does not need to be proper full sentences. Just key words and very brief explanation.
-     
+        Tags: 2-4 relevant keywords or phrases.
+
         Each title should explore a distinct subtopic or angle related to the main topic.
         Do not write too much articles about beginner levels.
-        Respond each title in MD format.
      
         **Example Output Format**:
         Title: Rapid HTML Enhancement & Best Practices
@@ -151,78 +128,56 @@ public class ArticleGenerationService : IArticleGenerationService
     """;
 
 
-    private string user_ArticleContent(AIGenArticle article) => @$"
-    You are a helpful assistant that generates articles based on the title: {article.Title} and key points: {article.Abstract}  
-    Formatting Requirements:
-    - Strictly use pure markdown syntax ONLY
-    - Omit the article title completely
-    - Never use ```markdown code blocks
-    - Maintain proper heading hierarchy (H2 for sections)
-    - No markdown formatting in introduction/conclusion
-
-    Article Structure:
-    1. **Introduction** (H2 heading)
-    - 1-2 paragraphs establishing context
-    - Clearly state article purpose
-
-    2. **Core Sections** (3-5 H2 sections)
-    - Convert each key points from above to H2 heading
-    - 1-3 paragraphs per section
-    - Include examples/data where applicable
-    - Use bullet points for lists where appropriate
-
-    3. **Conclusion** (H2 heading)
-    - Summarize key insights
-    - Highlight practical applications
-    - Avoid introducing new information
-
+    private string user_ArticleContent(string title, string keyPoints) => @$"
+    You are a helpful assistant that generates articles based on the title: {title} and key points: {keyPoints}  
     Content Generation Guidelines:
     - Write in professional but accessible tone
     - Maintain academic rigor without jargon
-    - Ensure logical flow between sections
-    - All content must be original analysis
-    - Keep paragraphs under 6 sentences";
+    - Ensure logical flow between sections";
     private string format_ArticlesList => """
     Generate a JSON response in this EXACT structure:
     {
     "Articles": [
         {
-        "Id": 1,
-        "Title": "Article Title",
-        "Abstract": 
-            "**Key Point** content with two trailing spaces.  "
-            "**Key Point** content with two trailing spaces.  "
-            "**Key Point** content with two trailing spaces.  "
-        }
+        "Id": <1>,
+        "Title": <"Article Title">,
+        "Abstract": < "**Key Point** - content with two trailing spaces.  **Key Point** - content with two trailing spaces.  **Key Point** - content with two trailing spaces.  ">,
+        "Tags": <["tag1", "tag2", "tag3"]>
+        },
+        { article2 etc... }
     ],
-    "AIMessage": "Your message here"
+    "AIMessage": <"Your message here">
     }
 
     **RULES:**
-    - Property names MUST be "Articles", "Id", "Title", "Abstract", "AIMessage" (case-sensitive)
-    - "Id" MUST start at 1 and increment
-    - Escape line breaks with \\n (double backslash)
-    1. **Id Field:** Start at 1 and increment for each article.
+    - <> indicates a placeholder, replace with appropriate value, do not inlcude the brackets in responses.
+    - Property names MUST be "Articles", "Id", "Title", "Abstract", "Tags", "AIMessage" (case-sensitive)
+    1. **Id:** Start at 1 and increment for each article.
     2. **Title:** Clear and concise, describing the article's focus.
-    3. **Abstract:** Use **Markdown** (bold, lists, etc.) to structure content. Split ideas with `\n`.
-    4. **AIMessage:** 
+    3. **Abstract:** **KeyPoints**: one sentence briefly summarizing each points.
+    4. **Tags:** list relevant keywords, 2-4 tags each article.
+    5. **AIMessage:** 
     - If the topic is valid: List key subtopics covered and confirm completion.
     - If invalid/off-topic: Leave `Articles` empty and explain why in `AIMessage`.
-    5. **JSON Syntax:** Ensure all quotes, commas, and brackets are closed. Escape `\n` and `\"` properly.
+    - **JSON Syntax:** Ensure all quotes, commas, and brackets are closed.
     """;
     private string format_ArticleContent => """
     Respond ONLY with the raw markdown content following this exact structure:
-    # Introduction
-    [Content...]
+    
+        # Introduction
+        Content...
 
-    ## [First Key Point]
-    [Content...]
+        ## [First Key Point]
+        Content...
 
-    ## [Second Key Point] 
-    [Content...]
+        ## [Second Key Point] 
+        Content...
 
-    # Conclusion
-    [Content...]
+        # Conclusion
+        Content...
+    
+    Introduction and Conclusion contents should be 1 paragraphs.
+    Key Points should be 1-3 paragraphs.
 
     DO NOT include: 
     - Title
