@@ -15,11 +15,11 @@ using System.Threading.Tasks;
 namespace FF.Articles.Backend.ServiceDefaults;
 public static class ProgramExtensions
 {
-    public static WebApplicationBuilder AddServiceDefaults(this WebApplicationBuilder builder, IConfiguration configuration)
+    public static WebApplicationBuilder AddServiceDefaults(this WebApplicationBuilder builder)
     {
 
         builder.AddLogger();
-        builder.AddCors(configuration);
+        builder.AddCustomCors();
         builder.AddCookieAuth();
         builder.Services.AddHttpClient();
 

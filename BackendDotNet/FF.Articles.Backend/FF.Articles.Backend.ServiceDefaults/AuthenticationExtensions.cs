@@ -1,15 +1,9 @@
-﻿using FF.Articles.Backend.Common.Middlewares;
-using Microsoft.AspNetCore.Authentication.Cookies;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FF.Articles.Backend.ServiceDefaults;
 public static class AuthenticationExtensions
@@ -31,17 +25,16 @@ public static class AuthenticationExtensions
         return builder;
     }
 
-    public static WebApplicationBuilder AddCors(this WebApplicationBuilder builder, IConfiguration configuration)
+    public static WebApplicationBuilder AddCustomCors(this WebApplicationBuilder builder)
     {
         builder.Services.AddCors(options =>
         {
-            string url = configuration["Domain:Home"] ?? "";
             options.AddPolicy("AllowedOrigins",
                 builder =>
                 {
                     builder.AllowAnyHeader()
                            .AllowAnyMethod()
-                           .WithOrigins(configuration["Domain:Home"] ?? "",
+                           .WithOrigins(new Domain().URL,
                                 "http://localhost:3000",
                                 "http://localhost:21000",
                                 "http://localhost:22000",
@@ -59,5 +52,11 @@ public static class AuthenticationExtensions
         app.UseAuthorization();
 
     }
+
+    
 }
 
+public class Domain
+{
+    public virtual string URL { get; set; } = "";
+}

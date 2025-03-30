@@ -26,3 +26,4 @@ appsettings.Production.json
 
 # Ignore openapi config
 # FrontendReact/ff-articles-frontend/openapi.config.ts
+/BackendDotNet/FF.Articles.Backend/FF.Articles.Backend.Common/Constants/RemoteApiUrlConstant.Hidden.cs

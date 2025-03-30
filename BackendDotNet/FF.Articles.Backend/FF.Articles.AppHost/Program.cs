@@ -24,4 +24,5 @@ builder.AddProject<Projects.FF_Articles_Backend_Contents_API>("contents-api", la
 
 builder.AddProject<Projects.FF_Articles_Backend_AI_API>("ai-api", launchProfileName);
 
+builder.AddProject<Projects.FF_Articles_Backend_Gateway_API>("gateway-api", launchProfileName);
 builder.Build().Run();

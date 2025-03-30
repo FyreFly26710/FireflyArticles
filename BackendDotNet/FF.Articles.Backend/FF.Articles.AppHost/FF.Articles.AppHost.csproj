@@ -20,6 +20,7 @@
   <ItemGroup>
     <ProjectReference Include="..\FF.Articles.Backend.AI.API\FF.Articles.Backend.AI.API.csproj" />
     <ProjectReference Include="..\FF.Articles.Backend.Contents.API\FF.Articles.Backend.Contents.API.csproj" />
+    <ProjectReference Include="..\FF.Articles.Backend.Gateway.API\FF.Articles.Backend.Gateway.API.csproj" />
     <ProjectReference Include="..\FF.Articles.Backend.Identity.API\FF.Articles.Backend.Identity.API.csproj" />
   </ItemGroup>
 

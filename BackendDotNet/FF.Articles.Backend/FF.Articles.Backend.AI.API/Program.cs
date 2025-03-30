@@ -11,7 +11,7 @@ using FF.Articles.Backend.ServiceDefaults;
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 
-builder.AddServiceDefaults(configuration);
+builder.AddServiceDefaults();
 
 // Services
 builder.Services.AddDeepSeek(configuration);
