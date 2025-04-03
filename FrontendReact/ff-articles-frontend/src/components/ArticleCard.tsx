@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 import styles from './ArticleCard.module.css';
 
 import dynamic from 'next/dynamic'
+import Markdown from "./aiChat/Markdown";
 
 const MdViewer = dynamic(() => import('@/components/MdViewer'), {
     ssr: false
@@ -164,7 +165,8 @@ const ArticleCard = (props: Props) => {
                         style={{ height: 80, resize: "none" }}
                     />
                 ) : (
-                    <MdViewer value={article.abstract} />
+                    // <MdViewer value={article.abstract} />
+                    <Markdown>{article.abstract ?? ""}</Markdown>
                 )}
             </Card>
             <div style={{ marginBottom: 16 }} />
@@ -175,7 +177,7 @@ const ArticleCard = (props: Props) => {
                         onChange={(value) => setEditedContent(value)}
                     />
                 ) : (
-                    <MdViewer value={article.content} />
+                    <Markdown>{article.content ?? ""}</Markdown>
                 )}
             </Card>
             <ArticleFormModal
