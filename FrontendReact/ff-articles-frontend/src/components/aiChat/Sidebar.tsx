@@ -59,7 +59,7 @@ export default function Sidebar({
         <Sider
             style={{
                 position: 'fixed',
-                top: 44,
+                top: 52,
                 left: 0,
                 height: 'calc(100vh - 40px)',
                 zIndex: 50,
@@ -71,20 +71,17 @@ export default function Sidebar({
             className={className}
         >
             <div className="flex flex-col h-full">
-                <div className="flex items-center justify-end p-2">
+                <div className="flex items-center justify-between p-2">
+                    <h2 className="text-lg font-semibold text-gray-800 ml-4">
+                        {!collapsed && 'Chats'}
+                    </h2>
                     <Button
                         type="text"
-                        icon={
-                            collapsed ? (
-                                <MenuUnfoldOutlined style={{ fontSize: '20px' }} />
-                            ) : (
-                                <MenuFoldOutlined style={{ fontSize: '20px' }} />
-                            )
-                        }
+                        icon={<MenuFoldOutlined style={{ fontSize: '20px' }} />}
                         onClick={() => handleCollapse(!collapsed)}
                     />
-
                 </div>
+
 
                 {!collapsed && (
                     <div className="flex-1 overflow-y-auto">

@@ -31,9 +31,6 @@ export default function SessionList({
 
     return (
         <div className={cn("flex flex-col h-full p-4 bg-white", className)}>
-            <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-semibold text-gray-800 m-0">Chats</h2>
-            </div>
 
             <div className="flex-1 overflow-y-auto pr-2 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded [&::-webkit-scrollbar-track]:bg-transparent">
                 {filteredSessions.map(session => (
