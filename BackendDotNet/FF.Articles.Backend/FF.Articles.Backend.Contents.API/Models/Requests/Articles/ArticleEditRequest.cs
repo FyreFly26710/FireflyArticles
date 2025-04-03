@@ -13,7 +13,7 @@ public class ArticleEditRequest
     public string? ArticleType { get; set; }
     public long? ParentArticleId { get; set; }
     public long? TopicId { get; set; }
-    public List<string>? TagNames { get; set; }
+    public List<string>? Tags { get; set; }
     public int? SortNumber { get; set; }
     public int? IsHidden { get; set; }
 }

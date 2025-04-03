@@ -6,8 +6,7 @@ import { apiTagGetAll } from "@/api/contents/api/tag";
 // Fetch topic by ID
 export async function fetchTopic(topicId: number): Promise<API.TopicDto | undefined> {
     try {
-        const topicRes = await apiTopicGetById({ id: topicId, IncludeArticles: true });
-        // @ts-ignore
+        const topicRes = await apiTopicGetById({ id: topicId, IncludeArticles: true, IncludeSubArticles: true });
         return topicRes.data;
     } catch (e: any) {
         console.error("Failed fetching topic:", e.message);
@@ -22,12 +21,8 @@ export async function fetchTopicList(): Promise<API.TopicDto[] | undefined> {
             PageNumber: 1,
             PageSize: 100,
             IncludeArticles: true,
-            IncludeSubArticles: false,
-            IncludeContent: false,
-            IncludeUser: false,
         });
-        // @ts-ignore
-        return topicListRes.data.data;
+        return topicListRes.data?.data ?? [];
     } catch (e: any) {
         console.error("Failed fetching topics:", e.message);
         return undefined;
@@ -38,7 +33,6 @@ export async function fetchTopicList(): Promise<API.TopicDto[] | undefined> {
 export async function fetchTags(): Promise<API.TagDto[] | undefined> {
     try {
         const tagRes = await apiTagGetAll();
-        // @ts-ignore
         return tagRes.data;
     } catch (e: any) {
         console.error("Failed fetching tags:", e.message);
@@ -53,7 +47,6 @@ export async function fetchArticle(articleId: number): Promise<API.ArticleDto | 
         //     return { articleType: "Article", topicId: topicId, title: topic?.title } as API.ArticleDto;
         // } else 
         const articleRes = await apiArticleGetById({ id: articleId, IncludeContent: true });
-        // @ts-ignore
         return articleRes.data;
 
     } catch (e: any) {

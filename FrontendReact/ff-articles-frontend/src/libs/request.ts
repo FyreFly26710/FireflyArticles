@@ -1,17 +1,18 @@
-import axios, { AxiosResponse } from "axios";
+import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
+
 const DevBaseUrl = "http://localhost:21000/";
 const ProdBaseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-const url = ProdBaseUrl??DevBaseUrl;
+const url = ProdBaseUrl ?? DevBaseUrl;
 
-// create Axios
-const myAxios = axios.create({
+// create Axios instance
+const axiosInstance = axios.create({
     baseURL: url,
     timeout: 20000,
     withCredentials: true,
 });
 
 // request interceptors
-myAxios.interceptors.request.use(
+axiosInstance.interceptors.request.use(
     function (config) {
         return config;
     },
@@ -21,8 +22,8 @@ myAxios.interceptors.request.use(
     },
 );
 
-// create interceptors
-myAxios.interceptors.response.use(
+// response interceptors
+axiosInstance.interceptors.response.use(
     // 2xx response
     function (response: AxiosResponse<any>) {
         return response.data;
@@ -33,4 +34,13 @@ myAxios.interceptors.response.use(
     },
 );
 
-export default myAxios;
+// Type-safe request function
+function request<T = any>(url: string, config?: AxiosRequestConfig): Promise<T> {
+    return axiosInstance.request<T, T>({
+        url,
+        ...config
+    });
+}
+
+// For backward compatibility with existing API usage
+export default request;

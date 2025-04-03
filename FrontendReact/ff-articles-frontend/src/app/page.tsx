@@ -1,4 +1,3 @@
-import "./index.css";
 import { Divider, Flex } from "antd";
 import Title from "antd/es/typography/Title";
 import Link from "antd/es/typography/Link";
@@ -20,7 +19,7 @@ export default async function HomePage() {
             IncludeSubArticles: false,
             IncludeUser: false,
         });
-        topicList = res.data.data ?? [];
+        topicList = res.data?.data ?? [];
     } catch (e: any) {
         console.error("Failed fetching topics, " + e.message);
     }
@@ -33,7 +32,7 @@ export default async function HomePage() {
             IncludeUser: false,
             DisplaySubArticles: false,
         });
-        articleList = res.data.data ?? [];
+        articleList = res.data?.data ?? [];
     } catch (e: any) {
         console.error("Failed fetching articles, " + e.message);
     }

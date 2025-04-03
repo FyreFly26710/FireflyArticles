@@ -1,0 +1,26 @@
+.card {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.card :global(.ant-card-body) {
+    padding: 12px !important;
+}
+
+.container {
+    flex-direction: column;
+    width: 100%;
+}
+
+.headerCard {
+    width: 100%;
+    box-sizing: border-box;
+    height: 170px;
+    overflow-y: auto;
+}
+
+.contentCard {
+    width: 100%;
+    min-height: calc(100vh - 265px);
+    box-sizing: border-box;
+}

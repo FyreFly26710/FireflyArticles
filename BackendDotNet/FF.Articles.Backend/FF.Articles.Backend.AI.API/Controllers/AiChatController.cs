@@ -9,10 +9,11 @@ namespace FF.Articles.Backend.AI.API.Controllers;
 [Route("api/ai/chat")]
 public class AiChatController(IChatService chatService) : ControllerBase
 {
-    [HttpPost]
+    [HttpPost("get-message")]
     public async Task<IActionResult> Chat([FromBody] ClientMessagesRequest request, CancellationToken cancellationToken)
     {
-        var result = await chatService.ChatAsync(request.Message, request.ConversationId, HttpContext.Request, cancellationToken);
+        //var result = await chatService.ChatAsync(request.Message, request.ConversationId, HttpContext.Request, cancellationToken);
+        var result = request.Message;
         return Ok(result);
     }
 }

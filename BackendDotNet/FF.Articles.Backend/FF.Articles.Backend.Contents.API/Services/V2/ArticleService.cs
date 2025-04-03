@@ -160,9 +160,9 @@ public class ArticleService : RedisService<Article>, IArticleService
         }
         if (articleEditRequest.SortNumber != null && article.SortNumber != articleEditRequest.SortNumber)
             article.SortNumber = (int)articleEditRequest.SortNumber;
-        if (articleEditRequest.TagNames != null)
+        if (articleEditRequest.Tags != null)
         {
-            var tagIds = (await _tagRedisRepository.GetOrCreateByNamesAsync(articleEditRequest.TagNames)).Select(t => t.Id).ToList();
+            var tagIds = (await _tagRedisRepository.GetOrCreateByNamesAsync(articleEditRequest.Tags)).Select(t => t.Id).ToList();
             await _articleTagRedisRepository.EditArticleTags(article.Id, tagIds);
         }
         //article.UpdateTime = DateTime.UtcNow;

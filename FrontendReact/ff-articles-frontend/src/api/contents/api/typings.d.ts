@@ -118,7 +118,7 @@ declare namespace API {
     articleType?: string;
     parentArticleId?: number;
     topicId?: number;
-    tagNames?: string[];
+    tags?: string[];
     sortNumber?: number;
     isHidden?: number;
   };

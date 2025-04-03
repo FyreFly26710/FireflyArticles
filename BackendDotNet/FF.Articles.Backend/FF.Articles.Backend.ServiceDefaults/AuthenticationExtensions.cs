@@ -20,7 +20,7 @@ public static class AuthenticationExtensions
                 options.Cookie.SameSite = SameSiteMode.None;
             });
         builder.Services.AddDataProtection()
-            .PersistKeysToFileSystem(new DirectoryInfo(@"D:\202502"))
+            .PersistKeysToFileSystem(new DirectoryInfo(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".firefly-articles", "data-protection")))
             .SetApplicationName("SharedAuth");
         return builder;
     }

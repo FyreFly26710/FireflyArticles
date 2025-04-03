@@ -19,6 +19,7 @@
     "@emotion/css": "^11.13.5",
     "@reduxjs/toolkit": "^2.5.1",
     "@types/qs": "^6.9.18",
+    "@types/styled-components": "^5.1.34",
     "antd": "^5.24.0",
     "axios": "^1.7.9",
     "github-markdown-css": "^5.8.1",
@@ -26,7 +27,8 @@
     "qs": "^6.14.0",
     "react": "^18",
     "react-dom": "^18",
-    "react-redux": "^9.2.0"
+    "react-redux": "^9.2.0",
+    "styled-components": "^6.1.16"
   },
   "devDependencies": {
     "@types/node": "^20",

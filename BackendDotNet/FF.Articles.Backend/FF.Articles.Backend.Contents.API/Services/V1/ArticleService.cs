@@ -158,9 +158,9 @@ public class ArticleService : BaseService<Article, ContentsDbContext>, IArticleS
             }
             if (articleEditRequest.SortNumber != null && article.SortNumber != articleEditRequest.SortNumber)
                 article.SortNumber = (int)articleEditRequest.SortNumber;
-            if (articleEditRequest.TagNames != null)
+            if (articleEditRequest.Tags != null)
             {
-                var tagIds = (await _tagRepository.GetOrCreateByNamesAsync(articleEditRequest.TagNames)).Select(t => t.Id).ToList();
+                var tagIds = (await _tagRepository.GetOrCreateByNamesAsync(articleEditRequest.Tags)).Select(t => t.Id).ToList();
                 await _articleTagRepository.EditArticleTags(article.Id, tagIds);
             }
             //article.UpdateTime = DateTime.UtcNow;
