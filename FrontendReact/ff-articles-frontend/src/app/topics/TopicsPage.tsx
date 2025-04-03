@@ -1,5 +1,5 @@
 import Title from "antd/es/typography/Title";
-import TopicList from "@/components/TopicList";
+import TopicList from "@/components/article/TopicList";
 import { apiTopicGetByPage } from "@/api/contents/api/topic";
 import { Divider } from "antd";
 

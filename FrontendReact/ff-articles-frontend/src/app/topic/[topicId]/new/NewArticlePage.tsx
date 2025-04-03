@@ -1,6 +1,6 @@
 "use server";
-import ArticleCard from "@/components/ArticleCard";
-import ArticleSider from "@/components/ArticleSider";
+import ArticleCard from "@/components/article/ArticleCard";
+import ArticleSider from "@/components/article/ArticleSider";
 import { fetchTags, fetchTopic, fetchTopicList } from "@/app/topic/utils/fetcher";
 import { Flex } from "antd";
 import { redirect } from "next/navigation";

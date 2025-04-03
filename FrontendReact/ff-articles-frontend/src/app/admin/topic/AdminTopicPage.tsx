@@ -4,8 +4,8 @@ import { Button } from "antd";
 import React from "react";
 import { getTopicColumns } from "@/app/admin/utils/topicColumns";
 import { useTopicAdmin } from "@/app/admin/utils/useTopicAdmin";
-import CreateTopicModal from "@/components/CreateTopicModal";
-import UpdateTopicModal from "@/components/UpdateTopicModal";
+import CreateTopicModal from "@/components/admin/CreateTopicModal";
+import UpdateTopicModal from "@/components/admin/UpdateTopicModal";
 
 const AdminTopicPage: React.FC = () => {
     const {

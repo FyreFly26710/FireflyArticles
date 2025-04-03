@@ -1,8 +1,8 @@
 import { Divider, Flex } from "antd";
 import Title from "antd/es/typography/Title";
 import Link from "antd/es/typography/Link";
-import TopicList from "@/components/TopicList";
-import ArticleList from "@/components/ArticleList";
+import TopicList from "@/components/article/TopicList";
+import ArticleList from "@/components/article/ArticleList";
 import { apiTopicGetByPage } from "@/api/contents/api/topic";
 import { apiArticleGetByPage } from "@/api/contents/api/article";
 

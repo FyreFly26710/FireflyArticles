@@ -51,7 +51,7 @@ public class DeepSeekClient : IDeepSeekClient
         return JsonSerializer.Deserialize<ChatResponse>(resContent, JsonSerializerOptions);
     }
 
-    public async IAsyncEnumerable<Choice>? ChatStreamAsync(ChatRequest request, [EnumeratorCancellation] CancellationToken cancellationToken)
+    public async IAsyncEnumerable<ChatResponse>? ChatStreamAsync(ChatRequest request, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         request.Stream = true;
         var content = new StringContent(JsonSerializer.Serialize(request, JsonSerializerOptions), Encoding.UTF8, "application/json");
@@ -72,17 +72,15 @@ public class DeepSeekClient : IDeepSeekClient
                 var line = await reader.ReadLineAsync();
                 if (line != null && line.StartsWith("data: "))
                 {
-
                     var json = line.Substring(6);
                     if (!string.IsNullOrWhiteSpace(json) && json != "[DONE]")
                     {
                         var chatResponse = JsonSerializer.Deserialize<ChatResponse>(json, JsonSerializerOptions);
-                        var choice = chatResponse?.Choices.FirstOrDefault();
-                        if (choice is null)
+                        if (chatResponse is null)
                         {
                             continue;
                         }
-                        yield return choice;
+                        yield return chatResponse;
                     }
                 }
             }

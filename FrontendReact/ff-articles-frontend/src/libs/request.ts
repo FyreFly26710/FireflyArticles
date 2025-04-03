@@ -1,13 +1,16 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 
-const DevBaseUrl = "http://localhost:21000/";
+const DevBaseUrl = "https://localhost:21000/";
 const ProdBaseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 const url = ProdBaseUrl ?? DevBaseUrl;
+
+// Default timeout (in milliseconds)
+const DEFAULT_TIMEOUT = 20*1000;
 
 // create Axios instance
 const axiosInstance = axios.create({
     baseURL: url,
-    timeout: 20000,
+    timeout: DEFAULT_TIMEOUT,
     withCredentials: true,
 });
 
@@ -36,9 +39,13 @@ axiosInstance.interceptors.response.use(
 
 // Type-safe request function
 function request<T = any>(url: string, config?: AxiosRequestConfig): Promise<T> {
+    // Use the provided timeout in config if available, otherwise use default
+    const timeout = config?.timeout || DEFAULT_TIMEOUT;
+    
     return axiosInstance.request<T, T>({
         url,
-        ...config
+        ...config,
+        timeout, // Ensure timeout is applied
     });
 }
 

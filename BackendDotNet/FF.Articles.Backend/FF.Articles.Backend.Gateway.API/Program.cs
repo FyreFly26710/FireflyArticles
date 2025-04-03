@@ -1,3 +1,4 @@
+using FF.Articles.Backend.Common.Middlewares;
 using Yarp.ReverseProxy.Transforms;
 
 // This is a minimal reverse proxy example using YARP
@@ -20,9 +21,11 @@ builder.Services.AddReverseProxy()
     });
 
 // Increase Kestrel limits for larger requests/responses
-builder.WebHost.ConfigureKestrel(options =>{ options.Limits.MaxRequestBodySize = 104857600;}); // 100MB
+builder.WebHost.ConfigureKestrel(options => { options.Limits.MaxRequestBodySize = 104857600; }); // 100MB
 
 var app = builder.Build();
+
+app.UseMiddleware<GlobalExceptionMiddleware>();
 
 //app.UseExceptionHandler(appBuilder =>
 //{

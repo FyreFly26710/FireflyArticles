@@ -2,7 +2,7 @@
 import { GithubFilled, LogoutOutlined, } from '@ant-design/icons';
 import { ProLayout, } from '@ant-design/pro-components';
 import { Dropdown, message, } from 'antd';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
@@ -25,13 +25,19 @@ export default function BasicLayout({ children }: Props) {
     const loginUser = useSelector((state: RootState) => state.loginUser);
     const router = useRouter();
 
+    // Force client-side only rendering for the ProLayout to avoid hydration mismatch
+    const [mounted, setMounted] = useState(false);
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
     const userLogout = async () => {
         try {
             await apiAuthLogout();
             message.success("Logout successfully");
             // Clear user from both Redux and localStorage
-            dispatch(setLoginUser(DEFAULT_USER));
             storage.clearUser();
+            dispatch(setLoginUser(DEFAULT_USER));
             router.push("/user/login");
         } catch (e: any) {
             message.error(e.message);
@@ -39,18 +45,46 @@ export default function BasicLayout({ children }: Props) {
         return;
     };
 
+    // Return a simpler layout during server-side rendering to avoid hydration mismatch
+    if (!mounted) {
+        return (
+            <div id="basicLayout">
+                <div style={{ minHeight: '100vh' }}>
+                    {children}
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div id="basicLayout">
             <ProLayout
                 title="FireFly Articles"
                 layout="top"
+                fixedHeader
+                fixSiderbar
+                style={{
+                    minHeight: '100vh',
+                }}
+                token={{
+                    header: {
+                        colorBgHeader: '#fff',
+                        colorHeaderTitle: '#000',
+                        colorTextMenu: '#000',
+                        colorTextMenuSecondary: '#000',
+                        colorTextMenuSelected: '#1890ff',
+                        colorBgMenuItemSelected: '#e6f7ff',
+                    }
+                }}
                 logo={
-                    <Image
-                        src="/assets/logo.png"
-                        height={32}
-                        width={32}
-                        alt="Firefly Bird"
-                    />
+                    <div className="flex items-center h-full">
+                        <Image
+                            src="/assets/logo.png"
+                            height={32}
+                            width={32}
+                            alt="Firefly Bird"
+                        />
+                    </div>
                 }
                 location={{
                     pathname,

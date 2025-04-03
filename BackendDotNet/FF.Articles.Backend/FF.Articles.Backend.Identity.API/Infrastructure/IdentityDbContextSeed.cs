@@ -14,7 +14,7 @@ namespace FF.Articles.Backend.Identity.API.Infrastructure
             {
                 var dbContext = scope.ServiceProvider.GetRequiredService<IdentityDbContext>();
 
-                var pendingMigrations = dbContext.Database.GetPendingMigrations();
+                var pendingMigrations = dbContext?.Database?.GetPendingMigrations();
 
                 hasPendingMigrations = pendingMigrations?.Any();               
                 
