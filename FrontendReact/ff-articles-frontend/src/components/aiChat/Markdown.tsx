@@ -91,7 +91,6 @@ function CodeBlock({ children, className, hiddenCodeCopyButton }: CodeBlockProps
             </div>
             <SyntaxHighlighter
                 language={language}
-                //style={atomDark}
                 customStyle={{
                     margin: 0,
                     borderTopLeftRadius: 0,

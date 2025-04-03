@@ -44,13 +44,30 @@ export default function BasicLayout({ children }: Props) {
             <ProLayout
                 title="FireFly Articles"
                 layout="top"
+                fixedHeader
+                fixSiderbar
+                style={{
+                    minHeight: '100vh',
+                }}
+                token={{
+                    header: {
+                        colorBgHeader: '#fff',
+                        colorHeaderTitle: '#000',
+                        colorTextMenu: '#000',
+                        colorTextMenuSecondary: '#000',
+                        colorTextMenuSelected: '#1890ff',
+                        colorBgMenuItemSelected: '#e6f7ff',
+                    }
+                }}
                 logo={
-                    <Image
-                        src="/assets/logo.png"
-                        height={32}
-                        width={32}
-                        alt="Firefly Bird"
-                    />
+                    <div className="flex items-center h-full">
+                        <Image
+                            src="/assets/logo.png"
+                            height={32}
+                            width={32}
+                            alt="Firefly Bird"
+                        />
+                    </div>
                 }
                 location={{
                     pathname,

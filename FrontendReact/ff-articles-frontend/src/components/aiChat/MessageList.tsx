@@ -1,31 +1,15 @@
 import { useEffect, useRef } from 'react'
 import Message from './Message'
 import { cn } from '@/libs/utils'
+import { Message as MessageType, Session } from '@/types/chat'
 
-interface Message {
-    id: string
-    content: string
-    role: 'user' | 'assistant' | 'system'
-    timestamp?: number
-    generating?: boolean
-    model?: string
-    tokenCount?: number
-    tokensUsed?: number
-    wordCount?: number
-}
-
-interface Session {
-    id: string
-    type: 'chat' | 'system'
-}
-
-interface Props {
-    messages: Message[]
+interface MessageListProps {
+    messages: MessageType[]
     session: Session
     className?: string
 }
 
-export default function MessageList({ messages, session, className }: Props) {
+export default function MessageList({ messages, session, className }: MessageListProps) {
     const ref = useRef<HTMLDivElement>(null)
 
     // Simple scroll to bottom on new messages
@@ -38,7 +22,7 @@ export default function MessageList({ messages, session, className }: Props) {
     return (
         <div
             className={cn(
-                'overflow-y-auto w-full h-full pr-0 pl-0',
+                'w-full h-full bg-white px-4',
                 className
             )}
             ref={ref}

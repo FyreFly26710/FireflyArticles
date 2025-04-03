@@ -3,15 +3,9 @@ import { useEffect } from 'react'
 import { Typography, Button } from 'antd'
 import { EditOutlined } from '@ant-design/icons'
 import { cn } from '@/libs/utils'
+import { Session } from '@/types/chat'
 
-interface Session {
-    id: string
-    name: string
-    type: 'chat' | 'system'
-    messages: any[]
-}
-
-interface Props {
+interface HeaderProps {
     session: Session
     onEditSession?: (session: Session) => void
     autoGenerateTitle?: boolean
@@ -21,7 +15,7 @@ export default function Header({
     session,
     onEditSession,
     autoGenerateTitle = true
-}: Props) {
+}: HeaderProps) {
     useEffect(() => {
         if (
             autoGenerateTitle &&

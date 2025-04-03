@@ -4,6 +4,7 @@ import { UserOutlined, RobotOutlined, SettingOutlined } from '@ant-design/icons'
 import { format } from 'date-fns'
 import Markdown from './Markdown'
 import { cn } from '@/libs/utils'
+import { Message as MessageType } from '@/types/chat'
 
 // Placeholder values for atoms
 const showMessageTimestamp = true
@@ -15,30 +16,18 @@ const enableMarkdownRendering = true
 const currentSessionPicUrl = null
 const setOpenSettingWindow = (type: string) => console.log('Open settings:', type)
 
-interface Message {
-    id: string
-    content: string
-    role: 'user' | 'assistant' | 'system'
-    timestamp?: number
-    generating?: boolean
-    model?: string
-    tokenCount?: number
-    tokensUsed?: number
-    wordCount?: number
-}
-
-interface Props {
+interface MessageProps {
     id?: string
     sessionId: string
     sessionType: 'chat' | 'system'
-    msg: Message
+    msg: MessageType
     className?: string
     collapseThreshold?: number
     hiddenButtonGroup?: boolean
     small?: boolean
 }
 
-export default function Message(props: Props) {
+export default function Message(props: MessageProps) {
     const { msg, className, collapseThreshold, hiddenButtonGroup, small } = props
 
     const needCollapse = collapseThreshold
@@ -50,12 +39,6 @@ export default function Message(props: Props) {
 
     const tips: string[] = []
     if (props.sessionType === 'chat' || !props.sessionType) {
-        if (showWordCount && !msg.generating) {
-            tips.push(`word count: ${msg.wordCount || msg.content.split(' ').length}`)
-        }
-        if (showTokenCount && !msg.generating) {
-            tips.push(`token count: ${msg.tokenCount || Math.ceil(msg.content.length / 4)}`)
-        }
         if (showTokenUsed && msg.role === 'assistant' && !msg.generating) {
             tips.push(`tokens used: ${msg.tokensUsed || 'unknown'}`)
         }
@@ -64,18 +47,6 @@ export default function Message(props: Props) {
         }
     }
 
-    if (showMessageTimestamp && msg.timestamp !== undefined) {
-        const date = new Date(msg.timestamp)
-        let messageTimestamp: string
-        if (date.toDateString() === new Date().toDateString()) {
-            messageTimestamp = format(date, 'HH:mm')
-        } else if (date.getFullYear() === new Date().getFullYear()) {
-            messageTimestamp = format(date, 'MM-dd HH:mm')
-        } else {
-            messageTimestamp = format(date, 'yyyy-MM-dd HH:mm')
-        }
-        tips.push('time: ' + messageTimestamp)
-    }
 
     useEffect(() => {
         if (msg.generating) {
@@ -111,18 +82,24 @@ export default function Message(props: Props) {
             key={msg.id}
             className={cn(
                 'group/message',
-                'px-2',
+                'px-4',
                 msg.generating ? 'rendering' : 'render-done',
                 {
-                    user: 'bg-gray-100',
+                    user: 'bg-white',
                     system: 'bg-yellow-50',
                     assistant: 'bg-white',
                 }[msg.role || 'user'],
                 className,
             )}
         >
-            <div className="flex items-start space-x-4 p-4">
-                <div className="mt-2">
+            <div className={cn(
+                "flex items-start p-4",
+                msg.role === 'user' ? "flex-row-reverse space-x-reverse space-x-4" : "flex-row space-x-4"
+            )}>
+                <div className={cn(
+                    "mt-2",
+                    msg.role === 'user' ? "ml-4" : "mr-4"
+                )}>
                     {msg.role === 'assistant' ? (
                         currentSessionPicUrl ? (
                             <Avatar src={currentSessionPicUrl} size={28} />
@@ -144,19 +121,33 @@ export default function Message(props: Props) {
                         />
                     )}
                 </div>
-                <div className="flex-1 min-w-0">
-                    <div className={cn('msg-content', { 'text-sm': small })}>
-                        {enableMarkdownRendering && !isCollapsed ? (
-                            <Markdown>{content}</Markdown>
-                        ) : (
-                            <div>
+                <div className={cn(
+                    "flex-1 min-w-0 pt-2",
+                    msg.role === 'user' ? "text-right" : "text-left"
+                )}>
+                    {msg.role === 'user' ? (
+                        <div className="flex justify-end">
+                            <div className="bg-gray-100 rounded-lg p-3 max-w-[80%] break-words whitespace-pre-wrap text-left">
                                 {content}
-                                {needCollapse && isCollapsed && CollapseButton}
                             </div>
-                        )}
-                    </div>
-                    {needCollapse && !isCollapsed && CollapseButton}
-                    <Typography.Text type="secondary" className="text-xs">
+                        </div>
+                    ) : (
+                        <div className="mr-4 break-words whitespace-pre-wrap text-left">
+                            {enableMarkdownRendering && !isCollapsed ? (
+                                <Markdown>{content}</Markdown>
+                            ) : (
+                                <div>
+                                    {content}
+                                    {needCollapse && isCollapsed && CollapseButton}
+                                </div>
+                            )}
+                            {needCollapse && !isCollapsed && CollapseButton}
+                        </div>
+                    )}
+                    <Typography.Text type="secondary" className={cn(
+                        "text-xs mt-2 block",
+                        msg.role === 'user' ? "text-right" : "text-left"
+                    )}>
                         {tips.join(', ')}
                     </Typography.Text>
                 </div>
