@@ -17,10 +17,29 @@ public class UserUtil
 {
     public static UserApiDto GetUserFromHttpRequest(HttpRequest request)
     {
+        if (!request.HttpContext.User.Identity.IsAuthenticated)
+        {
+            throw new UnauthorizedAccessException("User is not authenticated");
+        }
+
         var user = request.HttpContext.User.FindFirst("user");
         if (user == null)
-            throw new UnauthorizedAccessException("User not found");
-        return JsonSerializer.Deserialize<UserApiDto>(user.Value);
+        {
+            // Check what claims are actually available for debugging
+            var availableClaims = request.HttpContext.User.Claims.Select(c => c.Type).ToList();
+            var claimsMessage = string.Join(", ", availableClaims);
+            
+            throw new UnauthorizedAccessException($"User claim not found in the authenticated user. Available claims: {claimsMessage}");
+        }
+        
+        try
+        {
+            return JsonSerializer.Deserialize<UserApiDto>(user.Value);
+        }
+        catch (JsonException ex)
+        {
+            throw new UnauthorizedAccessException($"Failed to deserialize user claim: {ex.Message}");
+        }
     }
     public static long GetUserId(HttpRequest request)
     {

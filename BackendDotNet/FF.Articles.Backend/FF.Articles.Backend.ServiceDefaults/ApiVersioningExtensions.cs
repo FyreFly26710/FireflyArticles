@@ -50,6 +50,29 @@ namespace FF.Articles.Backend.ServiceDefaults
                     }
                     return null;
                 });
+                
+                c.AddSecurityDefinition("cookieAuth", new OpenApiSecurityScheme
+                {
+                    Name = "AuthCookie", // Same as your cookie name
+                    Type = SecuritySchemeType.ApiKey,
+                    In = ParameterLocation.Cookie,
+                    Description = "Authentication using cookies"
+                });
+
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Id = "cookieAuth",
+                                Type = ReferenceType.SecurityScheme
+                            }
+                        },
+                        Array.Empty<string>()
+                    }
+                });
             });
             return builder;
         }
