@@ -10,7 +10,6 @@ interface SessionItemProps {
     onSelect: (session: Session) => void
     onEdit: (session: Session) => void
     onDelete: (session: Session) => void
-    className?: string
 }
 
 export default function SessionItem({
@@ -18,8 +17,7 @@ export default function SessionItem({
     isActive,
     onSelect,
     onEdit,
-    onDelete,
-    className
+    onDelete
 }: SessionItemProps) {
     const [isHovered, setIsHovered] = useState(false)
     const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false)
@@ -48,7 +46,6 @@ export default function SessionItem({
                     "flex items-center p-3 cursor-pointer transition-colors rounded-lg mb-2",
                     isActive ? "bg-gray-100" : "bg-transparent",
                     "hover:bg-gray-100",
-                    className
                 )}
                 onClick={() => onSelect(session)}
                 onMouseEnter={() => setIsHovered(true)}

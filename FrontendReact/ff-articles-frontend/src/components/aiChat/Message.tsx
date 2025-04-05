@@ -5,6 +5,7 @@ import { format } from 'date-fns'
 import Markdown from './Markdown'
 import { cn } from '@/libs/utils'
 import { Message as MessageType } from '@/types/chat'
+import { useChat } from '@/app/aichat/context/ChatContext'
 
 // Placeholder values for atoms
 const showMessageTimestamp = true
@@ -17,19 +18,12 @@ const currentSessionPicUrl = null
 const setOpenSettingWindow = (type: string) => console.log('Open settings:', type)
 
 interface MessageProps {
-    id?: string
-    sessionId: string
-    sessionType: 'chat' | 'system'
     msg: MessageType
-    className?: string
     collapseThreshold?: number
-    hiddenButtonGroup?: boolean
-    small?: boolean
 }
 
 export default function Message(props: MessageProps) {
-    const { msg, className, collapseThreshold, hiddenButtonGroup, small } = props
-
+    const { msg, collapseThreshold} = props
     const needCollapse = collapseThreshold
         && (JSON.stringify(msg.content)).length > collapseThreshold
         && (JSON.stringify(msg.content)).length - collapseThreshold > 50
@@ -38,14 +32,13 @@ export default function Message(props: MessageProps) {
     const ref = useRef<HTMLDivElement>(null)
 
     const tips: string[] = []
-    if (props.sessionType === 'chat' || !props.sessionType) {
-        if (showTokenUsed && msg.role === 'assistant' && !msg.generating) {
-            tips.push(`tokens used: ${msg.tokensUsed || 'unknown'}`)
-        }
-        if (showModelName && props.msg.role === 'assistant') {
-            tips.push(`model: ${props.msg.model || 'unknown'}`)
-        }
+    if (showTokenUsed && msg.role === 'assistant' && !msg.generating) {
+        tips.push(`tokens used: ${msg.tokensUsed || 'unknown'}`)
     }
+    if (showModelName && msg.role === 'assistant') {
+        tips.push(`model: ${msg.model || 'unknown'}`)
+    }
+
 
 
     useEffect(() => {
@@ -78,7 +71,7 @@ export default function Message(props: MessageProps) {
     return (
         <div
             ref={ref}
-            id={props.id}
+            id={msg.id}
             key={msg.id}
             className={cn(
                 'group/message',
@@ -89,7 +82,6 @@ export default function Message(props: MessageProps) {
                     system: 'bg-yellow-50',
                     assistant: 'bg-white',
                 }[msg.role || 'user'],
-                className,
             )}
         >
             <div className={cn(

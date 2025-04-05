@@ -14,16 +14,14 @@ import 'katex/dist/katex.min.css'
 interface MarkdownProps {
     children: string
     hiddenCodeCopyButton?: boolean
-    className?: string
 }
 
 interface CodeBlockProps {
     children: ReactNode
-    className?: string
     hiddenCodeCopyButton?: boolean
 }
 
-export default function Markdown({ children, hiddenCodeCopyButton, className }: MarkdownProps) {
+export default function Markdown({ children, hiddenCodeCopyButton }: MarkdownProps) {
     return (
         <ReactMarkdown
             remarkPlugins={[remarkGfm, remarkMath, remarkBreaks]}
@@ -33,7 +31,6 @@ export default function Markdown({ children, hiddenCodeCopyButton, className }: 
                 code: ({ children, className, ...props }) => (
                     <CodeBlock
                         children={children}
-                        className={className}
                         hiddenCodeCopyButton={hiddenCodeCopyButton}
                         {...props}
                     />
@@ -53,8 +50,8 @@ export default function Markdown({ children, hiddenCodeCopyButton, className }: 
     )
 }
 
-function CodeBlock({ children, className, hiddenCodeCopyButton }: CodeBlockProps) {
-    const match = /language-(\w+)/.exec(className || '')
+function CodeBlock({ children, hiddenCodeCopyButton }: CodeBlockProps) {
+    const match = /language-(\w+)/.exec( '')
     const language = match?.[1] || 'text'
 
     const handleCopy = async () => {
@@ -68,7 +65,7 @@ function CodeBlock({ children, className, hiddenCodeCopyButton }: CodeBlockProps
 
     if (!String(children).includes('\n')) {
         return (
-            <code className={`px-1 mx-1 rounded ${className || ''}`}>
+            <code className={`px-1 mx-1 rounded`}>
                 {children}
             </code>
         )

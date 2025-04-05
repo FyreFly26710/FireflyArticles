@@ -2,16 +2,15 @@
 import React, { useRef, useState } from 'react'
 import { Button, Input, Tooltip } from 'antd'
 import { SendOutlined, SettingOutlined } from '@ant-design/icons'
-import { Message, InputBoxProps } from '@/types/chat'
+import { Message } from '@/types/chat'
+import { useChat } from '@/app/aichat/context/ChatContext'
 
 export default function InputBox({
-    currentSessionId,
-    currentSessionType,
-    onSendMessage,
     onOpenSettings
-}: InputBoxProps) {
+}: { onOpenSettings?: () => void }) {
     const [messageInput, setMessageInput] = useState('')
     const inputRef = useRef<HTMLTextAreaElement>(null)
+    const { handleSendMessage } = useChat()
 
     const handleSubmit = (needGenerating = true) => {
         if (messageInput.trim() === '') {
@@ -23,7 +22,7 @@ export default function InputBox({
             role: 'user',
             timestamp: Date.now()
         }
-        onSendMessage(newMessage)
+        handleSendMessage(newMessage)
         setMessageInput('')
     }
 

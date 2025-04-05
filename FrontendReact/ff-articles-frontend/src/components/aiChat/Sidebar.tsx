@@ -9,7 +9,7 @@ import {
     MenuUnfoldOutlined
 } from '@ant-design/icons'
 import SessionList from './SessionList'
-import { Session } from '@/types/chat'
+import { useChat } from '@/app/aichat/context/ChatContext'
 
 const { Sider } = Layout
 
@@ -17,39 +17,28 @@ interface SidebarProps {
     openCopilotWindow: () => void
     openAboutWindow: () => void
     setOpenSettingWindow: (name: 'ai' | 'display' | null) => void
-    sessions: Session[]
-    currentSessionId: string
-    onSelectSession: (session: Session) => void
-    onEditSession: (session: Session) => void
-    onDeleteSession: (session: Session) => void
-    onCreateSession: () => void
-    onCollapse: (collapsed: boolean) => void
-    className?: string
 }
 
 export default function Sidebar({
     openCopilotWindow,
     openAboutWindow,
-    setOpenSettingWindow,
-    sessions,
-    currentSessionId,
-    onSelectSession,
-    onEditSession,
-    onDeleteSession,
-    onCreateSession,
-    onCollapse,
-    className
+    setOpenSettingWindow
 }: SidebarProps) {
     const sessionListRef = useRef<HTMLDivElement>(null)
     const [collapsed, setCollapsed] = useState(false)
+    
+    const {
+        handleCreateSession,
+        setSidebarCollapsed
+    } = useChat();
 
     const handleCollapse = (value: boolean) => {
         setCollapsed(value)
-        onCollapse(value)
+        setSidebarCollapsed(value)
     }
 
     const handleCreateNewSession = () => {
-        onCreateSession()
+        handleCreateSession()
         if (sessionListRef.current) {
             sessionListRef.current.scrollTo(0, 0)
         }
@@ -68,7 +57,6 @@ export default function Sidebar({
             }}
             width={240}
             collapsed={collapsed}
-            className={className}
         >
             <div className="flex flex-col h-full">
                 <div className="flex items-center justify-between p-2">
@@ -85,14 +73,7 @@ export default function Sidebar({
 
                 {!collapsed && (
                     <div className="flex-1 overflow-y-auto">
-                        <SessionList
-                            sessions={sessions}
-                            currentSessionId={currentSessionId}
-                            onSelectSession={onSelectSession}
-                            onEditSession={onEditSession}
-                            onDeleteSession={onDeleteSession}
-                            onCreateSession={onCreateSession}
-                        />
+                        <SessionList />
                     </div>
                 )}
 

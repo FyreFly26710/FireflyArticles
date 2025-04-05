@@ -1,16 +1,12 @@
 import { useEffect, useRef } from 'react'
 import Message from './Message'
-import { cn } from '@/libs/utils'
-import { Message as MessageType, Session } from '@/types/chat'
+import { useChat } from '@/app/aichat/context/ChatContext'
 
-interface MessageListProps {
-    messages: MessageType[]
-    session: Session
-    className?: string
-}
 
-export default function MessageList({ messages, session, className }: MessageListProps) {
+export default function MessageList() {
     const ref = useRef<HTMLDivElement>(null)
+    const { session } = useChat()
+    const messages = session.messages
 
     // Simple scroll to bottom on new messages
     useEffect(() => {
@@ -21,20 +17,13 @@ export default function MessageList({ messages, session, className }: MessageLis
 
     return (
         <div
-            className={cn(
-                'w-full h-full bg-white px-4',
-                className
-            )}
+            className="w-full h-full bg-white px-4"
             ref={ref}
         >
             {messages.map((msg, index) => (
                 <Message
                     key={msg.id}
-                    id={msg.id}
                     msg={msg}
-                    sessionId={session.id}
-                    sessionType={session.type}
-                    className={index === 0 ? 'pt-4' : ''}
                     collapseThreshold={msg.role === 'system' ? 150 : undefined}
                 />
             ))}

@@ -13,13 +13,12 @@ export interface Message {
 export interface Session {
     id: string
     name: string
-    type: 'chat' | 'system'
     messages: Message[]
 }
 
-export interface InputBoxProps {
-    currentSessionId: string
-    currentSessionType: 'chat' | 'system'
-    onSendMessage: (message: Message) => void
-    onOpenSettings?: () => void
-} 
+// export interface InputBoxProps {
+//     currentSessionId: string
+//     // currentSessionType: 'chat' | 'system'
+//     onSendMessage: (message: Message) => void
+//     onOpenSettings?: () => void
+// } 
