@@ -6,8 +6,11 @@ var redis = builder.AddRedis("redis")
     {
         e.Port = 6380;
         e.IsProxied = false;
-    });
+    })
+    .WithVolume("redis-data", "/data") // Persist Redis data
+    .WithRedisInsight(redisInsight => redisInsight.WithHostPort(8001));
 
+// Get postgres credentials from appsettings.json [parameters]
 var username = builder.AddParameter("username", secret: false);
 var password = builder.AddParameter("password", secret: false);
 var postgres = builder.AddPostgres("postgres", username, password)
@@ -19,13 +22,12 @@ var postgres = builder.AddPostgres("postgres", username, password)
         e.Port = 5433;
         e.IsProxied = false;
     })
-    // .WithEnvironment("POSTGRES_DB", "postgres")
-    .WithPgWeb(pgweb =>
-    {
-        pgweb.WithHostPort(5050);
-        pgweb.WithLifetime(ContainerLifetime.Persistent);
-    });
+    .WithEnvironment("POSTGRES_USER", username)
+    .WithEnvironment("POSTGRES_PASSWORD", password)
+    .WithVolume("postgres-data", "/data") // Persist PostgreSQL data
+    .WithPgWeb(pgweb => pgweb.WithHostPort(5050));
 
+// Todo: these databases are not created by apphost, need to create them manually
 var identityDb = postgres.AddDatabase("identitydb");
 var contentDb = postgres.AddDatabase("contentdb");
 var aidb = postgres.AddDatabase("aidb");

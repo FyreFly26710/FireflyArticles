@@ -12,6 +12,7 @@ using FF.Articles.Backend.AI.API.UnitOfWork;
 using FF.Articles.Backend.Common.Middlewares;
 using FF.Articles.Backend.ServiceDefaults;
 using Microsoft.EntityFrameworkCore;
+using FF.Articles.Backend.Common.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -27,6 +28,8 @@ builder.Services.AddDbContext<AIDbContext>(options =>
 
 
 builder.AddServiceDefaults();
+
+builder.Services.AddMigration<AIDbContext>();
 
 builder.Services.AddScoped<IAIDbContextUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IChatRoundRepository, ChatRoundRepository>();
@@ -46,8 +49,6 @@ builder.Services.AddSingleton<UserArticleStateStore>();
 builder.Services.AddControllers();
 
 builder.AddBasicApi();
-
-await AiDbSeed.InitializeDatabase(builder);
 
 var app = builder.Build();
 

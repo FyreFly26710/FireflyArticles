@@ -4,10 +4,13 @@ using FF.Articles.Backend.Contents.API.Infrastructure;
 using FF.Articles.Backend.Contents.API.Infrastructure.Migrations;
 using FF.Articles.Backend.ServiceDefaults;
 using Microsoft.EntityFrameworkCore;
+using FF.Articles.Backend.Common.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 builder.AddServiceDefaults();
+
+builder.Services.AddMigration<ContentsDbContext, ContentsDbSeed>();
 
 builder.Services.AddDbContext<ContentsDbContext>(options =>
 {
@@ -26,7 +29,6 @@ builder.Services.AddControllers();
 
 builder.AddCustomApiVersioning();
 
-await ContentsDbSeed.InitializeDatabase(builder);
 
 var app = builder.Build();
 
