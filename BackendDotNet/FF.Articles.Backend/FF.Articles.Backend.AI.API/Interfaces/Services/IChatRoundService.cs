@@ -9,7 +9,7 @@ public interface IChatRoundService : IBaseService<ChatRound>
 {
     Task<ChatRoundDto> NewChatRound(ChatRoundCreateRequest request, HttpRequest httpRequest, CancellationToken cancellationToken = default);
     // Task<ChatRoundDto> ReQueryChatRound(ChatRoundReQueryRequest request, HttpRequest httpRequest, CancellationToken cancellationToken = default);
-    Task StreamChatRound(ChatRoundCreateRequest request, HttpRequest httpRequest, HttpResponse httpResponse, CancellationToken cancellationToken = default);
+    IAsyncEnumerable<SseDto> StreamChatRound(ChatRoundCreateRequest request, HttpRequest httpRequest, CancellationToken cancellationToken = default);
     Task<bool> DisableChatRound(List<long> ids);
     Task<bool> EnableChatRound(List<long> ids);
     Task<bool> DeleteAsync(List<long> ids);

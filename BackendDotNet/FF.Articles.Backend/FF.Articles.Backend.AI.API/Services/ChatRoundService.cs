@@ -37,283 +37,134 @@ public class ChatRoundService(
 
     public async Task<ChatRoundDto> NewChatRound(ChatRoundCreateRequest request, HttpRequest httpRequest, CancellationToken cancellationToken = default)
     {
-        ValidateUserMessage(request.UserMessage);
+        var newRound = await getChatRound(request, httpRequest);
+        var chatRequest = await getChatRequest(newRound.SessionId, request);
 
-        var sessionId = await _sessionRepository.GetOrCreateSessionId(request.SessionId, 1);
-        var historyMessages = await GetHistoryMessages(sessionId, request.HistoryChatRoundIds);
-
-        var newRound = CreateNewChatRound(sessionId, request.UserMessage, request.Model);
-
-        // Get AI response
-        _logger.LogInformation("Asking DeepSeek AI for response...");
         var stopwatch = Stopwatch.StartNew();
-        var response = await QueryDeepSeek(
-            [.. historyMessages, Message.NewUserMessage(newRound.UserMessage)],
-            false,
-            cancellationToken
-        );
+        var response = await _deepSeekClient.ChatAsync(chatRequest, new CancellationToken());
+        if (response == null)
+            throw new ApiException(ErrorCode.SYSTEM_ERROR, "Failed to get response from DeepSeek AI");
         stopwatch.Stop();
-        _logger.LogInformation("DeepSeek AI response received, Time taken: {TimeTaken}ms", stopwatch.Elapsed.TotalMilliseconds);
 
-        // Store the response in the chat round
         newRound.AssistantMessage = response.Choices.FirstOrDefault()?.Message?.Content ?? string.Empty;
         newRound.PromptTokens = response?.Usage?.PromptTokens ?? 0;
         newRound.CompletionTokens = response?.Usage?.CompletionTokens ?? 0;
         newRound.TimeTaken = (int)stopwatch.Elapsed.TotalMilliseconds;
 
-        // Add the chat round to the conversation
         await _chatRoundRepository.CreateAsync(newRound);
         await _chatRoundRepository.SaveChangesAsync();
 
         return newRound.ToDto();
     }
 
-    public async Task StreamChatRound(ChatRoundCreateRequest request, HttpRequest httpRequest, HttpResponse httpResponse, CancellationToken cancellationToken = default)
+    public async IAsyncEnumerable<SseDto> StreamChatRound(ChatRoundCreateRequest request, HttpRequest httpRequest, CancellationToken cancellationToken = default)
     {
-        ValidateUserMessage(request.UserMessage);
+        var newRound = await getChatRound(request, httpRequest);
+        var chatRequest = await getChatRequest(newRound.SessionId, request);
 
-        var sessionId = await _sessionRepository.GetOrCreateSessionId(request.SessionId, 1);
-        var historyMessages = await GetHistoryMessages(sessionId, request.HistoryChatRoundIds);
-        var newRound = CreateNewChatRound(sessionId, request.UserMessage, request.Model);
+        // Send initial data
+        yield return new SseDto
+        {
+            Event = SseEvent.Init,
+            Data = JsonSerializer.Serialize(newRound.ToDto(), _jsonOptions)
+        };
 
-        // Prepare for streaming
         var responseBuilder = new StringBuilder();
-        _logger.LogInformation("Streaming response builder prepared");
         var stopwatch = Stopwatch.StartNew();
-        var tokenInfo = new TokenInfo();
+        int promptTokens = 0;
+        int completionTokens = 0;
 
-        // Send initial data to client
-        await SendInitialData(httpResponse, newRound, cancellationToken);
+        var streamingResponse = _deepSeekClient.ChatStreamAsync(chatRequest, new CancellationToken());
+        if (streamingResponse == null)
+            throw new ApiException(ErrorCode.SYSTEM_ERROR, "Failed to get streaming response from DeepSeek AI");
 
-        try
+        await foreach (var json in streamingResponse)
         {
-            await ProcessStreamingResponse(
-                httpResponse,
-                historyMessages,
-                newRound,
-                responseBuilder,
-                tokenInfo,
-                cancellationToken
-            );
-        }
-        catch (Exception ex)
-        {
-            await HandleStreamingError(
-                httpResponse,
-                ex,
-                newRound,
-                responseBuilder,
-                stopwatch,
-                tokenInfo,
-                cancellationToken
-            );
-            throw;
-        }
+            if (json == "[DONE]") break;
 
+            var chatResponse = JsonSerializer.Deserialize<ChatResponse>(json, _jsonOptions);
+            if (chatResponse == null) continue;
+
+            var content = chatResponse.Choices.FirstOrDefault()?.Delta?.Content;
+            if (content == null || string.IsNullOrEmpty(content)) continue;
+
+            if (chatResponse.Usage != null)
+            {
+                promptTokens = chatResponse.Usage.PromptTokens;
+                completionTokens = chatResponse.Usage.CompletionTokens;
+            }
+
+            responseBuilder.Append(content);
+
+            yield return new SseDto { Event = SseEvent.Data, Data = content };
+        }
         stopwatch.Stop();
-        _logger.LogInformation("Streaming completed, Time taken: {TimeTaken}ms", stopwatch.Elapsed.TotalMilliseconds);
+
         // Save the completed chat round
         newRound.AssistantMessage = responseBuilder.ToString();
         newRound.TimeTaken = (int)stopwatch.Elapsed.TotalMilliseconds;
-        newRound.PromptTokens = tokenInfo.PromptTokens;
-        newRound.CompletionTokens = tokenInfo.CompletionTokens;
+        newRound.PromptTokens = promptTokens;
+        newRound.CompletionTokens = completionTokens;
 
         await _chatRoundRepository.CreateAsync(newRound);
         await _chatRoundRepository.SaveChangesAsync();
 
-        // Send completion message
-        await SendCompletionData(httpResponse, newRound, cancellationToken);
-    }
-
-    #region Streaming Helper Methods
-
-    // Simple class to track token usage
-    private class TokenInfo
-    {
-        public int PromptTokens { get; set; }
-        public int CompletionTokens { get; set; }
-    }
-
-    private async Task ProcessStreamingResponse(
-        HttpResponse httpResponse,
-        List<Message> historyMessages,
-        ChatRound newRound,
-        StringBuilder responseBuilder,
-        TokenInfo tokenInfo,
-        CancellationToken cancellationToken)
-    {
-        var chatRequest = new ChatRequest
+        // Send completion data
+        yield return new SseDto
         {
-            Messages = [.. historyMessages, Message.NewUserMessage(newRound.UserMessage)],
-            Temperature = 0.7,
-            MaxTokens = 2000,
-            Stream = true
+            Event = SseEvent.End,
+            Data = JsonSerializer.Serialize(newRound.ToDto(), _jsonOptions)
         };
 
-        var streamingResponse = _deepSeekClient.ChatStreamAsync(chatRequest, cancellationToken);
-        if (streamingResponse == null)
-        {
-            throw new ApiException(ErrorCode.SYSTEM_ERROR, "Failed to get streaming response from DeepSeek AI");
-        }
-
-        // Process each chunk as it arrives
-        await foreach (var response in streamingResponse)
-        {
-            try
-            {
-                // Extract token usage when available
-                if (response.Usage != null)
-                {
-                    tokenInfo.PromptTokens = response.Usage.PromptTokens;
-                    tokenInfo.CompletionTokens = response.Usage.CompletionTokens;
-                }
-
-                // Extract and accumulate content
-                var choice = response.Choices.FirstOrDefault();
-                if (choice?.Delta != null && !string.IsNullOrEmpty(choice.Delta.Content))
-                {
-                    responseBuilder.Append(choice.Delta.Content);
-                }
-
-                // Forward the raw response to client
-                await httpResponse.WriteAsync($"data: {JsonSerializer.Serialize(response, _jsonOptions)}\n\n", cancellationToken);
-                await httpResponse.Body.FlushAsync(cancellationToken);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error processing streaming chunk");
-            }
-        }
-
-        // Send stream end marker
-        await httpResponse.WriteAsync("data: [DONE]\n\n", cancellationToken);
-        await httpResponse.Body.FlushAsync(cancellationToken);
     }
 
-    private async Task SendInitialData(HttpResponse httpResponse, ChatRound newRound, CancellationToken cancellationToken)
+    private async Task<ChatRound> getChatRound(ChatRoundCreateRequest request, HttpRequest httpRequest)
     {
-        var initialData = new
-        {
-            chatRoundId = newRound.Id,
-            sessionId = newRound.SessionId,
-            userMessage = newRound.UserMessage,
-            model = newRound.Model,
-            isActive = newRound.IsActive,
-            createdAt = newRound.CreatedAt,
-            type = "init"
-        };
-
-        await SendSSEMessage(httpResponse, JsonSerializer.Serialize(initialData, _jsonOptions), "init", cancellationToken);
-    }
-
-    private async Task SendCompletionData(HttpResponse httpResponse, ChatRound newRound, CancellationToken cancellationToken)
-    {
-        var finalData = new
-        {
-            chatRoundId = newRound.Id,
-            sessionId = newRound.SessionId,
-            userMessage = newRound.UserMessage,
-            assistantMessage = newRound.AssistantMessage,
-            model = newRound.Model,
-            isActive = newRound.IsActive,
-            createdAt = newRound.CreatedAt,
-            promptTokens = newRound.PromptTokens,
-            completionTokens = newRound.CompletionTokens,
-            timeTaken = newRound.TimeTaken,
-            type = "done"
-        };
-
-        await SendSSEMessage(httpResponse, JsonSerializer.Serialize(finalData, _jsonOptions), "done", cancellationToken);
-    }
-
-    private async Task HandleStreamingError(
-        HttpResponse httpResponse,
-        Exception ex,
-        ChatRound newRound,
-        StringBuilder responseBuilder,
-        Stopwatch stopwatch,
-        TokenInfo tokenInfo,
-        CancellationToken cancellationToken)
-    {
-        _logger.LogError(ex, "Error streaming response from DeepSeek AI");
-        await SendSSEMessage(httpResponse, "Error: " + ex.Message, "error", cancellationToken);
-
-        // Save partial response
-        newRound.AssistantMessage = responseBuilder.ToString() + "\n\n[Error: Response was interrupted]";
-        newRound.TimeTaken = (int)stopwatch.Elapsed.TotalMilliseconds;
-        newRound.PromptTokens = tokenInfo.PromptTokens;
-        newRound.CompletionTokens = tokenInfo.CompletionTokens;
-
-        await _chatRoundRepository.CreateAsync(newRound);
-        await _chatRoundRepository.SaveChangesAsync();
-    }
-
-    private async Task SendSSEMessage(HttpResponse response, string data, string eventType, CancellationToken cancellationToken)
-    {
-        // Format according to SSE specification
-        var message = $"event: {eventType}\ndata: {data}\n\n";
-        await response.WriteAsync(message, cancellationToken);
-        await response.Body.FlushAsync(cancellationToken);
-    }
-
-    #endregion
-
-    #region Helper Methods
-
-    private void ValidateUserMessage(string userMessage)
-    {
-        if (string.IsNullOrEmpty(userMessage?.Trim()))
+        if (string.IsNullOrEmpty(request.UserMessage?.Trim()))
             throw new ApiException(ErrorCode.PARAMS_ERROR, "User message is required");
-    }
 
-    private async Task<List<Message>> GetHistoryMessages(long sessionId, List<long>? historyChatRoundIds)
-    {
-        var chatRounds = await _chatRoundRepository.GetChatsBySessionId(sessionId);
+        // Create or get session
+        var sessionId = (await _sessionRepository.GetByIdAsync(request.SessionId ?? 0L))?.Id ?? 0L;
+        if (sessionId == 0L)
+        {
+            var session = new Session
+            {
+                Id = EntityUtil.GenerateSnowflakeId(),
+                UserId = UserUtil.GetUserId(httpRequest),
+                TimeStamp = request.SessionTimeStamp,
+            };
+            sessionId = await _sessionRepository.CreateAsync(session);
+            await _sessionRepository.SaveChangesAsync();
+        }
 
-        return chatRounds
-            .Where(c => c.IsActive)
-            .Where(c => historyChatRoundIds == null || historyChatRoundIds.Count == 0 || historyChatRoundIds.Contains(c.Id))
-            .SelectMany(c => c.ToMessages())
-            .ToList();
-    }
-
-    private ChatRound CreateNewChatRound(long sessionId, string userMessage, string? model)
-    {
-        return new ChatRound
+        // Create new chat round
+        var newRound = new ChatRound
         {
             Id = EntityUtil.GenerateSnowflakeId(),
             SessionId = sessionId,
-            UserMessage = userMessage,
-            Model = model ?? "",
+            UserMessage = request.UserMessage,
+            Model = request.Model ?? "",
             IsActive = true,
-            CreatedAt = DateTime.UtcNow
         };
+        return newRound;
     }
-
-    private async Task<ChatResponse> QueryDeepSeek(List<Message> messages, bool stream = false, CancellationToken cancellationToken = default)
+    private async Task<ChatRequest> getChatRequest(long sessionId, ChatRoundCreateRequest request)
     {
+        var chatRounds = await _chatRoundRepository.GetChatsBySessionId(sessionId);
+        var historyMessages = chatRounds
+            .Where(c => c.IsActive)
+            .Where(c => request.HistoryChatRoundIds == null || request.HistoryChatRoundIds.Count == 0 || request.HistoryChatRoundIds.Contains(c.Id))
+            .SelectMany(c => c.ToMessages())
+            .ToList();
         var chatRequest = new ChatRequest
         {
-            Messages = messages,
+            Messages = [.. historyMessages, Message.NewUserMessage(request.UserMessage)],
             Temperature = 0.7,
             MaxTokens = 2000,
-            Stream = stream
+            Stream = false
         };
-
-        // Get AI response
-        var response = await _deepSeekClient.ChatAsync(chatRequest, cancellationToken);
-
-        if (response == null)
-        {
-            _logger.LogError("Failed to get response from DeepSeek AI");
-            throw new ApiException(ErrorCode.SYSTEM_ERROR, "Failed to get response from DeepSeek AI");
-        }
-
-        return response;
+        return chatRequest;
     }
-
-    #endregion
-
     #region Chat Management
 
     public async Task<bool> DisableChatRound(List<long> ids) => await SwitchChatRoundStatus(ids, false);

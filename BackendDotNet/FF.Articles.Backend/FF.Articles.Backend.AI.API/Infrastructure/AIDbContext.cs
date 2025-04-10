@@ -31,21 +31,20 @@ public class AIDbContext : DbContext
 
     private void ConfigureSession(ModelBuilder modelBuilder)
     {
-        EFCoreUtil.ConfigBasetEntityIgnoreOptions<Session>(modelBuilder);
+        EFCoreUtil.ConfigBaseEntity<Session>(modelBuilder, [BaseProperty.CreateTime, BaseProperty.UpdateTime]);
 
         modelBuilder.Entity<Session>(entity =>
         {
             entity.ToTable("Session");
             entity.Property(e => e.SessionName).HasMaxLength(256);
             entity.Property(e => e.UserId).IsRequired().HasDefaultValue(0L);
-            entity.Property(e => e.CreatedAt).IsRequired().HasDefaultValue(DateTime.UtcNow);
-
+            entity.Property(e => e.TimeStamp).IsRequired();
             entity.HasIndex(e => e.UserId).HasDatabaseName("IX_Session_UserId");
         });
     }
     private void ConfigureChatRound(ModelBuilder modelBuilder)
     {
-        EFCoreUtil.ConfigBasetEntityIgnoreOptions<ChatRound>(modelBuilder);
+        EFCoreUtil.ConfigBaseEntity<ChatRound>(modelBuilder, [BaseProperty.CreateTime, BaseProperty.UpdateTime]);
 
         modelBuilder.Entity<ChatRound>(entity =>
         {
@@ -58,13 +57,14 @@ public class AIDbContext : DbContext
             entity.Property(e => e.TimeTaken).IsRequired().HasDefaultValue(0);
             entity.Property(e => e.PromptTokens).IsRequired().HasDefaultValue(0);
             entity.Property(e => e.CompletionTokens).IsRequired().HasDefaultValue(0);
+            entity.Property(e => e.TimeStamp).IsRequired();
 
             entity.HasIndex(e => e.SessionId).HasDatabaseName("IX_ChatRound_SessionId");
         });
     }
     private void ConfigureSystemMessage(ModelBuilder modelBuilder)
     {
-        EFCoreUtil.ConfigBasetEntityIgnoreOptions<SystemMessage>(modelBuilder);
+        EFCoreUtil.ConfigBaseEntity<SystemMessage>(modelBuilder, []);
 
         modelBuilder.Entity<SystemMessage>(entity =>
         {

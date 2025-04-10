@@ -7,6 +7,5 @@ namespace FF.Articles.Backend.AI.API.Interfaces.Repositories;
 
 public interface ISessionRepository : IBaseRepository<Session, AIDbContext>
 {
-    Task<long> GetOrCreateSessionId(long sessionId, long userId);
     Task<List<Session>> GetSessionsByUserId(long userId);
 }

@@ -17,7 +17,7 @@ export async function apiChatRoundAddByRequest(
       "Content-Type": "application/json",
     },
     data: body,
-    timeout: 10*60*1000,
+    timeout: 10 * 60 * 1000,
     ...(options || {}),
   });
 }
@@ -29,7 +29,7 @@ export async function apiChatRoundAddByRequest(
 export function apiChatRoundStreamResponse(
   body: API.ChatRoundCreateRequest,
   callbacks: {
-    onInit?: (data: any) => void;
+    onInit?: (data: API.ChatRoundDto) => void;
     onChunk?: (content: string) => void;
     onDone?: (data: API.ChatRoundDto) => void;
     onError?: (error: any) => void;
@@ -38,11 +38,11 @@ export function apiChatRoundStreamResponse(
 ) {
   // Ensure streaming is enabled
   body.enableStreaming = true;
-  
+
   // Create a new AbortController to cancel the request if needed
   const controller = new AbortController();
   console.log("Streaming request started");
-  
+
   // Make a fetch request to the streaming endpoint
   fetch(`${baseUrl}api/ai/chat-rounds/stream`, {
     method: "POST",
@@ -52,120 +52,108 @@ export function apiChatRoundStreamResponse(
     body: JSON.stringify(body),
     signal: controller.signal,
   })
-  .then(response => {
-    if (!response.ok) {
-      console.log(response);
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    
-    const reader = response.body!.getReader();
-    const decoder = new TextDecoder();
-    let buffer = "";
-    
-    function processChunk({ done, value }: { done: boolean, value?: Uint8Array }): Promise<void> | void {
-      if (done) {
-        // Handle any remaining buffer data
-        if (buffer.length > 0) {
-          processBuffer(buffer);
-        }
-        return;
+    .then(response => {
+      if (!response.ok) {
+        console.log(response);
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
-      // Decode the chunk and add it to our buffer
-      const chunk = decoder.decode(value, { stream: true });
-      buffer += chunk;
-      
-      // Process any complete events in the buffer
-      buffer = processBuffer(buffer);
-      
-      // Continue reading
-      return reader.read().then(processChunk);
-    }
-    
-    function processBuffer(inputBuffer: string): string {
-      // Split the buffer by double newlines (SSE format)
-      const events = inputBuffer.split("\n\n");
-      
-      // The last element might be incomplete, so we keep it in the buffer
-      const remainingBuffer = events.pop() || "";
-      
-      // Process each complete event
-      for (const event of events) {
-        if (!event.trim()) continue;
-        
-        const lines = event.split("\n");
-        let eventType = "";
-        let data = "";
-        
-        for (const line of lines) {
-          if (line.startsWith("event: ")) {
-            eventType = line.slice(7);
-          } else if (line.startsWith("data: ")) {
-            data = line.slice(6);
+
+      const reader = response.body!.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+
+      function processChunk({ done, value }: { done: boolean, value?: Uint8Array }): Promise<void> | void {
+        if (done) {
+          // Handle any remaining buffer data
+          if (buffer.length > 0) {
+            processBuffer(buffer);
           }
+          return;
         }
-        
-        if (eventType && data) {
-          // Handle different event types
-          switch (eventType) {
-            case "init":
-              callbacks.onInit?.(JSON.parse(data));
-              break;
-            case "chunk":
-              callbacks.onChunk?.(data);
-              break;
-            case "done":
-              callbacks.onDone?.(JSON.parse(data));
-              break;
-            case "error":
-              callbacks.onError?.(data);
-              break;
-          }
-        } else if (data) {
-          // Handle raw SSE data without event type (DeepSeek format)
-          if (data === "[DONE]") {
-            // End of stream
-            break;
-          }
-          
-          try {
-            const parsedData = JSON.parse(data);
-            
-            // Check if it's a DeepSeek completion chunk
-            if (parsedData.choices && parsedData.choices.length > 0) {
-              const choice = parsedData.choices[0];
-              
-              // Handle token counts when they appear in the final message
-              if (parsedData.usage) {
-                callbacks.onTokens?.(
-                  parsedData.usage.prompt_tokens || 0,
-                  parsedData.usage.completion_tokens || 0
-                );
-              }
-              
-              // Extract content if available
-              if (choice.delta && choice.delta.content) {
-                callbacks.onChunk?.(choice.delta.content);
-              }
+
+        // Decode the chunk and add it to our buffer
+        const chunk = decoder.decode(value, { stream: true });
+        buffer += chunk;
+
+        // Process any complete events in the buffer
+        buffer = processBuffer(buffer);
+
+        // Continue reading
+        return reader.read().then(processChunk);
+      }
+
+      function processBuffer(inputBuffer: string): string {
+        // Split the buffer by double newlines (SSE format)
+        const events = inputBuffer.split("\n\n");
+
+        // The last element might be incomplete, so we keep it in the buffer
+        const remainingBuffer = events.pop() || "";
+
+        // Process each complete event
+        for (const event of events) {
+          if (!event.trim()) continue;
+
+          const lines = event.split("\n");
+          let eventType = "";
+          let data = "";
+
+          for (const line of lines) {
+            if (line.startsWith("event: ")) {
+              eventType = line.slice(7);
+            } else if (line.startsWith("data: ")) {
+              data = line.slice(6);
             }
-          } catch (e) {
-            console.error("Error parsing SSE data:", e);
+          }
+
+          if (eventType && data) {
+            // Handle different event types based on the updated backend
+            switch (eventType) {
+              case "init":
+                try {
+                  const initData = JSON.parse(data);
+                  callbacks.onInit?.(initData);
+                } catch (e) {
+                  console.error("Error parsing init event data:", e);
+                }
+                break;
+              case "data":
+                // The backend now sends the actual content directly
+                callbacks.onChunk?.(data);
+                break;
+              case "end":
+                try {
+                  const doneData = JSON.parse(data);
+                  // Update token information from the complete response
+                  if (doneData.promptTokens !== undefined && doneData.completionTokens !== undefined) {
+                    callbacks.onTokens?.(
+                      doneData.promptTokens,
+                      doneData.completionTokens
+                    );
+                  }
+                  callbacks.onDone?.(doneData);
+                } catch (e) {
+                  console.error("Error parsing done event data:", e);
+                }
+                break;
+              case "error":
+                callbacks.onError?.(data);
+                break;
+            }
           }
         }
+
+        return remainingBuffer;
       }
-      
-      return remainingBuffer;
-    }
-    
-    // Start reading
-    reader.read().then(processChunk).catch(error => {
+
+      // Start reading
+      reader.read().then(processChunk).catch(error => {
+        callbacks.onError?.(error);
+      });
+    })
+    .catch(error => {
       callbacks.onError?.(error);
     });
-  })
-  .catch(error => {
-    callbacks.onError?.(error);
-  });
-  
+
   // Return a function to abort the request
   return () => {
     controller.abort();
@@ -183,7 +171,7 @@ export async function apiChatRoundUpdateByRequest(
       "Content-Type": "application/json",
     },
     data: body,
-    timeout: 5*60*1000,
+    timeout: 5 * 60 * 1000,
     ...(options || {}),
   });
 }
@@ -217,19 +205,19 @@ export async function apiChatRoundDisable(
 }
 /** PUT /api/ai/chat-rounds/enable */
 export async function apiChatRoundEnable(
-    body: number[],
-    options?: { [key: string]: any }
-  ) {
-    return request<API.BooleanApiResponse>("/api/ai/chat-rounds/enable", {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      data: body,
-      ...(options || {}),
-    });
-  }
-  
+  body: number[],
+  options?: { [key: string]: any }
+) {
+  return request<API.BooleanApiResponse>("/api/ai/chat-rounds/enable", {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+
 /** DELETE /api/ai/chat-rounds */
 export async function apiChatRoundDeleteByIds(
   body: number[],

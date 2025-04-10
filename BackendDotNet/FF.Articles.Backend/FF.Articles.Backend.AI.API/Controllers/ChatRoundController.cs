@@ -6,6 +6,7 @@ using FF.Articles.Backend.Common.Exceptions;
 using FF.Articles.Backend.Common.Responses;
 using FF.Articles.Backend.Common.Utils;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 
 namespace FF.Articles.Backend.AI.API.Controllers;
 
@@ -17,29 +18,40 @@ public class ChatRoundController(IChatRoundService chatRoundService) : Controlle
     [HttpPost]
     public async Task<ApiResponse<ChatRoundDto>> NewChatByRequest([FromBody] ChatRoundCreateRequest request, CancellationToken cancellationToken)
     {
-        // If streaming is enabled, use the streaming endpoint instead
-        if (request.EnableStreaming)
-        {
-            throw new ApiException(ErrorCode.PARAMS_ERROR, "For streaming responses, use the /stream endpoint");
-        }
-
         var result = await chatRoundService.NewChatRound(request, HttpContext.Request, cancellationToken);
         return ResultUtil.Success(result);
     }
 
     [HttpPost("stream")]
-    public async Task StreamChatResponse([FromBody] ChatRoundCreateRequest request, CancellationToken cancellationToken)
+    public async Task StreamChat([FromBody] ChatRoundCreateRequest request, CancellationToken cancellationToken)
     {
+
         // Set content type for SSE
         Response.Headers.Add("Content-Type", "text/event-stream");
         Response.Headers.Add("Cache-Control", "no-cache");
         Response.Headers.Add("Connection", "keep-alive");
 
-        // Force streaming to be true
-        request.EnableStreaming = true;
-
-        // Use the service to stream the response
-        await chatRoundService.StreamChatRound(request, HttpContext.Request, Response, cancellationToken);
+        try
+        {
+            // Use the service to stream the response
+            await foreach (var sseDto in chatRoundService.StreamChatRound(request, HttpContext.Request, cancellationToken))
+            {
+                // Format according to SSE specification: event: <event>\ndata: <data>\n\n
+                var message = $"event: {sseDto.Event}\ndata: {sseDto.Data}\n\n";
+                await Response.WriteAsync(message, cancellationToken);
+                await Response.Body.FlushAsync(cancellationToken);
+            }
+        }
+        catch (Exception ex)
+        {
+            var errorMessage = $"event: {SseEvent.Error}\ndata: {JsonSerializer.Serialize(new { message = ex.Message })}\n\n";
+            await Response.WriteAsync(errorMessage, cancellationToken);
+            await Response.Body.FlushAsync(cancellationToken);
+        }
+        finally
+        {
+            await Response.CompleteAsync();
+        }
     }
     // [HttpPut]
     // public async Task<ApiResponse<ChatRoundDto>> UpdateByRequest([FromBody] ChatRoundReQueryRequest request, CancellationToken cancellationToken)

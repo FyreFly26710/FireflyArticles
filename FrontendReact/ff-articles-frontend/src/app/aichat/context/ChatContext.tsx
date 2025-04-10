@@ -2,9 +2,9 @@
 
 import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { apiSessionGetSessions, apiSessionGetById, apiSessionUpdate, apiSessionDeleteById } from '@/api/ai/api/session';
-import { 
-  apiChatRoundAddByRequest, 
-  apiChatRoundUpdateByRequest, 
+import {
+  apiChatRoundAddByRequest,
+  apiChatRoundUpdateByRequest,
   apiChatRoundDeleteById,
   apiChatRoundDisable,
   apiChatRoundEnable,
@@ -60,16 +60,16 @@ const createEmptySession = (): API.SessionDto => ({
 
 // Default settings
 const defaultSettings: ChatSettings = {
-    showMessageTimestamp: true,
-    showModelName: true,
-    showTokenUsed: true,
-    showTimeTaken: true,
-    enableMarkdownRendering: true,
-    enableThinking: true,
-    enableStreaming: true,
-    showOnlyActiveMessages: false,
-    enableCollapsibleMessages: true,
-    selectedModel: 'deepseek'
+  showMessageTimestamp: true,
+  showModelName: true,
+  showTokenUsed: true,
+  showTimeTaken: true,
+  enableMarkdownRendering: true,
+  enableThinking: true,
+  enableStreaming: true,
+  showOnlyActiveMessages: false,
+  enableCollapsibleMessages: true,
+  selectedModel: 'deepseek'
 };
 
 export function ChatProvider({ children }: { children: ReactNode }) {
@@ -89,13 +89,13 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         setLoading(true);
         const response: API.SessionDto[] = (await apiSessionGetSessions({ includeChatRounds: false })).data ?? [];
         setSessions(response);
-        
+
         // Early return if no sessions exist
         if (response.length === 0) {
           handleCreateSession();
           return;
         }
-        
+
         // Process the first session
         const firstSession = response[0];
         if (firstSession.sessionId > 0) {
@@ -104,7 +104,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         } else {
           setSession(firstSession);
         }
-        
+
       } catch (error) {
         console.error('Error fetching sessions:', error);
         // Initialize with default session if API fails
@@ -154,7 +154,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       if (settings.enableStreaming) {
         // Track the abort controller to allow canceling the stream
         let abortStream: (() => void) | null = null;
-        
+
         // Handle streaming response
         abortStream = apiChatRoundStreamResponse(
           messageRequest,
@@ -164,14 +164,14 @@ export function ChatProvider({ children }: { children: ReactNode }) {
               setSession(prev => {
                 const updatedSession = { ...prev };
                 const updatedRounds = [...(updatedSession.rounds || [])];
-                
+
                 if (updatedRounds.length > 0) {
                   const lastRound = { ...updatedRounds[updatedRounds.length - 1] };
                   lastRound.chatRoundId = data.chatRoundId;
                   lastRound.sessionId = data.sessionId;
                   updatedRounds[updatedRounds.length - 1] = lastRound;
                 }
-                
+
                 updatedSession.rounds = updatedRounds;
                 return updatedSession;
               });
@@ -181,13 +181,13 @@ export function ChatProvider({ children }: { children: ReactNode }) {
               setSession(prev => {
                 const updatedSession = { ...prev };
                 const updatedRounds = [...(updatedSession.rounds || [])];
-                
+
                 if (updatedRounds.length > 0) {
                   const lastRound = { ...updatedRounds[updatedRounds.length - 1] };
                   lastRound.assistantMessage = (lastRound.assistantMessage || '') + content;
                   updatedRounds[updatedRounds.length - 1] = lastRound;
                 }
-                
+
                 updatedSession.rounds = updatedRounds;
                 return updatedSession;
               });
@@ -197,7 +197,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
               setSession(prev => {
                 const updatedSession = { ...prev };
                 const updatedRounds = [...(updatedSession.rounds || [])];
-                
+
                 if (updatedRounds.length > 0) {
                   const lastRound = { ...updatedRounds[updatedRounds.length - 1] };
                   lastRound.promptTokens = promptTokens;
@@ -205,7 +205,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
                   lastRound.totalTokens = promptTokens + completionTokens;
                   updatedRounds[updatedRounds.length - 1] = lastRound;
                 }
-                
+
                 updatedSession.rounds = updatedRounds;
                 return updatedSession;
               });
@@ -215,37 +215,42 @@ export function ChatProvider({ children }: { children: ReactNode }) {
               setSession(prev => {
                 const updatedSession = { ...prev };
                 const updatedRounds = [...(updatedSession.rounds || [])];
-                
+
                 if (updatedRounds.length > 0) {
+                  // Preserve any accumulated content if the backend response doesn't include it
+                  if (updatedRounds[updatedRounds.length - 1].assistantMessage &&
+                    !data.assistantMessage) {
+                    data.assistantMessage = updatedRounds[updatedRounds.length - 1].assistantMessage;
+                  }
                   updatedRounds[updatedRounds.length - 1] = data;
                 }
-                
+
                 // Update session ID if API created a new session
                 const sessionIdChanged = updatedSession.sessionId !== data.sessionId;
                 if (sessionIdChanged) {
                   updatedSession.sessionId = data.sessionId;
-                  
+
                   // If session ID changed, update the sessions array too
                   setSessions(prevSessions => {
                     // Remove the old session with the previous ID
                     const filteredSessions = prevSessions.filter(s => s.sessionId !== prev.sessionId);
-                    
+
                     // Check if the new session already exists
                     const sessionIndex = filteredSessions.findIndex(s => s.sessionId === data.sessionId);
-                    
+
                     // If the session exists in the array, update it
                     if (sessionIndex >= 0) {
                       const updatedSessions = [...filteredSessions];
                       updatedSessions[sessionIndex] = updatedSession;
                       return updatedSessions;
-                    } 
+                    }
                     // If it's a completely new session, add it to the array
                     else {
                       return [...filteredSessions, updatedSession];
                     }
                   });
                 }
-                
+
                 updatedSession.rounds = updatedRounds;
                 updatedSession.roundCount = updatedRounds.length;
                 return updatedSession;
@@ -253,20 +258,21 @@ export function ChatProvider({ children }: { children: ReactNode }) {
             },
             onError: (error) => {
               console.error('Error streaming response:', error);
-              
+
               // Update UI to show error
               setSession(prev => {
                 const updatedSession = { ...prev };
                 const updatedRounds = [...(updatedSession.rounds || [])];
-                
+
                 if (updatedRounds.length > 0) {
                   const lastRound = updatedRounds[updatedRounds.length - 1];
                   updatedRounds[updatedRounds.length - 1] = {
                     ...lastRound,
-                    assistantMessage: lastRound.assistantMessage + "\n\nSorry, there was an error generating the rest of the response."
+                    assistantMessage: (lastRound.assistantMessage || '') +
+                      "\n\nSorry, there was an error generating the rest of the response."
                   };
                 }
-                
+
                 updatedSession.rounds = updatedRounds;
                 return updatedSession;
               });
@@ -276,7 +282,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       } else {
         // Make the regular API call for non-streaming
         const response = await apiChatRoundAddByRequest(messageRequest);
-        
+
         if (!response.data) {
           throw new Error('No data returned from API');
         }
@@ -285,54 +291,54 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         setSession(prev => {
           const updatedSession = { ...prev };
           const updatedRounds = [...(updatedSession.rounds || [])];
-          
+
           // Replace the placeholder with the actual response
           if (updatedRounds.length > 0 && response.data) {
             updatedRounds[updatedRounds.length - 1] = response.data;
           } else if (response.data) {
             updatedRounds.push(response.data);
           }
-          
+
           // Update session ID if API created a new session
           const newSessionId = response.data?.sessionId ?? messageRequest.sessionId;
           const sessionIdChanged = updatedSession.sessionId !== newSessionId;
           updatedSession.sessionId = newSessionId;
           updatedSession.rounds = updatedRounds;
           updatedSession.roundCount = updatedRounds.length;
-          
+
           // If session ID changed, update the sessions array too
           if (sessionIdChanged) {
             setSessions(prevSessions => {
               // First, remove the old session with the previous ID
               const filteredSessions = prevSessions.filter(s => s.sessionId !== prev.sessionId);
-              
+
               // Then check if the new session already exists
               const sessionIndex = filteredSessions.findIndex(s => s.sessionId === newSessionId);
-              
+
               // If the session exists in the array, update it
               if (sessionIndex >= 0) {
                 const updatedSessions = [...filteredSessions];
                 updatedSessions[sessionIndex] = updatedSession;
                 return updatedSessions;
-              } 
+              }
               // If it's a completely new session, add it to the array
               else {
                 return [...filteredSessions, updatedSession];
               }
             });
           }
-          
+
           return updatedSession;
         });
       }
     } catch (error) {
       console.error('Error getting assistant response:', error);
-      
+
       // Update UI to show error
       setSession(prev => {
         const updatedSession = { ...prev };
         const updatedRounds = [...(updatedSession.rounds || [])];
-        
+
         if (updatedRounds.length > 0) {
           const lastRound = updatedRounds[updatedRounds.length - 1];
           updatedRounds[updatedRounds.length - 1] = {
@@ -340,7 +346,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
             assistantMessage: "Sorry, there was an error generating a response."
           };
         }
-        
+
         updatedSession.rounds = updatedRounds;
         return updatedSession;
       });
@@ -351,7 +357,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     try {
       // Default session name
       const name = 'New Chat';
-      
+
       // Create a new session
       const newSession: API.SessionDto = {
         sessionId: Date.now(),
@@ -360,7 +366,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         roundCount: 0,
         createdAt: new Date().toISOString()
       };
-      
+
       setSessions(prev => [...prev, newSession]);
       setSession(newSession);
     } catch (error) {
@@ -390,12 +396,12 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         sessionId: updatedSession.sessionId,
         sessionName: updatedSession.sessionName
       });
-      
+
       // Update local state if successful
       setSessions(prev => prev.map(s =>
         s.sessionId === updatedSession.sessionId ? updatedSession : s
       ));
-      
+
       // Update current session if it's the one being edited
       if (session.sessionId === updatedSession.sessionId) {
         setSession(updatedSession);
@@ -409,10 +415,10 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     try {
       // Delete session on the backend
       await apiSessionDeleteById({ id: sessionToDelete.sessionId });
-      
+
       // Update local state if successful
       setSessions(prev => prev.filter(s => s.sessionId !== sessionToDelete.sessionId));
-      
+
       if (session.sessionId === sessionToDelete.sessionId) {
         if (sessions.length > 1) {
           // Find another session to display
@@ -433,7 +439,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   const handleDisableChatRounds = async (chatRoundIds: number[]) => {
     try {
       if (!chatRoundIds.length) return;
-      
+
       await apiChatRoundDisable(chatRoundIds);
       // Refresh the current session to reflect changes
       await refreshCurrentSession();
@@ -445,9 +451,9 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   const handleEnableChatRounds = async (chatRoundIds: number[]) => {
     try {
       if (!chatRoundIds.length) return;
-      
+
       await apiChatRoundEnable(chatRoundIds);
-      
+
       // Refresh the current session to reflect changes
       await refreshCurrentSession();
     } catch (error) {
@@ -458,9 +464,9 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   const handleDeleteChatRounds = async (chatRoundIds: number[]) => {
     try {
       if (!chatRoundIds.length) return;
-      
+
       await apiChatRoundDeleteByIds(chatRoundIds);
-      
+
       // Refresh the current session to reflect changes
       await refreshCurrentSession();
     } catch (error) {
@@ -475,13 +481,13 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         console.log('Cannot refresh session with invalid sessionId:', session.sessionId);
         return;
       }
-      
+
       const response = await apiSessionGetById({ id: session.sessionId });
       if (response.data) {
         setSession(response.data);
-        
+
         // Also update the session in the sessions list
-        setSessions(prev => prev.map(s => 
+        setSessions(prev => prev.map(s =>
           s.sessionId === response.data?.sessionId ? response.data : s
         ) as API.SessionDto[]);
       }

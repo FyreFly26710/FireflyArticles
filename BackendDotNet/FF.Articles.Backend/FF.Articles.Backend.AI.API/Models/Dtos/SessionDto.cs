@@ -8,5 +8,5 @@ public class SessionDto
     public string SessionName { get; set; } = string.Empty;
     public List<ChatRoundDto> Rounds { get; set; } = [];
     public int RoundCount { get; set; }
-    public DateTime CreatedAt { get; set; }
+    public long TimeStamp { get; set; }
 }

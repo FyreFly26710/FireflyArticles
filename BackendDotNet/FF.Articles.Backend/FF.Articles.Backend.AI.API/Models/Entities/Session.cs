@@ -7,6 +7,6 @@ public class Session : BaseEntity
 {
     public long UserId { get; set; }
     public string? SessionName { get; set; }
-    public DateTime CreatedAt { get; set; }
+    public long TimeStamp { get; set; }
 
 }

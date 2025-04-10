@@ -20,11 +20,11 @@ public static class ChatMessageRequestExtensions
             UserMessage = chatRound.UserMessage,
             AssistantMessage = chatRound.AssistantMessage,
             Model = chatRound.Model,
-            CreatedAt = chatRound.CreatedAt,
             PromptTokens = chatRound.PromptTokens,
             CompletionTokens = chatRound.CompletionTokens,
             TimeTaken = chatRound.TimeTaken,
-            IsActive = chatRound.IsActive
+            IsActive = chatRound.IsActive,
+            TimeStamp = chatRound.TimeStamp
         };
     }
 
