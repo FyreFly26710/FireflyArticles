@@ -18,10 +18,13 @@ public static class EFCoreUtil
         // Soft delete
         if (properties.Contains(BaseProperty.IsDelete))
             modelBuilder.Entity<TEntity>().HasQueryFilter(u => u.IsDelete == 0);
+            
         if (!properties.Contains(BaseProperty.CreateTime))
             modelBuilder.Entity<TEntity>().Ignore(e => e.CreateTime);
         if (!properties.Contains(BaseProperty.UpdateTime))
             modelBuilder.Entity<TEntity>().Ignore(e => e.UpdateTime);
+        if (!properties.Contains(BaseProperty.IsDelete))
+            modelBuilder.Entity<TEntity>().Ignore(e => e.IsDelete);    
     }
 }
 

@@ -47,6 +47,7 @@ public static class MigrationWorker
             var retryCount = 0;
             var maxRetries = 10;
             var delay = TimeSpan.FromSeconds(4);
+            var isInit = true;
 
             while (retryCount < maxRetries)
             {
@@ -65,6 +66,7 @@ public static class MigrationWorker
                     }
                     catch (PostgresException ex) when (ex.SqlState == "42P04")
                     {
+                        isInit = false;
                         logger.LogInformation("Database {DatabaseName} already exists", databaseName);
                     }
 
@@ -89,7 +91,7 @@ public static class MigrationWorker
 
             // Apply migrations and seed data
             await context.Database.MigrateAsync();
-            if (seeder != null)
+            if (seeder != null && isInit)
             {
                 await seeder.SeedAsync(services);
             }
