@@ -89,4 +89,26 @@ declare namespace API {
     message?: string;
     data?: boolean;
   };
+
+  // AI Articles models
+  type ArticleListRequest = {
+    topic: string;
+    articleCount?: number;
+  };
+
+  type ArticlesAIResponseDto = {
+    code?: number;
+    message?: string;
+    data?: {
+      articles: AIGenArticleDto[];
+      aiMessage: string;
+    };
+  };
+
+  type AIGenArticleDto = {
+    id: number;
+    title: string;
+    abstract: string;
+    tags: string[];
+  };
 }

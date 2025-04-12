@@ -1,0 +1,66 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.article-results-card {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  margin-bottom: 1.5rem;
+}
+
+.article-card {
+  transition: all 0.3s;
+  border-radius: 8px;
+  border: 1px solid #f0f0f0;
+}
+
+.article-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.article-card-editing {
+  border: 2px solid #1890ff;
+  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.15);
+}
+
+.tag-input-container {
+  display: flex;
+  margin-top: 8px;
+  align-items: center;
+}
+
+.tag-container {
+  margin-bottom: 12px;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 0;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 8px;
+  text-align: center;
+}
+
+.loading-text {
+  margin-top: 16px;
+  color: #1890ff;
+  font-size: 16px;
+}
+
+.controls-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+} 

@@ -12,6 +12,7 @@ using FF.Articles.Backend.Common.ApiDtos;
 using FF.Articles.Backend.AI.API.Services.Stores;
 using FF.Articles.Backend.Common.Utils;
 using FF.Articles.Backend.AI.API.Models.Requests.ArticleGenerations;
+
 namespace FF.Articles.Backend.AI.API.Services;
 
 /// <summary>
@@ -50,8 +51,11 @@ public class ArticleGenerationService : IArticleGenerationService
             ResponseFormat = new ResponseFormat() { Type = ResponseFormatTypes.JsonObject }
         };
 
-        var response = await _deepSeekClient.ChatAsync(chatRequest, cancellationToken);
-        var jsonContent = response?.Choices.First().Message?.Content ?? "";
+        //var response = await _deepSeekClient.ChatAsync(chatRequest, cancellationToken);
+        //var jsonContent = response?.Choices.First().Message?.Content ?? "";
+        await Task.Delay(1000);
+        var jsonContent = mock_article_list;
+        Console.WriteLine(jsonContent);
         var articlesResponse = JsonSerializer.Deserialize<ArticlesAIResponseDto>(jsonContent);
         if (articlesResponse is null) throw new Exception("Failed to generate article");
 
@@ -59,42 +63,42 @@ public class ArticleGenerationService : IArticleGenerationService
     }
 
     // round 2
-    public async Task<ArticleApiAddRequest> GenerateArticleContentAsync(ContentRequest request, HttpRequest httpRequest)
-    {
-        var round1 = round1_Messages(request.Topic, request.ArticleCount);
+    // public async Task<long> GenerateArticleContentAsync(ContentRequest request)
+    // {
+    //     var round1 = round1_Messages(request.Topic, request.ArticleCount);
 
-        var chatRequest = new ChatRequest
-        {
-            Messages = [
-                ..round1,
-                Message.NewAssistantMessage(request.AiMessage),
-                Message.NewSystemMessage(format_ArticleContent),
-                Message.NewUserMessage("You are a helpful assistant that generates articles based on the following information: "+request.Abstract),
-            ],
-            ResponseFormat = new ResponseFormat() { Type = ResponseFormatTypes.Text }
-        };
+    //     var chatRequest = new ChatRequest
+    //     {
+    //         Messages = [
+    //             ..round1,
+    //             Message.NewAssistantMessage(request.AiMessage),
+    //             Message.NewSystemMessage(format_ArticleContent),
+    //             Message.NewUserMessage("You are a helpful assistant that generates articles based on the following information: "+request.Abstract),
+    //         ],
+    //         ResponseFormat = new ResponseFormat() { Type = ResponseFormatTypes.Text }
+    //     };
 
-        var response = await _deepSeekClient.ChatAsync(chatRequest, new CancellationToken());
+    //     var response = await _deepSeekClient.ChatAsync(chatRequest, new CancellationToken());
 
-        var content = response?.Choices.First().Message?.Content ?? "";
-        if (string.IsNullOrEmpty(content)) throw new ApiException(ErrorCode.SYSTEM_ERROR, "Failed to generate article");
+    //     var content = response?.Choices.First().Message?.Content ?? "";
+    //     if (string.IsNullOrEmpty(content)) throw new ApiException(ErrorCode.SYSTEM_ERROR, "Failed to generate article");
 
-        // Add article
-        var article = new ArticleApiAddRequest
-        {
-            Title = request.Title,
-            Abstract = request.Abstract,
-            Content = content,
-            Tags = request.Tags,
-            TopicId = request.TopicId,
-            SortNumber = request.SortNumber,
-            ArticleType = "Article",
-            ParentArticleId = null,
-        };
-        await _contentsApiRemoteService.AddArticleAsync(article, httpRequest);
+    //     // Add article
+    //     var article = new ArticleApiAddRequest
+    //     {
+    //         Title = request.Title,
+    //         Abstract = request.Abstract,
+    //         Content = content,
+    //         Tags = request.Tags,
+    //         TopicId = request.TopicId,
+    //         SortNumber = request.SortNumber,
+    //         ArticleType = "Article",
+    //         ParentArticleId = null,
+    //     };
+    //     var articleId = await _contentsApiRemoteService.AddArticleAsync(article);
 
-        return article;
-    }
+    //     return articleId;
+    // }
 
     // public async Task BatchGenerateArticleContentAsync(List<int> articleIds, HttpRequest httpRequest, CancellationToken cancellationToken = default)
     // {
@@ -110,6 +114,8 @@ public class ArticleGenerationService : IArticleGenerationService
         Message.NewSystemMessage(system_ArticleList),
         Message.NewUserMessage(@$"Topic: {topic}; ArticleCount: {articleCount}"),
     ];
+
+
     private string system_ArticleList = """
     Take a deep breath.
     Think step by step.
@@ -185,4 +191,61 @@ public class ArticleGenerationService : IArticleGenerationService
     - Markdown code fences
     - Any text outside the specified structure
     """;
+
+    private string mock_article_list = """
+    {
+        "Articles": [
+            {
+                "Id": 1,
+                "Title": "Introduction to AI in Education: Basics and Potential",
+                "Abstract": "**AI Overview** - Brief explanation of AI and its role in modern education.  \n**Benefits** - How AI can personalize learning and improve efficiency.  \n**Challenges** - Initial barriers like cost and teacher training.  ",
+                "Tags": ["AI", "education", "technology"]
+            },
+            {
+                "Id": 2,
+                "Title": "AI-Powered Personalized Learning: Adaptive Systems",
+                "Abstract": "**Adaptive Learning** - How AI tailors content to individual student needs.  \n**Case Studies** - Examples of platforms like Khan Academy using AI.  \n**Future Trends** - Predictive analytics for student performance.  ",
+                "Tags": ["personalized learning", "AI", "adaptive systems"]
+            },
+            {
+                "Id": 3,
+                "Title": "Automated Grading and Feedback: Saving Time for Educators",
+                "Abstract": "**Efficiency** - How AI reduces grading workload for teachers.  \n**Accuracy** - AI's role in providing consistent and unbiased feedback.  \n**Limitations** - Areas where human judgment is still essential.  ",
+                "Tags": ["grading", "feedback", "AI tools"]
+            },
+            {
+                "Id": 4,
+                "Title": "AI Chatbots in Education: Virtual Tutors and Assistants",
+                "Abstract": "**24/7 Support** - How chatbots provide instant help to students.  \n**Engagement** - Interactive learning through conversational AI.  \n**Implementation** - Best practices for integrating chatbots in classrooms.  ",
+                "Tags": ["chatbots", "virtual tutors", "AI assistants"]
+            },
+            {
+                "Id": 5,
+                "Title": "Ethical Considerations of AI in Education",
+                "Abstract": "**Data Privacy** - Concerns around student data collection and usage.  \n**Bias in AI** - How algorithms can perpetuate inequalities.  \n**Transparency** - The need for explainable AI in educational settings.  ",
+                "Tags": ["ethics", "data privacy", "AI bias"]
+            },
+            {
+                "Id": 6,
+                "Title": "AI for Special Education: Supporting Diverse Learners",
+                "Abstract": "**Accessibility** - AI tools for students with disabilities.  \n**Customization** - Tailoring learning experiences for neurodiverse students.  \n**Success Stories** - Real-world applications making a difference.  ",
+                "Tags": ["special education", "accessibility", "inclusive learning"]
+            },
+            {
+                "Id": 7,
+                "Title": "The Future of AI in Higher Education",
+                "Abstract": "**Research Assistance** - AI in academic research and paper writing.  \n**Administrative Automation** - Streamlining admissions and scheduling.  \n**Global Classrooms** - AI enabling cross-border education.  ",
+                "Tags": ["higher education", "AI research", "automation"]
+            },
+            {
+                "Id": 8,
+                "Title": "Building AI Literacy: Preparing Students for an AI-Driven World",
+                "Abstract": "**Curriculum Integration** - Teaching AI concepts in K-12.  \n**Critical Thinking** - Helping students understand AI limitations.  \n**Career Readiness** - Skills needed for future AI-centric jobs.  ",
+                "Tags": ["AI literacy", "future skills", "education policy"]
+            }
+        ],
+        "AIMessage": "Generated 8 articles covering AI in education from basics to advanced applications, including personalized learning, ethical considerations, special education support, and future trends. All articles follow the requested structure."
+    }
+    """;
+
 }

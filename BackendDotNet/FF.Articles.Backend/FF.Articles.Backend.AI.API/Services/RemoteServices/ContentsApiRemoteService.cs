@@ -32,24 +32,24 @@ public class ContentsApiRemoteService(HttpClient _httpClient, ITokenService _tok
         return _systemAdminUser;
     }
 
-    public async Task<Dictionary<long, string>> AddBatchArticlesAsync(List<ArticleApiAddRequest> requests, HttpRequest httpRequest)
-    {
-        string url = RemoteApiUrlConstant.ArticleBatchUrl();
-        var httpRequestMessage = CreateHttpRequestMessage(HttpMethod.Post, url, requests, httpRequest);
-        var response = await _httpClient.SendAsync(httpRequestMessage);
+    // public async Task<Dictionary<long, string>> AddBatchArticlesAsync(List<ArticleApiAddRequest> requests, HttpRequest httpRequest)
+    // {
+    //     string url = RemoteApiUrlConstant.ArticleBatchUrl();
+    //     var httpRequestMessage = CreateHttpRequestMessage(HttpMethod.Post, url, requests, httpRequest);
+    //     var response = await _httpClient.SendAsync(httpRequestMessage);
 
-        if (!response.IsSuccessStatusCode)
-        {
-            return new Dictionary<long, string>();
-        }
-        var res = await response.Content.ReadFromJsonAsync<ApiResponse<Dictionary<long, string>>>();
-        return res?.Data ?? new();
-    }
+    //     if (!response.IsSuccessStatusCode)
+    //     {
+    //         return new Dictionary<long, string>();
+    //     }
+    //     var res = await response.Content.ReadFromJsonAsync<ApiResponse<Dictionary<long, string>>>();
+    //     return res?.Data ?? new();
+    // }
 
-    public async Task<long> AddArticleAsync(ArticleApiAddRequest request, HttpRequest httpRequest)
+    public async Task<long> AddArticleAsync(ArticleApiAddRequest request)
     {
         string url = RemoteApiUrlConstant.ArticleUrl();
-        var httpRequestMessage = CreateHttpRequestMessage(HttpMethod.Post, url, request, httpRequest);
+        var httpRequestMessage = CreateHttpRequestMessage(HttpMethod.Post, url, request, null);
         var response = await _httpClient.SendAsync(httpRequestMessage);
 
         if (!response.IsSuccessStatusCode)
@@ -60,14 +60,14 @@ public class ContentsApiRemoteService(HttpClient _httpClient, ITokenService _tok
         return res?.Data ?? 0;
     }
 
-    public async Task<bool> EditArticleByRequest(ArticleApiEditRequest request, HttpRequest httpRequest)
-    {
-        string url = RemoteApiUrlConstant.ArticleUrl();
-        var httpRequestMessage = CreateHttpRequestMessage(HttpMethod.Put, url, request, httpRequest);
-        var response = await _httpClient.SendAsync(httpRequestMessage);
+    // public async Task<bool> EditArticleByRequest(ArticleApiEditRequest request, HttpRequest httpRequest)
+    // {
+    //     string url = RemoteApiUrlConstant.ArticleUrl();
+    //     var httpRequestMessage = CreateHttpRequestMessage(HttpMethod.Put, url, request, httpRequest);
+    //     var response = await _httpClient.SendAsync(httpRequestMessage);
 
-        return response.IsSuccessStatusCode;
-    }
+    //     return response.IsSuccessStatusCode;
+    // }
 
     public async Task<long> AddTopicByTitleAsync(string title, HttpRequest httpRequest)
     {

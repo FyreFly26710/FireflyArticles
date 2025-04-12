@@ -1,6 +1,7 @@
 using FF.Articles.Backend.AI.API.Interfaces;
 using FF.Articles.Backend.AI.API.Interfaces.Services.RemoteServices;
 using FF.Articles.Backend.AI.API.Models.AiDtos;
+using FF.Articles.Backend.AI.API.Models.Requests.ArticleGenerations;
 using FF.Articles.Backend.Common.ApiDtos;
 using FF.Articles.Backend.Common.Constants;
 using FF.Articles.Backend.Common.Responses;
@@ -18,17 +19,17 @@ public class AiArticlesController(
     ILogger<AiArticlesController> logger) : ControllerBase
 {
 
-    // [HttpPost("generate-article-list")]
-    // public async Task<ApiResponse<ArticlesAIResponseDto>> GenerateArticleList(string topic, int aricleCount, CancellationToken cancellationToken)
-    // {
-    //     var article = await articleGenerationService.GenerateArticleListsAsync(topic, aricleCount, cancellationToken);
-    //     return ResultUtil.Success(article);
-    // }
+    [HttpPost("generate-article-list")]
+    public async Task<ApiResponse<ArticlesAIResponseDto>> GenerateArticleList(ArticleListRequest request, CancellationToken cancellationToken)
+    {
+        var article = await articleGenerationService.GenerateArticleListsAsync(request, cancellationToken);
+        return ResultUtil.Success(article);
+    }
 
     // [HttpPost("generate-article-content")]
-    // public async Task<IActionResult> GenerateArticleContent(int articleId, CancellationToken cancellationToken)
+    // public async Task<IActionResult> GenerateArticleContent(ContentRequest request)
     // {
-    //     var content = await articleGenerationService.GenerateArticleContentAsync(articleId, Request, cancellationToken);
+    //     var content = await articleGenerationService.GenerateArticleContentAsync(request, Request);
     //     return Ok(content);
     // }
     // [HttpPost("generate-article-content-batch")]
