@@ -1,14 +1,40 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Message from './Message'
 import { useChat } from '@/app/aichat/context/ChatContext'
+import { storage, ChatDisplaySettings } from '@/stores/storage'
 
 export default function MessageList() {
     const ref = useRef<HTMLDivElement>(null)
-    const { session, showOnlyActiveMessages } = useChat()
+    const { session } = useChat()
     const rounds = session.rounds
+    
+    // Initialize display settings with state
+    const [displaySettings, setDisplaySettings] = useState(() => storage.getChatDisplaySettings());
+
+    // Listen for display settings changes
+    useEffect(() => {
+        const handleDisplayChange = (event: CustomEvent<ChatDisplaySettings>) => {
+            setDisplaySettings(event.detail);
+        };
+
+        // Handle changes from other tabs
+        const handleStorageChange = (event: StorageEvent) => {
+            if (event.key === 'chat-display-settings') {
+                setDisplaySettings(storage.getChatDisplaySettings());
+            }
+        };
+
+        window.addEventListener('chatDisplaySettingsChanged', handleDisplayChange);
+        window.addEventListener('storage', handleStorageChange);
+
+        return () => {
+            window.removeEventListener('chatDisplaySettingsChanged', handleDisplayChange);
+            window.removeEventListener('storage', handleStorageChange);
+        };
+    }, []);
 
     // Filter messages if showOnlyActiveMessages is true
-    const filteredRounds = showOnlyActiveMessages 
+    const filteredRounds = displaySettings.showOnlyActiveMessages 
         ? rounds?.filter(round => round.isActive) 
         : rounds;
 
@@ -72,7 +98,7 @@ export default function MessageList() {
             {filteredRounds && filteredRounds.length > 0 ? (
                 filteredRounds.map((chatRound) => (
                     <div
-                        key={chatRound.chatRoundId}
+                        key={`${chatRound.sessionId}-${chatRound.chatRoundId}`}
                         id={`chat-round-${chatRound.chatRoundId}`}
                         className="scroll-mt-16 mb-1"
                     >

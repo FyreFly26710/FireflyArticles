@@ -1,23 +1,50 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { Button, Anchor } from 'antd';
-import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
+import { useState, useEffect } from 'react';
 import MessageList from '@/components/aiChat/MessageList'
 import InputBox from '@/components/aiChat/InputBox'
 import SessionSidebar from '@/components/aiChat/SessionSidebar'
 import ChatSidebar from '@/components/aiChat/ChatSidebar'
-import { useChat } from './context/ChatContext'
+import { storage, LayoutSettings } from '@/stores/storage';
 
 export default function AiChatPage() {
-  const { 
-    sidebarCollapsed, 
-    rightSidebarCollapsed, 
-    setRightSidebarCollapsed 
-  } = useChat();
+  // Initialize state with storage values
+  const [layoutSettings, setLayoutSettings] = useState<LayoutSettings>(() => storage.getLayoutSettings());
   
-  const sidebarWidth = sidebarCollapsed ? '80px' : '240px';
-  const rightSidebarWidth = rightSidebarCollapsed ? '0px' : '240px';
+  useEffect(() => {
+    // Handler for storage changes from other tabs
+    const handleStorageChange = (event: StorageEvent) => {
+      if (event.key === 'layout-settings') {
+        setLayoutSettings(storage.getLayoutSettings());
+      }
+    };
+
+    // Handler for layout settings changes in current tab
+    const handleLayoutChange = (event: CustomEvent<LayoutSettings>) => {
+      setLayoutSettings(event.detail);
+    };
+
+    // Add event listeners
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('layoutSettingsChanged', handleLayoutChange);
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('layoutSettingsChanged', handleLayoutChange);
+    };
+  }, []);
+
+  const sidebarWidth = layoutSettings.sidebarCollapsed ? '80px' : '240px';
+  const rightSidebarWidth = layoutSettings.rightSidebarCollapsed ? '0px' : '240px';
+
+  const toggleRightSidebar = () => {
+    const newSettings = {
+      ...layoutSettings,
+      rightSidebarCollapsed: !layoutSettings.rightSidebarCollapsed
+    };
+    storage.setLayoutSettings(newSettings);
+  };
 
   return (
     <div className="h-screen flex overflow-hidden bg-white">
@@ -73,8 +100,8 @@ export default function AiChatPage() {
 
       {/* Right Sidebar */}
       <ChatSidebar 
-        collapsed={rightSidebarCollapsed} 
-        toggleCollapsed={() => setRightSidebarCollapsed(!rightSidebarCollapsed)} 
+        collapsed={layoutSettings.rightSidebarCollapsed} 
+        toggleCollapsed={toggleRightSidebar} 
       />
     </div>
   );

@@ -16,7 +16,7 @@ public static class AuthenticationExtensions
 {
     public static WebApplicationBuilder AddCookieAuth(this WebApplicationBuilder builder)
     {
-        builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+        builder.Services.AddAuthentication()
         .AddCookie(options =>
         {
             options.Cookie.Name = "AuthCookie";
@@ -24,7 +24,6 @@ public static class AuthenticationExtensions
             options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
             options.Cookie.SameSite = SameSiteMode.None;
             options.Events = new ThrowingCookieAuthenticationEvents();
-
         });
         builder.Services.AddDataProtection()
             .PersistKeysToFileSystem(new DirectoryInfo(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".firefly-articles", "data-protection")))
@@ -34,21 +33,21 @@ public static class AuthenticationExtensions
     public static WebApplicationBuilder AddApiAuthentication(this WebApplicationBuilder builder)
     {
         // Configure JWT for service-to-service communication
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? "your-secret-key-at-least-16-chars-long"));
+        // var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? "your-secret-key-at-least-16-chars-long"));
 
-        builder.Services.AddAuthentication()
-            .AddJwtBearer("Bearer", options =>
-            {
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuer = false,
-                    ValidateAudience = false,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = key
-                };
-                options.Events = new ThrowingJwtBearerEvents();
-            });
+        // builder.Services.AddAuthentication()
+        //     .AddJwtBearer("Bearer", options =>
+        //     {
+        //         options.TokenValidationParameters = new TokenValidationParameters
+        //         {
+        //             ValidateIssuer = false,
+        //             ValidateAudience = false,
+        //             ValidateLifetime = true,
+        //             ValidateIssuerSigningKey = true,
+        //             IssuerSigningKey = key
+        //         };
+        //         options.Events = new ThrowingJwtBearerEvents();
+        //     });
 
         return builder;
     }
@@ -117,10 +116,10 @@ public class ThrowingJwtBearerEvents : JwtBearerEvents
             context.HandleResponse(); // Prevent default challenge response
             throw new ApiException(ErrorCode.NOT_LOGIN_ERROR, "API authentication required");
         }
-        
+
         return base.Challenge(context);
     }
-    
+
     public override Task Forbidden(ForbiddenContext context)
     {
         // For API requests, throw an exception instead of the default response
@@ -129,10 +128,10 @@ public class ThrowingJwtBearerEvents : JwtBearerEvents
         {
             throw new ApiException(ErrorCode.FORBIDDEN_ERROR, "API insufficient permissions");
         }
-        
+
         return base.Forbidden(context);
     }
-    
+
     public override Task TokenValidated(TokenValidatedContext context)
     {
         // Copy the 'user' claim to make it available in the same way as cookie auth

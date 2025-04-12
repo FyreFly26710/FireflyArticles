@@ -21,29 +21,29 @@ public static class ProgramExtensions
         builder.Services.AddSingleton<ITokenService, TokenService>();
 
         // Add JWT authentication
-        builder.AddApiAuthentication();
+        //builder.AddApiAuthentication();
 
         // Configure the default authentication scheme to try JWT first, then cookie
-        builder.Services.AddAuthentication(options =>
-        {
-            options.DefaultScheme = "MultiScheme";
-            options.DefaultChallengeScheme = "MultiScheme";
-        })
-        .AddPolicyScheme("MultiScheme", "Cookie or JWT", options =>
-        {
-            options.ForwardDefaultSelector = context =>
-            {
-                // Check if the request has Authorization header with Bearer token
-                if (context.Request.Headers.ContainsKey("Authorization") &&
-                    context.Request.Headers["Authorization"].ToString().StartsWith("Bearer "))
-                {
-                    return JwtBearerDefaults.AuthenticationScheme;
-                }
+        // builder.Services.AddAuthentication(options =>
+        // {
+        //     options.DefaultScheme = "MultiScheme";
+        //     options.DefaultChallengeScheme = "MultiScheme";
+        // })
+        // .AddPolicyScheme("MultiScheme", "Cookie or JWT", options =>
+        // {
+        //     options.ForwardDefaultSelector = context =>
+        //     {
+        //         // Check if the request has Authorization header with Bearer token
+        //         if (context.Request.Headers.ContainsKey("Authorization") &&
+        //             context.Request.Headers["Authorization"].ToString().StartsWith("Bearer "))
+        //         {
+        //             return JwtBearerDefaults.AuthenticationScheme;
+        //         }
 
-                // Otherwise use cookie authentication
-                return CookieAuthenticationDefaults.AuthenticationScheme;
-            };
-        });
+        //         // Otherwise use cookie authentication
+        //         return CookieAuthenticationDefaults.AuthenticationScheme;
+        //     };
+        // });
 
         builder.Services.AddHttpClient();
 

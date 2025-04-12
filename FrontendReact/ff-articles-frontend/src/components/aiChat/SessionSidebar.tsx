@@ -1,37 +1,54 @@
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { Button, Badge, Layout, Space } from 'antd'
 import {
-    SettingOutlined,
-    InfoCircleOutlined,
-    RobotOutlined,
     PlusCircleOutlined,
     MenuFoldOutlined,
     MenuUnfoldOutlined
 } from '@ant-design/icons'
 import SessionList from './SessionList'
 import { useChat } from '@/app/aichat/context/ChatContext'
-
+import { storage, LayoutSettings } from '@/stores/storage'
 const { Sider } = Layout
 
-
-export default function SessionSidebar(){
+export default function SessionSidebar() {
     const sessionListRef = useRef<HTMLDivElement>(null)
-    const [collapsed, setCollapsed] = useState(false)
-    
+    const [layoutSettings, setLayoutSettings] = useState(() => storage.getLayoutSettings());
     const {
         handleCreateSession,
-        setSidebarCollapsed
+        sessions,
+        setSession
     } = useChat();
 
+    // Listen for layout settings changes
+    useEffect(() => {
+        const handleLayoutChange = (event: CustomEvent<LayoutSettings>) => {
+            setLayoutSettings(event.detail);
+        };
+
+        const handleStorageChange = (event: StorageEvent) => {
+            if (event.key === 'layout-settings') {
+                setLayoutSettings(storage.getLayoutSettings());
+            }
+        };
+
+        window.addEventListener('layoutSettingsChanged', handleLayoutChange);
+        window.addEventListener('storage', handleStorageChange);
+
+        return () => {
+            window.removeEventListener('layoutSettingsChanged', handleLayoutChange);
+            window.removeEventListener('storage', handleStorageChange);
+        };
+    }, []);
+
     const handleCollapse = (value: boolean) => {
-        setCollapsed(value)
-        setSidebarCollapsed(value)
+        const newSettings = { ...layoutSettings, sidebarCollapsed: value };
+        storage.setLayoutSettings(newSettings);
     }
 
     const handleCreateNewSession = () => {
-        handleCreateSession()
+        handleCreateSession();
         if (sessionListRef.current) {
-            sessionListRef.current.scrollTo(0, 0)
+            sessionListRef.current.scrollTo(0, 0);
         }
     }
 
@@ -48,37 +65,37 @@ export default function SessionSidebar(){
                 overflow: 'hidden'
             }}
             width={240}
-            collapsed={collapsed}
+            collapsed={layoutSettings.sidebarCollapsed}
         >
             <div className="flex flex-col h-full">
                 <div className="flex items-center justify-between p-2">
                     <h2 className="text-lg font-semibold text-gray-800 ml-4">
-                        {!collapsed && 'Sessions'}
+                        {!layoutSettings.sidebarCollapsed && 'Sessions'}
                     </h2>
                     <Button
                         type="text"
                         icon={<MenuFoldOutlined style={{ fontSize: '20px' }} />}
-                        onClick={() => handleCollapse(!collapsed)}
+                        onClick={() => handleCollapse(!layoutSettings.sidebarCollapsed)}
                     />
                 </div>
 
-
-                {!collapsed && (
-                    <div className="flex-1 overflow-y-auto">
+                {!layoutSettings.sidebarCollapsed && (
+                    <div className="flex-1 overflow-y-auto" ref={sessionListRef}>
                         <SessionList />
                     </div>
                 )}
 
                 <div className="p-4 border-t border-gray-200">
-                        <Button
-                            type="primary"
-                            icon={<PlusCircleOutlined />}
-                            onClick={handleCreateNewSession}
-                            style={{ width: '100%', textAlign: 'left', height: 40 }}
-                        >
-                            {!collapsed && 'New Chat'}
-                        </Button>
-
+                    <Button
+                        type="primary"
+                        icon={<PlusCircleOutlined />}
+                        onClick={sessions.find(session => session.sessionId === 0) 
+                            ? () => setSession(sessions.find(session => session.sessionId === 0)!)
+                            : handleCreateNewSession}
+                        style={{ width: '100%', textAlign: 'left', height: 40 }}
+                    >
+                        {!layoutSettings.sidebarCollapsed && 'New Chat'}
+                    </Button>
                 </div>
             </div>
         </Sider>

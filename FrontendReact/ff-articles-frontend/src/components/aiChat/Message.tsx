@@ -2,15 +2,8 @@ import { useEffect, useState, useRef } from 'react'
 import { Avatar, Typography, Divider } from 'antd'
 import { UserOutlined, RobotOutlined } from '@ant-design/icons'
 import Markdown from './Markdown'
+import { storage } from '@/stores/storage'
 import { useChat } from '@/app/aichat/context/ChatContext'
-
-// Placeholder values for atoms
-// const showMessageTimestamp = true
-// const showModelName = true
-// const showTokenUsed = true
-// const showTimeTaken = true
-// const enableMarkdownRendering = true
-// const currentSessionPicUrl = null
 
 const setOpenSettingWindow = (type: string) => console.log('Open settings:', type)
 
@@ -24,17 +17,22 @@ export default function Message(props: MessageProps) {
     const { chatRound, collapseThreshold, displayMode = 'both' } = props
     
     // Get settings from context
-    const {
-        showMessageTimestamp,
-        showModelName,
-        showTokenUsed,
-        showTimeTaken,
-        enableMarkdownRendering,
-        enableCollapsibleMessages
-    } = useChat();
+    const displaySettings = storage.getChatDisplaySettings();
+    const { isGenerating, session } = useChat();
     
-    // Determine if the message is still being generated
-    const isGenerating = chatRound.completionTokens === 0;
+    // Determine if this is the latest message
+    const isLatestMessage = session.rounds && 
+        session.rounds.length > 0 && 
+        session.rounds[session.rounds.length - 1].chatRoundId === chatRound.chatRoundId;
+    
+    // Force rerender when generation completes for the latest message
+    const [, forceUpdate] = useState({});
+    useEffect(() => {
+        if (isLatestMessage && !isGenerating) {
+            console.log('chatRound', chatRound);
+            forceUpdate({});
+        }
+    }, [isGenerating, isLatestMessage]);
     
     // Determine if the message is inactive
     const isInactive = !chatRound.isActive;
@@ -44,7 +42,7 @@ export default function Message(props: MessageProps) {
     const assistantContent = chatRound.assistantMessage || "";
     
     // Only apply collapse if the feature is enabled
-    const shouldUseCollapse = enableCollapsibleMessages && collapseThreshold !== undefined;
+    const shouldUseCollapse = displaySettings.enableCollapsibleMessages && collapseThreshold !== undefined;
     const assistantNeedsCollapse = shouldUseCollapse && 
         assistantContent.length > collapseThreshold && 
         assistantContent.length - collapseThreshold > 50;
@@ -57,21 +55,21 @@ export default function Message(props: MessageProps) {
     // Update collapse state when collapsible setting changes
     useEffect(() => {
         setIsAssistantCollapsed(assistantNeedsCollapse);
-    }, [enableCollapsibleMessages, assistantNeedsCollapse]);
+    }, [displaySettings.enableCollapsibleMessages, assistantNeedsCollapse]);
 
     // Prepare metadata tips for assistant message
     const tips: string[] = []
-    if (showTokenUsed && !isGenerating) {
-        tips.push(`tokens: input ${chatRound.promptTokens} output ${chatRound.completionTokens}`)
+    if (displaySettings.showTokenUsed && !isGenerating) {
+        tips.push(`tokens: input ${chatRound.promptTokens} output ${chatRound.completionTokens}`);
     }
-    if (showModelName) {
-        tips.push(`model: ${chatRound.model || 'unknown'}`)
+    if (displaySettings.showModelName) {
+        tips.push(`model: ${chatRound.model || 'unknown'}`);
     }
-    if (showTimeTaken) {
-        tips.push(`time: ${Math.round(chatRound.timeTaken/1000)}s`)
+    if (displaySettings.showTimeTaken && !isGenerating) {
+        tips.push(`time: ${Math.round(chatRound.timeTaken/1000)}s`);
     }
-    if (showMessageTimestamp) {
-        tips.push(`${new Date(chatRound.createdAt).toLocaleString()}`)
+    if (displaySettings.showMessageTimestamp) {
+        tips.push(`${new Date(chatRound.updateTime).toLocaleString()}`);
     }
     if (isInactive) {
         tips.push(`status: inactive`);
@@ -137,7 +135,7 @@ export default function Message(props: MessageProps) {
                         <Avatar icon={<RobotOutlined />} size={28} className="bg-primary mt-1 mr-3" />
                         <div className="flex-1">
                             <div className={`mr-4 break-words whitespace-pre-wrap text-left ${isInactive ? 'text-gray-500' : ''}`}>
-                                {enableMarkdownRendering && !isAssistantCollapsed ? (
+                                {displaySettings.enableMarkdownRendering && !isAssistantCollapsed ? (
                                     <Markdown>{formattedAssistantContent}</Markdown>
                                 ) : (
                                     <div>

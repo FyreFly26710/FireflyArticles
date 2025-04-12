@@ -1,3 +1,4 @@
+'use client'
 import React from 'react';
 import { Select, Switch, Divider, Typography } from 'antd';
 import { 
@@ -10,48 +11,49 @@ import {
   RobotOutlined,
   CompressOutlined
 } from '@ant-design/icons';
-import { useChat } from '@/app/aichat/context/ChatContext';
-import { storage, ChatSettings } from '@/stores/storage';
+import { storage, ChatDisplaySettings, ChatBehaviorSettings } from '@/stores/storage';
 
 const { Text } = Typography;
 const { Option } = Select;
-
-// Default settings
-const defaultSettings: ChatSettings = {
-    showMessageTimestamp: true,
-    showModelName: true,
-    showTokenUsed: true,
-    showTimeTaken: true,
-    enableMarkdownRendering: true,
-    enableThinking: true,
-    enableStreaming: true,
-    showOnlyActiveMessages: false,
-    enableCollapsibleMessages: true,
-    selectedModel: 'deepseek'
-};
 
 interface InputSettingsProps {
   visible: boolean;
 }
 
 const InputSettings: React.FC<InputSettingsProps> = ({ visible }) => {
-  const { 
-    showMessageTimestamp,
-    showModelName,
-    showTokenUsed,
-    showTimeTaken,
-    enableMarkdownRendering,
-    enableThinking,
-    enableStreaming,
-    showOnlyActiveMessages,
-    enableCollapsibleMessages,
-    selectedModel
-  } = useChat();
+  // Initialize with current settings
+  const [displaySettings, setDisplaySettings] = React.useState(() => storage.getChatDisplaySettings());
+  const [behaviorSettings, setBehaviorSettings] = React.useState(() => storage.getChatBehaviorSettings());
 
-  const updateSetting = (key: keyof ChatSettings, value: boolean | string) => {
-    const currentSettings = storage.getChatSettings() || defaultSettings;
-    const newSettings = { ...currentSettings, [key]: value };
-    storage.setChatSettings(newSettings);
+  // Listen for settings changes
+  React.useEffect(() => {
+    const handleDisplayChange = (event: CustomEvent<ChatDisplaySettings>) => {
+      setDisplaySettings(event.detail);
+    };
+
+    const handleBehaviorChange = (event: CustomEvent<ChatBehaviorSettings>) => {
+      setBehaviorSettings(event.detail);
+    };
+
+    window.addEventListener('chatDisplaySettingsChanged', handleDisplayChange);
+    window.addEventListener('chatBehaviorSettingsChanged', handleBehaviorChange);
+
+    return () => {
+      window.removeEventListener('chatDisplaySettingsChanged', handleDisplayChange);
+      window.removeEventListener('chatBehaviorSettingsChanged', handleBehaviorChange);
+    };
+  }, []);
+
+  // Update display settings
+  const updateDisplaySetting = (key: keyof ChatDisplaySettings, value: boolean) => {
+    const newSettings = { ...displaySettings, [key]: value };
+    storage.setChatDisplaySettings(newSettings);
+  };
+
+  // Update behavior settings
+  const updateBehaviorSetting = (key: keyof ChatBehaviorSettings, value: boolean | string) => {
+    const newSettings = { ...behaviorSettings, [key]: value };
+    storage.setChatBehaviorSettings(newSettings);
   };
 
   return (
@@ -66,8 +68,8 @@ const InputSettings: React.FC<InputSettingsProps> = ({ visible }) => {
           <div className="flex items-center gap-2">
             <Text strong><RobotOutlined /> Model:</Text>
             <Select 
-              value={selectedModel} 
-              onChange={(value) => updateSetting('selectedModel', value)}
+              value={behaviorSettings.selectedModel} 
+              onChange={(value) => updateBehaviorSetting('selectedModel', value)}
               placeholder="Select Model"
               style={{ width: 180 }}
               disabled={true}
@@ -82,32 +84,32 @@ const InputSettings: React.FC<InputSettingsProps> = ({ visible }) => {
           <div className="flex flex-wrap gap-4">
             <div className="flex items-center gap-2">
               <Switch 
-                checked={enableThinking} 
-                onChange={(checked) => updateSetting('enableThinking', checked)}
+                checked={behaviorSettings.enableThinking} 
+                onChange={(checked) => updateBehaviorSetting('enableThinking', checked)}
                 size="small" 
               />
               <Text><BulbOutlined /> Thinking</Text>
             </div>
             <div className="flex items-center gap-2">
               <Switch 
-                checked={enableStreaming} 
-                onChange={(checked) => updateSetting('enableStreaming', checked)}
+                checked={behaviorSettings.enableStreaming} 
+                onChange={(checked) => updateBehaviorSetting('enableStreaming', checked)}
                 size="small" 
               />
               <Text><ThunderboltOutlined /> Streaming</Text>
             </div>
             <div className="flex items-center gap-2">
               <Switch 
-                checked={showOnlyActiveMessages} 
-                onChange={(checked) => updateSetting('showOnlyActiveMessages', checked)}
+                checked={displaySettings.showOnlyActiveMessages} 
+                onChange={(checked) => updateDisplaySetting('showOnlyActiveMessages', checked)}
                 size="small"
               />
               <Text><EyeOutlined /> Only Active</Text>
             </div>
             <div className="flex items-center gap-2">
               <Switch 
-                checked={enableCollapsibleMessages} 
-                onChange={(checked) => updateSetting('enableCollapsibleMessages', checked)}
+                checked={displaySettings.enableCollapsibleMessages} 
+                onChange={(checked) => updateDisplaySetting('enableCollapsibleMessages', checked)}
                 size="small"
               />
               <Text><CompressOutlined /> Collapsible</Text>
@@ -121,40 +123,40 @@ const InputSettings: React.FC<InputSettingsProps> = ({ visible }) => {
         <div className="flex flex-wrap gap-4">
           <div className="flex items-center gap-2">
             <Switch 
-              checked={showTokenUsed} 
-              onChange={(checked) => updateSetting('showTokenUsed', checked)}
+              checked={displaySettings.showTokenUsed} 
+              onChange={(checked) => updateDisplaySetting('showTokenUsed', checked)}
               size="small" 
             />
             <Text><FileTextOutlined /> Tokens</Text>
           </div>
           <div className="flex items-center gap-2">
             <Switch 
-              checked={showModelName} 
-              onChange={(checked) => updateSetting('showModelName', checked)}
+              checked={displaySettings.showModelName} 
+              onChange={(checked) => updateDisplaySetting('showModelName', checked)}
               size="small" 
             />
             <Text><RobotOutlined /> Model</Text>
           </div>
           <div className="flex items-center gap-2">
             <Switch 
-              checked={showTimeTaken} 
-              onChange={(checked) => updateSetting('showTimeTaken', checked)}
+              checked={displaySettings.showTimeTaken} 
+              onChange={(checked) => updateDisplaySetting('showTimeTaken', checked)}
               size="small" 
             />
             <Text><ClockCircleOutlined /> Time</Text>
           </div>
           <div className="flex items-center gap-2">
             <Switch 
-              checked={showMessageTimestamp} 
-              onChange={(checked) => updateSetting('showMessageTimestamp', checked)}
+              checked={displaySettings.showMessageTimestamp} 
+              onChange={(checked) => updateDisplaySetting('showMessageTimestamp', checked)}
               size="small" 
             />
             <Text><ClockCircleOutlined /> Date</Text>
           </div>
           <div className="flex items-center gap-2">
             <Switch 
-              checked={enableMarkdownRendering} 
-              onChange={(checked) => updateSetting('enableMarkdownRendering', checked)}
+              checked={displaySettings.enableMarkdownRendering} 
+              onChange={(checked) => updateDisplaySetting('enableMarkdownRendering', checked)}
               size="small" 
             />
             <Text><CodeOutlined /> Markdown</Text>

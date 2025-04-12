@@ -1,4 +1,5 @@
 ﻿using FF.Articles.Backend.Common.ApiDtos;
+using FF.Articles.Backend.Common.Exceptions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
@@ -17,10 +18,10 @@ public class UserUtil
 {
     public static UserApiDto GetUserFromHttpRequest(HttpRequest request)
     {
-        if (!request.HttpContext.User.Identity.IsAuthenticated)
-        {
-            throw new UnauthorizedAccessException("User is not authenticated");
-        }
+        // if (!request.HttpContext.User.Identity.IsAuthenticated)
+        // {
+        //     throw new ApiException(ErrorCode.NOT_LOGIN_ERROR, "User is not authenticated");
+        // }
 
         var user = request.HttpContext.User.FindFirst("user");
         if (user == null)
@@ -29,7 +30,7 @@ public class UserUtil
             var availableClaims = request.HttpContext.User.Claims.Select(c => $"{c.Type}: {c.Value}").ToList();
             var claimsMessage = string.Join(", ", availableClaims);
 
-            throw new UnauthorizedAccessException($"User claim not found in the authenticated user. Available claims: {claimsMessage}");
+            throw new ApiException(ErrorCode.NOT_LOGIN_ERROR, $"User claim not found in the authenticated user. Available claims: {claimsMessage}");
         }
 
         try
@@ -38,7 +39,7 @@ public class UserUtil
         }
         catch (JsonException ex)
         {
-            throw new UnauthorizedAccessException($"Failed to deserialize user claim: {ex.Message}");
+            throw new ApiException(ErrorCode.NOT_LOGIN_ERROR, $"Failed to deserialize user claim: {ex.Message}");
         }
     }
 

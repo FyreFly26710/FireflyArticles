@@ -76,7 +76,7 @@ export default function SessionItem({
                     <div className="text-xs text-gray-500 flex items-center gap-2">
                         <span>{session.roundCount} chats</span>
                         <span>•</span>
-                        <span>{new Date(session.createdAt).toLocaleDateString()}</span>
+                        <span>{new Date(session.updateTime).toLocaleDateString()}</span>
                     </div>
                 </div>
                 <div className="flex items-center gap-2">

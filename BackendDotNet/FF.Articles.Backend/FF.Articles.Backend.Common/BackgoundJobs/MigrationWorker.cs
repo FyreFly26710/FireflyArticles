@@ -89,8 +89,10 @@ public static class MigrationWorker
                 }
             }
 
-            // Apply migrations and seed data
+            // Apply migrations
             await context.Database.MigrateAsync();
+
+            // Seed if first init
             if (seeder != null && isInit)
             {
                 await seeder.SeedAsync(services);

@@ -23,7 +23,7 @@ public class ChatResponse
     /// </summary>
     public string Model { get; set; } = default!;
 
-    [JsonPropertyName("system_fingerprint")]
+    // [JsonPropertyName("system_fingerprint")]
     public string? SystemFingerprint { get; set; }
 
     /// <summary>
@@ -41,7 +41,7 @@ public class ChatResponse
 /// </summary>
 public class Choice
 {
-    [JsonPropertyName("finish_reason")]
+    // [JsonPropertyName("finish_reason")]
     public string? FinishReason { get; set; }
     public int Index { get; set; }
     public Message? Message { get; set; }
@@ -62,26 +62,26 @@ public class Choice
 /// </summary>
 public class Usage
 {
-    [JsonPropertyName("completion_tokens")]
+    // [JsonPropertyName("completion_tokens")]
     public int CompletionTokens { get; set; }
-    [JsonPropertyName("prompt_tokens")]
+    //[JsonPropertyName("prompt_tokens")]
     public int PromptTokens { get; set; }
 
-    [JsonPropertyName("prompt_cache_hit_tokens")]
+    // [JsonPropertyName("prompt_cache_hit_tokens")]
     public int PromptCacheHitTokens { get; set; }
-    [JsonPropertyName("prompt_cache_miss_tokens")]
+    // [JsonPropertyName("prompt_cache_miss_tokens")]
     public int PromptCacheMissTokens { get; set; }
-    [JsonPropertyName("total_tokens")]
+    // [JsonPropertyName("total_tokens")]
     public int TotalTokens { get; set; }
 
-    [JsonPropertyName("prompt_tokens_details")]
+    // [JsonPropertyName("prompt_tokens_details")]
     public CompletionTokensDetails Details { get; set; }
 
     public class CompletionTokensDetails
     {
-        [JsonPropertyName("reasoning_tokens")]
+        // [JsonPropertyName("reasoning_tokens")]
         public int ReasoningTokens { get; set; }
-        [JsonPropertyName("cached_tokens")]
+        // [JsonPropertyName("cached_tokens")]
         public int CachedTokens { get; set; }
     }
 }

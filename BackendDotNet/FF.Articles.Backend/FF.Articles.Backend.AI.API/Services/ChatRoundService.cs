@@ -18,6 +18,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
+using System.Text.Json.Serialization;
 
 namespace FF.Articles.Backend.AI.API.Services;
 
@@ -31,7 +32,7 @@ public class ChatRoundService(
 {
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
-        PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         Encoder = JavaScriptEncoder.Create(UnicodeRanges.All)
     };
 
@@ -50,6 +51,8 @@ public class ChatRoundService(
         newRound.PromptTokens = response?.Usage?.PromptTokens ?? 0;
         newRound.CompletionTokens = response?.Usage?.CompletionTokens ?? 0;
         newRound.TimeTaken = (int)stopwatch.Elapsed.TotalMilliseconds;
+
+        _logger.LogInformation($"Non-streaming response - Prompt tokens: {newRound.PromptTokens}, Completion tokens: {newRound.CompletionTokens}");
 
         await _chatRoundRepository.CreateAsync(newRound);
         await _chatRoundRepository.SaveChangesAsync();
@@ -81,18 +84,25 @@ public class ChatRoundService(
         await foreach (var json in streamingResponse)
         {
             if (json == "[DONE]") break;
-
-            var chatResponse = JsonSerializer.Deserialize<ChatResponse>(json, _jsonOptions);
+            var jsonOptions = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
+                Encoder = JavaScriptEncoder.Create(UnicodeRanges.All)
+            };
+            var chatResponse = JsonSerializer.Deserialize<ChatResponse>(json, jsonOptions);
             if (chatResponse == null) continue;
 
             var content = chatResponse.Choices.FirstOrDefault()?.Delta?.Content;
-            if (content == null || string.IsNullOrEmpty(content)) continue;
-
-            if (chatResponse.Usage != null)
+            var finishReason = chatResponse.Choices.FirstOrDefault()?.FinishReason;
+            // Only process tokens when we get the final message (indicated by finish_reason being "stop")
+            if (finishReason == "stop")
             {
-                promptTokens = chatResponse.Usage.PromptTokens;
-                completionTokens = chatResponse.Usage.CompletionTokens;
+                completionTokens = chatResponse.Usage?.CompletionTokens ?? 0;
+                promptTokens = chatResponse.Usage?.PromptTokens ?? 0;
+                _logger.LogInformation($"Received token counts - Prompt: {promptTokens}, Completion: {completionTokens}");
             }
+
+            if (content == null || string.IsNullOrEmpty(content)) continue;
 
             responseBuilder.Append(content);
 
@@ -161,7 +171,8 @@ public class ChatRoundService(
             Messages = [.. historyMessages, Message.NewUserMessage(request.UserMessage)],
             Temperature = 0.7,
             MaxTokens = 2000,
-            Stream = false
+            Stream = false,
+            StreamOptions = new StreamOptions { IncludeUsage = true }
         };
         return chatRequest;
     }

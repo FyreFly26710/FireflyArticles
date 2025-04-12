@@ -13,7 +13,6 @@ export default function InputBox(){
     const { 
       handleSendMessage, 
       session,
-      selectedModel
     } = useChat()
 
     const handleSubmit = () => {
@@ -22,8 +21,9 @@ export default function InputBox(){
         }
         const newMessage: API.ChatRoundCreateRequest = {
             sessionId: session.sessionId,
+            SessionTimeStamp: session.timestamp,
             userMessage: messageInput,
-            model: selectedModel || 'gpt-3.5-turbo'
+            model: 'deepseek'
         }
         handleSendMessage(newMessage)
         setMessageInput('')

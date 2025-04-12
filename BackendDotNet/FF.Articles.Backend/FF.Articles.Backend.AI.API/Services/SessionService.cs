@@ -50,7 +50,9 @@ public class SessionService(
         SessionName = session.SessionName ?? chatRounds.Last().UserMessage,
         RoundCount = chatRounds.Count,
         Rounds = includeChatRounds ? chatRounds.Select(c => c.ToDto()).ToList() : [],
-        TimeStamp = session.TimeStamp
+        TimeStamp = session.TimeStamp,
+        CreateTime = session.CreateTime ?? DateTime.Now,
+        UpdateTime = session.UpdateTime ?? DateTime.Now
     };
 
     public async Task<bool> UpdateSession(SessionEditRequest request, CancellationToken cancellationToken)

@@ -15,11 +15,11 @@ public class ChatRoundRepository : BaseRepository<ChatRound, AIDbContext>, IChat
 
     public async Task<List<ChatRound>> GetChatsBySessionId(long sessionId)
     {
-        return await GetQueryable().Where(c => c.SessionId == sessionId).ToListAsync();
+        return await GetQueryable().Where(c => c.SessionId == sessionId).OrderBy(c=>c.Id).ToListAsync();
     }
 
     public async Task<List<ChatRound>> GetChatsBySessionIds(List<long> sessionIds)
     {
-        return await GetQueryable().Where(c => sessionIds.Contains(c.SessionId)).ToListAsync();
+        return await GetQueryable().Where(c => sessionIds.Contains(c.SessionId)).OrderBy(c=>c.Id).ToListAsync();
     }
 }

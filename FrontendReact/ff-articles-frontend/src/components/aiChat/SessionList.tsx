@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Input } from 'antd'
 import SessionItem from './SessionItem'
 import { useChat } from '@/app/aichat/context/ChatContext'
@@ -15,10 +15,6 @@ export default function SessionList() {
         handleDeleteSession,
         handleCreateSession
     } = useChat();
-
-    // const filteredSessions = sessions.filter(session =>
-    //     session.sessionName.toLowerCase().includes(searchText.toLowerCase())
-    // )
 
     return (
         <div className={"flex flex-col h-full p-4 bg-white"}>

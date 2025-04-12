@@ -33,12 +33,8 @@ export function apiChatRoundStreamResponse(
     onChunk?: (content: string) => void;
     onDone?: (data: API.ChatRoundDto) => void;
     onError?: (error: any) => void;
-    onTokens?: (promptTokens: number, completionTokens: number) => void;
   }
 ) {
-  // Ensure streaming is enabled
-  body.enableStreaming = true;
-
   // Create a new AbortController to cancel the request if needed
   const controller = new AbortController();
   console.log("Streaming request started");
@@ -49,6 +45,7 @@ export function apiChatRoundStreamResponse(
     headers: {
       "Content-Type": "application/json",
     },
+    credentials: "include",
     body: JSON.stringify(body),
     signal: controller.signal,
   })
@@ -123,13 +120,6 @@ export function apiChatRoundStreamResponse(
               case "end":
                 try {
                   const doneData = JSON.parse(data);
-                  // Update token information from the complete response
-                  if (doneData.promptTokens !== undefined && doneData.completionTokens !== undefined) {
-                    callbacks.onTokens?.(
-                      doneData.promptTokens,
-                      doneData.completionTokens
-                    );
-                  }
                   callbacks.onDone?.(doneData);
                 } catch (e) {
                   console.error("Error parsing done event data:", e);

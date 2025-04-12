@@ -16,10 +16,10 @@ declare namespace API {
   // Chat round models
   type ChatRoundCreateRequest = {
     sessionId: number;
+    SessionTimeStamp: number;
     historyChatRoundIds?: number[];
     userMessage: string;
     model?: string;
-    enableStreaming?: boolean;
   };
 
   type ChatRoundReQueryRequest = {
@@ -36,12 +36,13 @@ declare namespace API {
     userMessage: string;
     assistantMessage: string;
     model: string;
-    createdAt: string;
     promptTokens: number;
     completionTokens: number;
     totalTokens: number;
     timeTaken: number;
     isActive: boolean;
+    createTime: string;
+    updateTime: string;
   };
 
   // Session models
@@ -56,10 +57,12 @@ declare namespace API {
 
   type SessionDto = {
     sessionId: number;
+    timestamp: number;
     sessionName: string;
     rounds: ChatRoundDto[];
     roundCount: number;
-    createdAt: string;
+    createTime: string;
+    updateTime: string;
   };
 
   // API responses

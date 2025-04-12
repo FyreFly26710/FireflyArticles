@@ -24,7 +24,7 @@ public class DeepSeekClient : IDeepSeekClient
     private readonly JsonSerializerOptions JsonSerializerOptions = new()
     {
         ReferenceHandler = ReferenceHandler.IgnoreCycles,
-        PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         Encoder = JavaScriptEncoder.Create(UnicodeRanges.All)
     };
 

@@ -24,7 +24,8 @@ public static class ChatMessageRequestExtensions
             CompletionTokens = chatRound.CompletionTokens,
             TimeTaken = chatRound.TimeTaken,
             IsActive = chatRound.IsActive,
-            TimeStamp = chatRound.TimeStamp
+            CreateTime = chatRound.CreateTime ?? DateTime.Now,
+            UpdateTime = chatRound.UpdateTime ?? DateTime.Now
         };
     }
 
