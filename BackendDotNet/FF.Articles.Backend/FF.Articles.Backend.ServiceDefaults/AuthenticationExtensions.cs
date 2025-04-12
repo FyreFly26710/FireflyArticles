@@ -33,21 +33,21 @@ public static class AuthenticationExtensions
     public static WebApplicationBuilder AddApiAuthentication(this WebApplicationBuilder builder)
     {
         // Configure JWT for service-to-service communication
-        // var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? "your-secret-key-at-least-16-chars-long"));
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? "your-secret-key-at-least-16-chars-long"));
 
-        // builder.Services.AddAuthentication()
-        //     .AddJwtBearer("Bearer", options =>
-        //     {
-        //         options.TokenValidationParameters = new TokenValidationParameters
-        //         {
-        //             ValidateIssuer = false,
-        //             ValidateAudience = false,
-        //             ValidateLifetime = true,
-        //             ValidateIssuerSigningKey = true,
-        //             IssuerSigningKey = key
-        //         };
-        //         options.Events = new ThrowingJwtBearerEvents();
-        //     });
+        builder.Services.AddAuthentication()
+            .AddJwtBearer("Bearer", options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = key
+                };
+                options.Events = new ThrowingJwtBearerEvents();
+            });
 
         return builder;
     }

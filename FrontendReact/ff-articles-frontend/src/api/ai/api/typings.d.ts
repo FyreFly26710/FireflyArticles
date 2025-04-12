@@ -99,12 +99,13 @@ declare namespace API {
   type ArticlesAIResponseDto = {
     code?: number;
     message?: string;
-    data?: {
-      articles: AIGenArticleDto[];
-      aiMessage: string;
-    };
+    data?: ArticlesAIResponse;
   };
-
+  type ArticlesAIResponse = {
+    articles: AIGenArticleDto[];
+    aiMessage: string;
+    topicId: number;
+  };
   type AIGenArticleDto = {
     id: number;
     title: string;

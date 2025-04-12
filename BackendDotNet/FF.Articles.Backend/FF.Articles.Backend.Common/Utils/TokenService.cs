@@ -18,14 +18,14 @@ public interface ITokenService
 public class TokenService : ITokenService
 {
     private readonly string _key;
-    private readonly string _issuer;
-    private readonly string _audience;
+    // private readonly string _issuer;
+    // private readonly string _audience;
 
     public TokenService(IConfiguration configuration)
     {
         _key = configuration["Jwt:Key"] ?? "your-secret-key-at-least-16-chars-long";
-        _issuer = configuration["Jwt:Issuer"] ?? "firefly-articles";
-        _audience = configuration["Jwt:Audience"] ?? "firefly-articles-api";
+        // _issuer = configuration["Jwt:Issuer"] ?? "firefly-articles";
+        // _audience = configuration["Jwt:Audience"] ?? "firefly-articles-api";
     }
 
     public string GenerateApiToken(UserApiDto user, TimeSpan? expiration = null)
@@ -42,8 +42,8 @@ public class TokenService : ITokenService
         };
 
         var token = new JwtSecurityToken(
-            issuer: _issuer,
-            audience: _audience,
+            // issuer: _issuer,
+            // audience: _audience,
             claims: claims,
             expires: DateTime.UtcNow.Add(expiration ?? TimeSpan.FromMinutes(30)),
             signingCredentials: credentials

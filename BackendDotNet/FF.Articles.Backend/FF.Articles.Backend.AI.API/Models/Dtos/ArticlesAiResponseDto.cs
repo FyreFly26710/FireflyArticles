@@ -8,6 +8,8 @@ public class ArticlesAIResponseDto
 
     public string AIMessage { get; set; } = "";
 
+    public long TopicId { get; set; }
+
 }
 public class AIGenArticleDto
 {

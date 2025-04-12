@@ -5,8 +5,8 @@ namespace FF.Articles.Backend.AI.API.Interfaces.Services.RemoteServices;
 public interface IContentsApiRemoteService
 {
     // Task<Dictionary<long, string>> AddBatchArticlesAsync(List<ArticleApiAddRequest> requests, HttpRequest httpRequest);
-    Task<long> AddArticleAsync(ArticleApiAddRequest request);
+    //Task<long> AddArticleAsync(ArticleApiAddRequest request);
     //Task<bool> EditContentBatchAsync(Dictionary<long, string> batchEditConentRequests, HttpRequest httpRequest);
-    Task<long> AddTopicByTitleAsync(string title, HttpRequest httpRequest);
+    Task<long> AddTopicByTitleAsync(string titlet);
     // Task<bool> EditArticleByRequest(ArticleApiEditRequest request, HttpRequest httpRequest);
 }

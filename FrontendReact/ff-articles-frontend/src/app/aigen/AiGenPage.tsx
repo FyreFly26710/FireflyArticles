@@ -1,43 +1,17 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
-import { Card, Space, Divider, Spin, Button } from 'antd';
+import React, { useState } from 'react';
+import { Card, Space, Spin, Button } from 'antd';
 import Title from "antd/es/typography/Title";
 import ArticleGenerationForm from './components/ArticleGenerationForm';
 import { apiAiArticlesGenerateList } from '@/api/ai/api/aiarticles';
 import styles from './aigen.module.css';
 import ArticleResults from './components/ArticleResults';
 
-const LOCAL_STORAGE_KEY = 'ff-article-generator-results';
-
 const AiGenPage = () => {
     const [loading, setLoading] = useState(false);
     const [results, setResults] = useState<API.ArticlesAIResponseDto['data']>();
     const [showForm, setShowForm] = useState(true);
-
-    // Load saved results from localStorage on initial render
-    useEffect(() => {
-        const savedResults = localStorage.getItem(LOCAL_STORAGE_KEY);
-        if (savedResults) {
-            try {
-                const parsedResults = JSON.parse(savedResults);
-                setResults(parsedResults);
-                setShowForm(false);
-            } catch (error) {
-                console.error('Error parsing saved results:', error);
-                localStorage.removeItem(LOCAL_STORAGE_KEY);
-            }
-        }
-    }, []);
-
-    // Save results to localStorage, but debounced
-    const saveToLocalStorage = useCallback((data: API.ArticlesAIResponseDto['data']) => {
-        try {
-            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
-        } catch (error) {
-            console.error('Error saving to localStorage:', error);
-        }
-    }, []);
 
     const handleGenerateArticles = async (topic: string, articleCount: number) => {
         setLoading(true);
@@ -48,9 +22,6 @@ const AiGenPage = () => {
                 articleCount
             });
             setResults(response.data);
-            if (response.data) {
-                saveToLocalStorage(response.data);
-            }
             setShowForm(false);
         } catch (error) {
             console.error('Error generating articles:', error);
@@ -61,9 +32,6 @@ const AiGenPage = () => {
 
     const handleUpdateResults = (updatedResults: API.ArticlesAIResponseDto['data']) => {
         setResults(updatedResults);
-        if (updatedResults) {
-            saveToLocalStorage(updatedResults);
-        }
     };
 
     const handleNewGeneration = () => {
@@ -74,7 +42,6 @@ const AiGenPage = () => {
     const handleClearResults = () => {
         setResults(undefined);
         setShowForm(true);
-        localStorage.removeItem(LOCAL_STORAGE_KEY);
     };
 
     return (
@@ -89,7 +56,7 @@ const AiGenPage = () => {
                         </Space>
                     )}
                 </div>
-                
+
                 {showForm && (
                     <Card title="Generate Articles" bordered={false} className={styles['article-results-card']}>
                         <ArticleGenerationForm onSubmit={handleGenerateArticles} loading={loading} />
@@ -108,8 +75,8 @@ const AiGenPage = () => {
                 )}
 
                 {results && !loading && (
-                    <ArticleResults 
-                        results={results} 
+                    <ArticleResults
+                        results={results}
                         onUpdateResults={handleUpdateResults}
                     />
                 )}

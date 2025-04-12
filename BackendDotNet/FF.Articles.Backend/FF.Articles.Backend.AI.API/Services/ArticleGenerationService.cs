@@ -50,15 +50,16 @@ public class ArticleGenerationService : IArticleGenerationService
             Messages = round1_Messages(request.Topic, request.ArticleCount),
             ResponseFormat = new ResponseFormat() { Type = ResponseFormatTypes.JsonObject }
         };
-
-        //var response = await _deepSeekClient.ChatAsync(chatRequest, cancellationToken);
-        //var jsonContent = response?.Choices.First().Message?.Content ?? "";
-        await Task.Delay(1000);
-        var jsonContent = mock_article_list;
-        Console.WriteLine(jsonContent);
+        Task<long> addTopicTask = _contentsApiRemoteService.AddTopicByTitleAsync(request.Topic);
+        var response = await _deepSeekClient.ChatAsync(chatRequest, cancellationToken);
+        var jsonContent = response?.Choices.First().Message?.Content ?? "";
+        // await Task.Delay(1000);
+        // var jsonContent = mock_article_list;
+        // Console.WriteLine(jsonContent);
         var articlesResponse = JsonSerializer.Deserialize<ArticlesAIResponseDto>(jsonContent);
         if (articlesResponse is null) throw new Exception("Failed to generate article");
-
+        var topicId = await addTopicTask;
+        articlesResponse.TopicId = topicId;
         return articlesResponse;
     }
 
