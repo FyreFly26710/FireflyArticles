@@ -76,11 +76,11 @@ export default function Message(props: MessageProps) {
     }
 
     // Auto-scroll to bottom when message is being generated
-    useEffect(() => {
-        if (isGenerating) {
-            window.scrollTo(0, document.body.scrollHeight)
-        }
-    }, [isGenerating, assistantContent])
+    // useEffect(() => {
+    //     if (isGenerating) {
+    //         window.scrollTo(0, document.body.scrollHeight)
+    //     }
+    // }, [isGenerating, assistantContent])
 
     // Format content for display
     let formattedUserContent = userContent;
@@ -117,10 +117,10 @@ export default function Message(props: MessageProps) {
                     <Avatar
                         icon={<UserOutlined />}
                         size={28}
-                        className="cursor-pointer mt-1 ml-3"
+                        className="cursor-pointer mt-1"
                         onClick={() => setOpenSettingWindow('chat')}
                     />
-                    <div className="flex-1 text-right">
+                    <div className="flex-1 text-right mr-4">
                         <div className={`inline-block bg-gray-100 rounded-lg p-3 max-w-[80%] break-words whitespace-pre-wrap text-left ${isInactive ? 'border border-gray-300' : ''}`}>
                             {formattedUserContent}
                         </div>
@@ -132,8 +132,8 @@ export default function Message(props: MessageProps) {
             {(displayMode === 'assistant' || displayMode === 'both') && (
                 <div className={`${isGenerating ? 'rendering' : 'render-done'} py-2`}>
                     <div className="flex items-start">
-                        <Avatar icon={<RobotOutlined />} size={28} className="bg-primary mt-1 mr-3" />
-                        <div className="flex-1">
+                        <Avatar icon={<RobotOutlined />} size={28} className="bg-primary mt-1" />
+                        <div className="flex-1 ml-4">
                             <div className={`mr-4 break-words whitespace-pre-wrap text-left ${isInactive ? 'text-gray-500' : ''}`}>
                                 {displaySettings.enableMarkdownRendering && !isAssistantCollapsed ? (
                                     <Markdown>{formattedAssistantContent}</Markdown>

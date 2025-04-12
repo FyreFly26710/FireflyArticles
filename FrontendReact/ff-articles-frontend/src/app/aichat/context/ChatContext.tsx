@@ -16,26 +16,11 @@ import { storage } from '@/stores/storage';
 interface ChatContextType {
   session: API.SessionDto;
   sessions: API.SessionDto[];
-  // sidebarCollapsed: boolean;
-  // rightSidebarCollapsed: boolean;
   loading: boolean;
   isGenerating: boolean;
-  // // Settings
-  // showMessageTimestamp: boolean;
-  // showModelName: boolean;
-  // showTokenUsed: boolean;
-  // showTimeTaken: boolean;
-  // enableMarkdownRendering: boolean;
-  // enableThinking: boolean;
-  // enableStreaming: boolean;
-  // showOnlyActiveMessages: boolean;
-  // enableCollapsibleMessages: boolean;
-  // selectedModel: string;
   // Setters
   setSession: (session: API.SessionDto) => void;
   setSessions: (sessions: API.SessionDto[]) => void;
-  // setSidebarCollapsed: (collapsed: boolean) => void;
-  // setRightSidebarCollapsed: (collapsed: boolean) => void;
   // Handlers
   handleSendMessage: (message: API.ChatRoundCreateRequest) => Promise<void>;
   handleCreateSession: () => Promise<void>;
@@ -70,7 +55,6 @@ export function ChatProvider({ children }: { children: ReactNode }) {
 
   // Get settings from storage
   const settings = storage.getChatBehaviorSettings();
-
 
   // Load sessions on component mount
   useEffect(() => {
@@ -150,7 +134,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
                   const lastRound = { ...updatedRounds[updatedRounds.length - 1] };
                   lastRound.chatRoundId = data.chatRoundId;
                   lastRound.sessionId = data.sessionId;
-                  lastRound.isActive = true; // Ensure active on init
+                  // lastRound.isActive = true; 
                   updatedRounds[updatedRounds.length - 1] = lastRound;
                 }
 
@@ -166,8 +150,6 @@ export function ChatProvider({ children }: { children: ReactNode }) {
                 if (updatedRounds.length > 0) {
                   const lastRound = { ...updatedRounds[updatedRounds.length - 1] };
                   lastRound.assistantMessage = (lastRound.assistantMessage || '') + content;
-                  lastRound.isActive = true; // Keep active while receiving chunks
-                  lastRound.updateTime = new Date().toISOString(); // Update timestamp
                   updatedRounds[updatedRounds.length - 1] = lastRound;
                 }
 
@@ -177,18 +159,12 @@ export function ChatProvider({ children }: { children: ReactNode }) {
             },
             onDone: (data) => {
               setIsGenerating(false);  // Stop generating
-              console.log('onDone data:', data);
-              // Only use updateSessionsByChatRound, remove the duplicate setSession
-              if (!data.promptTokens || !data.completionTokens || !data.timeTaken) {
-                console.warn('Missing metadata in onDone:', data);
-                // Ensure we have the required metadata
-                data = {
-                  ...data,
-                  promptTokens: data.promptTokens || 0,
-                  completionTokens: data.completionTokens || 0,
-                  timeTaken: data.timeTaken || 0,
-                };
-              }
+              data = {
+                ...data,
+                promptTokens: data.promptTokens || 0,
+                completionTokens: data.completionTokens || 0,
+                timeTaken: data.timeTaken || 0,
+              };
               updateSessionsByChatRound(data);
             },
             onError: (error) => {
@@ -203,7 +179,6 @@ export function ChatProvider({ children }: { children: ReactNode }) {
                   lastRound.assistantMessage = (lastRound.assistantMessage || '') +
                     "\n\nSorry, there was an error generating the rest of the response.";
                   lastRound.isActive = true; // Keep message active even on error
-                  lastRound.updateTime = new Date().toISOString();
                   updatedRounds[updatedRounds.length - 1] = lastRound;
                 }
 
@@ -220,10 +195,10 @@ export function ChatProvider({ children }: { children: ReactNode }) {
           throw new Error('No data returned from API');
         }
         updateSessionsByChatRound(response.data);
-        setIsGenerating(false);  // Stop generating for non-streaming
+        setIsGenerating(false);  
       }
     } catch (error) {
-      setIsGenerating(false);  // Stop generating on error
+      setIsGenerating(false); 
       console.error('Error getting assistant response:', error);
       setSession(prev => {
         const updatedSession = { ...prev };
@@ -232,8 +207,6 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         if (updatedRounds.length > 0) {
           const lastRound = { ...updatedRounds[updatedRounds.length - 1] };
           lastRound.assistantMessage = "Sorry, there was an error generating a response.";
-          lastRound.isActive = true; // Keep active even on error
-          lastRound.updateTime = new Date().toISOString();
           updatedRounds[updatedRounds.length - 1] = lastRound;
         }
 

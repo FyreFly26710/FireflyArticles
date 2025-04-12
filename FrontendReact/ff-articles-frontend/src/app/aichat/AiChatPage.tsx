@@ -8,7 +8,6 @@ import ChatSidebar from '@/components/aiChat/ChatSidebar'
 import { storage, LayoutSettings } from '@/stores/storage';
 
 export default function AiChatPage() {
-  // Initialize state with storage values
   const [layoutSettings, setLayoutSettings] = useState<LayoutSettings>(() => storage.getLayoutSettings());
   
   useEffect(() => {
@@ -24,11 +23,9 @@ export default function AiChatPage() {
       setLayoutSettings(event.detail);
     };
 
-    // Add event listeners
     window.addEventListener('storage', handleStorageChange);
     window.addEventListener('layoutSettingsChanged', handleLayoutChange);
 
-    // Cleanup
     return () => {
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('layoutSettingsChanged', handleLayoutChange);

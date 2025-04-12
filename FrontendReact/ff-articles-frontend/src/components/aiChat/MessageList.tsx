@@ -39,24 +39,24 @@ export default function MessageList() {
         : rounds;
 
     // Scroll to bottom on new messages or when a message is being generated
-    useEffect(() => {
-        if (ref.current) {
-            // Check if the last message is being generated
-            const lastRound = filteredRounds?.[filteredRounds.length - 1];
-            const isGenerating = lastRound?.completionTokens === 0;
+    // useEffect(() => {
+    //     if (ref.current) {
+    //         // Check if the last message is being generated
+    //         const lastRound = filteredRounds?.[filteredRounds.length - 1];
+    //         const isGenerating = lastRound?.completionTokens === 0;
 
-            if (isGenerating) {
-                // Smooth scroll to bottom when generating
-                ref.current.scrollTo({
-                    top: ref.current.scrollHeight,
-                    behavior: 'smooth'
-                });
-            } else {
-                // Instant scroll for other cases
-                ref.current.scrollTop = ref.current.scrollHeight;
-            }
-        }
-    }, [filteredRounds?.length, filteredRounds?.[filteredRounds.length - 1]?.assistantMessage]);
+    //         if (isGenerating) {
+    //             // Smooth scroll to bottom when generating
+    //             ref.current.scrollTo({
+    //                 top: ref.current.scrollHeight,
+    //                 behavior: 'smooth'
+    //             });
+    //         } else {
+    //             // Instant scroll for other cases
+    //             ref.current.scrollTop = ref.current.scrollHeight;
+    //         }
+    //     }
+    // }, [filteredRounds?.length, filteredRounds?.[filteredRounds.length - 1]?.assistantMessage]);
 
     // Handle hash change for anchor links
     useEffect(() => {
