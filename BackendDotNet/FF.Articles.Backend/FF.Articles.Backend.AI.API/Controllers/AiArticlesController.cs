@@ -22,12 +22,12 @@ public class AiArticlesController(IArticleGenerationService articleGenerationSer
         return ResultUtil.Success(article);
     }
 
-    // [HttpPost("generate-article-content")]
-    // public async Task<IActionResult> GenerateArticleContent(ContentRequest request)
-    // {
-    //     var content = await articleGenerationService.GenerateArticleContentAsync(request, Request);
-    //     return Ok(content);
-    // }
+    [HttpPost("generate-article-content")]
+    public async Task<ApiResponse<long>> GenerateArticleContent(ContentRequest request)
+    {
+        var content = await articleGenerationService.GenerateArticleContentAsync(request);
+        return ResultUtil.Success(content);
+    }
     // [HttpPost("generate-article-content-batch")]
     // public async Task<IActionResult> BatchGenerateArticleContent(List<int> articleIds, CancellationToken cancellationToken)
     // {

@@ -1,21 +1,18 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Form, Input, Button, InputNumber, Card, Typography, Row, Col, Tooltip } from 'antd';
 import { SendOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import { useAiGen } from '../context/AiGenContext';
 
 const { Title, Paragraph } = Typography;
 
-interface ArticleGenerationFormProps {
-  onSubmit: (topic: string, count: number) => void;
-  loading: boolean;
-}
-
-const ArticleGenerationForm: React.FC<ArticleGenerationFormProps> = ({ onSubmit, loading }) => {
+const ArticleGenerationForm: React.FC = () => {
   const [form] = Form.useForm();
+  const { generateArticles, loading } = useAiGen();
 
   const handleSubmit = (values: { topic: string; count: number }) => {
-    onSubmit(values.topic, values.count);
+    generateArticles(values.topic, values.count);
   };
 
   return (
@@ -73,7 +70,7 @@ const ArticleGenerationForm: React.FC<ArticleGenerationFormProps> = ({ onSubmit,
                 icon={<SendOutlined />}
                 style={{ width: '100%', marginTop: 16 }}
               >
-                Generate Articles
+                {loading ? 'Generating...' : 'Generate Articles'}
               </Button>
             </Form.Item>
           </Form>

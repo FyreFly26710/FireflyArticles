@@ -8,5 +8,5 @@ namespace FF.Articles.Backend.AI.API.Interfaces;
 public interface IArticleGenerationService
 {
     Task<ArticlesAIResponseDto> GenerateArticleListsAsync(ArticleListRequest request, CancellationToken cancellationToken = default);
-    // Task<ArticleApiAddRequest> GenerateArticleContentAsync(ContentRequest request, HttpRequest httpRequest);
+    Task<long> GenerateArticleContentAsync(ContentRequest request);
 }

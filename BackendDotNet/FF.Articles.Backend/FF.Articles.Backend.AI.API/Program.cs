@@ -26,6 +26,8 @@ builder.Services.AddDbContext<AIDbContext>(options =>
            .EnableSensitiveDataLogging();
 });
 
+builder.AddRedisClient("redis");
+
 
 builder.AddServiceDefaults();
 

@@ -6,12 +6,13 @@ using FF.Articles.Backend.AI.API.Interfaces;
 using FF.Articles.Backend.AI.API.Interfaces.Services.RemoteServices;
 using System.Text.Json;
 using FF.Articles.Backend.AI.API.Models.AiDtos;
-using FF.Articles.Backend.AI.API.MapperExtensions;
 using FF.Articles.Backend.Common.Exceptions;
 using FF.Articles.Backend.Common.ApiDtos;
 using FF.Articles.Backend.AI.API.Services.Stores;
 using FF.Articles.Backend.Common.Utils;
 using FF.Articles.Backend.AI.API.Models.Requests.ArticleGenerations;
+using StackExchange.Redis;
+using FF.Articles.Backend.AI.API.Models.Entities;
 
 namespace FF.Articles.Backend.AI.API.Services;
 
@@ -33,73 +34,130 @@ public class ArticleGenerationService : IArticleGenerationService
 {
     private readonly IDeepSeekClient _deepSeekClient;
     private readonly IContentsApiRemoteService _contentsApiRemoteService;
-    private UserArticleStateStore _userArticleStateStore;
-
-    public ArticleGenerationService(IDeepSeekClient deepSeekClient, IContentsApiRemoteService contentsApiRemoteService, UserArticleStateStore userArticleStateStore)
+    private readonly IDatabase _redis;
+    public ArticleGenerationService(IDeepSeekClient deepSeekClient, IContentsApiRemoteService contentsApiRemoteService, IConnectionMultiplexer redis)
     {
         _deepSeekClient = deepSeekClient;
         _contentsApiRemoteService = contentsApiRemoteService;
-        _userArticleStateStore = userArticleStateStore;
+        _redis = redis.GetDatabase();
     }
     // Round 1
     public async Task<ArticlesAIResponseDto> GenerateArticleListsAsync(ArticleListRequest request, CancellationToken cancellationToken = default)
     {
+        var history = new AiGenHistory
+        {
+            Topic = request.Topic,
+            ArticleCount = request.ArticleCount,
+        };
 
         var chatRequest = new ChatRequest
         {
-            Messages = round1_Messages(request.Topic, request.ArticleCount),
+            Messages = {
+                Message.NewSystemMessage(format_ArticlesList),
+                Message.NewSystemMessage(system_ArticleList),
+                Message.NewUserMessage(@$"Topic: {request.Topic}; ArticleCount: {request.ArticleCount}"),
+            },
             ResponseFormat = new ResponseFormat() { Type = ResponseFormatTypes.JsonObject }
         };
         Task<long> addTopicTask = _contentsApiRemoteService.AddTopicByTitleAsync(request.Topic);
         var response = await _deepSeekClient.ChatAsync(chatRequest, cancellationToken);
         var jsonContent = response?.Choices.First().Message?.Content ?? "";
+        //var jsonContent = mock_article_list;
+
+        // Extract content between first { and last }
+        int firstBrace = jsonContent.IndexOf('{');
+        int lastBrace = jsonContent.LastIndexOf('}');
+
+        if (firstBrace >= 0 && lastBrace > firstBrace)
+        {
+            jsonContent = jsonContent.Substring(firstBrace, lastBrace - firstBrace + 1);
+        }
+
         // await Task.Delay(1000);
-        // var jsonContent = mock_article_list;
         // Console.WriteLine(jsonContent);
         var articlesResponse = JsonSerializer.Deserialize<ArticlesAIResponseDto>(jsonContent);
         if (articlesResponse is null) throw new Exception("Failed to generate article");
         var topicId = await addTopicTask;
         articlesResponse.TopicId = topicId;
+        history.AiResponse = jsonContent;
+        history.TopicId = topicId;
+        // await _redis.HashSetAsync($"history:{history.TopicId}", "topic", history.Topic);
+        // await _redis.HashSetAsync($"history:{history.TopicId}", "articleCount", history.ArticleCount.ToString());
+        // await _redis.HashSetAsync($"history:{history.TopicId}", "aiResponse", history.AiResponse);
+
         return articlesResponse;
     }
 
     // round 2
-    // public async Task<long> GenerateArticleContentAsync(ContentRequest request)
-    // {
-    //     var round1 = round1_Messages(request.Topic, request.ArticleCount);
+    public async Task<long> GenerateArticleContentAsync(ContentRequest request)
+    {
+        if (request.TopicId == 0 || string.IsNullOrEmpty(request.Title) || string.IsNullOrEmpty(request.Abstract))
+            throw new ApiException(ErrorCode.PARAMS_ERROR, "Invalid request");
+        // var history = JsonSerializer.Deserialize<AiGenHistory>(await _redis.HashGetAsync($"history:{request.TopicId}", "topic"));
+        //if (history is null) throw new Exception("Failed to generate article");
+        // var topic = await _redis.HashGetAsync($"history:{request.TopicId}", "topic");
+        // var articleCount = await _redis.HashGetAsync($"history:{request.TopicId}", "articleCount");
+        // var aiResponse = await _redis.HashGetAsync($"history:{request.TopicId}", "aiResponse");
 
-    //     var chatRequest = new ChatRequest
-    //     {
-    //         Messages = [
-    //             ..round1,
-    //             Message.NewAssistantMessage(request.AiMessage),
-    //             Message.NewSystemMessage(format_ArticleContent),
-    //             Message.NewUserMessage("You are a helpful assistant that generates articles based on the following information: "+request.Abstract),
-    //         ],
-    //         ResponseFormat = new ResponseFormat() { Type = ResponseFormatTypes.Text }
-    //     };
+        var chatRequest = new ChatRequest
+        {
+            Messages = [
+                //Message.NewSystemMessage(format_ArticlesList),
+                //Message.NewSystemMessage(system_ArticleList),
+                //Message.NewUserMessage(@$"Topic: {history.Topic}; ArticleCount: {history.ArticleCount}"),
+                //Message.NewAssistantMessage(history.AiResponse),
+                Message.NewSystemMessage(format_ArticleContent),
+                Message.NewUserMessage(@$"
+                Take a deep breath.
+                Think step by step.
+                You are a helpful assistant that generates an article based on the following information:
+                Topic: {request.Topic}
+                Title: {request.Title}
+                Abstract: {request.Abstract}
+                Tags: {string.Join(", ", request.Tags)}
+                """),
+            ],
+            ResponseFormat = new ResponseFormat() { Type = ResponseFormatTypes.Text }
+        };
 
-    //     var response = await _deepSeekClient.ChatAsync(chatRequest, new CancellationToken());
+        var response = await _deepSeekClient.ChatAsync(chatRequest, new CancellationToken());
 
-    //     var content = response?.Choices.First().Message?.Content ?? "";
-    //     if (string.IsNullOrEmpty(content)) throw new ApiException(ErrorCode.SYSTEM_ERROR, "Failed to generate article");
+        var content = response?.Choices.First().Message?.Content ?? "";
+        if (string.IsNullOrEmpty(content)) throw new ApiException(ErrorCode.SYSTEM_ERROR, "Failed to generate article");
 
-    //     // Add article
-    //     var article = new ArticleApiAddRequest
-    //     {
-    //         Title = request.Title,
-    //         Abstract = request.Abstract,
-    //         Content = content,
-    //         Tags = request.Tags,
-    //         TopicId = request.TopicId,
-    //         SortNumber = request.SortNumber,
-    //         ArticleType = "Article",
-    //         ParentArticleId = null,
-    //     };
-    //     var articleId = await _contentsApiRemoteService.AddArticleAsync(article);
+        // Clean the content from outer markdown code fences
+        content = content.Trim();
+        bool startsWithMarkdown = content.StartsWith("```markdown");
+        bool startsWithFence = !startsWithMarkdown && content.StartsWith("```");
+        bool endsWithFence = content.EndsWith("```");
+        int startOffset = startsWithMarkdown ? "```markdown".Length :
+                          startsWithFence ? "```".Length : 0;
 
-    //     return articleId;
-    // }
+        int endOffset = endsWithFence ? "```".Length : 0;
+        if (startOffset > 0 || endOffset > 0)
+        {
+            content = content.Substring(
+                startOffset,
+                content.Length - startOffset - endOffset
+            ).Trim();
+        }
+
+        // Add article
+        var article = new ArticleApiAddRequest
+        {
+            Title = request.Title,
+            Abstract = request.Abstract,
+            Content = content,
+            Tags = request.Tags,
+            TopicId = request.TopicId,
+            SortNumber = request.Id,
+            ArticleType = "Article",
+            ParentArticleId = null,
+        };
+        var articleId = await _contentsApiRemoteService.AddArticleAsync(article);
+
+        return articleId;
+    }
 
     // public async Task BatchGenerateArticleContentAsync(List<int> articleIds, HttpRequest httpRequest, CancellationToken cancellationToken = default)
     // {
@@ -150,7 +208,7 @@ public class ArticleGenerationService : IArticleGenerationService
         {
         "Id": 1,
         "Title": "Article Title",
-        "Abstract": "**Key Point** - content with two trailing spaces.  **Key Point** - content with two trailing spaces.  **Key Point** - content with two trailing spaces.  ",
+        "Abstract": "**Key Point** - content with two trailing spaces.  \n**Key Point** - content with two trailing spaces.  \n**Key Point** - content with two trailing spaces.  ",
         "Tags": ["tag1", "tag2", "tag3"]
         },
         { article2 etc... }
@@ -167,30 +225,32 @@ public class ArticleGenerationService : IArticleGenerationService
     5. **AIMessage:** 
         - If the topic is valid: List key subtopics covered and confirm completion.
         - If invalid/off-topic: Leave `Articles` empty and explain why in `AIMessage`.
-    - **JSON Syntax:** Ensure all quotes, commas, and brackets are closed.
+    - **JSON Syntax:** Ensure all quotes, commas, and brackets are closed, do not include any code fences, your response should be a valid json object.
     """;
     private string format_ArticleContent => """
+    For this round, you will be given a title, abstract, and tags.
     Respond ONLY with the raw markdown content following this exact structure:
     
         # Introduction
         Content...
 
-        ## [First Key Point]
+        ## First Key Point (smaller point)
         Content...
 
-        ## [Second Key Point] 
+        ## Second Key Point (larger point)
+        Content...
+        Content...
         Content...
 
         # Conclusion
         Content...
     
     Introduction and Conclusion contents should be 1 paragraphs.
-    Key Points should be 1-3 paragraphs.
+    Each Key Points should have 1-3 paragraphs.
 
     DO NOT include: 
     - Title
-    - Markdown code fences
-    - Any text outside the specified structure
+    - Opening and closing markdown code fences
     """;
 
     private string mock_article_list = """

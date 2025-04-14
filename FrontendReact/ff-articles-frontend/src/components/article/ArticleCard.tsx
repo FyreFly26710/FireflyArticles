@@ -165,8 +165,8 @@ const ArticleCard = (props: Props) => {
                         style={{ height: 80, resize: "none" }}
                     />
                 ) : (
-                    // <MdViewer value={article.abstract} />
-                    <Markdown>{article.abstract ?? ""}</Markdown>
+                    <MdViewer value={article.abstract} />
+                    //<Markdown>{article.abstract ?? ""}</Markdown>
                 )}
             </Card>
             <div style={{ marginBottom: 16 }} />
@@ -177,7 +177,8 @@ const ArticleCard = (props: Props) => {
                         onChange={(value) => setEditedContent(value)}
                     />
                 ) : (
-                    <Markdown>{article.content ?? ""}</Markdown>
+                    //<Markdown>{article.content ?? ""}</Markdown>
+                    <MdViewer value={article.content} />
                 )}
             </Card>
             <ArticleFormModal

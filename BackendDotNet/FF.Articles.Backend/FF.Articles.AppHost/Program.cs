@@ -44,7 +44,8 @@ builder.AddProject<Projects.FF_Articles_Backend_Contents_API>("contents-api", la
     .WithReference(redis);
 
 builder.AddProject<Projects.FF_Articles_Backend_AI_API>("ai-api", launchProfileName)
-    .WithReference(aidb);
+    .WithReference(aidb)
+    .WithReference(redis);
 
 builder.AddProject<Projects.FF_Articles_Backend_Gateway_API>("gateway-api", launchProfileName);
 builder.Build().Run();

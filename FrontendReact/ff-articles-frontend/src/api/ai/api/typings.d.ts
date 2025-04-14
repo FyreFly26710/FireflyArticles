@@ -89,6 +89,11 @@ declare namespace API {
     message?: string;
     data?: boolean;
   };
+  type NumberApiResponse = {
+    code?: number;
+    message?: string;
+    data?: number;
+  };
 
   // AI Articles models
   type ArticleListRequest = {
@@ -108,6 +113,14 @@ declare namespace API {
   };
   type AIGenArticleDto = {
     id: number;
+    title: string;
+    abstract: string;
+    tags: string[];
+  };
+  type ContentRequest = {
+    id: number;
+    topicId: number;
+    topic: string;
     title: string;
     abstract: string;
     tags: string[];
