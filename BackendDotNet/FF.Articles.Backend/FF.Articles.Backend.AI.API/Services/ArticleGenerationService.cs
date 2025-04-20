@@ -1,18 +1,16 @@
 using System;
-using FF.Articles.Backend.AI.Constants;
-using FF.Articles.Backend.AI.Models;
-using FF.Articles.Backend.AI.Services;
 using FF.Articles.Backend.AI.API.Interfaces;
 using FF.Articles.Backend.AI.API.Interfaces.Services.RemoteServices;
 using System.Text.Json;
 using FF.Articles.Backend.AI.API.Models.AiDtos;
 using FF.Articles.Backend.Common.Exceptions;
 using FF.Articles.Backend.Common.ApiDtos;
-using FF.Articles.Backend.AI.API.Services.Stores;
-using FF.Articles.Backend.Common.Utils;
-using FF.Articles.Backend.AI.API.Models.Requests.ArticleGenerations;
 using StackExchange.Redis;
 using FF.Articles.Backend.AI.API.Models.Entities;
+using FF.AI.Common.Interfaces;
+using FF.AI.Common.Providers;
+using FF.AI.Common.Models;
+using FF.Articles.Backend.AI.API.Models.Requests.ArticleGenerations;
 
 namespace FF.Articles.Backend.AI.API.Services;
 
@@ -32,12 +30,12 @@ namespace FF.Articles.Backend.AI.API.Services;
 /// </summary>
 public class ArticleGenerationService : IArticleGenerationService
 {
-    private readonly IDeepSeekClient _deepSeekClient;
+    private readonly IAssistant<DeepSeekProvider> _deepSeekAssistant;
     private readonly IContentsApiRemoteService _contentsApiRemoteService;
     private readonly IDatabase _redis;
-    public ArticleGenerationService(IDeepSeekClient deepSeekClient, IContentsApiRemoteService contentsApiRemoteService, IConnectionMultiplexer redis)
+    public ArticleGenerationService(IAssistant<DeepSeekProvider> deepSeekAssistant, IContentsApiRemoteService contentsApiRemoteService, IConnectionMultiplexer redis)
     {
-        _deepSeekClient = deepSeekClient;
+        _deepSeekAssistant = deepSeekAssistant;
         _contentsApiRemoteService = contentsApiRemoteService;
         _redis = redis.GetDatabase();
     }
@@ -53,15 +51,15 @@ public class ArticleGenerationService : IArticleGenerationService
         var chatRequest = new ChatRequest
         {
             Messages = {
-                Message.NewSystemMessage(format_ArticlesList),
-                Message.NewSystemMessage(system_ArticleList),
-                Message.NewUserMessage(@$"Topic: {request.Topic}; ArticleCount: {request.ArticleCount}"),
+                Message.User(format_ArticlesList),
+                Message.System(system_ArticleList),
+                Message.User(@$"Topic: {request.Topic}; ArticleCount: {request.ArticleCount}"),
             },
-            ResponseFormat = new ResponseFormat() { Type = ResponseFormatTypes.JsonObject }
+            Options = new ChatOptions() { ResponseFormat = ChatOptions.GetResponseFormat<ArticlesAIResponseDto>() }
         };
         Task<long> addTopicTask = _contentsApiRemoteService.AddTopicByTitleAsync(request.Topic);
-        var response = await _deepSeekClient.ChatAsync(chatRequest, cancellationToken);
-        var jsonContent = response?.Choices.First().Message?.Content ?? "";
+        var response = await _deepSeekAssistant.ChatAsync(chatRequest, cancellationToken);
+        var jsonContent = response?.Message?.Content ?? "";
         //var jsonContent = mock_article_list;
 
         // Extract content between first { and last }
@@ -106,8 +104,8 @@ public class ArticleGenerationService : IArticleGenerationService
                 //Message.NewSystemMessage(system_ArticleList),
                 //Message.NewUserMessage(@$"Topic: {history.Topic}; ArticleCount: {history.ArticleCount}"),
                 //Message.NewAssistantMessage(history.AiResponse),
-                Message.NewSystemMessage(format_ArticleContent),
-                Message.NewUserMessage(@$"
+                Message.System(format_ArticleContent),
+                Message.User(@$"
                 Take a deep breath.
                 Think step by step.
                 You are a helpful assistant that generates an article based on the following information:
@@ -117,12 +115,11 @@ public class ArticleGenerationService : IArticleGenerationService
                 Tags: {string.Join(", ", request.Tags)}
                 """),
             ],
-            ResponseFormat = new ResponseFormat() { Type = ResponseFormatTypes.Text }
         };
 
-        var response = await _deepSeekClient.ChatAsync(chatRequest, new CancellationToken());
+        var response = await _deepSeekAssistant.ChatAsync(chatRequest, new CancellationToken());
 
-        var content = response?.Choices.First().Message?.Content ?? "";
+        var content = response?.Message?.Content ?? "";
         if (string.IsNullOrEmpty(content)) throw new ApiException(ErrorCode.SYSTEM_ERROR, "Failed to generate article");
 
         // Clean the content from outer markdown code fences
@@ -169,9 +166,9 @@ public class ArticleGenerationService : IArticleGenerationService
     // }
 
     private List<Message> round1_Messages(string topic, int articleCount) => [
-        Message.NewSystemMessage(format_ArticlesList),
-        Message.NewSystemMessage(system_ArticleList),
-        Message.NewUserMessage(@$"Topic: {topic}; ArticleCount: {articleCount}"),
+        Message.System(format_ArticlesList),
+        Message.System(system_ArticleList),
+        Message.User(@$"Topic: {topic}; ArticleCount: {articleCount}"),
     ];
 
 

@@ -1,10 +1,9 @@
 using System;
+using FF.AI.Common.Constants;
+using FF.AI.Common.Models;
 using FF.Articles.Backend.AI.API.Models.Dtos;
 using FF.Articles.Backend.AI.API.Models.Entities;
 using FF.Articles.Backend.AI.API.Models.Requests.Chats;
-using FF.Articles.Backend.AI.API.Services.Stores;
-using FF.Articles.Backend.AI.Constants;
-using FF.Articles.Backend.AI.Models;
 
 namespace FF.Articles.Backend.AI.API.MapperExtensions.Chats;
 

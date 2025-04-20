@@ -42,14 +42,9 @@ public class StreamOptions
 
 public class ResponseFormat
 {
-    public string Type { get; set; } = ResponseFormatTypes.Text;
+    public string Type { get; set; } = "text";
 }
 
-public static class ResponseFormatTypes
-{
-    public const string Text = "text";
-    public const string JsonObject = "json_object";
-}
 
 internal static class DeepSeekRequestExtensions
 {
@@ -67,7 +62,7 @@ internal static class DeepSeekRequestExtensions
                 deepSeekRequest.MaxTokens = request.Options.MaxTokens.Value;
 
             if (request.Options.ResponseFormat != null)
-                deepSeekRequest.ResponseFormat = new ResponseFormat { Type = request.Options.ResponseFormat };
+                deepSeekRequest.ResponseFormat = new ResponseFormat { Type = "json_object" };
 
             // if (request.Options.Stream.HasValue)
             //     deepSeekRequest.Stream = request.Options.Stream.Value;

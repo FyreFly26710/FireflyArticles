@@ -85,8 +85,8 @@ internal static class OllamaRequestExtensions
             if (request.Options.MaxTokens.HasValue)
                 ollamaRequest.Options.NumPredict = request.Options.MaxTokens.Value;
 
-            if (request.Options.ResponseFormat != null && request.Options.ResponseFormat == "json_object")
-                ollamaRequest.Format = "json";
+            if (request.Options.ResponseFormat != null)
+                ollamaRequest.Format = request.Options.ResponseFormat;
 
             // if (request.Options.Stream.HasValue)
             //     deepSeekRequest.Stream = request.Options.Stream.Value;

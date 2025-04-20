@@ -7,7 +7,6 @@ using FF.Articles.Backend.AI.API.Interfaces.Services.RemoteServices;
 using FF.Articles.Backend.AI.API.Repositories;
 using FF.Articles.Backend.AI.API.Services;
 using FF.Articles.Backend.AI.API.Services.RemoteServices;
-using FF.Articles.Backend.AI.API.Services.Stores;
 using FF.Articles.Backend.AI.API.UnitOfWork;
 using FF.Articles.Backend.Common.Middlewares;
 using FF.Articles.Backend.ServiceDefaults;
@@ -40,14 +39,12 @@ builder.Services.AddScoped<ISystemMessageRepository, SystemMessageRepository>();
 
 // Services
 builder.Services.AddAI(configuration);
-builder.Services.AddDeepSeek(configuration);
 builder.Services.AddScoped<IArticleGenerationService, ArticleGenerationService>();
 builder.Services.AddScoped<IContentsApiRemoteService, ContentsApiRemoteService>();
 builder.Services.AddScoped<IChatRoundService, ChatRoundService>();
 builder.Services.AddScoped<ISessionService, SessionService>();
 
 // Stores
-builder.Services.AddSingleton<UserArticleStateStore>();
 
 builder.Services.AddControllers();
 
