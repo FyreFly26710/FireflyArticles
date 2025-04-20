@@ -13,7 +13,7 @@ using FF.Articles.Backend.Common.Middlewares;
 using FF.Articles.Backend.ServiceDefaults;
 using Microsoft.EntityFrameworkCore;
 using FF.Articles.Backend.Common.Extensions;
-
+using FF.AI.Common;
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 
@@ -39,6 +39,7 @@ builder.Services.AddScoped<ISessionRepository, SessionRepository>();
 builder.Services.AddScoped<ISystemMessageRepository, SystemMessageRepository>();
 
 // Services
+builder.Services.AddAI(configuration);
 builder.Services.AddDeepSeek(configuration);
 builder.Services.AddScoped<IArticleGenerationService, ArticleGenerationService>();
 builder.Services.AddScoped<IContentsApiRemoteService, ContentsApiRemoteService>();
