@@ -1,5 +1,12 @@
 using FF.Articles.Backend.AI.API.Interfaces;
+using FF.Articles.Backend.AI.API.Interfaces.Services.RemoteServices;
+using FF.Articles.Backend.AI.API.Models.AiDtos;
+using FF.Articles.Backend.AI.API.Models.Requests.ArticleGenerations;
+using FF.Articles.Backend.Common.ApiDtos;
+using FF.Articles.Backend.Common.Constants;
+using FF.Articles.Backend.Common.Responses;
 using FF.Articles.Backend.Common.Utils;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 namespace FF.Articles.Backend.AI.API.Controllers;
 
@@ -8,24 +15,27 @@ namespace FF.Articles.Backend.AI.API.Controllers;
 public class AiArticlesController(IArticleGenerationService articleGenerationService) : ControllerBase
 {
 
-    [HttpPost("generate-article")]
-    public async Task<IActionResult> GenerateArticle(string topic, int aricleCount, CancellationToken cancellationToken)
+    [HttpPost("generate-article-list")]
+    public async Task<ApiResponse<ArticlesAIResponseDto>> GenerateArticleList(ArticleListRequest request, CancellationToken cancellationToken)
     {
-        var article = await articleGenerationService.GenerateArticleListsAsync(topic, Request, aricleCount, cancellationToken);
-        return Ok(article);
+        var article = await articleGenerationService.GenerateArticleListsAsync(request, cancellationToken);
+        return ResultUtil.Success(article);
     }
 
     [HttpPost("generate-article-content")]
-    public async Task<IActionResult> GenerateArticleContent(int articleId, CancellationToken cancellationToken)
+    public async Task<ApiResponse<long>> GenerateArticleContent(ContentRequest request)
     {
-        var content = await articleGenerationService.GenerateArticleContentAsync(articleId, Request, cancellationToken);
-        return Ok(content);
+        var content = await articleGenerationService.GenerateArticleContentAsync(request);
+        return ResultUtil.Success(content);
     }
-    [HttpPost("generate-article-content-batch")]
-    public async Task<IActionResult> BatchGenerateArticleContent(List<int> articleIds, CancellationToken cancellationToken)
-    {
-        await articleGenerationService.BatchGenerateArticleContentAsync(articleIds, Request, cancellationToken);
-        return Ok();
-    }
+    // [HttpPost("generate-article-content-batch")]
+    // public async Task<IActionResult> BatchGenerateArticleContent(List<int> articleIds, CancellationToken cancellationToken)
+    // {
+    //     await articleGenerationService.BatchGenerateArticleContentAsync(articleIds, Request, cancellationToken);
+    //     return Ok();
+    // }
+
+
 
 }
+

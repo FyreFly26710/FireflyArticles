@@ -8,28 +8,27 @@
             "projectPath": "${workspaceFolder}/BackendDotNet/FF.Articles.Backend/FF.Articles.AppHost/FF.Articles.AppHost.csproj"
         },
         {
-            "name": "IdentityAPI",
-            "type": "dotnet",
-            "request": "launch",
-            "projectPath": "${workspaceFolder}/BackendDotNet/FF.Articles.Backend/FF.Articles.Backend.Identity.API/FF.Articles.Backend.Identity.API.csproj"
-        },
-        {
-            "name": "ContentsAPI",
-            "type": "dotnet",
-            "request": "launch",
-            "projectPath": "${workspaceFolder}/BackendDotNet/FF.Articles.Backend/FF.Articles.Backend.Contents.API/FF.Articles.Backend.Contents.API.csproj"
-        },
-        {
             "name": "Next.js Dev",
             "type": "node",
             "request": "launch",
             "cwd": "${workspaceFolder}/FrontendReact/ff-articles-frontend",
-            "runtimeExecutable": "npm",
-            "runtimeArgs": [
-                "run",
+            "program": "${workspaceFolder}/FrontendReact/ff-articles-frontend/node_modules/next/dist/bin/next",
+            "args": [
                 "dev"
             ],
-            "console": "integratedTerminal"
+            "env": {
+                "NODE_TLS_REJECT_UNAUTHORIZED": "0",
+                "NEXT_PUBLIC_CONFIG": "development"
+            },
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "console": "integratedTerminal",
+            "resolveSourceMapLocations": [
+                "${workspaceFolder}/**",
+                "!**/node_modules/**"
+            ],
+            "sourceMaps": true
         }
     ]
 }

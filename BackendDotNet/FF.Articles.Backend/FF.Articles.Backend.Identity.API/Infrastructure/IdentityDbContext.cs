@@ -24,7 +24,7 @@ public class IdentityDbContext : DbContext
 
     private void ConfigureUser(ModelBuilder modelBuilder)
     {
-        EFCoreUtil.ConfigBaseEntity<User>(modelBuilder);
+        EFCoreUtil.ConfigBaseEntity<User>(modelBuilder, [BaseProperty.CreateTime, BaseProperty.UpdateTime, BaseProperty.IsDelete]);
 
         modelBuilder.Entity<User>(entity =>
         {

@@ -24,7 +24,7 @@ public class DeepSeekClient : IDeepSeekClient
     private readonly JsonSerializerOptions JsonSerializerOptions = new()
     {
         ReferenceHandler = ReferenceHandler.IgnoreCycles,
-        PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         Encoder = JavaScriptEncoder.Create(UnicodeRanges.All)
     };
 
@@ -50,8 +50,34 @@ public class DeepSeekClient : IDeepSeekClient
         }
         return JsonSerializer.Deserialize<ChatResponse>(resContent, JsonSerializerOptions);
     }
+    /*
+    https://api-docs.deepseek.com/api/create-chat-completion
 
-    public async IAsyncEnumerable<Choice>? ChatStreamAsync(ChatRequest request, [EnumeratorCancellation] CancellationToken cancellationToken)
+    data: {"id": "1f633d8bfc032625086f14113c411638", "choices": [{"index": 0, "delta": {"content": "", "role": "assistant"}, "finish_reason": null, "logprobs": null}], "created": 1718345013, "model": "deepseek-chat", "system_fingerprint": "fp_a49d71b8a1", "object": "chat.completion.chunk", "usage": null}
+
+    data: {"choices": [{"delta": {"content": "Hello", "role": "assistant"}, "finish_reason": null, "index": 0, "logprobs": null}], "created": 1718345013, "id": "1f633d8bfc032625086f14113c411638", "model": "deepseek-chat", "object": "chat.completion.chunk", "system_fingerprint": "fp_a49d71b8a1"}
+
+    data: {"choices": [{"delta": {"content": "!", "role": "assistant"}, "finish_reason": null, "index": 0, "logprobs": null}], "created": 1718345013, "id": "1f633d8bfc032625086f14113c411638", "model": "deepseek-chat", "object": "chat.completion.chunk", "system_fingerprint": "fp_a49d71b8a1"}
+
+    data: {"choices": [{"delta": {"content": " How", "role": "assistant"}, "finish_reason": null, "index": 0, "logprobs": null}], "created": 1718345013, "id": "1f633d8bfc032625086f14113c411638", "model": "deepseek-chat", "object": "chat.completion.chunk", "system_fingerprint": "fp_a49d71b8a1"}
+
+    data: {"choices": [{"delta": {"content": " can", "role": "assistant"}, "finish_reason": null, "index": 0, "logprobs": null}], "created": 1718345013, "id": "1f633d8bfc032625086f14113c411638", "model": "deepseek-chat", "object": "chat.completion.chunk", "system_fingerprint": "fp_a49d71b8a1"}
+
+    data: {"choices": [{"delta": {"content": " I", "role": "assistant"}, "finish_reason": null, "index": 0, "logprobs": null}], "created": 1718345013, "id": "1f633d8bfc032625086f14113c411638", "model": "deepseek-chat", "object": "chat.completion.chunk", "system_fingerprint": "fp_a49d71b8a1"}
+
+    data: {"choices": [{"delta": {"content": " assist", "role": "assistant"}, "finish_reason": null, "index": 0, "logprobs": null}], "created": 1718345013, "id": "1f633d8bfc032625086f14113c411638", "model": "deepseek-chat", "object": "chat.completion.chunk", "system_fingerprint": "fp_a49d71b8a1"}
+
+    data: {"choices": [{"delta": {"content": " you", "role": "assistant"}, "finish_reason": null, "index": 0, "logprobs": null}], "created": 1718345013, "id": "1f633d8bfc032625086f14113c411638", "model": "deepseek-chat", "object": "chat.completion.chunk", "system_fingerprint": "fp_a49d71b8a1"}
+
+    data: {"choices": [{"delta": {"content": " today", "role": "assistant"}, "finish_reason": null, "index": 0, "logprobs": null}], "created": 1718345013, "id": "1f633d8bfc032625086f14113c411638", "model": "deepseek-chat", "object": "chat.completion.chunk", "system_fingerprint": "fp_a49d71b8a1"}
+
+    data: {"choices": [{"delta": {"content": "?", "role": "assistant"}, "finish_reason": null, "index": 0, "logprobs": null}], "created": 1718345013, "id": "1f633d8bfc032625086f14113c411638", "model": "deepseek-chat", "object": "chat.completion.chunk", "system_fingerprint": "fp_a49d71b8a1"}
+
+    data: {"choices": [{"delta": {"content": "", "role": null}, "finish_reason": "stop", "index": 0, "logprobs": null}], "created": 1718345013, "id": "1f633d8bfc032625086f14113c411638", "model": "deepseek-chat", "object": "chat.completion.chunk", "system_fingerprint": "fp_a49d71b8a1", "usage": {"completion_tokens": 9, "prompt_tokens": 17, "total_tokens": 26}}
+
+    data: [DONE]
+    */
+    public async IAsyncEnumerable<string>? ChatStreamAsync(ChatRequest request, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         request.Stream = true;
         var content = new StringContent(JsonSerializer.Serialize(request, JsonSerializerOptions), Encoding.UTF8, "application/json");
@@ -72,18 +98,17 @@ public class DeepSeekClient : IDeepSeekClient
                 var line = await reader.ReadLineAsync();
                 if (line != null && line.StartsWith("data: "))
                 {
-
                     var json = line.Substring(6);
-                    if (!string.IsNullOrWhiteSpace(json) && json != "[DONE]")
-                    {
-                        var chatResponse = JsonSerializer.Deserialize<ChatResponse>(json, JsonSerializerOptions);
-                        var choice = chatResponse?.Choices.FirstOrDefault();
-                        if (choice is null)
-                        {
-                            continue;
-                        }
-                        yield return choice;
-                    }
+                    yield return json;
+                    // if (!string.IsNullOrWhiteSpace(json) && json != "[DONE]")
+                    // {
+                    //     var chatResponse = JsonSerializer.Deserialize<ChatResponse>(json, JsonSerializerOptions);
+                    //     if (chatResponse is null)
+                    //     {
+                    //         continue;
+                    //     }
+                    //     yield return chatResponse;
+                    // }
                 }
             }
         }

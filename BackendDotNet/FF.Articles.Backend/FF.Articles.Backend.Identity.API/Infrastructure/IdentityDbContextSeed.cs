@@ -1,58 +1,46 @@
 ﻿using FF.Articles.Backend.Common.Constants;
 using FF.Articles.Backend.Identity.API.Models.Entities;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
+using FF.Articles.Backend.Common.BackgoundJobs;
+using FF.Articles.Backend.Common.ApiDtos;
 
 namespace FF.Articles.Backend.Identity.API.Infrastructure
 {
-    public static class IdentityDbContextSeed
+    public class IdentityDbContextSeed : IDbSeeder<IdentityDbContext>
     {
-        public static async Task InitialiseDatabase(WebApplicationBuilder builder)
+        public async Task SeedAsync(IServiceProvider serviceProvider)
         {
-            bool? hasPendingMigrations = false;
-            using (var scope = builder.Services.BuildServiceProvider().CreateScope())
+            using var scope = serviceProvider.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<IdentityDbContext>();
+            var connection = (NpgsqlConnection)context.Database.GetDbConnection();
+            if (connection.State != System.Data.ConnectionState.Open)
             {
-                var dbContext = scope.ServiceProvider.GetRequiredService<IdentityDbContext>();
-
-                var pendingMigrations = dbContext.Database.GetPendingMigrations();
-
-                hasPendingMigrations = pendingMigrations?.Any();               
-                
-                dbContext.Database.Migrate();
+                await connection.OpenAsync();
             }
-            if (hasPendingMigrations == true)
+            // Seed initial data if no users exist
+            if (!await context.Users.AnyAsync())
             {
-                using (var scope = builder.Services.BuildServiceProvider().CreateScope())
-                {
-                    var dbContext = scope.ServiceProvider.GetRequiredService<IdentityDbContext>();
-                    RemoveExisting(dbContext);
-                    SeedData(dbContext);
-                }
+                var defaultUser = AdminUsers.SYSTEM_ADMIN_FIREFLY;
+
+                await context.Users.AddAsync(CreateUser(defaultUser, "0732d07230a94c9318ecdfc223dfb310"));//12345678
+                await context.Users.AddAsync(CreateUser(AdminUsers.SYSTEM_ADMIN_DEEPSEEK, "11111111"));
+                await context.SaveChangesAsync();
             }
         }
-        public static void RemoveExisting(IdentityDbContext context)
+        private User CreateUser(UserApiDto user, string password)
         {
-            context.Users.RemoveRange(context.Users);
-            context.SaveChanges();
-        }
-        public static void SeedData(IdentityDbContext context)
-        {
-            if (!context.Users.Any())
+            return new User
             {
-                var defaultUser = new User
-                {
-                    Id = 1L,
-                    UserName = "admin",
-                    UserAccount = "firefly",
-                    UserRole = UserConstant.ADMIN_ROLE,
-                    UserPassword = "0732d07230a94c9318ecdfc223dfb310" // 12345678
-                };
-                context.Users.Add(defaultUser);
-                context.SaveChanges();
-            }
+                Id = user.UserId,
+                UserName = user.UserName,
+                UserAccount = user.UserAccount,
+                UserRole = user.UserRole,
+                UserAvatar = user.UserAvatar,
+                UserProfile = user.UserProfile,
+                UserEmail = user.UserEmail,
+                UserPassword = password,
+            };
         }
     }
-
-
-
 }

@@ -2,8 +2,8 @@
 import { PageContainer, ProTable } from "@ant-design/pro-components";
 import { Button } from "antd";
 import React, { useEffect, useState } from "react";
-import ArticleFormModal from "@/components/ArticleFormModal";
-import TagModal from "@/components/TagManagementModal";
+import ArticleFormModal from "@/components/article/ArticleFormModal";
+import TagModal from "@/components/admin/TagManagementModal";
 import { getArticleColumns } from "../utils/articleColumns";
 import { useArticleAdmin } from "../utils/useArticleAdmin";
 

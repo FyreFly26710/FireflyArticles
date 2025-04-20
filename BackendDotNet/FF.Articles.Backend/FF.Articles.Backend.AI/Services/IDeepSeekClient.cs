@@ -7,6 +7,6 @@ namespace FF.Articles.Backend.AI.Services;
 public interface IDeepSeekClient
 {
     Task<ChatResponse?> ChatAsync(ChatRequest request, CancellationToken cancellationToken);
-    IAsyncEnumerable<Choice>? ChatStreamAsync(ChatRequest request, CancellationToken cancellationToken);
+    IAsyncEnumerable<string>? ChatStreamAsync(ChatRequest request, CancellationToken cancellationToken);
     string? ErrorMsg { get; }
 }

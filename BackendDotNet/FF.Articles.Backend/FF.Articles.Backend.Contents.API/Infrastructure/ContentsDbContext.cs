@@ -33,7 +33,7 @@ public class ContentsDbContext : DbContext
 
     private void ConfigureArticle(ModelBuilder modelBuilder)
     {
-        EFCoreUtil.ConfigBaseEntity<Article>(modelBuilder);
+        EFCoreUtil.ConfigBaseEntity<Article>(modelBuilder, [BaseProperty.CreateTime, BaseProperty.UpdateTime, BaseProperty.IsDelete]);
 
         modelBuilder.Entity<Article>(entity =>
         {
@@ -47,14 +47,14 @@ public class ContentsDbContext : DbContext
             entity.Property(e => e.TopicId).HasDefaultValue(0L);
             entity.Property(e => e.SortNumber).HasDefaultValue(0);
             entity.Property(e => e.IsHidden).IsRequired().HasDefaultValue(0);
-            
+
             entity.HasIndex(e => new { e.TopicId, e.SortNumber }).HasDatabaseName("IX_Article_TopicId_SortNumber");
             entity.HasIndex(e => e.ParentArticleId).HasDatabaseName("IX_Article_ParentArticleId");
         });
     }
     private void ConfigureTopic(ModelBuilder modelBuilder)
     {
-        EFCoreUtil.ConfigBaseEntity<Topic>(modelBuilder);
+        EFCoreUtil.ConfigBaseEntity<Topic>(modelBuilder, [BaseProperty.CreateTime, BaseProperty.UpdateTime, BaseProperty.IsDelete]);
 
         modelBuilder.Entity<Topic>(entity =>
         {
@@ -71,7 +71,7 @@ public class ContentsDbContext : DbContext
     }
     private void ConfigureTag(ModelBuilder modelBuilder)
     {
-        EFCoreUtil.ConfigBasetEntityIgnoreOptions<Tag>(modelBuilder);
+        EFCoreUtil.ConfigBaseEntity<Tag>(modelBuilder, []);
 
         modelBuilder.Entity<Tag>(entity =>
         {
@@ -81,7 +81,7 @@ public class ContentsDbContext : DbContext
     }
     private void ConfigureArticleTag(ModelBuilder modelBuilder)
     {
-        EFCoreUtil.ConfigBasetEntityIgnoreOptions<ArticleTag>(modelBuilder);
+        EFCoreUtil.ConfigBaseEntity<ArticleTag>(modelBuilder, []);
 
         modelBuilder.Entity<ArticleTag>(entity =>
         {

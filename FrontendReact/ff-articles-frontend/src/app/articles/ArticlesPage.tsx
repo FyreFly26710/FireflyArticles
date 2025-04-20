@@ -1,6 +1,6 @@
 import Title from "antd/es/typography/Title";
 import { apiArticleGetByPage } from "@/api/contents/api/article";
-import ArticleTable from "@/components/ArticleTable";
+import ArticleTable from "@/components/article/ArticleTable";
 
 const ArticlesPage = async () => {
     let articleList: API.ArticleDto[] = [];

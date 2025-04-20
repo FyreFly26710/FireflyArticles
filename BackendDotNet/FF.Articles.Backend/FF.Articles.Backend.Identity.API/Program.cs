@@ -4,6 +4,7 @@ using FF.Articles.Backend.Identity.API.Repositories;
 using FF.Articles.Backend.Identity.API.Services;
 using FF.Articles.Backend.ServiceDefaults;
 using Microsoft.EntityFrameworkCore;
+using FF.Articles.Backend.Common.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -25,7 +26,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IOAuthService, OAuthService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
-await IdentityDbContextSeed.InitialiseDatabase(builder);
+builder.Services.AddMigration<IdentityDbContext, IdentityDbContextSeed>();
 
 builder.Services.AddControllers();
 

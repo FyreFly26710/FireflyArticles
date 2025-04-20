@@ -19,4 +19,5 @@ public class UserApiDto
     /// User role: admin, user, editor 
     /// </summary>
     public string UserRole { get; set; }
+
 }

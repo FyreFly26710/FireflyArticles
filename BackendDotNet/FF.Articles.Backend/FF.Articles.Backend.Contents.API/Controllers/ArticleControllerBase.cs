@@ -37,10 +37,10 @@ public abstract class ArticleControllerBase : ControllerBase
 
     [HttpPost]
     [Authorize(Roles = UserConstant.ADMIN_ROLE)]
-    public async Task<ApiResponse<string>> AddByRequest([FromBody] ArticleAddRequest articleAddRequest)
+    public async Task<ApiResponse<long>> AddByRequest([FromBody] ArticleAddRequest articleAddRequest)
     {
         long articleId = await _articleService.CreateByRequest(articleAddRequest, UserUtil.GetUserId(Request));
-        return ResultUtil.Success(articleId.ToString());
+        return ResultUtil.Success(articleId);
     }
     /// <summary>
     /// Create articles and return a dictionary of article id and title

@@ -23,7 +23,7 @@ public class UserArticleStateStore
 public class UserArticleState
 {
     public List<Message> HistroyMessages { get; set; } = new();
-    public ArticlesAIResponse? ArticlesAIResponse { get; set; }
+    public ArticlesAIResponseDto? ArticlesAIResponse { get; set; }
     public string Topic { get; set; } = "";
     public bool IsFirstRound { get; set; } = true;
     public List<ArticleApiAddRequest> ApiAddRequests { get; set; } = new();

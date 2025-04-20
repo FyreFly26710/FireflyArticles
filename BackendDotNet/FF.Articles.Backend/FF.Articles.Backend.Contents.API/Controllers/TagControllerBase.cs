@@ -36,7 +36,7 @@ public abstract class TagControllerBase : ControllerBase
         return ResultUtil.Success(tagResponse);
     }
     [HttpPost]
-    [Authorize(Roles = UserConstant.ADMIN_ROLE)]
+    //[Authorize(Roles = UserConstant.ADMIN_ROLE)]
     public async Task<ApiResponse<string>> AddByRequest([FromBody] TagAddRequest tagAddRequest)
     {
         var tag = await _tagService.GetTagByNameAsync(tagAddRequest.TagName);

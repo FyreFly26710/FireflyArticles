@@ -16,6 +16,14 @@ const menus = [
         name: "Articles",
     },
     {
+        path: "/aichat",
+        name: "AI Chat",
+    },
+    {
+        path: "/aigen",
+        name: "AI Generate",
+    },
+    {
         path: "/admin",
         name: "Admin",
         icon: <CrownOutlined />,
