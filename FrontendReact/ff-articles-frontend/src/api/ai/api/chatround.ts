@@ -105,7 +105,7 @@ export function apiChatRoundStreamResponse(
           if (eventType && data) {
             // Handle different event types based on the updated backend
             switch (eventType) {
-              case "init":
+              case "start":
                 try {
                   const initData = JSON.parse(data);
                   callbacks.onInit?.(initData);
@@ -113,11 +113,11 @@ export function apiChatRoundStreamResponse(
                   console.error("Error parsing init event data:", e);
                 }
                 break;
-              case "data":
+              case "generate":
                 // The backend now sends the actual content directly
                 callbacks.onChunk?.(data);
                 break;
-              case "end":
+              case "finish":
                 try {
                   const doneData = JSON.parse(data);
                   callbacks.onDone?.(doneData);
@@ -148,22 +148,6 @@ export function apiChatRoundStreamResponse(
   return () => {
     controller.abort();
   };
-}
-
-/** PUT /api/ai/chat-rounds */
-export async function apiChatRoundUpdateByRequest(
-  body: API.ChatRoundReQueryRequest,
-  options?: { [key: string]: any }
-) {
-  return request<API.ChatRoundDtoApiResponse>("/api/ai/chat-rounds", {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    data: body,
-    timeout: 5 * 60 * 1000,
-    ...(options || {}),
-  });
 }
 
 /** DELETE /api/ai/chat-rounds/${param0} */

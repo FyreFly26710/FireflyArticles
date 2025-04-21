@@ -14,7 +14,7 @@ namespace FF.AI.Common.Services.ChatAssistants;
 
 public class DeepSeekAssistant : BaseAssistant, IAssistant<DeepSeekProvider>
 {
-    public DeepSeekAssistant(DeepSeekProvider provider, HttpClient httpClient) : base(provider, httpClient)
+    public DeepSeekAssistant(DeepSeekProvider provider, IHttpClientFactory httpClientFactory) : base(provider, httpClientFactory)
     {
     }
     public async Task<ChatResponse?> ChatAsync(ChatRequest request, CancellationToken cancellationToken)

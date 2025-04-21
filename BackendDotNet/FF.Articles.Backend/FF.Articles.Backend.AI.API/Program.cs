@@ -14,6 +14,8 @@ using Microsoft.EntityFrameworkCore;
 using FF.Articles.Backend.Common.Extensions;
 using FF.AI.Common;
 using FF.Articles.Backend.Common.Constants;
+
+
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 

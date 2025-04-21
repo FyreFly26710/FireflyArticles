@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace FF.Articles.Backend.AI.API.Controllers;
 
-[Route("api/ai/assistant")]
+[Route("api/ai/assistants")]
 [ApiController]
 public class AssistantController(IAssistant _aiChatAssistant) : ControllerBase
 {

@@ -17,10 +17,10 @@ public abstract class BaseAssistant
         Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
     };
-    public BaseAssistant(IProvider provider, HttpClient httpClient)
+    public BaseAssistant(IProvider provider, IHttpClientFactory httpClientFactory)
     {
         _provider = provider;
-        _httpClient = httpClient;
+        _httpClient = httpClientFactory.CreateClient("ai-client");
         if (_provider.ApiKey is not null)
         {
             _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {_provider.ApiKey}");

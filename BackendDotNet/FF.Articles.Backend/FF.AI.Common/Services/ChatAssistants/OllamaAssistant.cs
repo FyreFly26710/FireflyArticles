@@ -14,7 +14,7 @@ namespace FF.AI.Common.Services.ChatAssistants;
 
 public class OllamaAssistant : BaseAssistant, IAssistant<OllamaProvider>
 {
-    public OllamaAssistant(OllamaProvider provider, HttpClient httpClient) : base(provider, httpClient)
+    public OllamaAssistant(OllamaProvider provider, IHttpClientFactory httpClientFactory) : base(provider, httpClientFactory)
     {
     }
     public async Task<ChatResponse?> ChatAsync(ChatRequest request, CancellationToken cancellationToken)

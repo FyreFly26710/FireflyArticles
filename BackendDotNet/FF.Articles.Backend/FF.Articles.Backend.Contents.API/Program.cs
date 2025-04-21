@@ -17,7 +17,10 @@ builder.Services.AddDbContext<ContentsDbContext>(options =>
     var connectionString = builder.Configuration.GetConnectionString("contentdb");
 
     options.UseNpgsql(connectionString)
-           .LogTo(Console.WriteLine, LogLevel.Information)
+           .LogTo(
+               (eventData) => Console.WriteLine($"{DateTime.Now:dd/MM/yyyy HH:mm:ss.fff} {eventData}"),
+               new[] { Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.CommandExecuted },
+               LogLevel.Information)
            .EnableSensitiveDataLogging();
 });
 

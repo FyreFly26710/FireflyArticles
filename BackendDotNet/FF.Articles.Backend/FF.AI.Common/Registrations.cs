@@ -11,6 +11,11 @@ public static class Registrations
 {
     public static IServiceCollection AddAI(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddHttpClient("ai-client", client =>
+        {
+            client.Timeout = TimeSpan.FromMinutes(10);
+        });
+
         services.AddSingleton<DeepSeekProvider>(sp => new DeepSeekProvider(configuration));
         services.AddSingleton<OllamaProvider>(sp => new OllamaProvider(configuration));
 

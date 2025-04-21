@@ -8,12 +8,3 @@ export interface ArticleGenerationStatus {
     generatedArticleId?: number;
   };
 }
-
-export interface ContentRequestPayload {
-  id: number;
-  title: string;
-  abstract: string;
-  tags: string[];
-  topic: string;
-  topicId: number;
-} 
