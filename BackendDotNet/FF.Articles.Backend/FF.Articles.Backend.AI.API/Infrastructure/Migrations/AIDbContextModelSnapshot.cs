@@ -57,6 +57,13 @@ namespace FF.Articles.Backend.AI.API.Infrastructure.Migrations
                         .HasColumnType("integer")
                         .HasDefaultValue(0);
 
+                    b.Property<string>("Provider")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasDefaultValue("");
+
                     b.Property<long>("SessionId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")

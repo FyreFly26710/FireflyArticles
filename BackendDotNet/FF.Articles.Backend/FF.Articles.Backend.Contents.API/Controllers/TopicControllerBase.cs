@@ -46,17 +46,20 @@ public abstract class TopicControllerBase : ControllerBase
 
     [HttpPost]
     [Authorize(Roles = UserConstant.ADMIN_ROLE)]
-    public async Task<ApiResponse<string>> AddByRequest([FromBody] TopicAddRequest topicAddRequest)
+    public async Task<ApiResponse<long>> AddByRequest([FromBody] TopicAddRequest topicAddRequest)
     {
         string title = topicAddRequest.Title;
         var existTopic = await _topicService.GetTopicByTitle(title);
-        if (existTopic != null) throw new ApiException(ErrorCode.PARAMS_ERROR, "Topic already exists");
+        if (existTopic != null)
+        {
+            return ResultUtil.Success(existTopic.Id);
+        }
 
         var topic = topicAddRequest.ToEntity();
         var userDto = UserUtil.GetUserFromHttpRequest(Request);
         topic.UserId = userDto.UserId;
         long topicId = await _topicService.CreateAsync(topic);
-        return ResultUtil.Success(topicId.ToString());
+        return ResultUtil.Success(topicId);
     }
 
     [HttpPut]

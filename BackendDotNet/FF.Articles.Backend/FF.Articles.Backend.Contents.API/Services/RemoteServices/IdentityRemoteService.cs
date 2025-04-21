@@ -9,7 +9,8 @@ public class IdentityRemoteService(HttpClient _httpClient)
 {
     public async Task<UserApiDto?> GetUserByIdAsync(long userId)
     {
-        var response = await _httpClient.GetAsync(RemoteApiUrlConstant.GetUserApiDtoById(userId));
+        var url = RemoteApiUrlConstant.IdentityBaseUrl + RemoteApiUrlConstant.GetUserApiDtoById(userId);
+        var response = await _httpClient.GetAsync(url);
         if (!response.IsSuccessStatusCode)
         {
             return null;

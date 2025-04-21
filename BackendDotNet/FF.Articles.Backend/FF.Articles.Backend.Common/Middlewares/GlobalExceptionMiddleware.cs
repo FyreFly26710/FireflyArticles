@@ -40,7 +40,9 @@ namespace FF.Articles.Backend.Common.Middlewares
         {
             context.Response.ContentType = "application/json";
             var response = new ApiResponse<bool>();
-            var log = $"Exception during request {requestId} - {context.Request.Path}: {exception.Message}" + Environment.NewLine;
+            var log = $"{DateTime.Now} Exception during request {requestId} - {context.Request.Path}: {exception.Message}" + Environment.NewLine;
+            log += $"Stack trace: {exception.StackTrace}" + Environment.NewLine;
+
             // Determine the error code based on exception type
             if (exception is ApiException apiEx)
             {

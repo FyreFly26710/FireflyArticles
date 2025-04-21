@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, ReactNode, useCallback } from 'react';
 import { apiAiArticlesGenerateList, apiAiArticlesGenerateContent } from '@/api/ai/api/aiarticles';
-import { ArticleGenerationStatus, ContentRequestPayload, EditableArticle } from '../types';
+import { ArticleGenerationStatus, EditableArticle } from '../types';
 import { message } from 'antd';
 
 interface AiGenContextType {
@@ -61,7 +61,9 @@ export function AiGenProvider({ children }: { children: ReactNode }) {
     try {
       const response = await apiAiArticlesGenerateList({
         topic,
-        articleCount
+        articleCount,
+        model: 'qwq:32b',
+        provider: 'ollama'
       });
       const data = response.data;
       setResults(data);
@@ -196,13 +198,15 @@ export function AiGenProvider({ children }: { children: ReactNode }) {
         throw new Error('Missing topicId in results');
       }
       
-      const contentRequest: ContentRequestPayload = {
+      const contentRequest: API.ContentRequest = {
         id: article.id,
         title: article.title,
         abstract: article.abstract,
         tags: article.tags,
         topic: topic,
-        topicId: results.topicId
+        topicId: results.topicId,
+        model: 'qwq:32b',
+        provider: 'ollama'
       };
       
       const articleId = (await apiAiArticlesGenerateContent(contentRequest)).data;

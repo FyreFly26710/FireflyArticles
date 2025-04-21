@@ -14,6 +14,8 @@ public class SessionRepository : BaseRepository<Session, AIDbContext>, ISessionR
     }
     public async Task<List<Session>> GetSessionsByUserId(long userId)
     {
-        return await GetQueryable().Where(s => s.UserId == userId).ToListAsync();
+        var query = GetQueryable().Where(s => s.UserId == userId).OrderBy(s => s.Id);
+        var result = await query.ToListAsync();
+        return result;
     }
 }

@@ -43,11 +43,12 @@ public class ContentsApiRemoteService(HttpClient _httpClient, ITokenService _tok
             throw new ApiException(ErrorCode.SYSTEM_ERROR, "Failed to add topic");
         }
         var res = await response.Content.ReadFromJsonAsync<ApiResponse<long>>();
+        _logger.LogInformation("AddTopicByTitleAsync: {res}", res);
         return res?.Data ?? 0;
     }
     private HttpRequestMessage CreateHttpRequestMessage(HttpMethod method, string url, object payload, UserApiDto user)
     {
-        var requestMessage = new HttpRequestMessage(method, url) { Content = JsonContent.Create(payload)};
+        var requestMessage = new HttpRequestMessage(method, url) { Content = JsonContent.Create(payload) };
         var adminToken = _tokenService.GenerateApiToken(user);
         requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", adminToken);
         return requestMessage;

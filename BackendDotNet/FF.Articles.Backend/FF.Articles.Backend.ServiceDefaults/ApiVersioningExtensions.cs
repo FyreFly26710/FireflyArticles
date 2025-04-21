@@ -25,7 +25,7 @@ namespace FF.Articles.Backend.ServiceDefaults
             // Add API versioning
             builder.Services.AddApiVersioning(x =>
             {
-                x.DefaultApiVersion = new ApiVersion(2.0);
+                x.DefaultApiVersion = new ApiVersion(1.0);
                 x.AssumeDefaultVersionWhenUnspecified = true;
                 x.ApiVersionReader = new HeaderApiVersionReader("api-version");
             }).AddMvc().AddApiExplorer();

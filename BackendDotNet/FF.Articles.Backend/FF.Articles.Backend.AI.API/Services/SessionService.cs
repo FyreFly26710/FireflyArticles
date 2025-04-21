@@ -6,8 +6,6 @@ using FF.Articles.Backend.AI.API.Interfaces.Services;
 using FF.Articles.Backend.AI.API.Interfaces.Repositories;
 using FF.Articles.Backend.AI.API.Infrastructure;
 using FF.Articles.Backend.AI.API.Interfaces.Services.RemoteServices;
-using FF.Articles.Backend.AI.Services;
-using FF.Articles.Backend.AI.Models;
 using FF.Articles.Backend.Common.Utils;
 using FF.Articles.Backend.AI.API.MapperExtensions.Chats;
 using FF.Articles.Backend.Common.Exceptions;
@@ -24,8 +22,8 @@ public class SessionService(
     {
         //var user = UserUtil.GetUserFromHttpRequest(httpRequest);
         var sessions = await _sessionRepository.GetSessionsByUserId(1);
-        if (sessions == null || sessions.Count == 0)
-            return new List<SessionDto>();
+        if (sessions == null || sessions.Count == 0) return [];
+
         var chatRounds = await _chatRoundRepository.GetChatsBySessionIds(sessions.Select(s => s.Id).ToList());
         var sessionDtos = sessions
             .Select(s => getSessionDto(s, chatRounds.Where(c => c.SessionId == s.Id).ToList(), request.IncludeChatRounds))
@@ -47,7 +45,7 @@ public class SessionService(
     new()
     {
         SessionId = session.Id,
-        SessionName = session.SessionName ?? chatRounds.Last().UserMessage,
+        SessionName = session.SessionName ?? chatRounds.LastOrDefault()?.UserMessage ?? "New Chat",
         RoundCount = chatRounds.Count,
         Rounds = includeChatRounds ? chatRounds.Select(c => c.ToDto()).ToList() : [],
         TimeStamp = session.TimeStamp,

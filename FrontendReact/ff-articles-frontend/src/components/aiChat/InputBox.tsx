@@ -23,7 +23,8 @@ export default function InputBox(){
             sessionId: session.sessionId,
             SessionTimeStamp: session.timestamp,
             userMessage: messageInput,
-            model: 'deepseek'
+            provider: 'ollama',
+            model: 'mistral-small3.1:24b'
         }
         handleSendMessage(newMessage)
         setMessageInput('')

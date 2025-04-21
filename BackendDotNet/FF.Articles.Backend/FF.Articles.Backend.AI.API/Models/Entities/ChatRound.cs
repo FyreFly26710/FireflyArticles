@@ -10,6 +10,7 @@ public class ChatRound : BaseEntity
     public string UserMessage { get; set; } = string.Empty;
     public string AssistantMessage { get; set; } = string.Empty;
     public string Model { get; set; } = string.Empty;
+    public string Provider { get; set; } = string.Empty;
     public long TimeStamp { get; set; }
     public int TimeTaken { get; set; }
     public int PromptTokens { get; set; }

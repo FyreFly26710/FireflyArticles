@@ -20,14 +20,7 @@ declare namespace API {
     historyChatRoundIds?: number[];
     userMessage: string;
     model?: string;
-  };
-
-  type ChatRoundReQueryRequest = {
-    chatRoundId: number;
-    sessionId: number;
-    userMessage: string;
-    model?: string;
-    includeHistory?: boolean;
+    provider?: string;
   };
 
   type ChatRoundDto = {
@@ -36,6 +29,7 @@ declare namespace API {
     userMessage: string;
     assistantMessage: string;
     model: string;
+    provider: string;
     promptTokens: number;
     completionTokens: number;
     totalTokens: number;
@@ -99,6 +93,8 @@ declare namespace API {
   type ArticleListRequest = {
     topic: string;
     articleCount?: number;
+    model?: string;
+    provider?: string;
   };
 
   type ArticlesAIResponseDto = {
@@ -124,5 +120,17 @@ declare namespace API {
     title: string;
     abstract: string;
     tags: string[];
+    model: string;
+    provider: string;
+  };
+  type ChatProvider = {
+    providerName: string;
+    models: string[];
+    isAvailable: boolean;
+  };
+  type ChatProviderListApiResponse = {
+    code?: number;
+    message?: string;
+    data?: ChatProvider[];
   };
 }

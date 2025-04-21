@@ -53,6 +53,7 @@ public class AIDbContext : DbContext
             entity.Property(e => e.UserMessage).IsRequired().HasDefaultValue("");
             entity.Property(e => e.AssistantMessage).IsRequired().HasDefaultValue("");
             entity.Property(e => e.Model).HasMaxLength(64).IsRequired().HasDefaultValue("");
+            entity.Property(e => e.Provider).HasMaxLength(64).IsRequired().HasDefaultValue("");
             entity.Property(e => e.SessionId).IsRequired().HasDefaultValue(0L);
             entity.Property(e => e.TimeTaken).IsRequired().HasDefaultValue(0);
             entity.Property(e => e.PromptTokens).IsRequired().HasDefaultValue(0);
