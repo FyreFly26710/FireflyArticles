@@ -4,9 +4,7 @@ using System.Text.Json;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
 using System.Text.Json.Serialization;
-using System.Runtime.CompilerServices;
-using FF.AI.Common.Models;
-namespace FF.AI.Common.Services;
+namespace FF.AI.Common.Services.ChatAssistants;
 
 public abstract class BaseAssistant
 {
@@ -16,7 +14,8 @@ public abstract class BaseAssistant
     {
         ReferenceHandler = ReferenceHandler.IgnoreCycles,
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        Encoder = JavaScriptEncoder.Create(UnicodeRanges.All)
+        Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
     };
     public BaseAssistant(IProvider provider, HttpClient httpClient)
     {

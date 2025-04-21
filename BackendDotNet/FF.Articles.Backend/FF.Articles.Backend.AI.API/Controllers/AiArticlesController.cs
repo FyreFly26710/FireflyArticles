@@ -19,14 +19,14 @@ public class AiArticlesController(IArticleGenerationService articleGenerationSer
     public async Task<ApiResponse<ArticlesAIResponseDto>> GenerateArticleList(ArticleListRequest request, CancellationToken cancellationToken)
     {
         var article = await articleGenerationService.GenerateArticleListsAsync(request, cancellationToken);
-        return ResultUtil.Success(article);
+        return ResultUtil.Success<ArticlesAIResponseDto>(article);
     }
 
     [HttpPost("generate-article-content")]
     public async Task<ApiResponse<long>> GenerateArticleContent(ContentRequest request)
     {
         var content = await articleGenerationService.GenerateArticleContentAsync(request);
-        return ResultUtil.Success(content);
+        return ResultUtil.Success<long>(content);
     }
     // [HttpPost("generate-article-content-batch")]
     // public async Task<IActionResult> BatchGenerateArticleContent(List<int> articleIds, CancellationToken cancellationToken)

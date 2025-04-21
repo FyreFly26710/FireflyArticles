@@ -4,6 +4,7 @@ using FF.AI.Common.Providers;
 using FF.AI.Common.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
+using FF.AI.Common.Services.ChatAssistants;
 namespace FF.AI.Common;
 
 public static class Registrations
@@ -15,6 +16,10 @@ public static class Registrations
 
         services.AddSingleton<IAssistant<DeepSeekProvider>, DeepSeekAssistant>();
         services.AddSingleton<IAssistant<OllamaProvider>, OllamaAssistant>();
+
+        services.AddSingleton<IAssistant, AiChatAssistant>();
+
         return services;
     }
+
 }

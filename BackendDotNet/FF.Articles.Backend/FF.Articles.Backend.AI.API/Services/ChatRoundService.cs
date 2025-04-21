@@ -26,7 +26,7 @@ namespace FF.Articles.Backend.AI.API.Services;
 public class ChatRoundService(
     IChatRoundRepository _chatRoundRepository,
     ISessionRepository _sessionRepository,
-    IAssistant<DeepSeekProvider> _deepSeekAssistant,
+    IAssistant _aiChatAssistant,
     ILogger<ChatRoundService> _logger
 )
 : BaseService<ChatRound, AIDbContext>(_chatRoundRepository, _logger), IChatRoundService
@@ -34,7 +34,8 @@ public class ChatRoundService(
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        Encoder = JavaScriptEncoder.Create(UnicodeRanges.All)
+        Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
     };
 
     public async Task<ChatRoundDto> NewChatRound(ChatRoundCreateRequest request, HttpRequest httpRequest, CancellationToken cancellationToken = default)
@@ -42,9 +43,9 @@ public class ChatRoundService(
         var newRound = await getChatRound(request, httpRequest);
         var chatRequest = await getChatRequest(newRound.SessionId, request);
 
-        var response = await _deepSeekAssistant.ChatAsync(chatRequest, new CancellationToken());
+        var response = await _aiChatAssistant.ChatAsync(chatRequest, new CancellationToken());
         if (response == null)
-            throw new ApiException(ErrorCode.SYSTEM_ERROR, "Failed to get response from DeepSeek AI");
+            throw new ApiException(ErrorCode.SYSTEM_ERROR, "Failed to get response from AI");
 
         newRound.AssistantMessage = response.Message?.Content ?? string.Empty;
         newRound.PromptTokens = response?.ExtraInfo?.InputTokens ?? 0;
@@ -71,41 +72,34 @@ public class ChatRoundService(
             Data = JsonSerializer.Serialize(newRound.ToDto(), _jsonOptions)
         };
 
-        var responseBuilder = new StringBuilder();
-
-        var streamingResponse = _deepSeekAssistant.ChatStreamAsync(chatRequest, cancellationToken);
+        var streamingResponse = _aiChatAssistant.ChatStreamAsync(chatRequest, cancellationToken);
         if (streamingResponse == null)
-            throw new ApiException(ErrorCode.SYSTEM_ERROR, "Failed to get streaming response from DeepSeek AI");
-
+            throw new ApiException(ErrorCode.SYSTEM_ERROR, "Failed to get streaming response from AI");
+        var fullResponse = "";
         await foreach (var chatResponse in streamingResponse)
         {
             var content = chatResponse.Message?.Content;
             if (string.IsNullOrEmpty(content)) continue;
-
-            // Append to the full response
-            responseBuilder.Append(content);
-
+            // If this is the final message with usage info
+            if (chatResponse.Event == ChatEvent.Finish)
+            {
+                newRound.PromptTokens = chatResponse.ExtraInfo?.InputTokens ?? 0;
+                newRound.CompletionTokens = chatResponse.ExtraInfo?.OutputTokens ?? 0;
+                newRound.TimeTaken = chatResponse.ExtraInfo?.Duration ?? 0;
+                fullResponse = chatResponse.Message?.Content ?? string.Empty;
+                _logger.LogInformation($"Received token counts - Prompt: {newRound.PromptTokens}, Completion: {newRound.CompletionTokens}");
+                break;
+            }
             // Stream the content chunk
             yield return new SseDto
             {
                 Event = SseEvent.Data,
-                Data = chatResponse.Message?.Content
+                Data = chatResponse.Message?.Content ?? string.Empty
             };
-
-            // If this is the final message with usage info
-            if (chatResponse.Event == ChatEvent.Finish)
-            {
-                newRound.PromptTokens = chatResponse?.ExtraInfo?.InputTokens ?? 0;
-                newRound.CompletionTokens = chatResponse?.ExtraInfo?.OutputTokens ?? 0;
-                newRound.TimeTaken = chatResponse?.ExtraInfo?.Duration ?? 0;
-
-                _logger.LogInformation($"Received token counts - Prompt: {newRound.PromptTokens}, Completion: {newRound.CompletionTokens}");
-                break;
-            }
         }
 
         // Save the completed chat round
-        newRound.AssistantMessage = responseBuilder.ToString();
+        newRound.AssistantMessage = fullResponse;
 
         await _chatRoundRepository.CreateAsync(newRound);
         await _chatRoundRepository.SaveChangesAsync();
@@ -144,6 +138,7 @@ public class ChatRoundService(
             SessionId = sessionId,
             UserMessage = request.UserMessage,
             Model = request.Model ?? "",
+            Provider = request.Provider ?? "",
             IsActive = true,
         };
         return newRound;
@@ -158,10 +153,15 @@ public class ChatRoundService(
             .ToList();
         var chatRequest = new ChatRequest
         {
+            Model = request.Model ?? "deepseek-chat",
+            Provider = request.Provider ?? ProviderList.DeepSeek,
             Messages = [.. historyMessages, Message.User(request.UserMessage)],
         };
         return chatRequest;
     }
+
+
+
     #region Chat Management
 
     public async Task<bool> DisableChatRound(List<long> ids) => await SwitchChatRoundStatus(ids, false);

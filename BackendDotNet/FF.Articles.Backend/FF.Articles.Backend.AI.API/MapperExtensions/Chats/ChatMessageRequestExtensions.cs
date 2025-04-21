@@ -19,6 +19,7 @@ public static class ChatMessageRequestExtensions
             UserMessage = chatRound.UserMessage,
             AssistantMessage = chatRound.AssistantMessage,
             Model = chatRound.Model,
+            Provider = chatRound.Provider,
             PromptTokens = chatRound.PromptTokens,
             CompletionTokens = chatRound.CompletionTokens,
             TimeTaken = chatRound.TimeTaken,

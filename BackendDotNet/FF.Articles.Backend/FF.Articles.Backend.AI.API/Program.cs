@@ -13,6 +13,7 @@ using FF.Articles.Backend.ServiceDefaults;
 using Microsoft.EntityFrameworkCore;
 using FF.Articles.Backend.Common.Extensions;
 using FF.AI.Common;
+using FF.Articles.Backend.Common.Constants;
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 
@@ -29,7 +30,10 @@ builder.AddRedisClient("redis");
 
 
 builder.AddServiceDefaults();
-
+builder.Services.AddHttpClient<IContentsApiRemoteService, ContentsApiRemoteService>(client =>
+{
+    client.BaseAddress = new Uri(RemoteApiUrlConstant.ContentsBaseUrl);
+});
 builder.Services.AddMigration<AIDbContext>();
 
 builder.Services.AddScoped<IAIDbContextUnitOfWork, UnitOfWork>();
@@ -40,7 +44,7 @@ builder.Services.AddScoped<ISystemMessageRepository, SystemMessageRepository>();
 // Services
 builder.Services.AddAI(configuration);
 builder.Services.AddScoped<IArticleGenerationService, ArticleGenerationService>();
-builder.Services.AddScoped<IContentsApiRemoteService, ContentsApiRemoteService>();
+// builder.Services.AddScoped<IContentsApiRemoteService, ContentsApiRemoteService>();
 builder.Services.AddScoped<IChatRoundService, ChatRoundService>();
 builder.Services.AddScoped<ISessionService, SessionService>();
 

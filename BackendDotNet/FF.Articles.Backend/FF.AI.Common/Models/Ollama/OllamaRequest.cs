@@ -82,6 +82,7 @@ internal static class OllamaRequestExtensions
 
         if (request.Options != null)
         {
+            ollamaRequest.Options = new OllamaChatOptions();
             if (request.Options.MaxTokens.HasValue)
                 ollamaRequest.Options.NumPredict = request.Options.MaxTokens.Value;
 

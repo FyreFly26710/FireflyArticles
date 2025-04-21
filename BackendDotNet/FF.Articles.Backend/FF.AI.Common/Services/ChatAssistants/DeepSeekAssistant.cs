@@ -10,7 +10,7 @@ using FF.AI.Common.Interfaces;
 using FF.AI.Common.Models;
 using FF.AI.Common.Models.DeepSeek;
 using FF.AI.Common.Providers;
-namespace FF.AI.Common.Services;
+namespace FF.AI.Common.Services.ChatAssistants;
 
 public class DeepSeekAssistant : BaseAssistant, IAssistant<DeepSeekProvider>
 {
@@ -133,7 +133,7 @@ public class DeepSeekAssistant : BaseAssistant, IAssistant<DeepSeekProvider>
         };
         yield return endResponse;
     }
-    public async Task<List<string>> GetModelsAsync(CancellationToken cancellationToken)
+    public async Task<ChatProvider> GetProviderAsync(CancellationToken cancellationToken)
     {
         var response = await _httpClient.GetAsync(_provider.ListModelsEndpoint, cancellationToken);
         if (!response.IsSuccessStatusCode)
@@ -147,6 +147,12 @@ public class DeepSeekAssistant : BaseAssistant, IAssistant<DeepSeekProvider>
             .Select(m => m.GetProperty("id").GetString())
             .Where(id => id != null)
             .ToList();
-        return models ?? [];
+        var chatProvider = new ChatProvider()
+        {
+            ProviderName = _provider.ProviderName,
+            Models = models,
+            IsAvailable = true
+        };
+        return chatProvider;
     }
 }

@@ -10,7 +10,7 @@ using System.Text;
 using System.Runtime.CompilerServices;
 using FF.AI.Common.Providers;
 
-namespace FF.AI.Common.Services;
+namespace FF.AI.Common.Services.ChatAssistants;
 
 public class OllamaAssistant : BaseAssistant, IAssistant<OllamaProvider>
 {
@@ -82,9 +82,10 @@ public class OllamaAssistant : BaseAssistant, IAssistant<OllamaProvider>
             throw new Exception(res);
         }
         var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
+        var content = "";
         var startResponse = new ChatResponse
         {
-            Message = Message.Assistant(string.Empty),
+            Message = Message.Assistant(content),
             Event = ChatEvent.Start,
             ExtraInfo = extraInfo
         };
@@ -108,9 +109,11 @@ public class OllamaAssistant : BaseAssistant, IAssistant<OllamaProvider>
                 {
                     extraInfo.OutputTokens = ollamaResponse.EvalCount;
                 }
+                var chunk = ollamaResponse.Message?.Content ?? string.Empty;
+                content += chunk;
                 var chatResponse = new ChatResponse()
                 {
-                    Message = Message.Assistant(ollamaResponse.Message?.Content ?? string.Empty),
+                    Message = Message.Assistant(chunk),
                     Event = ChatEvent.Generate,
                     ExtraInfo = null
                 };
@@ -120,13 +123,13 @@ public class OllamaAssistant : BaseAssistant, IAssistant<OllamaProvider>
         extraInfo.Duration = (int)(DateTime.UtcNow - extraInfo.CreatedAt.Value).TotalMilliseconds;
         var endResponse = new ChatResponse
         {
-            Message = Message.Assistant(string.Empty),
+            Message = Message.Assistant(content),
             Event = ChatEvent.Finish,
             ExtraInfo = extraInfo
         };
         yield return endResponse;
     }
-    public async Task<List<string>> GetModelsAsync(CancellationToken cancellationToken)
+    public async Task<ChatProvider> GetProviderAsync(CancellationToken cancellationToken)
     {
         var response = await _httpClient.GetAsync(_provider.ListModelsEndpoint, cancellationToken);
         if (!response.IsSuccessStatusCode)
@@ -140,6 +143,12 @@ public class OllamaAssistant : BaseAssistant, IAssistant<OllamaProvider>
             .Select(m => m.GetProperty("name").GetString())
             .Where(name => name != null)
             .ToList();
-        return models ?? [];
+        var chatProvider = new ChatProvider()
+        {
+            ProviderName = _provider.ProviderName,
+            Models = models,
+            IsAvailable = true
+        };
+        return chatProvider;
     }
 }

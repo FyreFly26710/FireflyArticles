@@ -2,13 +2,15 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using NJsonSchema;
+using FF.AI.Common.Constants;
 
 namespace FF.AI.Common.Models;
 
 public class ChatRequest
 {
     public List<Message> Messages { get; set; } = [];
-    public string Model { get; set; } = "deepseek-chat";
+    public string Provider { get; set; } = string.Empty;
+    public string Model { get; set; } = string.Empty;
     public ChatOptions? Options { get; set; }
 
 }
