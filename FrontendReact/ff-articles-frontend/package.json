@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "cross-env NODE_TLS_REJECT_UNAUTHORIZED=0 NEXT_PUBLIC_CONFIG=development next dev",
-    "build": "cross-env NEXT_PUBLIC_CONFIG=production next build"
+    "build": "cross-env NEXT_PUBLIC_CONFIG=production next build",
+    "start": "next start"
   },
   "dependencies": {
     "@ant-design/icons": "^5.6.1",

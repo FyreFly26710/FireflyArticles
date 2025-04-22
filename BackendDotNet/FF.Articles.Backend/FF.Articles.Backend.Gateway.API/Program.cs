@@ -1,5 +1,6 @@
 using FF.Articles.Backend.Common.Middlewares;
 using Yarp.ReverseProxy.Transforms;
+using Microsoft.AspNetCore.Http;
 
 // This is a minimal reverse proxy example using YARP
 // It redircts all incoming requests from http://localhost:21000 to the specified backend server configured in the appsettings.json file
@@ -14,6 +15,10 @@ builder.Services.AddReverseProxy()
     {
         transforms.AddRequestTransform(context =>
         {
+            // Log the transformation for debugging
+            Console.WriteLine($"Transforming request: {context.HttpContext.Request.Method} {context.HttpContext.Request.Path}");
+            Console.WriteLine($"Destination URL: {context.DestinationPrefix}");
+
             context.ProxyRequest.Headers.Add("X-Forwarded-Host", context.HttpContext.Request.Host.Value);
             context.ProxyRequest.Headers.Add("X-Request-Id", context.HttpContext.TraceIdentifier);
             return ValueTask.CompletedTask;
@@ -27,22 +32,21 @@ var app = builder.Build();
 
 app.UseMiddleware<GlobalExceptionMiddleware>();
 
-//app.UseExceptionHandler(appBuilder =>
-//{
-//    appBuilder.Run(async context =>
-//    {
-//        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-//        context.Response.ContentType = "application/json";
-
-//        await context.Response.WriteAsJsonAsync(new
-//        {
-//            ErrorCode = 50000,
-//            RequestId = context.TraceIdentifier
-//        });
-//    });
-//});
-
+// Add diagnostic middleware
+app.Use(async (context, next) =>
+{
+    Console.WriteLine($"Request received: {context.Request.Method} {context.Request.Path}");
+    await next();
+    Console.WriteLine($"Response: {context.Response.StatusCode}");
+});
 
 app.MapReverseProxy();
+
+// Add a fallback route for debugging
+app.Map("/{**catch-all}", async context =>
+{
+    Console.WriteLine($"Fallback route hit: {context.Request.Path}");
+    await context.Response.WriteAsync($"Route not found: {context.Request.Path}. This indicates the reverse proxy didn't handle the request.");
+});
 
 app.Run();

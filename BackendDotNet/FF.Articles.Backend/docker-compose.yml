@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  fireflyarticles:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "21000:21000"
+      - "22000:22000"  # Expose Identity API port for debugging
+      - "23000:23000"  # Expose Contents API port for debugging
+      - "24000:24000"  # Expose AI API port for debugging
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - Parameters__username=postgres
+      - Parameters__password=postgres
+      - ASPNETCORE_URLS=http://+:21000
+      - ConnectionStrings__identitydb=Host=postgres;Port=5432;Username=postgres;Password=postgres;Database=identitydb;Trust Server Certificate=True;Pooling=true;Timeout=30;Command Timeout=30;
+      - ConnectionStrings__contentdb=Host=postgres;Port=5432;Username=postgres;Password=postgres;Database=contentdb;Trust Server Certificate=True;
+      - ConnectionStrings__aidb=Host=postgres;Port=5432;Username=postgres;Password=postgres;Database=aidb;Trust Server Certificate=True;
+      - ConnectionStrings__redis=redis:6379
+      # Full YARP Route Configuration
+      - ReverseProxy__Routes__contents-route__ClusterId=contentsCluster
+      - ReverseProxy__Routes__contents-route__Match__Path=/api/contents/{**catch-all}
+      - ReverseProxy__Routes__identity-route__ClusterId=identityCluster
+      - ReverseProxy__Routes__identity-route__Match__Path=/api/identity/{**catch-all}
+      - ReverseProxy__Routes__ai-route__ClusterId=aiCluster
+      - ReverseProxy__Routes__ai-route__Match__Path=/api/ai/{**catch-all}
+      # Full YARP Cluster Configuration
+      - ReverseProxy__Clusters__contentsCluster__Destinations__destination1__Address=http://127.0.0.1:23000
+      - ReverseProxy__Clusters__identityCluster__Destinations__destination1__Address=http://127.0.0.1:22000
+      - ReverseProxy__Clusters__aiCluster__Destinations__destination1__Address=http://127.0.0.1:24000
+      - DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
+    networks:
+      - fireflynet
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:15
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - fireflynet
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+networks:
+  fireflynet:
+    driver: bridge
+
+volumes:
+  postgres-data:
