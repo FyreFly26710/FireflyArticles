@@ -122,9 +122,12 @@ export const storage = {
     // Chat Behavior Settings
     getChatBehaviorSettings: (): ChatBehaviorSettings => {
         try {
-            const stored = localStorage.getItem(STORAGE_KEY_CHAT_BEHAVIOR);
-            if (!stored) return defaultChatBehaviorSettings;
-            return JSON.parse(stored);
+            if (typeof window !== 'undefined' && window.localStorage) {
+                const stored = localStorage.getItem(STORAGE_KEY_CHAT_BEHAVIOR);
+                if (!stored) return defaultChatBehaviorSettings;
+                return JSON.parse(stored);
+            }
+            return defaultChatBehaviorSettings;
         } catch (e) {
             localStorage.removeItem(STORAGE_KEY_CHAT_BEHAVIOR);
             return defaultChatBehaviorSettings;
