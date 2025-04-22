@@ -81,9 +81,21 @@ public class DeepSeekAssistant : BaseAssistant, IAssistant<DeepSeekProvider>
         {
             Content = new StringContent(JsonSerializer.Serialize(deepSeekRequest, _jsonSerializerOptions), Encoding.UTF8, "application/json"),
         };
+
         using var response = await _httpClient.SendAsync(requestMessage, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
 
-        if (!response.IsSuccessStatusCode) throw new Exception(await response.Content.ReadAsStringAsync());
+        if (!response.IsSuccessStatusCode)
+        {
+            var errorContent = await response.Content.ReadAsStringAsync();
+            var errorResponse = new ChatResponse
+            {
+                Message = Message.Assistant($"Error: {response.StatusCode} - {errorContent}"),
+                Event = ChatEvent.Error,
+                ExtraInfo = new ExtraInfo() { CreatedAt = DateTime.UtcNow, Model = deepSeekRequest.Model }
+            };
+            yield return errorResponse;
+            yield break;
+        }
 
         var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
         using var reader = new StreamReader(stream);
@@ -99,31 +111,56 @@ public class DeepSeekAssistant : BaseAssistant, IAssistant<DeepSeekProvider>
 
         while (!reader.EndOfStream && !cancellationToken.IsCancellationRequested)
         {
-            var line = await reader.ReadLineAsync();
-            if (line != null && line.StartsWith("data: "))
+            ChatResponse? chatResponse = null;
+
+            try
             {
+                var line = await reader.ReadLineAsync();
+                if (line == null || !line.StartsWith("data: "))
+                    continue;
+
                 var json = line.Substring(6);
+
+                // Handle special case for "[DONE]"
+                if (json.Trim() == "[DONE]")
+                    continue;
+
                 var deepSeekResponse = JsonSerializer.Deserialize<DeepSeekResponse>(json, _jsonSerializerOptions);
-                if (deepSeekResponse is null) continue;
+                if (deepSeekResponse is null)
+                    continue;
 
                 if (deepSeekResponse.Usage is not null)
                 {
                     extraInfo.InputTokens = deepSeekResponse.Usage.PromptTokens;
                     extraInfo.OutputTokens = deepSeekResponse.Usage.CompletionTokens;
                 }
+
                 var delta = deepSeekResponse.Choices.FirstOrDefault()?.Delta?.Content ?? string.Empty;
                 content += delta;
 
-                var chatResponse = new ChatResponse()
+                chatResponse = new ChatResponse()
                 {
                     Message = Message.Assistant(delta),
                     Event = ChatEvent.Generate,
                     ExtraInfo = null
                 };
+            }
+            catch (Exception ex)
+            {
+                chatResponse = new ChatResponse()
+                {
+                    Message = Message.Assistant($"Error during streaming: {ex.Message}"),
+                    Event = ChatEvent.Error,
+                    ExtraInfo = null
+                };
+            }
 
+            if (chatResponse != null)
+            {
                 yield return chatResponse;
             }
         }
+
         extraInfo.Duration = (int)(DateTime.UtcNow - extraInfo.CreatedAt.Value).TotalMilliseconds;
         var endResponse = new ChatResponse
         {

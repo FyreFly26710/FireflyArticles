@@ -71,7 +71,6 @@ public class ChatRoundService(
             Event = SseEvent.Init,
             Data = JsonSerializer.Serialize(newRound.ToDto(), _jsonOptions)
         };
-
         var streamingResponse = _aiChatAssistant.ChatStreamAsync(chatRequest, cancellationToken);
         if (streamingResponse == null)
             throw new ApiException(ErrorCode.SYSTEM_ERROR, "Failed to get streaming response from AI");

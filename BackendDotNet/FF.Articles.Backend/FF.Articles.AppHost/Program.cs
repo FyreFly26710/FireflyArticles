@@ -1,14 +1,14 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
-var redis = builder.AddRedis("redis")
-    .WithLifetime(ContainerLifetime.Persistent)
-    .WithEndpoint("tcp", e =>
-    {
-        e.Port = 6380;
-        e.IsProxied = false;
-    })
-    .WithVolume("redis-data", "/data") // Persist Redis data
-    .WithRedisInsight(redisInsight => redisInsight.WithHostPort(8001));
+//var redis = builder.AddRedis("redis")
+//    .WithLifetime(ContainerLifetime.Persistent)
+//    .WithEndpoint("tcp", e =>
+//    {
+//        e.Port = 6380;
+//        e.IsProxied = false;
+//    })
+//    .WithVolume("redis-data", "/data") // Persist Redis data
+//    .WithRedisInsight(redisInsight => redisInsight.WithHostPort(8001));
 
 // Get postgres credentials from appsettings.json [parameters]
 var username = builder.AddParameter("username", secret: false);
@@ -37,15 +37,18 @@ var launchProfileName = "https";
 // Services
 builder.AddProject<Projects.FF_Articles_Backend_Identity_API>("identity-api", launchProfileName)
     .WithReference(identityDb)
-    .WithReference(redis);
+    //.WithReference(redis)
+    ;
 
 builder.AddProject<Projects.FF_Articles_Backend_Contents_API>("contents-api", launchProfileName)
     .WithReference(contentDb)
-    .WithReference(redis);
+    //.WithReference(redis)
+    ;
 
 builder.AddProject<Projects.FF_Articles_Backend_AI_API>("ai-api", launchProfileName)
     .WithReference(aidb)
-    .WithReference(redis);
+    //.WithReference(redis)
+    ;
 
 builder.AddProject<Projects.FF_Articles_Backend_Gateway_API>("gateway-api", launchProfileName);
 builder.Build().Run();

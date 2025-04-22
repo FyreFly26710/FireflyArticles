@@ -10,13 +10,16 @@ import {
   apiChatRoundDeleteByIds,
   apiChatRoundStreamResponse
 } from '@/api/ai/api/chatround';
-import { storage } from '@/stores/storage';
+import { apiAiAssistantProviders } from '@/api/ai/api/assistant';
+import { ChatBehaviorSettings, SelectedModel, storage } from '@/stores/storage';
 
 interface ChatContextType {
   session: API.SessionDto;
   sessions: API.SessionDto[];
   loading: boolean;
   isGenerating: boolean;
+  providers: API.ChatProvider[];
+  behaviorSettings: ChatBehaviorSettings;
   // Setters
   setSession: (session: API.SessionDto) => void;
   setSessions: (sessions: API.SessionDto[]) => void;
@@ -30,6 +33,8 @@ interface ChatContextType {
   handleEnableChatRounds: (chatRoundIds: number[]) => Promise<void>;
   handleDeleteChatRounds: (chatRoundIds: number[]) => Promise<void>;
   refreshCurrentSession: () => Promise<void>;
+  getProviders: () => Promise<API.ChatProvider[]>;
+  selectModel: (model: SelectedModel) => void;
 }
 
 const ChatContext = createContext<ChatContextType | undefined>(undefined);
@@ -47,13 +52,30 @@ const createEmptySession = (): API.SessionDto => ({
 
 
 export function ChatProvider({ children }: { children: ReactNode }) {
+
+  const settings = storage.getChatBehaviorSettings();
+
   const [session, setSession] = useState<API.SessionDto>(createEmptySession());
   const [sessions, setSessions] = useState<API.SessionDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [providers, setProviders] = useState<API.ChatProvider[]>([]);
+  const [behaviorSettings, setBehaviorSettings] = useState<ChatBehaviorSettings>(settings);
 
-  // Get settings from storage
-  const settings = storage.getChatBehaviorSettings();
+  useEffect(() => {
+    const handleBehaviorChange = (event: CustomEvent<ChatBehaviorSettings>) => {
+      setBehaviorSettings(event.detail);
+    };
+    window.addEventListener('chatBehaviorSettingsChanged', handleBehaviorChange);
+    return () => {
+      window.removeEventListener('chatBehaviorSettingsChanged', handleBehaviorChange);
+    };
+  }, []);
+
+  // // Load providers on component mount
+  // useEffect(() => {
+  //   getProviders();
+  // }, []);
 
   // Load sessions on component mount
   useEffect(() => {
@@ -61,11 +83,11 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       try {
         setLoading(true);
         const response = await apiSessionGetSessions({ includeChatRounds: false });
-        
+
         // Ensure we have a valid array of sessions
         const sessionData = Array.isArray(response.data) ? response.data : [];
         console.log('Fetched sessions:', sessionData);
-        
+
         // Validate each session has a proper rounds array
         const validSessions = sessionData.map(session => {
           if (!session.rounds || !Array.isArray(session.rounds)) {
@@ -73,7 +95,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
           }
           return session;
         });
-        
+
         setSessions(validSessions);
 
         // Early return if no sessions exist
@@ -118,6 +140,14 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const handleSendMessage = async (messageRequest: API.ChatRoundCreateRequest) => {
+    console.log('behaviorSettings', behaviorSettings);
+    messageRequest = {
+      ...messageRequest,
+      model: behaviorSettings.selectedModel.model,
+      provider: behaviorSettings.selectedModel.providerName
+    };
+    console.log('handleSendMessage', messageRequest);
+
     try {
       setIsGenerating(true);  // Start generating
       // Create a placeholder response for UI feedback with proper defaults
@@ -126,8 +156,8 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         chatRoundId: Date.now(),
         userMessage: messageRequest.userMessage,
         assistantMessage: "",
-        model: messageRequest.model || "deepseek-chat",
-        provider: messageRequest.provider || "deepseek",
+        model: messageRequest.model || behaviorSettings.selectedModel.model,
+        provider: messageRequest.provider || behaviorSettings.selectedModel.providerName,
         createTime: new Date().toISOString(),
         updateTime: new Date().toISOString(),
         promptTokens: 0,
@@ -149,7 +179,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         return updatedSession;
       });
 
-      if (settings.enableStreaming) {
+      if (behaviorSettings.enableStreaming) {
         await apiChatRoundStreamResponse(
           messageRequest,
           {
@@ -235,10 +265,10 @@ export function ChatProvider({ children }: { children: ReactNode }) {
           throw new Error('No data returned from API');
         }
         updateSessionsByChatRound(response.data);
-        setIsGenerating(false);  
+        setIsGenerating(false);
       }
     } catch (error) {
-      setIsGenerating(false); 
+      setIsGenerating(false);
       console.error('Error getting assistant response:', error);
       setSession(prev => {
         const updatedSession = { ...prev };
@@ -286,7 +316,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
           isActive: true,
           updateTime: new Date().toISOString()
         };
-        
+
         updatedRounds[updatedRounds.length - 1] = mergedData;
       } else if (updatedRound) {
         updatedRounds.push(updatedRound);
@@ -341,9 +371,9 @@ export function ChatProvider({ children }: { children: ReactNode }) {
           console.error('sessions state is not an array in handleCreateSession:', prev);
           return [newSession];
         }
-        return [...prev, newSession]; 
+        return [...prev, newSession];
       });
-      
+
       setSession(newSession);
     } catch (error) {
       console.error('Error creating new session:', error);
@@ -500,28 +530,52 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  // Get providers from storage or API
+  const getProviders = async (): Promise<API.ChatProvider[]> => {
+    try {
+      // Check if we have providers in storage
+      const storedProviders = storage.getChatProviders();
+      if (storedProviders) {
+        setProviders(storedProviders);
+        return storedProviders;
+      }
+
+      // Fetch from API if not in storage
+      const response = await apiAiAssistantProviders();
+
+      // The response is already the ChatProviderListApiResponse
+      if (response && response.data && Array.isArray(response.data)) {
+        setProviders(response.data);
+        // Store in localStorage for next time
+        storage.setChatProviders(response.data);
+        return response.data;
+      }
+      return [];
+    } catch (error) {
+      console.error('Error fetching providers:', error);
+      return [];
+    }
+  };
+
+  // Select a model and save to storage
+  const selectModel = (model: SelectedModel) => {
+    if (!model) return;
+
+    setBehaviorSettings({ ...behaviorSettings, selectedModel: model });
+    storage.setSelectedModel(model);
+  };
+
   return (
     <ChatContext.Provider value={{
       session,
       sessions,
       loading,
       isGenerating,
-      // Settings from storage
-      // showMessageTimestamp: settings.showMessageTimestamp,
-      // showModelName: settings.showModelName,
-      // showTokenUsed: settings.showTokenUsed,
-      // showTimeTaken: settings.showTimeTaken,
-      // enableMarkdownRendering: settings.enableMarkdownRendering,
-      // enableThinking: settings.enableThinking,
-      // enableStreaming: settings.enableStreaming,
-      // showOnlyActiveMessages: settings.showOnlyActiveMessages,
-      // enableCollapsibleMessages: settings.enableCollapsibleMessages,
-      // selectedModel: settings.selectedModel,
+      providers,
+      behaviorSettings,
       // Setters
       setSession,
       setSessions,
-      // setSidebarCollapsed,
-      // setRightSidebarCollapsed,
       // Handlers
       handleSendMessage,
       handleCreateSession,
@@ -532,6 +586,8 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       handleEnableChatRounds,
       handleDeleteChatRounds,
       refreshCurrentSession,
+      getProviders,
+      selectModel,
     }}>
       {children}
     </ChatContext.Provider>

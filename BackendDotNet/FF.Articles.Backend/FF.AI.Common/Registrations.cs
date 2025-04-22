@@ -16,8 +16,8 @@ public static class Registrations
             client.Timeout = TimeSpan.FromMinutes(10);
         });
 
-        services.AddSingleton<DeepSeekProvider>(sp => new DeepSeekProvider(configuration));
-        services.AddSingleton<OllamaProvider>(sp => new OllamaProvider(configuration));
+        services.AddSingleton<DeepSeekProvider>();
+        services.AddSingleton<OllamaProvider>();
 
         services.AddSingleton<IAssistant<DeepSeekProvider>, DeepSeekAssistant>();
         services.AddSingleton<IAssistant<OllamaProvider>, OllamaAssistant>();

@@ -29,13 +29,13 @@ const ArticleItem: React.FC<ArticleItemProps> = ({
   const [tagInput, setTagInput] = useState('');
   const [localGenerating, setLocalGenerating] = useState(false);
   const [localArticleId, setLocalArticleId] = useState<number | undefined>(undefined);
-  
-  const { 
-    handleEditArticle, 
-    handleSaveArticle, 
-    handleCancelEdit, 
-    handleUpdateField, 
-    handleAddTag, 
+
+  const {
+    handleEditArticle,
+    handleSaveArticle,
+    handleCancelEdit,
+    handleUpdateField,
+    handleAddTag,
     handleRemoveTag,
     generateArticleContent
   } = useAiGen();
@@ -54,7 +54,7 @@ const ArticleItem: React.FC<ArticleItemProps> = ({
     try {
       setLocalGenerating(true);
       const articleId = await generateArticleContent(article);
-      
+
       if (articleId) {
         setLocalArticleId(articleId);
         message.success('Article content generated successfully!');
@@ -89,7 +89,7 @@ const ArticleItem: React.FC<ArticleItemProps> = ({
       </Card>
     );
   }
-  
+
   // If generating, show loading spinner
   if (isGenerating) {
     const topicUrl = `/topic/${topicId}`;
@@ -117,16 +117,16 @@ const ArticleItem: React.FC<ArticleItemProps> = ({
 
   // Regular card with addition of "Generate Content" button
   return (
-    <Card 
+    <Card
       hoverable={!article.isEditing}
       style={{ width: '100%' }}
       className={`article-card ${article.isEditing ? styles['article-card-editing'] : ''}`}
       onClick={() => !article.isEditing && handleEditArticle(article.id)}
       actions={article.isEditing ? [
-        <Button 
-          key="save" 
-          type="primary" 
-          icon={<SaveOutlined />} 
+        <Button
+          key="save"
+          type="primary"
+          icon={<SaveOutlined />}
           onClick={(e) => {
             e.stopPropagation();
             handleSaveArticle(article.id);
@@ -134,9 +134,9 @@ const ArticleItem: React.FC<ArticleItemProps> = ({
         >
           Save
         </Button>,
-        <Button 
-          key="cancel" 
-          icon={<CloseOutlined />} 
+        <Button
+          key="cancel"
+          icon={<CloseOutlined />}
           onClick={(e) => {
             e.stopPropagation();
             handleCancelEdit(article.id);
@@ -145,9 +145,9 @@ const ArticleItem: React.FC<ArticleItemProps> = ({
           Cancel
         </Button>
       ] : [
-        <Button 
-          key="edit" 
-          icon={<EditOutlined />} 
+        <Button
+          key="edit"
+          icon={<EditOutlined />}
           onClick={(e) => {
             e.stopPropagation();
             handleEditArticle(article.id);
@@ -172,7 +172,7 @@ const ArticleItem: React.FC<ArticleItemProps> = ({
         <Col span={24}>
           {article.isEditing ? (
             <Form.Item label="Title" style={{ marginBottom: 8 }}>
-              <Input 
+              <Input
                 value={article.title}
                 onChange={(e) => handleUpdateField(article.id, 'title', e.target.value)}
                 onClick={(e) => e.stopPropagation()}
@@ -184,9 +184,9 @@ const ArticleItem: React.FC<ArticleItemProps> = ({
               {article.title}
             </Title>
           )}
-          <Divider style={{ margin: '4px 0' }}/>
+          <Divider style={{ margin: '4px 0' }} />
         </Col>
-        
+
         <Col span={24}>
           {article.isEditing ? (
             <Form.Item label="Abstract" style={{ marginBottom: 8 }}>
@@ -203,15 +203,15 @@ const ArticleItem: React.FC<ArticleItemProps> = ({
             </Paragraph>
           )}
         </Col>
-        
+
         <Col span={24}>
           {article.isEditing ? (
             <Form.Item label="Tags" style={{ marginBottom: 8 }}>
               <Space direction="vertical" style={{ width: '100%' }}>
                 <Space wrap>
                   {article.tags.map((tag, index) => (
-                    <Tag 
-                      key={index} 
+                    <Tag
+                      key={index}
                       color="purple"
                       closable
                       onClose={(e) => {
@@ -231,9 +231,9 @@ const ArticleItem: React.FC<ArticleItemProps> = ({
                     onPressEnter={handleAddTagLocal}
                     onClick={(e) => e.stopPropagation()}
                   />
-                  <Button 
-                    type="primary" 
-                    icon={<PlusOutlined />} 
+                  <Button
+                    type="primary"
+                    icon={<PlusOutlined />}
                     onClick={(e) => {
                       e.stopPropagation();
                       handleAddTagLocal();
