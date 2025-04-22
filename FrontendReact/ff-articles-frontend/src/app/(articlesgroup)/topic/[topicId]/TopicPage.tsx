@@ -1,7 +1,7 @@
 "use server";
 import ArticleCard from "@/components/article/ArticleCard";
 import ArticleSider from "@/components/article/ArticleSider";
-import { fetchArticle, fetchTags, fetchTopic, fetchTopicArticle, fetchTopicList } from "@/app/topic/utils/fetcher";
+import { fetchArticle, fetchTags, fetchTopic, fetchTopicArticle, fetchTopicList } from "@/app/(articlesgroup)/topic/fetcher";
 import { Flex } from "antd";
 
 const TopicPage = async ({ params }: { params: { topicId: number } }) => {

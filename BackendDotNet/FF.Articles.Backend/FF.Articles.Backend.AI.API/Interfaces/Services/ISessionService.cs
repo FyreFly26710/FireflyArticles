@@ -1,7 +1,7 @@
-using FF.Articles.Backend.Common.Bases;
 using FF.Articles.Backend.AI.API.Models.Entities;
 using FF.Articles.Backend.AI.API.Models.Dtos;
-using FF.Articles.Backend.AI.API.Models.Requests.Chats;
+using FF.Articles.Backend.Common.Bases.Interfaces;
+using FF.Articles.Backend.AI.API.Models.Requests.Sessions;
 namespace FF.Articles.Backend.AI.API.Interfaces.Services;
 
 public interface ISessionService : IBaseService<Session>

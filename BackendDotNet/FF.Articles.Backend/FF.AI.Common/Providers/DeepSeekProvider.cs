@@ -6,17 +6,15 @@ namespace FF.AI.Common.Providers;
 
 public class DeepSeekProvider : IProvider
 {
-    private readonly string? _apiKey;
-    private readonly string? _chatEndpoint;
-    private readonly string? _listModelsEndpoint;
+    private readonly string? _apiUrl;
+    private readonly string _baseUrl;
     public DeepSeekProvider(IConfiguration configuration)
     {
-        _apiKey = configuration["ApiKey:DeepSeek"];
-        _chatEndpoint = configuration["ChatEndpoint:DeepSeek"];
-        _listModelsEndpoint = configuration["ListModelsEndpoint:DeepSeek"];
+        _apiUrl = configuration["DeepSeek:ApiKey"];
+        _baseUrl = configuration["DeepSeek:ApiUrl"] ?? "https://api.deepseek.com/v1/";
     }
     public string ProviderName => ProviderList.DeepSeek;
-    public string ChatEndpoint => _chatEndpoint ?? "https://api.deepseek.com/v1/chat/completions";
-    public string? ApiKey => _apiKey;
-    public string? ListModelsEndpoint => _listModelsEndpoint ?? "https://api.deepseek.com/v1/models";
+    public string ChatEndpoint => _baseUrl + "chat/completions";
+    public string? ApiKey => _apiUrl;
+    public string? ListModelsEndpoint => _baseUrl + "models";
 }

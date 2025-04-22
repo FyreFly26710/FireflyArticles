@@ -53,27 +53,26 @@ public static class Prompts
     Title: {title}
     Abstract: {abs}
     Tags: {string.Join(", ", [.. tags])}
+    """
+    + Environment.NewLine +
+    User_ArticleContent_Format;
+
+    private const string User_ArticleContent_Format = """
     Respond ONLY with the raw markdown content following this exact structure:
     
-        # Introduction
-        Content...
-
-        ## First Key Point (smaller point)
-        Content...
-
-        ## Second Key Point (larger point)
-        Content...
-        Content...
-        Content...
-
-        # Conclusion
-        Content...
+    # Introduction
+    One paragraph intro...
     
-    Introduction and Conclusion contents should be 1 paragraphs.
-    Each Key Points should have 1-3 paragraphs.
+    ## First Key Point
+    One to three paragraphs Content...
+    
+    ## Second Key Point
+    One to three paragraphs Content...
+    
+    ... 
 
-    DO NOT include: 
-    - Title
+    # Conclusion
+    One paragraph conclusion...
+    
     """;
-
 }

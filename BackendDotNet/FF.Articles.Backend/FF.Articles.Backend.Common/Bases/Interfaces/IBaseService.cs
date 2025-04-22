@@ -1,6 +1,6 @@
 ﻿using FF.Articles.Backend.Common.Responses;
 
-namespace FF.Articles.Backend.Common.Bases;
+namespace FF.Articles.Backend.Common.Bases.Interfaces;
 public interface IBaseService<TEntity> where TEntity : BaseEntity
 {
     Task<TEntity?> GetByIdAsync(long id);

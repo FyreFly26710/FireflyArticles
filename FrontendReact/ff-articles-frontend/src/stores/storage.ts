@@ -2,6 +2,7 @@ const STORAGE_KEY_USER = 'user-storage';
 const STORAGE_KEY_LAYOUT = 'layout-settings';
 const STORAGE_KEY_CHAT_DISPLAY = 'chat-display-settings';
 const STORAGE_KEY_CHAT_BEHAVIOR = 'chat-behavior-settings';
+const STORAGE_KEY_CHAT_PROVIDERS = 'chat-providers';
 
 // Layout Settings
 export interface LayoutSettings {
@@ -39,13 +40,20 @@ const defaultChatDisplaySettings: ChatDisplaySettings = {
 export interface ChatBehaviorSettings {
     enableThinking: boolean;
     enableStreaming: boolean;
-    selectedModel: string;
+    selectedModel: SelectedModel;
+}
+export interface SelectedModel {
+    providerName: string;
+    model: string;
 }
 
 const defaultChatBehaviorSettings: ChatBehaviorSettings = {
     enableThinking: true,
     enableStreaming: true,
-    selectedModel: 'deepseek'
+    selectedModel: {
+        providerName: 'deepseek',
+        model: 'deepseek-chat'
+    }
 };
 
 export const storage = {
@@ -128,14 +136,50 @@ export const storage = {
         window.dispatchEvent(new CustomEvent('chatBehaviorSettingsChanged', { detail: settings }));
     },
 
+    // Chat Providers
+    getChatProviders: (): API.ChatProvider[] | null => {
+        try {
+            const stored = localStorage.getItem(STORAGE_KEY_CHAT_PROVIDERS);
+            if (!stored) return null;
+            const parsedProviders = JSON.parse(stored);
+            return Array.isArray(parsedProviders) ? parsedProviders : null;
+        } catch (e) {
+            localStorage.removeItem(STORAGE_KEY_CHAT_PROVIDERS);
+            return null;
+        }
+    },
+
+    setChatProviders: (providers: API.ChatProvider[]): void => {
+        if (!Array.isArray(providers)) {
+            console.error("Cannot store providers: not an array");
+            return;
+        }
+        localStorage.setItem(STORAGE_KEY_CHAT_PROVIDERS, JSON.stringify(providers));
+    },
+
+    // Set selected model shorthand method
+    setSelectedModel: (selectedModel: SelectedModel): void => {
+        if (!selectedModel) return;
+
+        const currentSettings = storage.getChatBehaviorSettings();
+        const updatedSettings = {
+            ...currentSettings,
+            selectedModel: selectedModel
+        };
+        storage.setChatBehaviorSettings(updatedSettings);
+        window.dispatchEvent(new CustomEvent('selectedModelChanged', { detail: selectedModel }));
+    },
+
     clearAllSettings: (): void => {
         localStorage.removeItem(STORAGE_KEY_LAYOUT);
         localStorage.removeItem(STORAGE_KEY_CHAT_DISPLAY);
         localStorage.removeItem(STORAGE_KEY_CHAT_BEHAVIOR);
-        
+        localStorage.removeItem(STORAGE_KEY_CHAT_PROVIDERS);
+
         window.dispatchEvent(new CustomEvent('layoutSettingsChanged', { detail: defaultLayoutSettings }));
         window.dispatchEvent(new CustomEvent('chatDisplaySettingsChanged', { detail: defaultChatDisplaySettings }));
         window.dispatchEvent(new CustomEvent('chatBehaviorSettingsChanged', { detail: defaultChatBehaviorSettings }));
+        window.dispatchEvent(new CustomEvent('selectedModelChanged', { detail: defaultChatBehaviorSettings.selectedModel }));
     }
 };
 
@@ -146,5 +190,6 @@ declare global {
         'layoutSettingsChanged': CustomEvent<LayoutSettings>;
         'chatDisplaySettingsChanged': CustomEvent<ChatDisplaySettings>;
         'chatBehaviorSettingsChanged': CustomEvent<ChatBehaviorSettings>;
+        'selectedModelChanged': CustomEvent<SelectedModel>;
     }
 } 

@@ -1,8 +1,6 @@
 using System;
-using FF.Articles.Backend.AI.API.Interfaces;
 using FF.Articles.Backend.AI.API.Interfaces.Services.RemoteServices;
 using System.Text.Json;
-using FF.Articles.Backend.AI.API.Models.AiDtos;
 using FF.Articles.Backend.Common.Exceptions;
 using FF.Articles.Backend.Common.ApiDtos;
 using StackExchange.Redis;
@@ -12,6 +10,8 @@ using FF.AI.Common.Providers;
 using FF.AI.Common.Models;
 using FF.Articles.Backend.AI.API.Models.Requests.ArticleGenerations;
 using FF.AI.Common.Constants;
+using FF.Articles.Backend.AI.API.Models.Dtos;
+using FF.Articles.Backend.AI.API.Interfaces.Services;
 
 namespace FF.Articles.Backend.AI.API.Services;
 

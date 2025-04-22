@@ -2,17 +2,17 @@
 import React, { useRef, useState } from 'react'
 import { Button, Input } from 'antd'
 import { SendOutlined, SettingOutlined } from '@ant-design/icons'
-import { useChat } from '@/app/aichat/context/ChatContext'
+import { useChat } from '@/app/(aigroup)/aichat/context/ChatContext'
 import InputSettings from './InputSettings'
 
-export default function InputBox(){
+export default function InputBox() {
     const [messageInput, setMessageInput] = useState('')
     const [showSettings, setShowSettings] = useState(false)
     const inputRef = useRef<HTMLTextAreaElement>(null)
-    
-    const { 
-      handleSendMessage, 
-      session,
+
+    const {
+        handleSendMessage,
+        session,
     } = useChat()
 
     const handleSubmit = () => {
@@ -23,8 +23,6 @@ export default function InputBox(){
             sessionId: session.sessionId,
             SessionTimeStamp: session.timestamp,
             userMessage: messageInput,
-            provider: 'ollama',
-            model: 'mistral-small3.1:24b'
         }
         handleSendMessage(newMessage)
         setMessageInput('')
@@ -63,7 +61,7 @@ export default function InputBox(){
                             autoSize={{ minRows: 3, maxRows: 5 }}
                         />
                     </div>
-                    
+
                     <div className="flex flex-shrink-0 flex-col gap-2">
                         <Button
                             type="text"

@@ -1,6 +1,7 @@
-using FF.Articles.Backend.AI.API.Interfaces;
+using FF.AI.Common.Constants;
+using FF.Articles.Backend.AI.API.Interfaces.Services;
 using FF.Articles.Backend.AI.API.Interfaces.Services.RemoteServices;
-using FF.Articles.Backend.AI.API.Models.AiDtos;
+using FF.Articles.Backend.AI.API.Models.Dtos;
 using FF.Articles.Backend.AI.API.Models.Requests.ArticleGenerations;
 using FF.Articles.Backend.Common.ApiDtos;
 using FF.Articles.Backend.Common.Constants;
@@ -18,6 +19,8 @@ public class AiArticlesController(IArticleGenerationService articleGenerationSer
     [HttpPost("generate-article-list")]
     public async Task<ApiResponse<ArticlesAIResponseDto>> GenerateArticleList(ArticleListRequest request, CancellationToken cancellationToken)
     {
+        request.Model = "deepseek-chat";
+        request.Provider = ProviderList.DeepSeek;
         var article = await articleGenerationService.GenerateArticleListsAsync(request, cancellationToken);
         return ResultUtil.Success<ArticlesAIResponseDto>(article);
     }
@@ -25,6 +28,8 @@ public class AiArticlesController(IArticleGenerationService articleGenerationSer
     [HttpPost("generate-article-content")]
     public async Task<ApiResponse<long>> GenerateArticleContent(ContentRequest request)
     {
+        request.Model = "deepseek-chat";
+        request.Provider = ProviderList.DeepSeek;
         var content = await articleGenerationService.GenerateArticleContentAsync(request);
         return ResultUtil.Success<long>(content);
     }

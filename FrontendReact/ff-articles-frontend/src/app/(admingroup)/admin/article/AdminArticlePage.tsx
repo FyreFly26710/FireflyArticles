@@ -4,8 +4,8 @@ import { Button } from "antd";
 import React, { useEffect, useState } from "react";
 import ArticleFormModal from "@/components/article/ArticleFormModal";
 import TagModal from "@/components/admin/TagManagementModal";
-import { getArticleColumns } from "../utils/articleColumns";
-import { useArticleAdmin } from "../utils/useArticleAdmin";
+import { getArticleColumns } from "./articleColumns";
+import { useArticleAdmin } from "./useArticleAdmin";
 
 const AdminArticlePage: React.FC = () => {
   const {

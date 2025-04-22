@@ -1,7 +1,6 @@
 using FF.Articles.Backend.Common.Middlewares;
 using FF.Articles.Backend.Contents.API;
 using FF.Articles.Backend.Contents.API.Infrastructure;
-using FF.Articles.Backend.Contents.API.Infrastructure.Migrations;
 using FF.Articles.Backend.ServiceDefaults;
 using Microsoft.EntityFrameworkCore;
 using FF.Articles.Backend.Common.Extensions;

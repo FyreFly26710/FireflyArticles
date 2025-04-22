@@ -21,7 +21,6 @@
 	</ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FF.Articles.Backend.AI\FF.Articles.Backend.AI.csproj" />
     <ProjectReference Include="..\FF.Articles.Backend.Common\FF.Articles.Backend.Common.csproj" />
     <ProjectReference Include="..\FF.Articles.Backend.ServiceDefaults\FF.Articles.Backend.ServiceDefaults.csproj" />
   </ItemGroup>

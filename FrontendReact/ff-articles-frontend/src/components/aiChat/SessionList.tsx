@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Input } from 'antd'
 import SessionItem from './SessionItem'
-import { useChat } from '@/app/aichat/context/ChatContext'
+import { useChat } from '@/app/(aigroup)/aichat/context/ChatContext'
 
 
 export default function SessionList() {

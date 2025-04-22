@@ -1,6 +1,6 @@
 using FF.Articles.Backend.AI.API.Interfaces.Services;
 using FF.Articles.Backend.AI.API.Models.Dtos;
-using FF.Articles.Backend.AI.API.Models.Requests.Chats;
+using FF.Articles.Backend.AI.API.Models.Requests.ChatRounds;
 using FF.Articles.Backend.Common.ApiDtos;
 using FF.Articles.Backend.Common.Exceptions;
 using FF.Articles.Backend.Common.Responses;

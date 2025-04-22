@@ -3,7 +3,7 @@ import { Avatar, Typography, Divider } from 'antd'
 import { UserOutlined, RobotOutlined } from '@ant-design/icons'
 import Markdown from './Markdown'
 import { storage } from '@/stores/storage'
-import { useChat } from '@/app/aichat/context/ChatContext'
+import { useChat } from '@/app/(aigroup)/aichat/context/ChatContext'
 
 const setOpenSettingWindow = (type: string) => console.log('Open settings:', type)
 
@@ -15,16 +15,16 @@ interface MessageProps {
 
 export default function Message(props: MessageProps) {
     const { chatRound, collapseThreshold, displayMode = 'both' } = props
-    
+
     // Get settings from context
     const displaySettings = storage.getChatDisplaySettings();
     const { isGenerating, session } = useChat();
-    
+
     // Determine if this is the latest message
-    const isLatestMessage = session.rounds && 
-        session.rounds.length > 0 && 
+    const isLatestMessage = session.rounds &&
+        session.rounds.length > 0 &&
         session.rounds[session.rounds.length - 1].chatRoundId === chatRound.chatRoundId;
-    
+
     // Force rerender when generation completes for the latest message
     const [, forceUpdate] = useState({});
     useEffect(() => {
@@ -33,25 +33,25 @@ export default function Message(props: MessageProps) {
             forceUpdate({});
         }
     }, [isGenerating, isLatestMessage]);
-    
+
     // Determine if the message is inactive
     const isInactive = !chatRound.isActive;
-    
+
     // Get user and assistant content
     const userContent = chatRound.userMessage || "";
     const assistantContent = chatRound.assistantMessage || "";
-    
+
     // Only apply collapse if the feature is enabled
     const shouldUseCollapse = displaySettings.enableCollapsibleMessages && collapseThreshold !== undefined;
-    const assistantNeedsCollapse = shouldUseCollapse && 
-        assistantContent.length > collapseThreshold && 
+    const assistantNeedsCollapse = shouldUseCollapse &&
+        assistantContent.length > collapseThreshold &&
         assistantContent.length - collapseThreshold > 50;
-    
+
     // Collapse state for user and assistant messages
     const [isAssistantCollapsed, setIsAssistantCollapsed] = useState(assistantNeedsCollapse);
 
     const ref = useRef<HTMLDivElement>(null)
-    
+
     // Update collapse state when collapsible setting changes
     useEffect(() => {
         setIsAssistantCollapsed(assistantNeedsCollapse);
@@ -59,14 +59,14 @@ export default function Message(props: MessageProps) {
 
     // Prepare metadata tips for assistant message
     const tips: string[] = []
-    if (displaySettings.showTokenUsed && !isGenerating) {
+    if (displaySettings.showTokenUsed && !(isGenerating && isLatestMessage)) {
         tips.push(`tokens: input ${chatRound.promptTokens} output ${chatRound.completionTokens}`);
     }
     if (displaySettings.showModelName) {
         tips.push(`model: ${chatRound.model || 'unknown'}`);
     }
-    if (displaySettings.showTimeTaken && !isGenerating) {
-        tips.push(`time: ${Math.round(chatRound.timeTaken/1000)}s`);
+    if (displaySettings.showTimeTaken && !(isGenerating && isLatestMessage)) {
+        tips.push(`time: ${Math.round(chatRound.timeTaken / 1000)}s`);
     }
     if (displaySettings.showMessageTimestamp) {
         tips.push(`${new Date(chatRound.updateTime).toLocaleString()}`);
@@ -84,7 +84,7 @@ export default function Message(props: MessageProps) {
 
     // Format content for display
     let formattedUserContent = userContent;
-    
+
     let formattedAssistantContent = assistantContent;
     if (isGenerating) {
         formattedAssistantContent += '...';
@@ -110,7 +110,7 @@ export default function Message(props: MessageProps) {
                     Inactive
                 </div>
             )}
-            
+
             {/* User Message - Only show if in 'user' or 'both' display mode */}
             {(displayMode === 'user' || displayMode === 'both') && (
                 <div className="flex items-start py-2 flex-row-reverse">
@@ -154,7 +154,7 @@ export default function Message(props: MessageProps) {
                     </div>
                 </div>
             )}
-            
+
             {/* Divider between messages */}
             <Divider className="my-1" style={{ borderColor: '#f0f0f0' }} />
         </div>
