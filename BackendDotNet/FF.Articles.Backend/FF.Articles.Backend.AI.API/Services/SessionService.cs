@@ -1,7 +1,6 @@
 using FF.Articles.Backend.Common.Bases;
 using FF.Articles.Backend.AI.API.Models.Entities;
 using FF.Articles.Backend.AI.API.Models.Dtos;
-using FF.Articles.Backend.AI.API.Models.Requests.Chats;
 using FF.Articles.Backend.AI.API.Interfaces.Services;
 using FF.Articles.Backend.AI.API.Interfaces.Repositories;
 using FF.Articles.Backend.AI.API.Infrastructure;
@@ -9,6 +8,7 @@ using FF.Articles.Backend.AI.API.Interfaces.Services.RemoteServices;
 using FF.Articles.Backend.Common.Utils;
 using FF.Articles.Backend.AI.API.MapperExtensions.Chats;
 using FF.Articles.Backend.Common.Exceptions;
+using FF.Articles.Backend.AI.API.Models.Requests.Sessions;
 namespace FF.Articles.Backend.AI.API.Services;
 
 public class SessionService(

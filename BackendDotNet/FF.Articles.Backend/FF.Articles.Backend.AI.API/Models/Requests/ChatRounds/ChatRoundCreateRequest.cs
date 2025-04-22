@@ -1,6 +1,6 @@
 using FF.AI.Common.Constants;
 
-namespace FF.Articles.Backend.AI.API.Models.Requests.Chats;
+namespace FF.Articles.Backend.AI.API.Models.Requests.ChatRounds;
 
 public class ChatRoundCreateRequest
 {

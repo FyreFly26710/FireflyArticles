@@ -1,7 +1,6 @@
 using FF.Articles.Backend.Common.Bases;
 using FF.Articles.Backend.AI.API.Models.Entities;
 using FF.Articles.Backend.AI.API.Models.Dtos;
-using FF.Articles.Backend.AI.API.Models.Requests.Chats;
 using FF.Articles.Backend.AI.API.Infrastructure;
 using FF.Articles.Backend.AI.API.Interfaces.Services;
 using FF.Articles.Backend.AI.API.Interfaces.Repositories;
@@ -20,6 +19,7 @@ using FF.AI.Common.Interfaces;
 using FF.AI.Common.Models;
 using FF.AI.Common.Providers;
 using FF.AI.Common.Constants;
+using FF.Articles.Backend.AI.API.Models.Requests.ChatRounds;
 
 namespace FF.Articles.Backend.AI.API.Services;
 

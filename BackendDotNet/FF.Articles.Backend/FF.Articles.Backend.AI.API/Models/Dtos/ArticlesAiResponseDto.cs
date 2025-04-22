@@ -1,7 +1,7 @@
 using System;
 using System.Text.Json.Serialization;
 
-namespace FF.Articles.Backend.AI.API.Models.AiDtos;
+namespace FF.Articles.Backend.AI.API.Models.Dtos;
 public class ArticlesAIResponseDto
 {
     public List<AIGenArticleDto> Articles { get; set; } = new();

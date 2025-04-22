@@ -1,6 +1,6 @@
 using System;
 
-namespace FF.Articles.Backend.AI.API.Models.Requests.Chats;
+namespace FF.Articles.Backend.AI.API.Models.Requests.Sessions;
 
 public class SessionQueryRequest
 {

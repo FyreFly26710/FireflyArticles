@@ -1,7 +1,4 @@
-using System;
 using FF.Articles.Backend.AI.API.Interfaces.Services.RemoteServices;
-using FF.Articles.Backend.AI.API.MapperExtensions;
-using FF.Articles.Backend.AI.API.Models.AiDtos;
 using FF.Articles.Backend.Common.ApiDtos;
 using FF.Articles.Backend.Common.Constants;
 using FF.Articles.Backend.Common.Exceptions;

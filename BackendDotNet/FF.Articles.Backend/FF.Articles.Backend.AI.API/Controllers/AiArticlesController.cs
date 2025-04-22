@@ -1,6 +1,6 @@
-using FF.Articles.Backend.AI.API.Interfaces;
+using FF.Articles.Backend.AI.API.Interfaces.Services;
 using FF.Articles.Backend.AI.API.Interfaces.Services.RemoteServices;
-using FF.Articles.Backend.AI.API.Models.AiDtos;
+using FF.Articles.Backend.AI.API.Models.Dtos;
 using FF.Articles.Backend.AI.API.Models.Requests.ArticleGenerations;
 using FF.Articles.Backend.Common.ApiDtos;
 using FF.Articles.Backend.Common.Constants;

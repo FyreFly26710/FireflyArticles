@@ -4,7 +4,7 @@ using FF.Articles.Backend.Contents.API.Interfaces.Repositories.V1;
 using FF.Articles.Backend.Contents.API.Interfaces.Repositories.V2;
 using Microsoft.EntityFrameworkCore;
 
-namespace FF.Articles.Backend.Contents.API.Infrastructure.Migrations;
+namespace FF.Articles.Backend.Contents.API.Infrastructure;
 
 public class ContentsDbSeed : IDbSeeder<ContentsDbContext>
 {
