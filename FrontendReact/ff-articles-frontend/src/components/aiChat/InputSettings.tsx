@@ -131,7 +131,7 @@ const InputSettings: React.FC<InputSettingsProps> = ({ visible }) => {
               dropdownStyle={{ maxHeight: '300px', overflow: 'auto' }}
               listHeight={300}
               loading={isLoading}
-              disabled={isLoading || providers.length === 0}
+              disabled={isLoading}
             >
               {providers.map(provider => (
                 provider.models.map(model => (

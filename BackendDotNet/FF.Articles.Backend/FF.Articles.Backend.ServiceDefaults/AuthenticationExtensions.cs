@@ -62,10 +62,12 @@ public static class AuthenticationExtensions
                            .AllowAnyMethod()
                            .WithOrigins(
                                 "http://localhost:3000",
-                                "http://localhost:21000",
-                                "http://localhost:22000",
-                                "http://localhost:23000",
-                                "http://localhost:24000")
+                                // "http://localhost:21000",
+                                // "http://localhost:22000",
+                                // "http://localhost:23000",
+                                // "http://localhost:24000",
+                                "http://90.241.0.203:8443"
+                                )
                            .AllowCredentials();
                 });
         });

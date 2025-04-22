@@ -31,6 +31,9 @@ services:
       - ReverseProxy__Clusters__identityCluster__Destinations__destination1__Address=http://127.0.0.1:22000
       - ReverseProxy__Clusters__aiCluster__Destinations__destination1__Address=http://127.0.0.1:24000
       - DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
+      # AI Services
+      - DeepSeek__ApiKey=sk-a63f33e0571547789e392edb9d325da6
+      - Ollama__ApiUrl=http://firefly-26711.duckdns.org:11435
     networks:
       - fireflynet
     depends_on:

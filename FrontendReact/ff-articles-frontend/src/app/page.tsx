@@ -1,41 +1,31 @@
-import { Divider, Flex } from "antd";
+"use client";
+import { Divider, Flex, Spin } from "antd";
 import Title from "antd/es/typography/Title";
 import Link from "antd/es/typography/Link";
 import TopicList from "@/components/article/TopicList";
 import ArticleList from "@/components/article/ArticleList";
-import { apiTopicGetByPage } from "@/api/contents/api/topic";
-import { apiArticleGetByPage } from "@/api/contents/api/article";
+import { useHomePageData } from "./hooks";
 
-export const dynamic = 'force-dynamic';
+export default function HomePage() {
+    const { topicList, articleList, loading, error } = useHomePageData();
 
-export default async function HomePage() {
-    let topicList: any = [];
-    let articleList: any = [];
-    try {
-        const res = await apiTopicGetByPage({
-            PageSize: 12,
-            IncludeContent: false,
-            IncludeArticles: false,
-            IncludeSubArticles: false,
-            IncludeUser: false,
-        });
-        topicList = res.data?.data ?? [];
-    } catch (e: any) {
-        console.error("Failed fetching topics, " + e.message);
+    if (loading) {
+        return (
+            <div className="flex justify-center items-center h-screen">
+                <Spin size="large" />
+            </div>
+        );
     }
 
-    try {
-        const res = await apiArticleGetByPage({
-            PageSize: 10,
-            IncludeContent: false,
-            IncludeSubArticles: false,
-            IncludeUser: false,
-            DisplaySubArticles: false,
-        });
-        articleList = res.data?.data ?? [];
-    } catch (e: any) {
-        console.error("Failed fetching articles, " + e.message);
+    if (error) {
+        return (
+            <div className="max-width-content">
+                <Title level={3}>Error Loading Data</Title>
+                <p>Failed to load homepage data. Please try again later.</p>
+            </div>
+        );
     }
+
     return (
         <div id="homePage" className="max-width-content">
             <Flex justify="space-between" align="center">
@@ -49,7 +39,6 @@ export default async function HomePage() {
                 <Link href={"/articles"}>Get more</Link>
             </Flex>
             <ArticleList articleList={articleList} />
-
         </div>
     );
 }

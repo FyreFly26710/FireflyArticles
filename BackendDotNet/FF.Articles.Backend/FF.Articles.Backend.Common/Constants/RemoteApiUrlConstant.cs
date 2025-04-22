@@ -1,9 +1,9 @@
 ﻿namespace FF.Articles.Backend.Common.Constants;
 public static class RemoteApiUrlConstant
 {
-    public const string IdentityBaseUrl = "https://localhost:22000";
-    public const string ContentsBaseUrl = "https://localhost:23000";
-    public const string AIBaseUrl = "https://localhost:24000";
+    public const string IdentityBaseUrl = "http://localhost:22000";
+    public const string ContentsBaseUrl = "http://localhost:23000";
+    public const string AIBaseUrl = "http://localhost:24000";
     /// <summary>
     /// identityApi/api/identity/admin/get-dto/{userId}
     /// </summary>

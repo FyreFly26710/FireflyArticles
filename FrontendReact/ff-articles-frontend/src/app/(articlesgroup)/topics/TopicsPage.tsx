@@ -1,8 +1,8 @@
+"use client";
 import Title from "antd/es/typography/Title";
 import TopicList from "@/components/article/TopicList";
-import { apiTopicGetByPage } from "@/api/contents/api/topic";
-import { Divider } from "antd";
-
+import { Divider, Spin } from "antd";
+import { useTopics } from "./hooks";
 
 // Define category order (lower number = higher priority)
 const CATEGORY_ORDER: Record<string, number> = {
@@ -16,18 +16,25 @@ function compareCategories(a: string, b: string): number {
     return orderA === orderB ? a.localeCompare(b) : orderA - orderB;
 }
 
-export const dynamic = 'force-dynamic';
-
-const TopicsPage = async () => {
+const TopicsPage = () => {
     const pageSize = 200;
-    let topicList: API.TopicDto[] = [];
-    try {
-        const res = await apiTopicGetByPage({
-            PageSize: pageSize,
-        });
-        topicList = res.data?.data ?? [];
-    } catch (e: any) {
-        console.error("Failed fetching topics, " + e.message);
+    const { topicList, loading, error } = useTopics(pageSize);
+
+    if (loading) {
+        return (
+            <div className="flex justify-center items-center h-screen">
+                <Spin size="large" />
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="max-width-content">
+                <Title level={3}>Error Loading Topics</Title>
+                <p>Failed to load topics. Please try again later.</p>
+            </div>
+        );
     }
 
     // Group topics by category

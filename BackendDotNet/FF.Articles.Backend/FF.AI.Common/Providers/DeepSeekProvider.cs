@@ -11,10 +11,10 @@ public class DeepSeekProvider : IProvider
     public DeepSeekProvider(IConfiguration configuration)
     {
         _apiUrl = configuration["DeepSeek:ApiKey"];
-        _baseUrl = configuration["DeepSeek:ApiUrl"] ?? "https://api.deepseek.com/v1/";
+        _baseUrl = configuration["DeepSeek:ApiUrl"] ?? "https://api.deepseek.com/v1";
     }
     public string ProviderName => ProviderList.DeepSeek;
-    public string ChatEndpoint => _baseUrl + "chat/completions";
+    public string ChatEndpoint => _baseUrl + "/chat/completions";
     public string? ApiKey => _apiUrl;
-    public string? ListModelsEndpoint => _baseUrl + "models";
+    public string? ListModelsEndpoint => _baseUrl + "/models";
 }

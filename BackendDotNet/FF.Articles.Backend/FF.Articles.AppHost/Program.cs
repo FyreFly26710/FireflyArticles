@@ -32,7 +32,7 @@ var identityDb = postgres.AddDatabase("identitydb");
 var contentDb = postgres.AddDatabase("contentdb");
 var aidb = postgres.AddDatabase("aidb");
 
-var launchProfileName = "https";
+var launchProfileName = "http";
 
 // Services
 builder.AddProject<Projects.FF_Articles_Backend_Identity_API>("identity-api", launchProfileName)
