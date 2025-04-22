@@ -2,8 +2,8 @@
 import { PageContainer, ProTable } from "@ant-design/pro-components";
 import { Button } from "antd";
 import React from "react";
-import { getTopicColumns } from "@/app/admin/utils/topicColumns";
-import { useTopicAdmin } from "@/app/admin/utils/useTopicAdmin";
+import { getTopicColumns } from "@/app/(admingroup)/admin/topic/topicColumns";
+import { useTopicAdmin } from "@/app/(admingroup)/admin/topic/useTopicAdmin";
 import CreateTopicModal from "@/components/admin/CreateTopicModal";
 import UpdateTopicModal from "@/components/admin/UpdateTopicModal";
 

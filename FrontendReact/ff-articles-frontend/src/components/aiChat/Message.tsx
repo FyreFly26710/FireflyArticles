@@ -3,7 +3,7 @@ import { Avatar, Typography, Divider } from 'antd'
 import { UserOutlined, RobotOutlined } from '@ant-design/icons'
 import Markdown from './Markdown'
 import { storage } from '@/stores/storage'
-import { useChat } from '@/app/aichat/context/ChatContext'
+import { useChat } from '@/app/(aigroup)/aichat/context/ChatContext'
 
 const setOpenSettingWindow = (type: string) => console.log('Open settings:', type)
 

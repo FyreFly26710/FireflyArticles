@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import Message from './Message'
-import { useChat } from '@/app/aichat/context/ChatContext'
+import { useChat } from '@/app/(aigroup)/aichat/context/ChatContext'
 import { storage, ChatDisplaySettings } from '@/stores/storage'
 
 export default function MessageList() {
