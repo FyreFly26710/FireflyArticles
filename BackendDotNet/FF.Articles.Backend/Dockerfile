@@ -17,7 +17,6 @@ RUN dotnet restore "FF.Articles.Backend.Identity.API/FF.Articles.Backend.Identit
 RUN dotnet restore "FF.Articles.Backend.Contents.API/FF.Articles.Backend.Contents.API.csproj"
 RUN dotnet restore "FF.Articles.Backend.AI.API/FF.Articles.Backend.AI.API.csproj"
 
-# Copy everything else
 COPY . .
 
 # Build and publish each service
@@ -26,13 +25,35 @@ RUN dotnet publish "FF.Articles.Backend.Identity.API/FF.Articles.Backend.Identit
 RUN dotnet publish "FF.Articles.Backend.Contents.API/FF.Articles.Backend.Contents.API.csproj" -c Release -o /app/contents
 RUN dotnet publish "FF.Articles.Backend.AI.API/FF.Articles.Backend.AI.API.csproj" -c Release -o /app/ai
 
-# Create the runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 
-# Install required tools
-RUN apt-get update && apt-get install -y curl net-tools
+# Set environment variables
+ENV ASPNETCORE_ENVIRONMENT=Production \
+    ASPNETCORE_URLS=http://+:21000 \
+    ConnectionStrings__identitydb="Host=postgres;Port=5432;Username=postgres;Password=postgres;Database=identitydb;Trust Server Certificate=True;" \
+    ConnectionStrings__contentdb="Host=postgres;Port=5432;Username=postgres;Password=postgres;Database=contentdb;Trust Server Certificate=True;" \
+    ConnectionStrings__aidb="Host=postgres;Port=5432;Username=postgres;Password=postgres;Database=aidb;Trust Server Certificate=True;" \
+    ConnectionStrings__redis="redis:6379" \
+    # AllowedOrigins__0="http://localhost:3000" \
+    # YARP Route Configuration
+    ReverseProxy__Routes__contents-route__ClusterId=contentsCluster \
+    ReverseProxy__Routes__contents-route__Match__Path="/api/contents/{**catch-all}" \
+    ReverseProxy__Routes__identity-route__ClusterId=identityCluster \
+    ReverseProxy__Routes__identity-route__Match__Path="/api/identity/{**catch-all}" \
+    ReverseProxy__Routes__ai-route__ClusterId=aiCluster \
+    ReverseProxy__Routes__ai-route__Match__Path="/api/ai/{**catch-all}" \
+    # YARP Cluster Configuration
+    ReverseProxy__Clusters__contentsCluster__Destinations__destination1__Address="http://127.0.0.1:23000" \
+    ReverseProxy__Clusters__identityCluster__Destinations__destination1__Address="http://127.0.0.1:22000" \
+    ReverseProxy__Clusters__aiCluster__Destinations__destination1__Address="http://127.0.0.1:24000" \
+    DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1 \
+    # GmailOAuth__ClientId="xxx" \
+    # GmailOAuth__ClientSecret="xxxx" \
+    # GmailOAuth__RedirectUri="http://localhost:21000/api/identity/auth/signin-google"
+    # AI Services
+    # DeepSeek__ApiKey="sk-a63f33e0571547789e392edb9d325da6" \
+    Ollama__ApiUrl="http://host.docker.internal:11434"
 
-# Copy published apps to the final image
 WORKDIR /app/gateway
 COPY --from=build /app/gateway .
 
@@ -53,5 +74,4 @@ RUN chmod +x /app/start.sh
 # Expose the gateway port
 EXPOSE 21000
 
-# Start all services via the script
 CMD ["/app/start.sh"] 

@@ -1,4 +1,5 @@
 using System;
+using FF.AI.Common.Constants;
 
 namespace FF.AI.Common.Models;
 
@@ -8,6 +9,19 @@ public class ChatResponse
     public Message? Message { get; set; }
     public string? Event { get; set; }
     public ExtraInfo? ExtraInfo { get; set; }
+
+    public ChatResponse()
+    {
+        Message = new Message();
+        Event = ChatEvent.Finish;
+        ExtraInfo = new ExtraInfo();
+    }
+    public ChatResponse(Message message, string @event, ExtraInfo extraInfo)
+    {
+        Message = message;
+        Event = @event;
+        ExtraInfo = extraInfo;
+    }
 }
 
 public class ExtraInfo

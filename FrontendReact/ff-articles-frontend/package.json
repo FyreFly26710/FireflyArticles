@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "cross-env NODE_TLS_REJECT_UNAUTHORIZED=0 NEXT_PUBLIC_CONFIG=development next dev",
+    "prod": "cross-env NODE_TLS_REJECT_UNAUTHORIZED=0 NEXT_PUBLIC_CONFIG=production NEXT_PUBLIC_BASE_URL=http://localhost:21000/ next dev",
     "build": "cross-env NEXT_PUBLIC_CONFIG=production next build",
     "start": "next start"
   },

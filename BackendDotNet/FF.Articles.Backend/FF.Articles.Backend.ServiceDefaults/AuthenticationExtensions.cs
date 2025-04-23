@@ -10,6 +10,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace FF.Articles.Backend.ServiceDefaults;
 public static class AuthenticationExtensions
@@ -53,6 +55,19 @@ public static class AuthenticationExtensions
     }
     public static WebApplicationBuilder AddCustomCors(this WebApplicationBuilder builder)
     {
+        var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>() ?? [];
+
+        var defaultOrigins = new[]
+        {
+            "http://localhost:3000",
+            "http://localhost:21000",
+            "http://localhost:22000",
+            "http://localhost:23000",
+            "http://localhost:24000",
+        };
+
+        string[] originsToUse = [.. allowedOrigins, .. defaultOrigins];
+
         builder.Services.AddCors(options =>
         {
             options.AddPolicy("AllowedOrigins",
@@ -60,17 +75,11 @@ public static class AuthenticationExtensions
                 {
                     builder.AllowAnyHeader()
                            .AllowAnyMethod()
-                           .WithOrigins(
-                                "http://localhost:3000",
-                                // "http://localhost:21000",
-                                // "http://localhost:22000",
-                                // "http://localhost:23000",
-                                // "http://localhost:24000",
-                                "http://90.241.0.203:8443"
-                                )
+                           .WithOrigins(originsToUse)
                            .AllowCredentials();
                 });
         });
+
         return builder;
     }
     public static void AddCookieAuthMiddleware(this WebApplication app)

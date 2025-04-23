@@ -29,6 +29,30 @@
                 "!**/node_modules/**"
             ],
             "sourceMaps": true
+        },
+        {
+            "name": "Next.js Prod",
+            "type": "node",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/FrontendReact/ff-articles-frontend",
+            "program": "${workspaceFolder}/FrontendReact/ff-articles-frontend/node_modules/next/dist/bin/next",
+            "args": [
+                "dev"
+            ],
+            "env": {
+                "NODE_TLS_REJECT_UNAUTHORIZED": "0",
+                "NEXT_PUBLIC_CONFIG": "production",
+                "NEXT_PUBLIC_BASE_URL": "http://localhost:21000"
+            },
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "console": "integratedTerminal",
+            "resolveSourceMapLocations": [
+                "${workspaceFolder}/**",
+                "!**/node_modules/**"
+            ],
+            "sourceMaps": true
         }
     ]
 }

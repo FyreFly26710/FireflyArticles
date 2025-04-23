@@ -4,7 +4,6 @@ import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 const DevBaseUrl = "https://localhost:21000";
 const ProdBaseUrl = process.env.NEXT_PUBLIC_BASE_URL?.replace(/\/$/, '');
 const url = ProdBaseUrl ?? DevBaseUrl;
-
 // Default timeout (in milliseconds)
 const DEFAULT_TIMEOUT = 20 * 1000;
 
@@ -18,7 +17,9 @@ const axiosInstance = axios.create({
 // request interceptors
 axiosInstance.interceptors.request.use(
     function (config) {
-        console.log("request interceptors: ", config);
+        if (!ProdBaseUrl) {
+            console.log("request interceptors: ", config);
+        }
         return config;
     },
     function (error) {

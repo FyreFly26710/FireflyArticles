@@ -25,13 +25,22 @@ public class DeepSeekAssistant : BaseAssistant, IAssistant<DeepSeekProvider>
         var content = new StringContent(JsonSerializer.Serialize(deepSeekRequest, _jsonSerializerOptions), Encoding.UTF8, "application/json");
 
         var response = await _httpClient.PostAsync(_provider.ChatEndpoint, content, cancellationToken);
-        if (!response.IsSuccessStatusCode) throw new Exception(await response.Content.ReadAsStringAsync());
-
         var resContent = await response.Content.ReadAsStringAsync();
-        if (string.IsNullOrWhiteSpace(resContent)) throw new Exception("empty response");
+
+        if (!response.IsSuccessStatusCode)
+        {
+            return new ChatResponse(Message.Assistant(resContent), ChatEvent.Finish, extraInfo);
+        }
+        if (string.IsNullOrWhiteSpace(resContent))
+        {
+            return new ChatResponse(Message.Assistant("invalid response"), ChatEvent.Finish, extraInfo);
+        }
 
         var deepSeekResponse = JsonSerializer.Deserialize<DeepSeekResponse>(resContent, _jsonSerializerOptions);
-        if (deepSeekResponse is null) throw new Exception("invalid response");
+        if (deepSeekResponse is null)
+        {
+            return new ChatResponse(Message.Assistant("invalid response"), ChatEvent.Finish, extraInfo);
+        }
 
         extraInfo.InputTokens = deepSeekResponse.Usage?.PromptTokens;
         extraInfo.OutputTokens = deepSeekResponse.Usage?.CompletionTokens;
@@ -175,7 +184,12 @@ public class DeepSeekAssistant : BaseAssistant, IAssistant<DeepSeekProvider>
         var response = await _httpClient.GetAsync(_provider.ListModelsEndpoint, cancellationToken);
         if (!response.IsSuccessStatusCode)
         {
-            throw new Exception(response.ReasonPhrase);
+            return new ChatProvider()
+            {
+                ProviderName = _provider.ProviderName,
+                Models = [],
+                IsAvailable = false
+            };
         }
         var content = await response.Content.ReadAsStringAsync(cancellationToken);
         using var document = JsonDocument.Parse(content);

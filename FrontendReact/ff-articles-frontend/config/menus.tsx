@@ -13,7 +13,7 @@ const menus = [
     },
     {
         path: "/articles",
-        name: "Articles",
+        name: "Article",
     },
     {
         path: "/aichat",
