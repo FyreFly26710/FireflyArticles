@@ -31,10 +31,7 @@ builder.AddRedisClient("redis");
 
 
 builder.AddServiceDefaults();
-builder.Services.AddHttpClient<IContentsApiRemoteService, ContentsApiRemoteService>(client =>
-{
-    client.BaseAddress = new Uri(RemoteApiUrlConstant.ContentsBaseUrl);
-});
+builder.Services.AddHttpClient<IContentsApiRemoteService, ContentsApiRemoteService>();
 builder.Services.AddMigration<AIDbContext>();
 
 builder.Services.AddScoped<IAIDbContextUnitOfWork, UnitOfWork>();

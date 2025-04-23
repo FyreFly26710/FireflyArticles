@@ -1,7 +1,8 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 
-const DevBaseUrl = "http://localhost:21000/";
-const ProdBaseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+// Dev uses https, Prod (docker) uses http
+const DevBaseUrl = "https://localhost:21000";
+const ProdBaseUrl = process.env.NEXT_PUBLIC_BASE_URL?.replace(/\/$/, '');
 const url = ProdBaseUrl ?? DevBaseUrl;
 
 // Default timeout (in milliseconds)
@@ -17,6 +18,7 @@ const axiosInstance = axios.create({
 // request interceptors
 axiosInstance.interceptors.request.use(
     function (config) {
+        console.log("request interceptors: ", config);
         return config;
     },
     function (error) {
@@ -51,3 +53,4 @@ function request<T = any>(url: string, config?: AxiosRequestConfig): Promise<T> 
 
 // For backward compatibility with existing API usage
 export default request;
+export { url };

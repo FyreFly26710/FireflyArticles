@@ -5,10 +5,27 @@ using FF.Articles.Backend.Common.Exceptions;
 using FF.Articles.Backend.Common.Responses;
 using FF.Articles.Backend.Common.Utils;
 using System.Net.Http.Headers;
+
 namespace FF.Articles.Backend.AI.API.Services.RemoteServices;
 
-public class ContentsApiRemoteService(HttpClient _httpClient, ITokenService _tokenService, ILogger<ContentsApiRemoteService> _logger) : IContentsApiRemoteService
+public class ContentsApiRemoteService : IContentsApiRemoteService
 {
+    private readonly HttpClient _httpClient;
+    private readonly ITokenService _tokenService;
+    private readonly ILogger<ContentsApiRemoteService> _logger;
+
+    public ContentsApiRemoteService(
+        HttpClient httpClient,
+        ITokenService tokenService,
+        ILogger<ContentsApiRemoteService> logger)
+    {
+        _httpClient = httpClient;
+        _tokenService = tokenService;
+        _logger = logger;
+
+        // Update base address with environment-aware URL
+        _httpClient.BaseAddress = new Uri(RemoteApiUrlConstant.GetContentsBaseUrl());
+    }
 
     public async Task<long> AddArticleAsync(ArticleApiAddRequest payload)
     {
@@ -45,10 +62,13 @@ public class ContentsApiRemoteService(HttpClient _httpClient, ITokenService _tok
     }
     private HttpRequestMessage CreateHttpRequestMessage(HttpMethod method, string url, object payload, UserApiDto user)
     {
-        var requestMessage = new HttpRequestMessage(method, url) { Content = JsonContent.Create(payload) };
+        var requestMessage = new HttpRequestMessage(method, url);
+        if (payload != null)
+        {
+            requestMessage.Content = JsonContent.Create(payload);
+        }
         var adminToken = _tokenService.GenerateApiToken(user);
         requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", adminToken);
         return requestMessage;
     }
-
 }

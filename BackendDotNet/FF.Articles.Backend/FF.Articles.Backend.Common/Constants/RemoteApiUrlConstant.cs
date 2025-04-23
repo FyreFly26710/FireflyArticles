@@ -1,15 +1,19 @@
-﻿namespace FF.Articles.Backend.Common.Constants;
+﻿using System;
+
+namespace FF.Articles.Backend.Common.Constants;
 public static class RemoteApiUrlConstant
 {
-    public const string IdentityBaseUrl = "http://localhost:22000";
-    public const string ContentsBaseUrl = "http://localhost:23000";
-    public const string AIBaseUrl = "http://localhost:24000";
     /// <summary>
-    /// identityApi/api/identity/admin/get-dto/{userId}
+    /// Only run production in docker
     /// </summary>
+    private static bool IsProduction() => Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true";
+    private static string GetBasePort() => IsProduction() ? "http://127.0.0.1:" : "https://localhost:";
+
+    public static string GetIdentityBaseUrl() => $"{GetBasePort()}22000";
+    public static string GetContentsBaseUrl() => $"{GetBasePort()}23000";
+    public static string GetAIBaseUrl() => $"{GetBasePort()}24000";
     public static string GetUserApiDtoById(long userId) => $"/api/identity/users/{userId}";
     public static string ArticleUrl() => $"/api/contents/articles";
-    //public static string ArticleBatchEditContentUrl() => ContentsBaseUrl + $"/api/contents/articles/content/batch";
     public static string TopicUrl() => $"/api/contents/topics";
 }
 

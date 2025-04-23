@@ -1,10 +1,6 @@
 /* eslint-disable */
-import request from "@/libs/request";
+import request, { url } from "@/libs/request";
 
-// Import the base URL configuration
-const DevBaseUrl = "https://localhost:21000/";
-const ProdBaseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-const baseUrl = ProdBaseUrl ?? DevBaseUrl;
 
 /** POST /api/ai/chat-rounds */
 export async function apiChatRoundAddByRequest(
@@ -39,8 +35,14 @@ export function apiChatRoundStreamResponse(
   const controller = new AbortController();
   console.log("Streaming request started");
 
+  // Ensure we don't have double slashes in the URL
+  const baseUrl = url.endsWith('/') ? url.slice(0, -1) : url;
+  const streamUrl = `${baseUrl}/api/ai/chat-rounds/stream`;
+
+  console.log("Using stream URL:", streamUrl);
+
   // Make a fetch request to the streaming endpoint
-  fetch(`${baseUrl}api/ai/chat-rounds/stream`, {
+  fetch(streamUrl, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
