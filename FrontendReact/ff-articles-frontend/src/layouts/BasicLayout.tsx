@@ -60,6 +60,7 @@ export default function BasicLayout({ children }: Props) {
         <div id="basicLayout">
             <ProLayout
                 title="FireFly Articles"
+                // todo: change to side layout
                 layout="top"
                 fixedHeader
                 fixSiderbar

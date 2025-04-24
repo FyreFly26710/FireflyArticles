@@ -51,7 +51,7 @@ export default function ArticleSider({ topic, parentArticleId, articleId }: Arti
                     />
                 </ConfigProvider>
                 <div style={{ margin: "auto 20px 20px 20px", textAlign: "right", fontSize: "16px" }}>
-                    <Link href={`/topic/${topic.topicId}/new?redirectId=${articleId !== undefined ? articleId : 0}`} style={{ color: "GrayText" }}>
+                    <Link href={`/topic/${topic.topicId}/new?redirectId=0`} style={{ color: "GrayText" }}>
                         <PlusSquareOutlined /> New Page
                     </Link>
                 </div>

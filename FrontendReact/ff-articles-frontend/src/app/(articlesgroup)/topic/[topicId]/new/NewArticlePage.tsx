@@ -13,15 +13,16 @@ interface PageProps {
 
 const NewArticlePage = ({ params, searchParams }: PageProps) => {
     const { topicId } = params;
-    const redirectId = searchParams?.redirectId ? Number(searchParams.redirectId) : undefined;
-    const router = useRouter();
+    // const redirectId = searchParams?.redirectId ? Number(searchParams.redirectId) : undefined;
+    const redirectId = 0;
+    // const router = useRouter();
 
     // Redirect if no redirectId is provided
-    useEffect(() => {
-        if (!redirectId) {
-            router.push('/error');
-        }
-    }, [redirectId, router]);
+    // useEffect(() => {
+    //     if (!redirectId) {
+    //         router.push('/error');
+    //     }
+    // }, [redirectId, router]);
 
     const { topic, loading: topicLoading, error: topicError } = useTopic(topicId);
     const { topicList, loading: topicListLoading } = useTopicList();
@@ -39,10 +40,6 @@ const NewArticlePage = ({ params, searchParams }: PageProps) => {
 
     if (topicError || !topic) {
         return <div>Failed fetching topic, please refresh page.</div>;
-    }
-
-    if (!redirectId) {
-        return null; // Will be redirected by useEffect
     }
 
     const nextSortNumber = (topic.articles && topic.articles.length > 0)

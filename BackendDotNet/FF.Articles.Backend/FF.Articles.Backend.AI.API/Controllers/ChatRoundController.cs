@@ -48,20 +48,14 @@ public class ChatRoundController(IChatRoundService chatRoundService) : Controlle
             var errorMessage = $"event: {SseEvent.Error}\ndata: {JsonSerializer.Serialize(new { message = ex.Message })}\n\n";
             await Response.WriteAsync(errorMessage, cancellationToken);
             await Response.Body.FlushAsync(cancellationToken);
-            throw ex;
+            throw;
         }
         finally
         {
             await Response.CompleteAsync();
         }
     }
-    // [HttpPut]
-    // public async Task<ApiResponse<ChatRoundDto>> UpdateByRequest([FromBody] ChatRoundReQueryRequest request, CancellationToken cancellationToken)
-    // {
-    //     await checkUserPermission(new List<long> { request.ChatRoundId });
-    //     var result = await chatRoundService.ReQueryChatRound(request, HttpContext.Request, cancellationToken);
-    //     return ResultUtil.Success(result);
-    // }
+
     [HttpPut("enable")]
     public async Task<ApiResponse<bool>> Enable([FromBody] List<long> ids)
     {

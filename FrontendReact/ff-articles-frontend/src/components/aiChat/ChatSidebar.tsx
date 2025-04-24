@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Anchor, Button, Checkbox, Dropdown, message, Modal } from 'antd';
-import { 
-  DoubleRightOutlined, 
+import {
+  DoubleRightOutlined,
   DoubleLeftOutlined,
-  DeleteOutlined, 
+  DeleteOutlined,
   StopOutlined,
   PlayCircleOutlined,
   MoreOutlined,
@@ -52,12 +52,12 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({ collapsed, toggleCollapsed })
   // Generate anchor items from chat rounds
   const anchorItems = session?.rounds?.map((round, index) => {
     // Truncate message for display
-    const messagePreview = round?.userMessage?.length > 25 
-      ? round.userMessage.substring(0, 25) + '...' 
+    const messagePreview = round?.userMessage?.length > 25
+      ? round.userMessage.substring(0, 25) + '...'
       : round?.userMessage || 'No message';
-      
+
     const isDisabled = !round?.isActive;
-    
+
     if (isModifyMode) {
       // When in modify mode, show checkboxes instead of anchors
       return {
@@ -134,7 +134,7 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({ collapsed, toggleCollapsed })
       message.warning('Please select at least one chat to enable');
       return;
     }
-    
+
     handleEnableChatRounds(selectedChatIds)
       .then(() => {
         message.success(`${selectedChatIds.length} chat(s) enabled`);
@@ -152,7 +152,7 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({ collapsed, toggleCollapsed })
       message.warning('Please select at least one chat to disable');
       return;
     }
-    
+
     handleDisableChatRounds(selectedChatIds)
       .then(() => {
         message.success(`${selectedChatIds.length} chat(s) disabled`);
@@ -170,7 +170,7 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({ collapsed, toggleCollapsed })
       message.warning('Please select at least one chat to delete');
       return;
     }
-    
+
     Modal.confirm({
       title: 'Delete chats',
       content: `Are you sure you want to delete ${selectedChatIds.length} chat(s)? This action cannot be undone.`,
@@ -215,8 +215,9 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({ collapsed, toggleCollapsed })
         onClick={toggleCollapsed}
         className="fixed z-10 transition-all duration-300"
         style={{
-          right: collapsed ? '0px' : '200px',
+          right: collapsed ? '0px' : '250px',
           top: '74px',
+          position: 'fixed'
         }}
       />
 
@@ -235,8 +236,8 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({ collapsed, toggleCollapsed })
           <div className="p-3 border-b border-gray-200 flex justify-between items-center">
             <h3 className="text-sm font-medium text-gray-700">Chats</h3>
             <div className="flex gap-2">
-              <Button 
-                size="small" 
+              <Button
+                size="small"
                 onClick={toggleModifyMode}
                 type={isModifyMode ? "primary" : "default"}
               >
@@ -251,9 +252,9 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({ collapsed, toggleCollapsed })
           {isModifyMode && (
             <div className="p-2 border-b border-gray-200 flex justify-between items-center">
               <span className="text-sm">{selectedChatIds.length} selected</span>
-              <Dropdown 
-                menu={{ items: dropdownItems }} 
-                trigger={['hover']} 
+              <Dropdown
+                menu={{ items: dropdownItems }}
+                trigger={['hover']}
                 placement="bottomRight"
                 disabled={selectedChatIds.length === 0}
               >
@@ -264,7 +265,7 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({ collapsed, toggleCollapsed })
             </div>
           )}
 
-          <div 
+          <div
             className="flex-1 overflow-y-auto p-2"
             ref={sidebarContentRef}
           >

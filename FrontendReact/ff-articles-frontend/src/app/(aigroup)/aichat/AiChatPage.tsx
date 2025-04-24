@@ -9,7 +9,7 @@ import { storage, LayoutSettings } from '@/stores/storage';
 
 export default function AiChatPage() {
   const [layoutSettings, setLayoutSettings] = useState<LayoutSettings>(() => storage.getLayoutSettings());
-  
+
   useEffect(() => {
     // Handler for storage changes from other tabs
     const handleStorageChange = (event: StorageEvent) => {
@@ -49,17 +49,17 @@ export default function AiChatPage() {
       <SessionSidebar />
 
       {/* Main content area */}
-      <main 
+      <main
         className="flex-1 flex flex-col bg-white transition-all duration-300"
-        style={{ 
+        style={{
           marginLeft: sidebarWidth,
           marginRight: rightSidebarWidth
         }}
       >
         {/* Chat container - handles positioning of both message list and input */}
-        <div 
-          className="fixed inset-0 bg-white" 
-          style={{ 
+        <div
+          className="fixed inset-0 bg-white"
+          style={{
             top: '64px', // Header height
             left: sidebarWidth,
             right: rightSidebarWidth,
@@ -69,19 +69,19 @@ export default function AiChatPage() {
           {/* Flexbox container for vertical layout */}
           <div className="relative h-full flex flex-col">
             {/* Message list container */}
-            <div 
-              className="flex-1 overflow-hidden" 
+            <div
+              className="flex-1 overflow-hidden"
               style={{ paddingBottom: '140px' }} // Make room for input box
             >
               <div className="h-full max-w-4xl mx-auto px-4 w-full">
                 <MessageList />
               </div>
             </div>
-            
+
             {/* Input box container */}
-            <div 
-              className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200" 
-              style={{ 
+            <div
+              className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200"
+              style={{
                 height: 'auto',
                 maxHeight: '400px',  // Allow more space for settings panel
                 transition: 'all 0.3s'
@@ -96,9 +96,9 @@ export default function AiChatPage() {
       </main>
 
       {/* Right Sidebar */}
-      <ChatSidebar 
-        collapsed={layoutSettings.rightSidebarCollapsed} 
-        toggleCollapsed={toggleRightSidebar} 
+      <ChatSidebar
+        collapsed={layoutSettings.rightSidebarCollapsed}
+        toggleCollapsed={toggleRightSidebar}
       />
     </div>
   );

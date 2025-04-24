@@ -4,7 +4,7 @@ import { UserOutlined, RobotOutlined } from '@ant-design/icons'
 import Markdown from './Markdown'
 import { storage } from '@/stores/storage'
 import { useChat } from '@/app/(aigroup)/aichat/context/ChatContext'
-
+import { DEFAULT_USER } from '@/constants/user'
 const setOpenSettingWindow = (type: string) => console.log('Open settings:', type)
 
 interface MessageProps {
@@ -15,6 +15,7 @@ interface MessageProps {
 
 export default function Message(props: MessageProps) {
     const { chatRound, collapseThreshold, displayMode = 'both' } = props
+    const user = storage.getUser() ?? DEFAULT_USER;
 
     // Get settings from context
     const displaySettings = storage.getChatDisplaySettings();
@@ -115,7 +116,7 @@ export default function Message(props: MessageProps) {
             {(displayMode === 'user' || displayMode === 'both') && (
                 <div className="flex items-start py-2 flex-row-reverse">
                     <Avatar
-                        icon={<UserOutlined />}
+                        src={user.userAvatar}
                         size={28}
                         className="cursor-pointer mt-1"
                         onClick={() => setOpenSettingWindow('chat')}

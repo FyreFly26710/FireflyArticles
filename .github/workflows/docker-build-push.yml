@@ -96,7 +96,7 @@ jobs:
           push: true
           tags: |
             firefly26710/ffarticles-backend:latest
-      # firefly26710/ffarticles-backend:${{ needs.check-commit.outputs.version }}
+            firefly26710/ffarticles-backend:${{ needs.check-commit.outputs.version }}
 
       # Build and push frontend image with environment variables from secrets
       - name: Build and push frontend image
@@ -107,7 +107,7 @@ jobs:
           push: true
           tags: |
             firefly26710/ffarticles-frontend:latest
-      # firefly26710/ffarticles-frontend:${{ needs.check-commit.outputs.version }}
+            firefly26710/ffarticles-frontend:${{ needs.check-commit.outputs.version }}
           build-args: |
             NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}
             NEXT_PUBLIC_GOOGLE_CLIENT_ID=${{ secrets.NEXT_PUBLIC_GOOGLE_CLIENT_ID }}

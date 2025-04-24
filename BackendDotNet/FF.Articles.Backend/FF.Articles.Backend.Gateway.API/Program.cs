@@ -1,11 +1,5 @@
 using FF.Articles.Backend.Common.Middlewares;
 using Yarp.ReverseProxy.Transforms;
-using Microsoft.AspNetCore.Http;
-
-// This is a minimal reverse proxy example using YARP
-// It redircts all incoming requests from http://localhost:21000 to the specified backend server configured in the appsettings.json file
-// Currently for development purposes, in Prod, use NGINX.
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Add YARP reverse proxy

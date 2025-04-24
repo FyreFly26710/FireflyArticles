@@ -11,6 +11,7 @@ import AccessLayout from "@/access/AccessLayout";
 import enGB from 'antd/locale/en_GB';
 import { ConfigProvider } from "antd";
 import { storage } from "@/stores/storage";
+import { apiAuthGetLoginUser } from "@/api/identity/api/auth";
 
 const InitLayout: React.FC<Readonly<{ children: React.ReactNode; }>> = ({ children }) => {
     const dispatch = useDispatch<AppDispatch>();
@@ -18,15 +19,16 @@ const InitLayout: React.FC<Readonly<{ children: React.ReactNode; }>> = ({ childr
     const doInitLoginUser = useCallback(async () => {
         try {
             let user = storage.getUser();
+            // if user is not in localStorage, get user from backend
+            // Todo: use guest user if user is not in localStorage
+            if (!user) {
+                const res = await apiAuthGetLoginUser();
+                user = res.data ?? null;
 
-            // if (!user) {
-            //     const res = await apiAuthGetLoginUser();
-            //     user = res.data ?? null;
-
-            //     if (user) {
-            //         storage.setUser(user);
-            //     }
-            // }
+                if (user) {
+                    storage.setUser(user);
+                }
+            }
 
             if (user) {
                 dispatch(setLoginUser(user));
