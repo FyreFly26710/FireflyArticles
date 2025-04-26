@@ -3,17 +3,19 @@ using FF.Articles.Backend.AI.API.Interfaces.Services;
 using FF.Articles.Backend.AI.API.Interfaces.Services.RemoteServices;
 using FF.Articles.Backend.AI.API.Models.Dtos;
 using FF.Articles.Backend.AI.API.Models.Requests.ArticleGenerations;
+using FF.Articles.Backend.AI.API.Services.Consumers;
 using FF.Articles.Backend.Common.ApiDtos;
 using FF.Articles.Backend.Common.Constants;
 using FF.Articles.Backend.Common.Responses;
 using FF.Articles.Backend.Common.Utils;
+using FF.Articles.Backend.RabbitMQ;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 namespace FF.Articles.Backend.AI.API.Controllers;
 
 [ApiController]
 [Route("api/ai/articles")]
-public class AiArticlesController(IArticleGenerationService articleGenerationService) : ControllerBase
+public class AiArticlesController(IArticleGenerationService articleGenerationService, IRabbitMqPublisher rabbitMqPublisher) : ControllerBase
 {
 
     [HttpPost("generate-article-list")]
@@ -30,8 +32,8 @@ public class AiArticlesController(IArticleGenerationService articleGenerationSer
     {
         request.Model = "deepseek-reasoner";
         request.Provider = ProviderList.DeepSeek;
-        var content = await articleGenerationService.GenerateArticleContentAsync(request);
-        return ResultUtil.Success<long>(content);
+        var articleId = await articleGenerationService.DispatchArticleGenerationAsync(request);
+        return ResultUtil.Success<long>(articleId);
     }
     // [HttpPost("generate-article-content-batch")]
     // public async Task<IActionResult> BatchGenerateArticleContent(List<int> articleIds, CancellationToken cancellationToken)

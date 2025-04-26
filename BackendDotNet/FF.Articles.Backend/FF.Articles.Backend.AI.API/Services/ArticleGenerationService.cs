@@ -12,6 +12,8 @@ using FF.Articles.Backend.AI.API.Models.Requests.ArticleGenerations;
 using FF.AI.Common.Constants;
 using FF.Articles.Backend.AI.API.Models.Dtos;
 using FF.Articles.Backend.AI.API.Interfaces.Services;
+using FF.Articles.Backend.RabbitMQ;
+using FF.Articles.Backend.AI.API.MapperExtensions;
 
 namespace FF.Articles.Backend.AI.API.Services;
 
@@ -34,12 +36,14 @@ public class ArticleGenerationService : IArticleGenerationService
     private readonly IAssistant _aiChatAssistant;
     private readonly IContentsApiRemoteService _contentsApiRemoteService;
     private readonly ILogger<ArticleGenerationService> _logger;
+    private readonly IRabbitMqPublisher _rabbitMqPublisher;
     // private readonly IDatabase _redis;
-    public ArticleGenerationService(IAssistant aiChatAssistant, IContentsApiRemoteService contentsApiRemoteService, ILogger<ArticleGenerationService> logger)
+    public ArticleGenerationService(IAssistant aiChatAssistant, IContentsApiRemoteService contentsApiRemoteService, ILogger<ArticleGenerationService> logger, IRabbitMqPublisher rabbitMqPublisher)
     {
         _aiChatAssistant = aiChatAssistant;
         _contentsApiRemoteService = contentsApiRemoteService;
         _logger = logger;
+        _rabbitMqPublisher = rabbitMqPublisher;
         // _redis = redis.GetDatabase();
     }
     // Round 1
@@ -93,10 +97,9 @@ public class ArticleGenerationService : IArticleGenerationService
         return articlesResponse;
     }
 
-    // round 2
-    public async Task<long> GenerateArticleContentAsync(ContentRequest request)
+    public async Task<string> GenerateArticleContentAsync(ContentRequest request)
     {
-        if (request.TopicId == 0 || string.IsNullOrEmpty(request.Title) || string.IsNullOrEmpty(request.Abstract))
+        if (request.TopicId == 0 || string.IsNullOrEmpty(request.Title) || string.IsNullOrEmpty(request.Abstract) || request.Id == null)
             throw new ApiException(ErrorCode.PARAMS_ERROR, "Invalid request");
 
         var chatRequest = new ChatRequest
@@ -115,22 +118,23 @@ public class ArticleGenerationService : IArticleGenerationService
 
         content = removeOuterFences(content);
         _logger.LogInformation("Request to generate article: {title}; Milliseconds taken : {time}; Tokens: {tokens}", request.Title, response?.ExtraInfo?.Duration, response?.ExtraInfo?.OutputTokens);
-        // Add article
-        var article = new ArticleApiAddRequest
-        {
-            Title = request.Title,
-            Abstract = request.Abstract,
-            Content = content,
-            Tags = request.Tags,
-            TopicId = request.TopicId,
-            SortNumber = request.Id,
-            ArticleType = "Article",
-            ParentArticleId = null,
-        };
-        var articleId = await _contentsApiRemoteService.AddArticleAsync(article);
 
+        return content;
+    }
+    /// <summary>
+    /// Insert article to db and dispatch article generation to rabbitmq
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns>article id</returns>
+    public async Task<long> DispatchArticleGenerationAsync(ContentRequest request)
+    {
+        var article = request.ToArticleApiUpsertRequest();
+        var articleId = await _contentsApiRemoteService.AddArticleAsync(article);
+        request.Id = articleId;
+        await _rabbitMqPublisher.PublishAsync(QueueList.GenerateArticleQueue, request);
         return articleId;
     }
+
 
     private string removeOuterFences(string content)
     {

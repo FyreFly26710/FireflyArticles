@@ -4,6 +4,8 @@ using FF.Articles.Backend.Contents.API.Infrastructure;
 using FF.Articles.Backend.ServiceDefaults;
 using Microsoft.EntityFrameworkCore;
 using FF.Articles.Backend.Common.Extensions;
+using FF.Articles.Backend.Contents.API.MqConsumers;
+using FF.Articles.Backend.RabbitMQ;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -26,6 +28,9 @@ builder.Services.AddDbContext<ContentsDbContext>(options =>
 builder.AddRedisClient("redis");
 
 builder.Services.AddContentsServices();
+
+builder.AddRabbitMq();
+builder.Services.AddHostedService<UpdateArticleConsumer>();
 
 builder.Services.AddControllers();
 

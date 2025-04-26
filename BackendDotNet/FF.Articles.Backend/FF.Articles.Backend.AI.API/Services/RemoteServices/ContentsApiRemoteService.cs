@@ -27,7 +27,7 @@ public class ContentsApiRemoteService : IContentsApiRemoteService
         _httpClient.BaseAddress = new Uri(RemoteApiUrlConstant.GetContentsBaseUrl());
     }
 
-    public async Task<long> AddArticleAsync(ArticleApiAddRequest payload)
+    public async Task<long> AddArticleAsync(ArticleApiUpsertRequest payload)
     {
         string url = RemoteApiUrlConstant.ArticleUrl();
         var requestMessage = CreateHttpRequestMessage(HttpMethod.Post, url, payload, AdminUsers.SYSTEM_ADMIN_DEEPSEEK);
@@ -41,7 +41,19 @@ public class ContentsApiRemoteService : IContentsApiRemoteService
         var res = await response.Content.ReadFromJsonAsync<ApiResponse<long>>();
         return res?.Data ?? 0;
     }
+    public async Task<bool> EditArticleAsync(ArticleApiUpsertRequest payload)
+    {
+        string url = RemoteApiUrlConstant.ArticleUrl();
+        var requestMessage = CreateHttpRequestMessage(HttpMethod.Put, url, payload, AdminUsers.SYSTEM_ADMIN_DEEPSEEK);
 
+        var response = await _httpClient.SendAsync(requestMessage);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new ApiException(ErrorCode.SYSTEM_ERROR, "Failed to edit article");
+        }
+        return true;
+    }
 
     public async Task<long> AddTopicByTitleAsync(string title)
     {

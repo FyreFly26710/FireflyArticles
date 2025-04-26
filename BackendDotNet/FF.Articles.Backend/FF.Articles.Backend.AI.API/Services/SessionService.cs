@@ -6,7 +6,7 @@ using FF.Articles.Backend.AI.API.Interfaces.Repositories;
 using FF.Articles.Backend.AI.API.Infrastructure;
 using FF.Articles.Backend.AI.API.Interfaces.Services.RemoteServices;
 using FF.Articles.Backend.Common.Utils;
-using FF.Articles.Backend.AI.API.MapperExtensions.Chats;
+using FF.Articles.Backend.AI.API.MapperExtensions;
 using FF.Articles.Backend.Common.Exceptions;
 using FF.Articles.Backend.AI.API.Models.Requests.Sessions;
 namespace FF.Articles.Backend.AI.API.Services;

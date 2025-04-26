@@ -32,7 +32,7 @@ public static class Prompts
     {
     "Articles": [
         {
-        "Id": 1,
+        "SortNumber": 1,
         "Title": "Rapid HTML Enhancement & Best Practices",
         "Abstract": "**Semantic HTML** - Using elements that convey meaning for better accessibility and SEO.  \n**Metadata & SEO** - `<meta> tags`, `<title>`, how HTML influences search engines.  \n**Accessibility Considerations** - `aria-*` attributes, proper use of headings and labels.",
         "Tags": ["Advanced", "Web Development", "HTML", "Best-practices", "Technical"]

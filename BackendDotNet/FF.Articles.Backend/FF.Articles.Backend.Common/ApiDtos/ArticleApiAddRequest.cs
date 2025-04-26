@@ -2,7 +2,7 @@ using System;
 
 namespace FF.Articles.Backend.Common.ApiDtos;
 
-public class ArticleApiAddRequest
+public class ArticleApiUpsertRequest
 {
     public long? Id { get; set; }
     public string Title { get; set; }
@@ -14,7 +14,7 @@ public class ArticleApiAddRequest
     public string ArticleType { get; set; } = "Article";
     public long? ParentArticleId { get; set; }
     public long TopicId { get; set; }
-    public List<string>? Tags { get; set; } 
+    public List<string>? Tags { get; set; }
     public int SortNumber { get; set; } = 1;
     public int IsHidden { get; set; } = 0;
 }

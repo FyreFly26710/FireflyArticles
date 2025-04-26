@@ -13,7 +13,7 @@ public class ArticlesAIResponseDto
 }
 public class AIGenArticleDto
 {
-    public int Id { get; set; }
+    public int SortNumber { get; set; }
     public string Title { get; set; } = "";
     public string Abstract { get; set; } = "";
     public List<string> Tags { get; set; } = new();

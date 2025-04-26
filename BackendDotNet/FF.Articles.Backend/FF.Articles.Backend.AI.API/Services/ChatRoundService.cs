@@ -7,7 +7,7 @@ using FF.Articles.Backend.AI.API.Interfaces.Repositories;
 using FF.Articles.Backend.Common.Exceptions;
 using FF.Articles.Backend.Common.Utils;
 using FF.Articles.Backend.Common.ApiDtos;
-using FF.Articles.Backend.AI.API.MapperExtensions.Chats;
+using FF.Articles.Backend.AI.API.MapperExtensions;
 using FF.Articles.Backend.AI.API.Interfaces.Services.RemoteServices;
 using System.Diagnostics;
 using System.Text;

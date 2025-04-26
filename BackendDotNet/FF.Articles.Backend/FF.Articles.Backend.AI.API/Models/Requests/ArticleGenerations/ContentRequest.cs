@@ -4,7 +4,8 @@ namespace FF.Articles.Backend.AI.API.Models.Requests.ArticleGenerations;
 
 public class ContentRequest
 {
-    public int Id { get; set; }
+    public long? Id { get; set; }
+    public int SortNumber { get; set; }
     public long TopicId { get; set; }
     public string Category { get; set; } = "";
     public string Topic { get; set; } = "";

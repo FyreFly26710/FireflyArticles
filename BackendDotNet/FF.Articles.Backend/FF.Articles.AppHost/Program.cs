@@ -9,6 +9,16 @@ var builder = DistributedApplication.CreateBuilder(args);
 //    })
 //    .WithVolume("redis-data", "/data") // Persist Redis data
 //    .WithRedisInsight(redisInsight => redisInsight.WithHostPort(8001));
+var rabbitMqUsername = builder.AddParameter("rabbitmqUsername", secret: false);
+var rabbitMqPassword = builder.AddParameter("rabbitmqPassword", secret: false);
+var rabbitMq = builder.AddRabbitMQ("rabbitmq", rabbitMqUsername, rabbitMqPassword)
+    .WithLifetime(ContainerLifetime.Persistent)
+    .WithManagementPlugin()
+    .WithEndpoint("tcp", e =>
+    {
+        e.Port = 5672;
+        e.IsProxied = false;
+    });
 
 // Get postgres credentials from appsettings.json [parameters]
 var username = builder.AddParameter("username", secret: false);
@@ -42,11 +52,13 @@ builder.AddProject<Projects.FF_Articles_Backend_Identity_API>("identity-api", la
 
 builder.AddProject<Projects.FF_Articles_Backend_Contents_API>("contents-api", launchProfileName)
     .WithReference(contentDb)
+    .WithReference(rabbitMq)
     //.WithReference(redis)
     ;
 
 builder.AddProject<Projects.FF_Articles_Backend_AI_API>("ai-api", launchProfileName)
     .WithReference(aidb)
+    .WithReference(rabbitMq)
     //.WithReference(redis)
     ;
 

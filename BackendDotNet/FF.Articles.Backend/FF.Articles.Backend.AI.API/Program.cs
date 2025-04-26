@@ -13,6 +13,8 @@ using Microsoft.EntityFrameworkCore;
 using FF.Articles.Backend.Common.Extensions;
 using FF.AI.Common;
 using FF.Articles.Backend.Common.Constants;
+using FF.Articles.Backend.AI.API.Services.Consumers;
+using FF.Articles.Backend.RabbitMQ;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -42,9 +44,12 @@ builder.Services.AddScoped<ISystemMessageRepository, SystemMessageRepository>();
 // Services
 builder.Services.AddAI(configuration);
 builder.Services.AddScoped<IArticleGenerationService, ArticleGenerationService>();
-// builder.Services.AddScoped<IContentsApiRemoteService, ContentsApiRemoteService>();
 builder.Services.AddScoped<IChatRoundService, ChatRoundService>();
 builder.Services.AddScoped<ISessionService, SessionService>();
+
+builder.AddRabbitMq();
+builder.Services.AddHostedService<GenerateArticleConsumer>();
+
 
 // Stores
 

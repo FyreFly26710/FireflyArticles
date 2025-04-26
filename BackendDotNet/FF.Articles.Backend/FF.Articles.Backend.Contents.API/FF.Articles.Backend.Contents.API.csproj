@@ -17,12 +17,15 @@
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.8" />
-		<PackageReference Include="Aspire.StackExchange.Redis" />
+		<PackageReference Include="Aspire.StackExchange.Redis" Version="9.1.0" />
 
 		<PackageReference Include="StackExchange.Redis" Version="2.8.31" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+		<PackageReference Include="Aspire.RabbitMQ.Client" Version="9.1.0" />
+
 	</ItemGroup>
 	<ItemGroup>
+		<ProjectReference Include="../FF.Articles.Backend.RabbitMQ/FF.Articles.Backend.RabbitMQ.csproj" />
 		<ProjectReference Include="..\FF.Articles.Backend.Common\FF.Articles.Backend.Common.csproj" />
 		<ProjectReference Include="..\FF.Articles.Backend.ServiceDefaults\FF.Articles.Backend.ServiceDefaults.csproj" />
 	</ItemGroup>
