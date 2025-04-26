@@ -53,8 +53,8 @@ public class ArticleGenerationService : IArticleGenerationService
 
         var chatRequest = new ChatRequest
         {
-            Model = request.Model ?? "deepseek-chat",
-            Provider = request.Provider ?? ProviderList.DeepSeek,
+            Model = request.Model!,
+            Provider = request.Provider!,
             Messages = {
                 Message.User(Prompts.User_ArticleList(request.Topic, request.ArticleCount)),
             },
@@ -78,15 +78,14 @@ public class ArticleGenerationService : IArticleGenerationService
         ArticlesAIResponseDto? articlesResponse = null;
         try
         {
-            _logger.LogInformation(jsonContent);
             articlesResponse = JsonSerializer.Deserialize<ArticlesAIResponseDto>(jsonContent);
         }
         catch (Exception ex)
         {
-            _logger.LogError("Failed to generate article:{jsonContent}", jsonContent);
-            throw new Exception($"Exception: {ex.Message}; Failed to generate article:{jsonContent}");
+            throw new ApiException(ErrorCode.SYSTEM_ERROR, $"Exception: {ex.Message}; Failed to generate article:{jsonContent}");
         }
-        _logger.LogInformation("Convert success");
+        if (articlesResponse == null)
+            throw new ApiException(ErrorCode.SYSTEM_ERROR, $"Failed to generate article:{jsonContent}");
         articlesResponse.TopicId = topicId;
         // history.AiResponse = jsonContent;
         // history.TopicId = topicId;
@@ -102,10 +101,10 @@ public class ArticleGenerationService : IArticleGenerationService
 
         var chatRequest = new ChatRequest
         {
-            Model = request.Model ?? "deepseek-chat",
-            Provider = request.Provider ?? ProviderList.DeepSeek,
+            Model = request.Model!,
+            Provider = request.Provider!,
             Messages = [
-                Message.User(Prompts.User_ArticleContent(request.Topic, request.Title, request.Abstract, request.Tags)),
+                Message.User(Prompts.User_ArticleContent(request.Category, request.Topic, request.Title, request.Abstract, request.Tags)),
             ],
         };
 

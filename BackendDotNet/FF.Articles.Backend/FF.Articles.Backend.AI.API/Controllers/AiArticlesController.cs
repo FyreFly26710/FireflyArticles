@@ -28,7 +28,7 @@ public class AiArticlesController(IArticleGenerationService articleGenerationSer
     [HttpPost("generate-article-content")]
     public async Task<ApiResponse<long>> GenerateArticleContent(ContentRequest request)
     {
-        request.Model = "deepseek-chat";
+        request.Model = "deepseek-reasoner";
         request.Provider = ProviderList.DeepSeek;
         var content = await articleGenerationService.GenerateArticleContentAsync(request);
         return ResultUtil.Success<long>(content);

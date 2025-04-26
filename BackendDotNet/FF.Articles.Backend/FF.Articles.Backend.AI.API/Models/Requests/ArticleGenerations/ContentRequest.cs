@@ -6,6 +6,7 @@ public class ContentRequest
 {
     public int Id { get; set; }
     public long TopicId { get; set; }
+    public string Category { get; set; } = "";
     public string Topic { get; set; } = "";
     public string Title { get; set; } = "";
     public string Abstract { get; set; } = "";
