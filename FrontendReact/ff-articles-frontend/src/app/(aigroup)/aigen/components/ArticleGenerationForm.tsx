@@ -68,11 +68,11 @@ const ArticleGenerationForm: React.FC = () => {
               name="count"
               label="Number of Articles"
               rules={[{ required: true, message: 'Please enter the number of articles' }]}
-              tooltip="How many article suggestions do you want to generate (1-10)"
+              tooltip="How many article suggestions do you want to generate (1-20)"
             >
               <InputNumber 
                 min={1} 
-                max={10} 
+                max={20} 
                 style={{ width: '100%' }} 
                 size="large"
               />

@@ -19,29 +19,77 @@ public class TagRepository : BaseRepository<Tag, ContentsDbContext>, ITagReposit
 
     public async Task<List<Tag>> GetOrCreateByNamesAsync(List<string> names)
     {
+        // Normalize and deduplicate the names
         names = names.Select(n => n.ToLower().Trim())
                     .Distinct()
-                    .Where(n => !string.IsNullOrEmpty(n.Trim()))
+                    .Where(n => !string.IsNullOrEmpty(n))
                     .ToList();
 
-        var existingTags = await base.GetQueryable()
+        if (!names.Any())
+        {
+            return new List<Tag>();
+        }
+
+        // Get all existing tags in one query with case-insensitive comparison
+        var allExistingTags = await base.GetQueryable()
             .Where(t => names.Contains(t.TagName.ToLower().Trim()))
             .ToListAsync();
 
-        var existingNames = existingTags.Select(t => t.TagName.ToLower().Trim()).ToList();
-        var missingNames = names.Except(existingNames).ToList();
+        // Handle potential duplicates in the database by taking the first tag for each name
+        var existingTags = new List<Tag>();
+        var processedNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-        if (missingNames.Any())
+        foreach (var tag in allExistingTags)
         {
-            foreach (var name in missingNames)
+            var normalizedName = tag.TagName.ToLower().Trim();
+            if (!processedNames.Contains(normalizedName))
             {
-                var id = await CreateAsync(new Tag { TagName = name });
-                existingTags.Add(new Tag { Id = id, TagName = name });
+                existingTags.Add(tag);
+                processedNames.Add(normalizedName);
+            }
+        }
+
+        // Create a dictionary of existing tags by normalized name for faster lookup
+        var existingTagsByName = existingTags
+            .ToDictionary(
+                t => t.TagName.ToLower().Trim(),
+                t => t,
+                StringComparer.OrdinalIgnoreCase
+            );
+
+        // Find names that don't exist yet
+        var tagsToCreate = names
+            .Where(name => !existingTagsByName.ContainsKey(name))
+            .ToList();
+
+        // Create new tags if needed
+        foreach (var name in tagsToCreate)
+        {
+            try
+            {
+                var tag = new Tag { TagName = name };
+                var id = await CreateAsync(tag);
+                tag.Id = id;
+                existingTags.Add(tag);
+            }
+            catch (Exception ex)
+            {
+                _context.ChangeTracker.Clear(); // Clear the context to avoid tracking conflicts
+
+                // Try to find the tag again - it might have been created by another process
+                // or there might be duplicates in the DB
+                var existingTag = await base.GetQueryable()
+                    .Where(t => t.TagName.ToLower().Trim() == name.ToLower().Trim())
+                    .OrderBy(t => t.Id) // Take the first one if there are duplicates
+                    .FirstOrDefaultAsync();
+
+                if (existingTag != null && !existingTags.Any(t => t.Id == existingTag.Id))
+                {
+                    existingTags.Add(existingTag);
+                }
             }
         }
 
         return existingTags;
     }
-
-
 }

@@ -56,7 +56,9 @@ public static class Prompts
     • Tags: {string.Join(", ", [.. tags])} 
 
     Article Structure (Markdown):
-    - Do not include title, introduction & conclusion.
+    - All your content should be displayed to the user as content of the article.
+    - Do not include non-article content information like Title, Category, Topic, Abstract, Tags; or your own instructions.
+    - Do not include introduction & conclusion.
     - Do not be limited by abstract, it is just a guideline.
     - Structure & examples driven by Tags  
     - Include code snippets where appropriate.
@@ -72,7 +74,7 @@ public static class Prompts
     TagRules;
 
     private static string TagRules = """
-    Tags (exactly four/five, following the same order):
+    Tags list (exactly four/five, following the same order):
     1. **Skill Level**: Beginner / Advanced / Expert / General  
     2. **Focus Area**: (choose one relevant to the article, e.g. “API Design,” “Performance Optimization,” “Testing”)  
     3. **Tech Stack/Language**: (e.g. ORM,” “JavaScript,” “Kubernetes”; only when applicable, if not applicable, leave blank)  

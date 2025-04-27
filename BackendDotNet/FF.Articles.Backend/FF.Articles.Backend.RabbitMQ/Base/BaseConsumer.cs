@@ -11,31 +11,52 @@ namespace FF.Articles.Backend.RabbitMQ;
 public abstract class BaseConsumer : BackgroundService
 {
     private readonly IConnection _connection;
-    private readonly IModel _channel;
+    protected readonly IModel _channel;
     protected readonly IServiceScopeFactory _serviceScopeFactory;
     protected readonly string _queue;
     protected readonly ILogger<BaseConsumer> _logger;
+    protected readonly int _prefetchCount;
+    private EventingBasicConsumer _consumer;
+    private EventingBasicConsumer _dlqConsumer;
 
     public BaseConsumer(
         IConnection connection,
         IServiceScopeFactory serviceScopeFactory,
         ILogger<BaseConsumer> logger,
-        string queue)
+        string queue,
+        int prefetchCount = 10)
     {
         _connection = connection;
         _channel = _connection.CreateModel();
         _serviceScopeFactory = serviceScopeFactory;
         _queue = queue;
         _logger = logger;
+        _prefetchCount = prefetchCount;
     }
 
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
         QueueDeclareHelper.DeclareQueues(_channel, _queue);
 
+        // Configure prefetch count to allow concurrent processing
+        _channel.BasicQos(prefetchSize: 0, prefetchCount: (ushort)_prefetchCount, global: false);
+        _logger.LogInformation("Configured prefetch count: {prefetchCount} for queue: {queue}", _prefetchCount, _queue);
+
+        // Set up consumers
+        SetupConsumers();
+
+        // Start consuming
+        StartConsuming();
+        StartConsumingDlq();
+
+        return Task.CompletedTask;
+    }
+
+    protected void SetupConsumers()
+    {
         // Set up consumer for main queue
-        var consumer = new EventingBasicConsumer(_channel);
-        consumer.Received += async (model, ea) =>
+        _consumer = new EventingBasicConsumer(_channel);
+        _consumer.Received += async (model, ea) =>
         {
             var messageJson = QueueDeclareHelper.GetJsonMessage(ea);
 
@@ -51,11 +72,10 @@ public abstract class BaseConsumer : BackgroundService
                 retryMessage(ex, ea);
             }
         };
-        _logger.LogInformation("Starting to listen on queue: {queue}", _queue);
-        _channel.BasicConsume(queue: _queue, autoAck: false, consumer: consumer);
 
-        var dlqConsumer = new EventingBasicConsumer(_channel);
-        dlqConsumer.Received += async (model, ea) =>
+        // Set up DLQ consumer
+        _dlqConsumer = new EventingBasicConsumer(_channel);
+        _dlqConsumer.Received += async (model, ea) =>
         {
             try
             {
@@ -73,12 +93,18 @@ public abstract class BaseConsumer : BackgroundService
                 _channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
             }
         };
+    }
 
-        string dlqName = $"{_queue}.dlq";
-        _logger.LogInformation("Starting to listen on DLQ: {dlqName}", dlqName);
-        _channel.BasicConsume(queue: dlqName, autoAck: false, consumer: dlqConsumer);
+    protected string StartConsuming() => _channel.BasicConsume(queue: _queue, autoAck: false, consumer: _consumer);
+    protected string StartConsumingDlq() => _channel.BasicConsume(queue: $"{_queue}.dlq", autoAck: false, consumer: _dlqConsumer);
 
-        return Task.CompletedTask;
+    protected void StopConsuming(string consumerTag)
+    {
+        if (!string.IsNullOrEmpty(consumerTag))
+        {
+            _logger.LogInformation("Stopping consumer with tag: {consumerTag}", consumerTag);
+            _channel.BasicCancel(consumerTag);
+        }
     }
 
     protected abstract Task HandleMessageAsync(string messageJson);

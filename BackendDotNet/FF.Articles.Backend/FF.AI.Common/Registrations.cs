@@ -19,10 +19,10 @@ public static class Registrations
         services.AddSingleton<DeepSeekProvider>();
         services.AddSingleton<OllamaProvider>();
 
-        services.AddSingleton<IAssistant<DeepSeekProvider>, DeepSeekAssistant>();
-        services.AddSingleton<IAssistant<OllamaProvider>, OllamaAssistant>();
+        services.AddScoped<IAssistant<DeepSeekProvider>, DeepSeekAssistant>();
+        services.AddScoped<IAssistant<OllamaProvider>, OllamaAssistant>();
 
-        services.AddSingleton<IAssistant, AiChatAssistant>();
+        services.AddScoped<IAssistant, AiChatAssistant>();
 
         return services;
     }

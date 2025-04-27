@@ -30,22 +30,21 @@ public class ArticleTagRepository : BaseRepository<ArticleTag, ContentsDbContext
 
     public async Task<bool> EditArticleTags(long articleId, List<long> tagIds)
     {
+        var uniqueTagIds = tagIds.Distinct().ToList();
+
         List<ArticleTag> currentArticleTags = await GetByArticleId(articleId);
-        //List<int> existingTags = await _context.Set<Tag>().Select(t => t.Id).ToListAsync();
-        foreach (var id in tagIds)
+        var currentTagIds = currentArticleTags.Select(at => at.TagId).ToHashSet();
+        foreach (var tagId in uniqueTagIds)
         {
-            // if (existingTags.Contains(id) && !currentArticleTags.Any(at => at.TagId == id))
-            //     await base.CreateAsync(new ArticleTag { ArticleId = articleId, TagId = id });
-            if (!currentArticleTags.Any(at => at.TagId == id))
-                await base.CreateAsync(new ArticleTag { ArticleId = articleId, TagId = id });
-
+            if (!currentTagIds.Contains(tagId))
+                await base.CreateAsync(new ArticleTag { ArticleId = articleId, TagId = tagId });
+        }
+        foreach (var articleTag in currentArticleTags)
+        {
+            if (!uniqueTagIds.Contains(articleTag.TagId))
+                await base.DeleteAsync(articleTag.Id);
         }
 
-        foreach (var at in currentArticleTags)
-        {
-            if (!tagIds.Contains(at.TagId))
-                await base.DeleteAsync(at.Id);
-        }
         return true;
     }
     public async Task<bool> DeleteByArticleId(long articleId)
