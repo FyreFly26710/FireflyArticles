@@ -46,7 +46,7 @@ const ArticleItem: React.FC<ArticleItemProps> = ({
 
   const handleAddTagLocal = () => {
     if (!tagInput.trim()) return;
-    handleAddTag(article.id, tagInput.trim());
+    handleAddTag(article.sortNumber, tagInput.trim());
     setTagInput('');
   };
 
@@ -98,17 +98,10 @@ const ArticleItem: React.FC<ArticleItemProps> = ({
         <div style={{ textAlign: 'center', padding: '30px 0' }}>
           <Spin size="large" />
           <Paragraph style={{ marginTop: 16 }}>
-            Generating article content for "{article.title}"...
+            Generating article content for &quot;{article.title}&quot;...
           </Paragraph>
           <Paragraph type="secondary">
             This may take a minute or two.
-          </Paragraph>
-          <Paragraph>
-            <Link href={topicUrl} target="_blank">
-              <Button type="primary" icon={<LinkOutlined />} size="large">
-                View articles will be displayed here
-              </Button>
-            </Link>
           </Paragraph>
         </div>
       </Card>
@@ -121,7 +114,7 @@ const ArticleItem: React.FC<ArticleItemProps> = ({
       hoverable={!article.isEditing}
       style={{ width: '100%' }}
       className={`article-card ${article.isEditing ? styles['article-card-editing'] : ''}`}
-      onClick={() => !article.isEditing && handleEditArticle(article.id)}
+      onClick={() => !article.isEditing && handleEditArticle(article.sortNumber)}
       actions={article.isEditing ? [
         <Button
           key="save"
@@ -129,7 +122,7 @@ const ArticleItem: React.FC<ArticleItemProps> = ({
           icon={<SaveOutlined />}
           onClick={(e) => {
             e.stopPropagation();
-            handleSaveArticle(article.id);
+            handleSaveArticle(article.sortNumber);
           }}
         >
           Save
@@ -139,7 +132,7 @@ const ArticleItem: React.FC<ArticleItemProps> = ({
           icon={<CloseOutlined />}
           onClick={(e) => {
             e.stopPropagation();
-            handleCancelEdit(article.id);
+            handleCancelEdit(article.sortNumber);
           }}
         >
           Cancel
@@ -150,7 +143,7 @@ const ArticleItem: React.FC<ArticleItemProps> = ({
           icon={<EditOutlined />}
           onClick={(e) => {
             e.stopPropagation();
-            handleEditArticle(article.id);
+            handleEditArticle(article.sortNumber);
           }}
         >
           Edit
@@ -174,7 +167,7 @@ const ArticleItem: React.FC<ArticleItemProps> = ({
             <Form.Item label="Title" style={{ marginBottom: 8 }}>
               <Input
                 value={article.title}
-                onChange={(e) => handleUpdateField(article.id, 'title', e.target.value)}
+                onChange={(e) => handleUpdateField(article.sortNumber, 'title', e.target.value)}
                 onClick={(e) => e.stopPropagation()}
               />
             </Form.Item>
@@ -192,7 +185,7 @@ const ArticleItem: React.FC<ArticleItemProps> = ({
             <Form.Item label="Abstract" style={{ marginBottom: 8 }}>
               <TextArea
                 value={article.abstract}
-                onChange={(e) => handleUpdateField(article.id, 'abstract', e.target.value)}
+                onChange={(e) => handleUpdateField(article.sortNumber, 'abstract', e.target.value)}
                 autoSize={{ minRows: 3, maxRows: 6 }}
                 onClick={(e) => e.stopPropagation()}
               />
@@ -216,7 +209,7 @@ const ArticleItem: React.FC<ArticleItemProps> = ({
                       closable
                       onClose={(e) => {
                         e.preventDefault();
-                        handleRemoveTag(article.id, index);
+                        handleRemoveTag(article.sortNumber, index);
                       }}
                     >
                       {tag}

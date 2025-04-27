@@ -10,6 +10,7 @@ public class ArticlesAIResponseDto
 
     public long? TopicId { get; set; }
 
+    public string Category { get; set; } = "";
 }
 public class AIGenArticleDto
 {

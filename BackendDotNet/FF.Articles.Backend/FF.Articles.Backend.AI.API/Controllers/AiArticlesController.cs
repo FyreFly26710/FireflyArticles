@@ -3,19 +3,14 @@ using FF.Articles.Backend.AI.API.Interfaces.Services;
 using FF.Articles.Backend.AI.API.Interfaces.Services.RemoteServices;
 using FF.Articles.Backend.AI.API.Models.Dtos;
 using FF.Articles.Backend.AI.API.Models.Requests.ArticleGenerations;
-using FF.Articles.Backend.AI.API.Services.Consumers;
-using FF.Articles.Backend.Common.ApiDtos;
-using FF.Articles.Backend.Common.Constants;
 using FF.Articles.Backend.Common.Responses;
 using FF.Articles.Backend.Common.Utils;
-using FF.Articles.Backend.RabbitMQ;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 namespace FF.Articles.Backend.AI.API.Controllers;
 
 [ApiController]
 [Route("api/ai/articles")]
-public class AiArticlesController(IArticleGenerationService articleGenerationService, IRabbitMqPublisher rabbitMqPublisher) : ControllerBase
+public class AiArticlesController(IArticleGenerationService articleGenerationService) : ControllerBase
 {
 
     [HttpPost("generate-article-list")]

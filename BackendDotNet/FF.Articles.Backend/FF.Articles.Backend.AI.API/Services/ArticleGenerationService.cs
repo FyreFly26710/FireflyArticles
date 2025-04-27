@@ -49,26 +49,21 @@ public class ArticleGenerationService : IArticleGenerationService
     // Round 1
     public async Task<ArticlesAIResponseDto> GenerateArticleListsAsync(ArticleListRequest request, CancellationToken cancellationToken = default)
     {
-        // var history = new AiGenHistory
-        // {
-        //     Topic = request.Topic,
-        //     ArticleCount = request.ArticleCount,
-        // };
-
         var chatRequest = new ChatRequest
         {
             Model = request.Model!,
             Provider = request.Provider!,
             Messages = {
-                Message.User(Prompts.User_ArticleList(request.Topic, request.ArticleCount)),
+                Message.User(Prompts.User_ArticleList(request.Topic, request.ArticleCount, request.Category)),
             },
             Options = new ChatOptions() { ResponseFormat = ChatOptions.GetResponseFormat<ArticlesAIResponseDto>() }
         };
         var topicId = await _contentsApiRemoteService.AddTopicByTitleAsync(request.Topic);
-        _logger.LogInformation("TopicId: {topicId}", topicId);
-        var response = await _aiChatAssistant.ChatAsync(chatRequest, cancellationToken);
-        var jsonContent = response?.Message?.Content ?? "";
-        _logger.LogInformation("Request to generate topic: {topic}; Milliseconds taken : {time}; Tokens: {tokens}", request.Topic, response?.ExtraInfo?.Duration, response?.ExtraInfo?.OutputTokens);
+        _logger.LogInformation("Begin to generate topic: {topic}; TopicId: {topicId}", request.Topic, topicId);
+        // var response = await _aiChatAssistant.ChatAsync(chatRequest, cancellationToken);
+        // var jsonContent = response?.Message?.Content ?? "";
+        var jsonContent = sampleResponse();
+        //_logger.LogInformation("Request to generate topic: {topic}; Milliseconds taken : {time}; Tokens: {tokens}", request.Topic, response?.ExtraInfo?.Duration, response?.ExtraInfo?.OutputTokens);
 
         // Extract content between first { and last }
         int firstBrace = jsonContent.IndexOf('{');
@@ -78,7 +73,7 @@ public class ArticleGenerationService : IArticleGenerationService
         {
             jsonContent = jsonContent.Substring(firstBrace, lastBrace - firstBrace + 1);
         }
-        // Console.WriteLine(jsonContent);
+        //Console.WriteLine(jsonContent);
         ArticlesAIResponseDto? articlesResponse = null;
         try
         {
@@ -86,13 +81,12 @@ public class ArticleGenerationService : IArticleGenerationService
         }
         catch (Exception ex)
         {
-            throw new ApiException(ErrorCode.SYSTEM_ERROR, $"Exception: {ex.Message}; Failed to generate article:{jsonContent}");
+            throw new ApiException(ErrorCode.SYSTEM_ERROR, $"Exception: {ex.Message}; AI Response cannot be parsed:{jsonContent}");
         }
         if (articlesResponse == null)
-            throw new ApiException(ErrorCode.SYSTEM_ERROR, $"Failed to generate article:{jsonContent}");
+            throw new ApiException(ErrorCode.SYSTEM_ERROR, $"AI Response cannot be parsed:{jsonContent}");
         articlesResponse.TopicId = topicId;
-        // history.AiResponse = jsonContent;
-        // history.TopicId = topicId;
+        articlesResponse.Category = request.Category;
 
         return articlesResponse;
     }
@@ -110,7 +104,7 @@ public class ArticleGenerationService : IArticleGenerationService
                 Message.User(Prompts.User_ArticleContent(request.Category, request.Topic, request.Title, request.Abstract, request.Tags)),
             ],
         };
-
+        _logger.LogInformation("Begin to generate article: {title}", request.Title);
         var response = await _aiChatAssistant.ChatAsync(chatRequest, new CancellationToken());
 
         var content = response?.Message?.Content ?? "";
@@ -128,7 +122,7 @@ public class ArticleGenerationService : IArticleGenerationService
     /// <returns>article id</returns>
     public async Task<long> DispatchArticleGenerationAsync(ContentRequest request)
     {
-        var article = request.ToArticleApiUpsertRequest();
+        var article = request.ToArticleApiUpsertRequest("Generating content...");
         var articleId = await _contentsApiRemoteService.AddArticleAsync(article);
         request.Id = articleId;
         await _rabbitMqPublisher.PublishAsync(QueueList.GenerateArticleQueue, request);
@@ -153,4 +147,37 @@ public class ArticleGenerationService : IArticleGenerationService
         }
         return content;
     }
+
+    private string sampleResponse() =>
+    """
+    {
+        "Articles": [
+            {
+                "SortNumber": 1,
+                "Title": "Understanding Prompts in AI: A Beginner's Guide",
+                "Abstract": "**What are Prompts?** - Introduction to prompts and their role in AI interactions.  \n**Types of Prompts** - Overview of different prompt styles and their uses.  \n**Creating Effective Prompts** - Basic tips for crafting prompts that yield useful AI responses.",
+                "Tags": ["Beginner", "AI Interaction", "N/A", "Overview", "Conversational"]
+            },
+            {
+                "SortNumber": 2,
+                "Title": "Advanced Techniques for Prompt Engineering in AI",
+                "Abstract": "**Prompt Engineering** - Deep dive into designing prompts for specific AI behaviors.  \n**Optimization Strategies** - Techniques for refining prompts to improve AI output quality.  \n**Case Studies** - Examples of successful prompt engineering in real-world applications.",
+                "Tags": ["Advanced", "AI Development", "N/A", "Deep-dive", "Technical"]
+            },
+            {
+                "SortNumber": 3,
+                "Title": "The Impact of Prompts on AI Model Performance",
+                "Abstract": "**Performance Metrics** - How prompts influence AI model accuracy and efficiency.  \n**Comparative Analysis** - Side-by-side comparison of different prompting strategies.  \n**Future Directions** - Emerging trends in prompt design and their potential impacts.",
+                "Tags": ["Expert", "AI Research", "N/A", "Comparison", "Analytical"]
+            },
+            {
+                "SortNumber": 4,
+                "Title": "Best Practices for Prompt Design in Conversational AI",
+                "Abstract": "**User Experience** - Designing prompts that enhance interaction quality.  \n**Common Pitfalls** - Mistakes to avoid in prompt design.  \n**Recommendations** - Proven strategies for creating effective conversational AI prompts.",
+                "Tags": ["General", "Conversational AI", "N/A", "Best-practices", "Conversational"]
+            }
+        ],
+        "AIMessage": "Key subtopics covered include beginner's guide to prompts, advanced prompt engineering techniques, impact of prompts on AI performance, and best practices for prompt design in conversational AI. Completion confirmed."
+    }
+    """;
 }

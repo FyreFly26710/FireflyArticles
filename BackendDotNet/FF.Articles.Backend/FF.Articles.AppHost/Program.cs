@@ -13,7 +13,7 @@ var rabbitMqUsername = builder.AddParameter("rabbitmqUsername", secret: false);
 var rabbitMqPassword = builder.AddParameter("rabbitmqPassword", secret: false);
 var rabbitMq = builder.AddRabbitMQ("rabbitmq", rabbitMqUsername, rabbitMqPassword)
     .WithLifetime(ContainerLifetime.Persistent)
-    .WithManagementPlugin()
+    .WithManagementPlugin(15672)
     .WithEndpoint("tcp", e =>
     {
         e.Port = 5672;

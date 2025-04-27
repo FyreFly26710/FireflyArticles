@@ -14,7 +14,7 @@ interface AiGenContextType {
   isGeneratingAll: boolean;
 
   // Article list actions
-  generateArticles: (topic: string, articleCount: number) => Promise<void>;
+  generateArticles: (articleListRequest: API.ArticleListRequest) => Promise<void>;
   updateResults: (updatedResults: API.ArticlesAIResponse) => void;
   newGeneration: () => void;
   clearResults: () => void;
@@ -53,18 +53,13 @@ export function AiGenProvider({ children }: { children: ReactNode }) {
   }, []);
 
   // Round 1: Generate article list
-  const generateArticles = async (topic: string, articleCount: number) => {
+  const generateArticles = async (articleListRequest: API.ArticleListRequest) => {
     setLoading(true);
     setResults(undefined);
     setTopic(topic);
     setGenerationStatus({});
     try {
-      const response = await apiAiArticlesGenerateList({
-        topic,
-        articleCount,
-        model: 'qwq:32b',
-        provider: 'ollama'
-      });
+      const response = await apiAiArticlesGenerateList(articleListRequest);
       const data = response.data;
       setResults(data);
       
@@ -104,20 +99,20 @@ export function AiGenProvider({ children }: { children: ReactNode }) {
   };
 
   // Article editing functions
-  const handleEditArticle = (articleId: number) => {
+  const handleEditArticle = (sortNumber: number) => {
     setEditableArticles(prevArticles => 
       prevArticles.map(article => 
-        article.id === articleId 
+        article.sortNumber === sortNumber 
           ? { ...article, isEditing: true } 
           : article
       )
     );
   };
 
-  const handleSaveArticle = (articleId: number) => {
+  const handleSaveArticle = (sortNumber: number) => {
     setEditableArticles(prevArticles => {
       const newArticles = prevArticles.map(article => 
-        article.id === articleId 
+        article.sortNumber === sortNumber 
           ? { ...article, isEditing: false } 
           : article
       );
@@ -134,12 +129,12 @@ export function AiGenProvider({ children }: { children: ReactNode }) {
     });
   };
 
-  const handleCancelEdit = (articleId: number) => {
+  const handleCancelEdit = (sortNumber: number) => {
     setEditableArticles(prevArticles => 
       prevArticles.map(article => {
-        if (article.id === articleId && results?.articles) {
+        if (article.sortNumber === sortNumber && results?.articles) {
           // Find the original article from results to restore its data
-          const originalArticle = results.articles.find(a => a.id === articleId);
+          const originalArticle = results.articles.find(a => a.sortNumber === sortNumber);
           return {
             ...originalArticle!,
             isEditing: false
@@ -150,20 +145,20 @@ export function AiGenProvider({ children }: { children: ReactNode }) {
     );
   };
 
-  const handleUpdateField = (articleId: number, field: keyof API.AIGenArticleDto, value: any) => {
+  const handleUpdateField = (sortNumber: number, field: keyof API.AIGenArticleDto, value: any) => {
     setEditableArticles(prevArticles => 
       prevArticles.map(article => 
-        article.id === articleId 
+        article.sortNumber === sortNumber 
           ? { ...article, [field]: value } 
           : article
       )
     );
   };
 
-  const handleAddTag = (articleId: number, tag: string) => {
+  const handleAddTag = (sortNumber: number, tag: string) => {
     setEditableArticles(prevArticles => 
       prevArticles.map(article => {
-        if (article.id === articleId) {
+        if (article.sortNumber === sortNumber) {
           const updatedTags = [...article.tags, tag];
           return { ...article, tags: updatedTags };
         }
@@ -172,10 +167,10 @@ export function AiGenProvider({ children }: { children: ReactNode }) {
     );
   };
 
-  const handleRemoveTag = (articleId: number, tagIndex: number) => {
+  const handleRemoveTag = (sortNumber: number, tagIndex: number) => {
     setEditableArticles(prevArticles => 
       prevArticles.map(article => {
-        if (article.id === articleId) {
+        if (article.sortNumber === sortNumber) {
           const updatedTags = [...article.tags];
           updatedTags.splice(tagIndex, 1);
           return { ...article, tags: updatedTags };
@@ -191,7 +186,7 @@ export function AiGenProvider({ children }: { children: ReactNode }) {
       // Update status to generating
       setGenerationStatus(prev => ({
         ...prev,
-        [article.id]: { isGenerating: true }
+        [article.sortNumber]: { isGenerating: true }
       }));
       
       if (!results?.topicId) {
@@ -199,7 +194,8 @@ export function AiGenProvider({ children }: { children: ReactNode }) {
       }
       
       const contentRequest: API.ContentRequest = {
-        id: article.id,
+        sortNumber: article.sortNumber,
+        category: results.category,
         title: article.title,
         abstract: article.abstract,
         tags: article.tags,
@@ -214,7 +210,7 @@ export function AiGenProvider({ children }: { children: ReactNode }) {
       // Update status with generated article ID
       setGenerationStatus(prev => ({
         ...prev,
-        [article.id]: { 
+        [article.sortNumber]: { 
           isGenerating: false,
           generatedArticleId: articleId
         }
@@ -222,12 +218,12 @@ export function AiGenProvider({ children }: { children: ReactNode }) {
       
       return articleId;
     } catch (error) {
-      console.error(`Error generating content for article ${article.id}:`, error);
+      console.error(`Error generating content for article ${article.sortNumber}:`, error);
       
       // Update status to show error
       setGenerationStatus(prev => ({
         ...prev,
-        [article.id]: { isGenerating: false }
+        [article.sortNumber]: { isGenerating: false }
       }));
       
       message.error(`Failed to generate content for "${article.title}"`);
@@ -241,8 +237,8 @@ export function AiGenProvider({ children }: { children: ReactNode }) {
       
       // Filter articles that haven't been generated yet AND aren't currently generating
       const articlesToGenerate = editableArticles.filter(
-        article => !generationStatus[article.id]?.generatedArticleId && 
-                  !generationStatus[article.id]?.isGenerating
+        article => !generationStatus[article.sortNumber]?.generatedArticleId && 
+                  !generationStatus[article.sortNumber]?.isGenerating
       );
       
       if (articlesToGenerate.length === 0) {

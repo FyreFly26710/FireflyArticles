@@ -11,8 +11,8 @@ const ArticleGenerationForm: React.FC = () => {
   const [form] = Form.useForm();
   const { generateArticles, loading } = useAiGen();
 
-  const handleSubmit = (values: { topic: string; count: number }) => {
-    generateArticles(values.topic, values.count);
+  const handleSubmit = (values: { topic: string; count: number; category: string }) => {
+    generateArticles({ topic: values.topic, category: values.category, articleCount: values.count });
   };
 
   return (
@@ -20,7 +20,7 @@ const ArticleGenerationForm: React.FC = () => {
       <Row gutter={[16, 24]}>
         <Col xs={24} md={16}>
           <Paragraph>
-            Enter a topic and the number of articles you'd like to generate. Our AI will create
+            Enter a topic and the number of articles you&apos;d like to generate. Our AI will create
             article suggestions with titles, abstracts, and relevant tags.
           </Paragraph>
           
@@ -30,6 +30,23 @@ const ArticleGenerationForm: React.FC = () => {
             onFinish={handleSubmit}
             initialValues={{ count: 3 }}
           >
+            <Form.Item
+              name="category"
+              label="Category"
+              rules={[{ required: true, message: 'Please enter a category' }]}
+              tooltip="Enter a specific category for which you want to generate articles"
+            >
+              <Input 
+                placeholder="e.g., Technology, Health, Business" 
+                size="large"
+                suffix={
+                  <Tooltip title="Be specific with your category for better results">
+                    <InfoCircleOutlined style={{ color: 'rgba(0,0,0,.45)' }} />
+                  </Tooltip>
+                }
+              />
+            </Form.Item>
+            
             <Form.Item
               name="topic"
               label="Topic"

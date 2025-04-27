@@ -40,10 +40,10 @@ const ArticleResults: React.FC = () => {
           itemLayout="vertical"
           dataSource={editableArticles}
           renderItem={(article) => (
-            <List.Item key={article.id}>
+            <List.Item key={article.sortNumber}>
               <ArticleItem
                 article={article}
-                generationStatus={generationStatus[article.id]}
+                generationStatus={generationStatus[article.sortNumber]}
                 topicId={results.topicId}
               />
             </List.Item>

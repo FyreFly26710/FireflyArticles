@@ -6,18 +6,18 @@ public static class Prompts
 {
     private const string magicPrompt = "Take a deep breath. Think step by step.";
 
-    public static string User_ArticleList(string topic, int articleCount) =>
+    public static string User_ArticleList(string topic, int articleCount, string category) =>
     magicPrompt
     + Environment.NewLine +
     $"""
-    Generate {articleCount} article titles covering the {topic}.
+    Generate {articleCount} article titles covering the {topic} in {category}.
     Each article should include:
         Title: Clear and concise, describing the article's focus.
         Abstract:
             - Provide 2-3 key points, each in a single concise sentence. 
             - It does not need to be proper full sentences. Just key words and very brief explanation.
         Tags:
-            - Provide five tags for the article.
+            - Provide tags for the article following the tags rules below.
         Each title should explore a distinct subtopic or angle related to the main topic.
     You should also provide a message.
         If the topic is valid: List key subtopics covered and confirm completion.
@@ -63,27 +63,28 @@ public static class Prompts
 
     Tone & Style Constraints:
     - Ensure nature language and flow.
-    - Adhere strictly to the five Tag values—do not invent or deviate.  
-    - Write to an approximate length of 800–1,200 words.  
+    - Write to an approximate length of 800–1,800 words.  
+    - Follow the tags rules. Tags are very important. 
+    - However, there might be cases that the tags provided do not match the rules. In that case, you can ignore the rules and write the article in a way that is most suitable for the article.
 
     """
     + Environment.NewLine +
     TagRules;
 
     private static string TagRules = """
-    Tags (exactly five, following the same order; omit Tech Stack/Language if non-programming):
+    Tags (exactly four/five, following the same order):
     1. **Skill Level**: Beginner / Advanced / Expert / General  
     2. **Focus Area**: (choose one relevant to the article, e.g. “API Design,” “Performance Optimization,” “Testing”)  
-    3. **Tech Stack/Language**: (e.g. ORM,” “JavaScript,” “Kubernetes”; only for programming articles)  
+    3. **Tech Stack/Language**: (e.g. ORM,” “JavaScript,” “Kubernetes”; only when applicable, if not applicable, leave blank)  
     4. **Article Style**: Overview / Deep-dive / Best-practices / Listicle / Q&A / Comparison  
-    5. **Tone**: Conversational / Analytical / Academic / Technical / Code-heavy
+    5. **Tone**: Conversational / Academic / Technical / Code-heavy
 
     Tag Interpretation Rules:
     - **Skill Level**  
     • Beginner → assume no prior knowledge.
     • Advanced → assume some experience; use domain terms with brief clarifications.  
     • Expert → presume deep background; dive into edge cases, optimizations, trade-offs.  
-    • General → not applicable to above or mix of levels; focus on broad understanding.
+    • General → not applicable to above or mix of levels; focus on broad understanding. Placeholder for articles that are not applicable to above styles.
 
     - **Focus Area**  
     → Choose examples, case studies, or sections that best match this subdomain.
@@ -91,6 +92,7 @@ public static class Prompts
     - **Tech Stack/Language**  
     → Write all code samples, configuration snippets, and idiomatic examples in this stack.  
     → Follow its best practices and naming conventions.
+    → If not applicable, leave blank.
 
     - **Article Style**  
     • Overview → broad survey with high-level descriptions.  
@@ -101,8 +103,10 @@ public static class Prompts
     • Comparison → side-by-side pros/cons, feature matrix or benchmark notes.
 
     - **Tone**  
-    • Conversational → use friendly tone.
     • Academic → formal style, careful choice of words.  
     • Technical → mix of prose and inline code comments; clear instructions.  
+    • Code-heavy → dense with code examples, minimal prose.
+    • Conversational → informal, casual, engaging tone. Placeholder for articles that are not applicable to above styles.
+
     """;
 }

@@ -30,9 +30,6 @@ public class RabbitMqPublisher : IRabbitMqPublisher
         var properties = _channel.CreateBasicProperties();
         properties.Persistent = true;
 
-        _channel.BasicPublish(exchange: "",
-                             routingKey: queueName,
-                             basicProperties: properties,
-                             body: body);
+        _channel.BasicPublish(exchange: "", routingKey: queueName, basicProperties: properties, body: body);
     }
 }

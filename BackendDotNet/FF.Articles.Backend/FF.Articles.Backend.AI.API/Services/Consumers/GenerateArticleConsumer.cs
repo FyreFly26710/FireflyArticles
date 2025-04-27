@@ -36,8 +36,7 @@ public class GenerateArticleConsumer(IConnection connection, IServiceScopeFactor
                 var articleGenerationService = scope.ServiceProvider.GetRequiredService<IArticleGenerationService>();
                 articleContent = await articleGenerationService.GenerateArticleContentAsync(generateRequest);
             }
-            var newRequest = generateRequest.ToArticleApiUpsertRequest();
-            newRequest.Content = articleContent;
+            var newRequest = generateRequest.ToArticleApiUpsertRequest(articleContent);
 
             var rabbitMqPublisher = scope.ServiceProvider.GetRequiredService<IRabbitMqPublisher>();
             await rabbitMqPublisher.PublishAsync(QueueList.ArticleReadyQueue, newRequest);

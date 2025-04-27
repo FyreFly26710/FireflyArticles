@@ -92,6 +92,7 @@ declare namespace API {
   // AI Articles models
   type ArticleListRequest = {
     topic: string;
+    category: string;
     articleCount?: number;
     model?: string;
     provider?: string;
@@ -106,17 +107,20 @@ declare namespace API {
     articles: AIGenArticleDto[];
     aiMessage: string;
     topicId: number;
+    category: string;
   };
   type AIGenArticleDto = {
-    id: number;
+    sortNumber: number;
     title: string;
     abstract: string;
     tags: string[];
   };
   type ContentRequest = {
-    id: number;
+    // id: number;
+    sortNumber: number;
     topicId: number;
     topic: string;
+    category: string;
     title: string;
     abstract: string;
     tags: string[];

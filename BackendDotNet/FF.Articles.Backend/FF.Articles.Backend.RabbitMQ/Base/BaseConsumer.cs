@@ -37,13 +37,14 @@ public abstract class BaseConsumer : BackgroundService
         var consumer = new EventingBasicConsumer(_channel);
         consumer.Received += async (model, ea) =>
         {
+            var messageJson = QueueDeclareHelper.GetJsonMessage(ea);
+
             try
             {
-                var messageJson = getJsonMessage(ea);
-
                 await HandleMessageAsync(messageJson);
 
                 _channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
+                _logger.LogInformation("Message processed: {messageJson}", messageJson);
             }
             catch (Exception ex)
             {
@@ -58,16 +59,17 @@ public abstract class BaseConsumer : BackgroundService
         {
             try
             {
-                var messageJson = getJsonMessage(ea);
+                var messageJson = QueueDeclareHelper.GetJsonMessage(ea);
 
                 // Call the DLQ-specific handler method
                 await HandleDeadLetterMessageAsync(messageJson);
+                _logger.LogInformation("DLQ message processed: {messageJson}", messageJson);
 
                 _channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error processing DLQ message: {messageJson}", getJsonMessage(ea));
+                _logger.LogError(ex, "Error processing DLQ message: {messageJson}", QueueDeclareHelper.GetJsonMessage(ea));
                 _channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
             }
         };
@@ -92,28 +94,13 @@ public abstract class BaseConsumer : BackgroundService
     private void retryMessage(Exception ex, BasicDeliverEventArgs ea)
     {
 
-        var headers = ea.BasicProperties.Headers;
-        int deathCount = 0;
-
-        if (headers != null && headers.TryGetValue("x-death", out var deathHeaderObj))
-        {
-            var deathHeader = (List<object>)deathHeaderObj;
-            if (deathHeader.Count > 0)
-            {
-                var death = (Dictionary<string, object>)deathHeader[0];
-                deathCount = (int)(long)death["count"];
-            }
-        }
-        _logger.LogError(ex, "Error processing message: {messageJson}, Death count: {deathCount}", getJsonMessage(ea), deathCount);
+        var deathCount = QueueDeclareHelper.GetDeathCount(ea);
+        _logger.LogError(ex, "Error processing message: {messageJson}, Death count: {deathCount}", QueueDeclareHelper.GetJsonMessage(ea), deathCount);
 
         if (deathCount >= 3)
         {
             // After 3 attempts, move to DLQ manually
-            _channel.BasicPublish(
-                exchange: "",
-                routingKey: $"{_queue}.dlq",
-                basicProperties: null,
-                body: ea.Body);
+            _channel.BasicPublish(exchange: "", routingKey: $"{_queue}.dlq", basicProperties: null, body: ea.Body);
             _channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
         }
         else
@@ -122,12 +109,7 @@ public abstract class BaseConsumer : BackgroundService
             _channel.BasicNack(deliveryTag: ea.DeliveryTag, multiple: false, requeue: false);
         }
     }
-    private string getJsonMessage(BasicDeliverEventArgs ea)
-    {
-        var body = ea.Body.ToArray();
-        var messageJson = Encoding.UTF8.GetString(body);
-        return messageJson;
-    }
+
     public override void Dispose()
     {
         _channel.Close();
