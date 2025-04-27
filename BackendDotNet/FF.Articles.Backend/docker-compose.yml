@@ -1,3 +1,5 @@
+# docker compose -f docker-compose.yml up -d
+
 version: '3.8'
 
 services:
@@ -7,20 +9,12 @@ services:
       dockerfile: Dockerfile
     ports:
       - "21000:21000"
-    # environment:
-    #   # CORS
-    #   - AllowedOrigins__0="http://localhost:3000"
-    #   # GmailOAuth
-    #   - GmailOAuth__ClientId=xxx
-    #   - GmailOAuth__ClientSecret=xxxx
-    #   - GmailOAuth__RedirectUri=http://localhost:21000/api/identity/auth/signin-google
-    #   # AI Services
-    #   - DeepSeek__ApiKey=xxxx
-    #   - Ollama__ApiUrl=xxxx
     networks:
       - fireflynet
     depends_on:
       postgres:
+        condition: service_healthy
+      rabbitmq:
         condition: service_healthy
     # Add host.docker.internal mapping to host gateway
     extra_hosts:
@@ -43,9 +37,25 @@ services:
       timeout: 5s
       retries: 5
 
+  rabbitmq:
+    image: rabbitmq:3-management
+    environment:
+      - RABBITMQ_DEFAULT_USER=rabbitmq
+      - RABBITMQ_DEFAULT_PASS=rabbitmq
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    networks:
+      - fireflynet
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "check_port_connectivity"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
 networks:
   fireflynet:
     driver: bridge
 
 volumes:
   postgres-data:
+  rabbitmq-data:

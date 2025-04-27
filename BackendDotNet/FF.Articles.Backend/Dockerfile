@@ -34,6 +34,7 @@ ENV ASPNETCORE_ENVIRONMENT=Production \
     ConnectionStrings__contentdb="Host=postgres;Port=5432;Username=postgres;Password=postgres;Database=contentdb;Trust Server Certificate=True;" \
     ConnectionStrings__aidb="Host=postgres;Port=5432;Username=postgres;Password=postgres;Database=aidb;Trust Server Certificate=True;" \
     ConnectionStrings__redis="redis:6379" \
+    ConnectionStrings__rabbitmq="amqp://rabbitmq:rabbitmq@rabbitmq:5672" \
     # AllowedOrigins__0="http://localhost:3000" \
     # YARP Route Configuration
     ReverseProxy__Routes__contents-route__ClusterId=contentsCluster \

@@ -1,0 +1,73 @@
+# docker compose -f docker-compose.from-images.yml up -d
+services:
+  frontend:
+    image: firefly26710/ffarticles-frontend:${FRONTEND_IMAGE_TAG}
+    depends_on:
+      - backend
+    networks:
+      - firefly-network
+    environment:
+      - NEXT_PUBLIC_API_URL=${GMAIL_OAUTH_REDIRECT_URI}
+      - NEXT_PUBLIC_GOOGLE_CLIENT_ID=${GMAIL_OAUTH_CLIENT_ID}
+      - NEXT_PUBLIC_BASE_URL=${NEXT_PUBLIC_BASE_URL}
+
+  backend:
+    image: firefly26710/ffarticles-backend:${BACKEND_IMAGE_TAG}
+    environment:
+      # CORS: Frontend App URL
+      - AllowedOrigins__0=${NEXT_PUBLIC_BASE_URL}
+      # GmailOAuth
+      - GmailOAuth__ClientId=${GMAIL_OAUTH_CLIENT_ID}
+      - GmailOAuth__ClientSecret=${GMAIL_OAUTH_CLIENT_SECRET}
+      - GmailOAuth__RedirectUri=${GMAIL_OAUTH_REDIRECT_URI}
+      # AI Services
+      - DeepSeek__ApiKey=${DEEPSEEK_API_KEY}
+      - Ollama__ApiUrl=${OLLAMA_API_URL}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - firefly-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    networks:
+      - firefly-network
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "check_port_connectivity"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  postgres:
+    image: postgres:15
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - firefly-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+networks:
+  firefly-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  redis-data:
+  rabbitmq-data: 

@@ -1,3 +1,6 @@
+# docker build -t ffarticles-frontend . --no-cache
+# docker run -d -p 3000:3000 --name ff-frontend ffarticles-frontend
+
 FROM node:20-alpine AS builder
 
 WORKDIR /app
@@ -33,10 +36,14 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 
-# Copy necessary files from builder
+# Create .next directory explicitly
+RUN mkdir -p .next
+
+# Copy .next directory separately
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/package-lock.json* ./
 COPY --from=builder /app/node_modules ./node_modules
 
 # Set runtime environment variables
@@ -53,4 +60,5 @@ EXPOSE 3000
 # Run with minimal privileges
 USER node
 
-CMD ["./node_modules/.bin/next", "start"]
+# Start Next.js
+CMD ["node_modules/next/dist/bin/next", "start"]

@@ -17,20 +17,6 @@ using FF.Articles.Backend.AI.API.MapperExtensions;
 
 namespace FF.Articles.Backend.AI.API.Services;
 
-/// <summary>
-/// new topic: - round 1
-/// ui inserts topic/category to db.
-/// ui sends topic/category and article count. api calls deepseek to generate list of articles (id, title, abstract).
-/// returns back to ui along with ai message.
-/// 
-/// new topic: - round 2
-/// ui modifies the list and sends back to api. (either single article or multiple articles)
-/// api calls deepseek to generate content, tags of the article. 
-/// api calls remote articles api to save new article to db. (save new article, get articleId)
-/// return ai message and new address to ui.
-/// 
-/// existing topic: (update and extend from existing articles) to do.
-/// </summary>
 public class ArticleGenerationService : IArticleGenerationService
 {
     private readonly IAssistant _aiChatAssistant;
@@ -60,10 +46,9 @@ public class ArticleGenerationService : IArticleGenerationService
         };
         var topicId = await _contentsApiRemoteService.AddTopicByTitleAsync(request.Topic);
         _logger.LogInformation("Begin to generate topic: {topic}; TopicId: {topicId}", request.Topic, topicId);
-        // var response = await _aiChatAssistant.ChatAsync(chatRequest, cancellationToken);
-        // var jsonContent = response?.Message?.Content ?? "";
-        var jsonContent = sampleResponse();
-        //_logger.LogInformation("Request to generate topic: {topic}; Milliseconds taken : {time}; Tokens: {tokens}", request.Topic, response?.ExtraInfo?.Duration, response?.ExtraInfo?.OutputTokens);
+        var response = await _aiChatAssistant.ChatAsync(chatRequest, cancellationToken);
+        var jsonContent = response?.Message?.Content ?? "";
+        _logger.LogInformation("Request to generate topic: {topic}; Milliseconds taken : {time}; Tokens: {tokens}", request.Topic, response?.ExtraInfo?.Duration, response?.ExtraInfo?.OutputTokens);
 
         // Extract content between first { and last }
         int firstBrace = jsonContent.IndexOf('{');
@@ -148,36 +133,4 @@ public class ArticleGenerationService : IArticleGenerationService
         return content;
     }
 
-    private string sampleResponse() =>
-    """
-    {
-        "Articles": [
-            {
-                "SortNumber": 1,
-                "Title": "Understanding Prompts in AI: A Beginner's Guide",
-                "Abstract": "**What are Prompts?** - Introduction to prompts and their role in AI interactions.  \n**Types of Prompts** - Overview of different prompt styles and their uses.  \n**Creating Effective Prompts** - Basic tips for crafting prompts that yield useful AI responses.",
-                "Tags": ["Beginner", "AI Interaction", "N/A", "Overview", "Conversational"]
-            },
-            {
-                "SortNumber": 2,
-                "Title": "Advanced Techniques for Prompt Engineering in AI",
-                "Abstract": "**Prompt Engineering** - Deep dive into designing prompts for specific AI behaviors.  \n**Optimization Strategies** - Techniques for refining prompts to improve AI output quality.  \n**Case Studies** - Examples of successful prompt engineering in real-world applications.",
-                "Tags": ["Advanced", "AI Development", "N/A", "Deep-dive", "Technical"]
-            },
-            {
-                "SortNumber": 3,
-                "Title": "The Impact of Prompts on AI Model Performance",
-                "Abstract": "**Performance Metrics** - How prompts influence AI model accuracy and efficiency.  \n**Comparative Analysis** - Side-by-side comparison of different prompting strategies.  \n**Future Directions** - Emerging trends in prompt design and their potential impacts.",
-                "Tags": ["Expert", "AI Research", "N/A", "Comparison", "Analytical"]
-            },
-            {
-                "SortNumber": 4,
-                "Title": "Best Practices for Prompt Design in Conversational AI",
-                "Abstract": "**User Experience** - Designing prompts that enhance interaction quality.  \n**Common Pitfalls** - Mistakes to avoid in prompt design.  \n**Recommendations** - Proven strategies for creating effective conversational AI prompts.",
-                "Tags": ["General", "Conversational AI", "N/A", "Best-practices", "Conversational"]
-            }
-        ],
-        "AIMessage": "Key subtopics covered include beginner's guide to prompts, advanced prompt engineering techniques, impact of prompts on AI performance, and best practices for prompt design in conversational AI. Completion confirmed."
-    }
-    """;
 }
