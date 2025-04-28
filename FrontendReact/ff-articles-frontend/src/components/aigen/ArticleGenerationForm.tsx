@@ -3,7 +3,7 @@
 import React from 'react';
 import { Form, Input, Button, InputNumber, Card, Typography, Row, Col, Tooltip } from 'antd';
 import { SendOutlined, InfoCircleOutlined } from '@ant-design/icons';
-import { useAiGen } from '../context/AiGenContext';
+import { useAiGen } from '@/stores/aiGenContext';
 
 const { Title, Paragraph } = Typography;
 

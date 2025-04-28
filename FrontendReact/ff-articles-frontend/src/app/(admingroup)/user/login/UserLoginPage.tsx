@@ -7,7 +7,7 @@ import { LockOutlined, UserOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { AppDispatch } from "@/stores";
+import { AppDispatch } from "@/stores/reduxStore";
 import { setLoginUser } from "@/stores/loginUser";
 import { useDispatch } from "react-redux";
 import { apiAuthLogin } from "@/api/identity/api/auth";

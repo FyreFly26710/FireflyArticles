@@ -7,7 +7,7 @@ import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import menus from "../../config/menus";
-import { AppDispatch, RootState } from "@/stores";
+import { AppDispatch, RootState } from "@/stores/reduxStore";
 import { useDispatch, useSelector } from "react-redux";
 import { setLoginUser } from "@/stores/loginUser";
 import { DEFAULT_USER } from "@/constants/user";

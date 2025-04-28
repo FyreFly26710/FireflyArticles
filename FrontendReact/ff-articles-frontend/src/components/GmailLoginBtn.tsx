@@ -1,11 +1,6 @@
 import React from 'react';
 import { Button, message } from 'antd';
 import styled from "styled-components";
-import { setLoginUser } from '@/stores/loginUser';
-import { storage } from '@/stores/storage';
-import { apiAuthGetLoginUser } from '@/api/identity/api/auth';
-import { AppDispatch } from "@/stores";
-import { useDispatch } from "react-redux";
 
 
 const GoogleIcon = () => (
@@ -33,7 +28,6 @@ const StyledButton = styled(Button)`
 `;
 
 const GoogleLoginButton = () => {
-    const dispatch = useDispatch<AppDispatch>();
     const apiUrl = process.env.NEXT_PUBLIC_API_URL;
     const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
     const handleGoogleLogin = async () => {

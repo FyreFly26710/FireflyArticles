@@ -4,10 +4,10 @@ import React, { useState } from 'react';
 import { Card, Tag, Typography, Row, Col, Space, Divider, Button, Input, Form, Spin, message } from 'antd';
 import { FileTextOutlined, TagsOutlined, EditOutlined, SaveOutlined, CloseOutlined, PlusOutlined, RocketOutlined, LinkOutlined } from '@ant-design/icons';
 import Markdown from 'react-markdown';
-import styles from '../aigen.module.css';
+import styles from '@/styles/aigroup.module.css';
 import Link from 'next/link';
-import { useAiGen } from '../context/AiGenContext';
-import { EditableArticle } from '../types';
+import { EditableArticle } from '@/types/aigrouptypes';
+import { useAiGen } from '@/stores/aiGenContext';
 
 const { Title, Paragraph } = Typography;
 const { TextArea } = Input;
@@ -75,7 +75,7 @@ const ArticleItem: React.FC<ArticleItemProps> = ({
   if (generatedArticleId) {
     const articleUrl = `/topic/${topicId}/article/${generatedArticleId}`;
     return (
-      <Card className="article-card">
+      <Card className={styles['article-card']}>
         <div style={{ textAlign: 'center', padding: '20px 0' }}>
           <Title level={5}>Article Generated Successfully!</Title>
           <Paragraph>
@@ -92,9 +92,8 @@ const ArticleItem: React.FC<ArticleItemProps> = ({
 
   // If generating, show loading spinner
   if (isGenerating) {
-    const topicUrl = `/topic/${topicId}`;
     return (
-      <Card className="article-card">
+      <Card className={styles['article-card']}>
         <div style={{ textAlign: 'center', padding: '30px 0' }}>
           <Spin size="large" />
           <Paragraph style={{ marginTop: 16 }}>
@@ -113,7 +112,7 @@ const ArticleItem: React.FC<ArticleItemProps> = ({
     <Card
       hoverable={!article.isEditing}
       style={{ width: '100%' }}
-      className={`article-card ${article.isEditing ? styles['article-card-editing'] : ''}`}
+      className={`${styles['article-card']} ${article.isEditing ? styles['article-card-editing'] : ''}`}
       onClick={() => !article.isEditing && handleEditArticle(article.sortNumber)}
       actions={article.isEditing ? [
         <Button

@@ -30,10 +30,11 @@ export default function Markdown({ children, hiddenCodeCopyButton }: MarkdownPro
             components={{
                 code: ({ children, className, ...props }) => (
                     <CodeBlock
-                        children={children}
                         hiddenCodeCopyButton={hiddenCodeCopyButton}
                         {...props}
-                    />
+                    >
+                        {children}
+                    </CodeBlock>
                 ),
                 a: ({ node, ...props }) => (
                     <a

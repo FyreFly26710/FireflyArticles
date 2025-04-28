@@ -3,10 +3,10 @@
 import React from 'react';
 import { Card, Space, Spin, Button } from 'antd';
 import Title from "antd/es/typography/Title";
-import ArticleGenerationForm from './components/ArticleGenerationForm';
-import styles from './aigen.module.css';
-import ArticleResults from './components/ArticleResults';
-import { useAiGen } from './context/AiGenContext';
+import styles from '@/styles/aigroup.module.css';
+import { useAiGen } from '../../../stores/aiGenContext';
+import ArticleGenerationForm from '@/components/aigen/ArticleGenerationForm';
+import ArticleResults from '@/components/aigen/ArticleResults';
 
 const AiGenPage = () => {
     const { 

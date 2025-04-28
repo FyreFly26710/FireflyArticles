@@ -2,8 +2,8 @@
 
 import { createContext, useContext, useState, ReactNode, useCallback } from 'react';
 import { apiAiArticlesGenerateList, apiAiArticlesGenerateContent } from '@/api/ai/api/aiarticles';
-import { ArticleGenerationStatus, EditableArticle } from '../types';
 import { message } from 'antd';
+import { ArticleGenerationStatus, EditableArticle } from '@/types/aigrouptypes';
 
 interface AiGenContextType {
   loading: boolean;

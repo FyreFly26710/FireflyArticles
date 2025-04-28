@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux";
-import { RootState } from "@/stores";
+import { RootState } from "@/stores/reduxStore";
 import { usePathname } from "next/navigation";
 import checkAccess from "@/access/checkAccess";
 import Forbidden from "@/app/forbidden";

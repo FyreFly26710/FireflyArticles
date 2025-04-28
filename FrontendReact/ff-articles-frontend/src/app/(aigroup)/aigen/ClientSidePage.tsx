@@ -1,4 +1,4 @@
-import { AiGenProvider } from './context/AiGenContext';
+import { AiGenProvider } from '../../../stores/aiGenContext';
 import AiGenPage from './AiGenPage';
 
 export default function ClientSidePage() {

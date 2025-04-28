@@ -1,6 +1,6 @@
 // @ts-ignore
 /* eslint-disable */
-import request from "@/libs/request";
+import request from "@/api/request";
 
 /**GET /api/identity/users */
 export async function apiUserGetByPage(

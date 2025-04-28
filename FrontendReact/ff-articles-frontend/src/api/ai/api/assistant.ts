@@ -1,5 +1,5 @@
 /* eslint-disable */
-import request from "@/libs/request";
+import request from "@/api/request";
 
 /** GET /api/ai/assistant/providers */
 export async function apiAiAssistantProviders(
