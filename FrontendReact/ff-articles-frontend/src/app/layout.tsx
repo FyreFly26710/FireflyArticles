@@ -2,12 +2,12 @@
 
 import { AntdRegistry } from "@ant-design/nextjs-registry";
 import "./globals.css";
-import BasicLayout from "@/components/BasicLayout";
+import BasicLayout from "@/components/shared/BasicLayout";
 import { useCallback, useEffect } from "react";
 import { Provider, useDispatch } from "react-redux";
 import store, { AppDispatch } from "@/stores/reduxStore";
 import { setLoginUser } from "@/stores/loginUser";
-import AccessLayout from "@/access/AccessLayout";
+import AccessLayout from "@/components/shared/AccessLayout";
 import enGB from 'antd/locale/en_GB';
 import { ConfigProvider } from "antd";
 import { storage } from "@/stores/storage";

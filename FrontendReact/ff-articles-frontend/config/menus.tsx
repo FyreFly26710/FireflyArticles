@@ -1,6 +1,6 @@
 import { MenuDataItem } from "@ant-design/pro-layout";
 import { CrownOutlined } from "@ant-design/icons";
-import ACCESS_ENUM from "@/access/accessEnum";
+import ACCESS_ENUM from "@/constants/accessEnum";
 
 const menus = [
     {

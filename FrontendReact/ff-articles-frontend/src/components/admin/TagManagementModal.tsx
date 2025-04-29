@@ -1,6 +1,6 @@
 import React from 'react';
 import { Modal } from 'antd';
-import TagEdit from '@/components/admin/TagEdit';
+import TagEdit from './TagEdit';
 
 interface TagModalProps {
     visible: boolean;

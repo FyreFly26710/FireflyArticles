@@ -1,5 +1,5 @@
 // Default user
-import ACCESS_ENUM from "@/access/accessEnum";
+import ACCESS_ENUM from "@/constants/accessEnum";
 
 export const DEFAULT_USER: API.LoginUserDto = {
     userName: "Not Login",
