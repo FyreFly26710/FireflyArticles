@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { ActionType, ProColumns, ProTable } from "@ant-design/pro-components";
 import Link from "next/link";
 import { TablePaginationConfig } from "antd";
-import TagList from "@/components/TagList";
+import TagList from "@/components/shared/TagList";
 import { apiArticleGetByPage } from "@/api/contents/api/article";
 import { apiTopicGetByPage } from "@/api/contents/api/topic";
 import { apiTagGetAll } from "@/api/contents/api/tag";

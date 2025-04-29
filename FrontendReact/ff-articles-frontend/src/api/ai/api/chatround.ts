@@ -1,5 +1,5 @@
 /* eslint-disable */
-import request, { url } from "@/libs/request";
+import request, { url } from "@/libs/utils/request";
 
 
 /** POST /api/ai/chat-rounds */

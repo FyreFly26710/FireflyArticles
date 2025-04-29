@@ -1,5 +1,5 @@
 /* eslint-disable */
-import request from "@/libs/request";
+import request from "@/libs/utils/request";
 
 /** POST /api/ai/articles/generate-article-list */
 export async function apiAiArticlesGenerateList(

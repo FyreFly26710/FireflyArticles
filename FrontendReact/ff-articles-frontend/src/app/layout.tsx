@@ -5,7 +5,7 @@ import "./globals.css";
 import BasicLayout from "@/layouts/BasicLayout";
 import { useCallback, useEffect } from "react";
 import { Provider, useDispatch } from "react-redux";
-import store, { AppDispatch } from "@/stores";
+import store, { AppDispatch } from "@/stores/reduxStore";
 import { setLoginUser } from "@/stores/loginUser";
 import AccessLayout from "@/access/AccessLayout";
 import enGB from 'antd/locale/en_GB';

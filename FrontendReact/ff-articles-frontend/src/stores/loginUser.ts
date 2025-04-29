@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { DEFAULT_USER } from "@/constants/user";
+import { DEFAULT_USER } from "@/libs/constants/user";
 
 /**
  * Slice: from redux toolkit to simplify redux

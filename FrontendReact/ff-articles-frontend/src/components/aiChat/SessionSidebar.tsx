@@ -6,7 +6,7 @@ import {
     MenuUnfoldOutlined
 } from '@ant-design/icons'
 import SessionList from './SessionList'
-import { useChat } from '@/app/(aigroup)/aichat/context/ChatContext'
+import { useChat } from '@/stores/ChatContext'
 import { storage, LayoutSettings } from '@/stores/storage'
 const { Sider } = Layout
 

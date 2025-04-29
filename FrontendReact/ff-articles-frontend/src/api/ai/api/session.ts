@@ -1,5 +1,5 @@
 /* eslint-disable */
-import request from "@/libs/request";
+import request from "@/libs/utils/request";
 import qs from "qs";
 
 /** GET /api/ai/sessions/${param0} */

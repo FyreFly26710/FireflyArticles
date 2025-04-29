@@ -2,7 +2,7 @@
 import React, { useRef, useState } from 'react'
 import { Button, Input } from 'antd'
 import { SendOutlined, SettingOutlined } from '@ant-design/icons'
-import { useChat } from '@/app/(aigroup)/aichat/context/ChatContext'
+import { useChat } from '@/stores/ChatContext'
 import InputSettings from './InputSettings'
 
 export default function InputBox() {

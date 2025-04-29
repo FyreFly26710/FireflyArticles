@@ -1,6 +1,6 @@
 // @ts-ignore
 /* eslint-disable */
-import request from "@/libs/request";
+import request from "@/libs/utils/request";
 
 /**GET /api/contents/tags */
 export async function apiTagGetAll(options?: { [key: string]: any }) {

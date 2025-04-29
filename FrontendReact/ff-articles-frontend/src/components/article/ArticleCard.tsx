@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import { Avatar, Button, Card, Dropdown, Flex, Input, MenuProps, message } from "antd";
 import Title from "antd/es/typography/Title";
 import { apiArticleAddByRequest, apiArticleEditByRequest } from "@/api/contents/api/article";
-import TagList from "@/components/TagList";
-import MdEditor from "@/components/MdEditor";
+import TagList from "@/components/shared/TagList";
+import MdEditor from "@/components/shared/MdEditor";
 import ArticleFormModal from "@/components/article/ArticleFormModal";
 import { useRouter } from "next/navigation";
 import styles from './ArticleCard.module.css';
@@ -13,7 +13,7 @@ import styles from './ArticleCard.module.css';
 import dynamic from 'next/dynamic'
 import Markdown from "../aiChat/Markdown";
 
-const MdViewer = dynamic(() => import('@/components/MdViewer'), {
+const MdViewer = dynamic(() => import('@/components/shared/MdViewer'), {
     ssr: false
 })
 

@@ -1,7 +1,7 @@
 import { apiArticleEditByRequest } from '@/api/contents/api/article';
 import { Button, Form, Input, InputNumber, message, Modal, Select, Tag } from 'antd';
 import React, { useEffect, useState } from 'react';
-import TagSelect from '@/components/TagSelect';
+import TagSelect from '@/components/shared/TagSelect';
 
 const { Option } = Select;
 

@@ -1,6 +1,6 @@
 // @ts-ignore
 /* eslint-disable */
-import request from "@/libs/request";
+import request from "@/libs/utils/request";
 
 /**POST /api/identity/auth/getLoginUser */
 export async function apiAuthGetLoginUser(options?: { [key: string]: any }) {

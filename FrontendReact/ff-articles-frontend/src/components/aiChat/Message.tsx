@@ -3,8 +3,8 @@ import { Avatar, Typography, Divider } from 'antd'
 import { UserOutlined, RobotOutlined } from '@ant-design/icons'
 import Markdown from './Markdown'
 import { storage } from '@/stores/storage'
-import { useChat } from '@/app/(aigroup)/aichat/context/ChatContext'
-import { DEFAULT_USER } from '@/constants/user'
+import { useChat } from '@/stores/ChatContext'
+import { DEFAULT_USER } from '@/libs/constants/user'
 const setOpenSettingWindow = (type: string) => console.log('Open settings:', type)
 
 interface MessageProps {
