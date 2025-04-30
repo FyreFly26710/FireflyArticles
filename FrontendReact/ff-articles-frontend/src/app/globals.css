@@ -33,3 +33,6 @@
 .ant-pro-layout .ant-pro-layout-content {
   padding-block: 10px !important;
 }
+.ant-layout-content {
+  margin: 12px !important;
+}

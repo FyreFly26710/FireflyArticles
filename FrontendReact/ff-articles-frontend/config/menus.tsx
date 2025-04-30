@@ -1,6 +1,6 @@
 import { MenuDataItem } from "@ant-design/pro-layout";
 import { CrownOutlined } from "@ant-design/icons";
-import ACCESS_ENUM from "@/access/accessEnum";
+import ACCESS_ENUM from "@/libs/constants/accessEnum";
 
 const menus = [
     {
@@ -11,10 +11,10 @@ const menus = [
         path: "/topics",
         name: "Topics",
     },
-    {
-        path: "/articles",
-        name: "Article",
-    },
+    // {
+    //     path: "/articles",
+    //     name: "Article",
+    // },
     {
         path: "/aichat",
         name: "AI Chat",

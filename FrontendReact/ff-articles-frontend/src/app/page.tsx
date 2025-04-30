@@ -2,8 +2,8 @@
 import { Divider, Flex, Spin } from "antd";
 import Title from "antd/es/typography/Title";
 import Link from "antd/es/typography/Link";
-import TopicList from "@/components/article/TopicList";
-import ArticleList from "@/components/article/ArticleList";
+import TopicList from "@/components/home/TopicList";
+import ArticleList from "@/components/home/ArticleList";
 import { useHomePageData } from "./hooks";
 
 export default function HomePage() {

@@ -52,14 +52,13 @@ declare namespace API {
     IncludeArticles?: boolean;
     IncludeSubArticles?: boolean;
     IncludeContent?: boolean;
+    OnlyCategoryTopic?: boolean;
     PageNumber?: number;
     PageSize?: number;
     SortField?: string;
     SortOrder?: string;
   };
 
-  // todo: 
-  // Changed tagIds to tags
   type ArticleAddRequest = {
     title?: string;
     content?: string;

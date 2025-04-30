@@ -40,7 +40,19 @@ public class TopicService : BaseService<Topic, ContentsDbContext>, ITopicService
     public async Task<TopicDto> GetTopicDto(Topic topic) => await GetTopicDto(topic, new TopicQueryRequest());
     public async Task<TopicDto> GetTopicDto(Topic topic, TopicQueryRequest topicRequest)
     {
-        var topicDto = topic.ToDto();
+        var topicDto = new TopicDto();
+        if (topicRequest.OnlyCategoryTopic)
+        {
+            topicDto = new TopicDto
+            {
+                TopicId = topic.Id,
+                Title = topic.Title,
+                Category = topic.Category,
+            };
+            return topicDto;
+        }
+
+        topicDto = topic.ToDto();
         if (topicRequest.IncludeUser) topicDto.User = await _identityRemoteService.GetUserByIdAsync(topic.UserId);
         if (topicRequest.IncludeArticles)
         {

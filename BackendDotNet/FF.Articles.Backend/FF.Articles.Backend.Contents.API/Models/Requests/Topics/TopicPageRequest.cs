@@ -9,6 +9,7 @@ namespace FF.Articles.Backend.Contents.API.Models.Requests.Topics
         public bool IncludeArticles { get; set; } = false;
         public bool IncludeSubArticles { get; set; } = false;
         public bool IncludeContent { get; set; } = false;
+        public bool OnlyCategoryTopic { get; set; } = false;
         public override string? SortField { get; set; } = "SortNumber";
     }
 }

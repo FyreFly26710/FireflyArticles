@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { Button, Dropdown, Menu, Modal, message, Input } from 'antd'
 import { MoreOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons'
-import { cn } from '@/libs/utils'
 
 interface SessionItemProps {
     session: API.SessionDto
@@ -60,11 +59,11 @@ export default function SessionItem({
     return (
         <>
             <div
-                className={cn(
-                    "flex items-center p-3 cursor-pointer transition-colors rounded-lg mb-2",
-                    isActive ? "bg-gray-100" : "bg-transparent",
-                    "hover:bg-gray-100",
-                )}
+                className={
+                    "flex items-center p-3 cursor-pointer transition-colors rounded-lg mb-2"
+                    + (isActive ? "bg-gray-100" : "")
+                    + (isHovered ? "hover:bg-gray-100" : "")
+                }
                 onClick={() => onSelect(session)}
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}

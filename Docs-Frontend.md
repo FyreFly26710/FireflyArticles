@@ -5,11 +5,9 @@
 The Firefly Articles frontend is built using the following technologies:
 
 - **Framework**: Next.js 14 (React-based framework)
-- **UI Library**: Ant Design (antd) with Pro Components
-- **State Management**: Redux Toolkit
-- **Styling**: Tailwind CSS with styled-components
-- **Markdown**: ByteMD editor and React Markdown for viewing
-- **Authentication**: Custom auth with Redux storage
+- **UI Library**: Ant Design (antd) 
+- **State Management**: Redux Toolkit, context
+- **Styling**: Tailwind CSS with styled-components, no extra css files
 
 ## Project Structure
 
@@ -27,7 +25,6 @@ FrontendReact/ff-articles-frontend/
 │   │   ├── aichat/         # AI chat page
 │   │   ├── aigen/          # AI generation page
 │   │   ├── admin/          # Admin pages
-│   │   ├── articles/       # Articles pages
 │   │   ├── topic/          
 │   │   │    └─ [topicid]   # Single topic page
 │   │   │           ├─ article  # Sinlgle article page
@@ -58,6 +55,13 @@ FrontendReact/ff-articles-frontend/
 └── ...                     # Configuration files
 ```
 
+### Topic/Topics pages
+- Topics/: list topics and articles table (filter by category/topic/tags)
+- Topic: On hover, list category-topics, click redirect to topicid page
+- Topic/[topicId]/: article page displaying topic summary article, left sidebar navigate to articles or new page
+- Topic/[topicId]/article/[articleId]/: article page, display article, enable edit
+- Topic/[topicId]/new: article page to create new article
+
 ## Organization Structure
 
 ### Page Organization
@@ -69,9 +73,6 @@ FrontendReact/ff-articles-frontend/
 ### Component Organization
 - One folder in `components` for each page
 - Page-specific components are stored in their respective folders
-- Components structure:
-  - `components.tsx`: Page-specific components
-  - `page.module.css`: CSS modules for both page and components
 - Shared components are in `components/shared`
 
 ### Hooks Organization
@@ -83,22 +84,6 @@ FrontendReact/ff-articles-frontend/
 - Redux store for global state management
 - Local storage for persisting data
 - Context for component-level state sharing
-
-## Key Components
-
-### Layout System
-
-The application uses a hierarchical layout system:
-- `BasicLayout`: Main layout including navigation and common UI elements
-- `AccessLayout`: Handles access control and permissions
-- Component-specific layouts
-
-### State Management
-
-Redux Toolkit is used for global state management with the following key stores:
-- User authentication state
-- Application configuration
-- Feature-specific states
 
 ### Core Features
 
@@ -115,13 +100,6 @@ AI features include:
 - Chat interface
 - Content generation capabilities
 - AI-assisted editing
-
-#### 3. Authentication
-
-Authentication system includes:
-- Gmail login integration
-- User role management
-- Permission-based access control
 
 ## Components Styling
 

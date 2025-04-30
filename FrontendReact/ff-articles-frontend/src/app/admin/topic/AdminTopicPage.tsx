@@ -4,9 +4,6 @@ import { Button } from "antd";
 import React from "react";
 import { getTopicColumns } from "@/app/admin/topic/topicColumns";
 import { useTopicAdmin } from "@/app/admin/topic/useTopicAdmin";
-import CreateTopicModal from "@/components/admin/CreateTopicModal";
-import UpdateTopicModal from "@/components/admin/UpdateTopicModal";
-
 const AdminTopicPage: React.FC = () => {
     const {
         createModalVisible,
@@ -44,7 +41,7 @@ const AdminTopicPage: React.FC = () => {
                 columns={getTopicColumns(setCurrentRow, setUpdateModalVisible, handleDelete)}
             />
 
-            <CreateTopicModal
+            {/* <CreateTopicModal
                 visible={createModalVisible}
                 columns={getTopicColumns(setCurrentRow, setUpdateModalVisible, handleDelete)}
                 onSubmit={() => {
@@ -68,7 +65,7 @@ const AdminTopicPage: React.FC = () => {
                 onCancel={() => {
                     setUpdateModalVisible(false);
                 }}
-            />
+            /> */}
         </PageContainer>
     );
 };

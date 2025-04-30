@@ -1,11 +1,12 @@
+"use client";
 import { useSelector } from "react-redux";
 import { RootState } from "@/stores/reduxStore";
 import { usePathname } from "next/navigation";
-import checkAccess from "@/access/checkAccess";
 import Forbidden from "@/app/forbidden";
 import React from "react";
-import { findAllMenuItemByPath } from "../../config/menus";
-import AccessEnum from "@/access/accessEnum";
+import { findAllMenuItemByPath } from "../../../config/menus";
+import AccessEnum from "@/libs/constants/accessEnum";
+import { checkAccess } from "@/libs/utils/accessUtils";
 
 const AccessLayout: React.FC<
   Readonly<{
