@@ -27,13 +27,24 @@ public static class ContentsDbSeedData
     {
         return new List<Topic>
         {
-            new Topic { Id = 1, Title = "Java Fundamentals", Content = "Learn the basics of Java programming", Abstract = "Introduction to Java", Category = "Java", UserId = 1, SortNumber = 1, IsHidden = 0 },
-            new Topic { Id = 2, Title = "Advanced Java", Content = "Advanced Java concepts and patterns", Abstract = "Advanced Java topics", Category = "Java", UserId = 1, SortNumber = 2, IsHidden = 0 },
-            new Topic { Id = 3, Title = "C# Basics", Content = "Introduction to C# programming", Abstract = "C# fundamentals", Category = "C#", UserId = 1, SortNumber = 3, IsHidden = 0 },
-            new Topic { Id = 4, Title = "C# Advanced", Content = "Advanced C# concepts and features", Abstract = "Advanced C# topics", Category = "C#", UserId = 1, SortNumber = 4, IsHidden = 0 },
-            new Topic { Id = 5, Title = "Cross-Platform Development", Content = "Developing cross-platform applications", Abstract = "Cross-platform development", Category = "C#", UserId = 1, SortNumber = 5, IsHidden = 0 }
+            new Topic { Id = 100, Title = "Java Fundamentals", Content = "Learn the basics of Java programming", Abstract = "Introduction to Java", Category = "Java", UserId = 1, SortNumber = 1, IsHidden = 0 },
+            new Topic { Id = 200, Title = "Advanced Java", Content = "Advanced Java concepts and patterns", Abstract = "Advanced Java topics", Category = "Java", UserId = 1, SortNumber = 2, IsHidden = 0 },
+            new Topic { Id = 300, Title = "C# Basics", Content = "Introduction to C# programming", Abstract = "C# fundamentals", Category = "C#", UserId = 1, SortNumber = 3, IsHidden = 0 },
+            new Topic { Id = 400, Title = "C# Advanced", Content = "Advanced C# concepts and features", Abstract = "Advanced C# topics", Category = "C#", UserId = 1, SortNumber = 4, IsHidden = 0 },
+            new Topic { Id = 500, Title = "Cross-Platform Development", Content = "Developing cross-platform applications", Abstract = "Cross-platform development", Category = "C#", UserId = 1, SortNumber = 5, IsHidden = 0 }
         };
     }
+    //public static List<Article> GetTopicArticles()
+    //{
+    //    return new List<Article>
+    //    {
+    //        new Article { Id = 100, Title = "Java Fundamentals", Content = "Learn the basics of Java programming", Abstract = "Introduction to Java", UserId = 1, SortNumber = 1, IsHidden = 0 },
+    //        new Article { Id = 200, Title = "Advanced Java", Content = "Advanced Java concepts and patterns", Abstract = "Advanced Java topics", UserId = 1, SortNumber = 2, IsHidden = 0 },
+    //        new Article { Id = 300, Title = "C# Basics", Content = "Introduction to C# programming", Abstract = "C# fundamentals", UserId = 1, SortNumber = 3, IsHidden = 0 },
+    //        new Article { Id = 400, Title = "C# Advanced", Content = "Advanced C# concepts and features", Abstract = "Advanced C# topics", UserId = 1, SortNumber = 4, IsHidden = 0 },
+    //        new Article { Id = 500, Title = "Cross-Platform Development", Content = "Developing cross-platform applications", Abstract = "Cross-platform development", UserId = 1, SortNumber = 5, IsHidden = 0 }
+    //    };
+    //}
 
     public static List<Article> GetArticles()
     {

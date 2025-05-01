@@ -12,4 +12,6 @@ public static class ArticleTypes
     /// SubArticle
     /// </summary>
     public const string SubArticle = "SubArticle";
+
+    public const string TopicArticle = "TopicArticle";
 }

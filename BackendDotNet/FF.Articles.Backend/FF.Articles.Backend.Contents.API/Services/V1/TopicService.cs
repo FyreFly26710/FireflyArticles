@@ -76,10 +76,10 @@ public class TopicService : BaseService<Topic, ContentsDbContext>, ITopicService
                 topic.IsHidden = (int)topicEditRequest.IsHidden;
             if (topicEditRequest.Title != null && topic.Title != topicEditRequest.Title)
                 topic.Title = topicEditRequest.Title;
-            if (topicEditRequest.Abstract != null && topic.Abstract != topicEditRequest.Abstract)
-                topic.Abstract = topicEditRequest.Abstract;
-            if (topicEditRequest.Content != null && topic.Content != topicEditRequest.Content)
-                topic.Content = topicEditRequest.Content;
+            //if (topicEditRequest.Abstract != null && topic.Abstract != topicEditRequest.Abstract)
+            //    topic.Abstract = topicEditRequest.Abstract;
+            //if (topicEditRequest.Content != null && topic.Content != topicEditRequest.Content)
+            //    topic.Content = topicEditRequest.Content;
             if (topicEditRequest.Category != null && topic.Category != topicEditRequest.Category)
                 topic.Category = topicEditRequest.Category;
             if (topicEditRequest.TopicImage != null && topic.TopicImage != topicEditRequest.TopicImage)
@@ -103,6 +103,28 @@ public class TopicService : BaseService<Topic, ContentsDbContext>, ITopicService
             await _topicRepository.DeleteAsync(topicId);
         });
         return true;
+    }
+    public override async Task<long> CreateAsync(Topic entity)
+    {
+        var id = await _topicRepository.CreateAsync(entity);
+        var article = new Article
+        {
+            Id = id,
+            Title = entity.Title,
+            Abstract = entity.Abstract,
+            Content = "",
+            ArticleType = ArticleTypes.TopicArticle,
+            ParentArticleId = null,
+            UserId = entity.UserId,
+            TopicId = id,
+            SortNumber = 0,
+            IsHidden = 0,
+            CreateTime = DateTime.UtcNow,
+            UpdateTime = DateTime.UtcNow
+        };
+        await _articleRepository.CreateAsync(article);
+        await _topicRepository.SaveChangesAsync();
+        return id;
     }
 }
 

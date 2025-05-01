@@ -12,6 +12,7 @@ public static class ArticleAddRequestExtensions
         var config = new MapperConfiguration(cfg =>
         {
             cfg.CreateMap<ArticleAddRequest, Article>();
+            cfg.CreateMap<ArticleEditRequest, ArticleAddRequest>();
         });
         _mapper = config.CreateMapper();
     }
@@ -22,6 +23,13 @@ public static class ArticleAddRequestExtensions
         {
             article.UserId = userId.Value;
         }
+        return article;
+    }
+    public static ArticleAddRequest ToAddRequest(this ArticleEditRequest articleAddRequest)
+    {
+        var article = _mapper.Map<ArticleAddRequest>(articleAddRequest);
+        article.Id = articleAddRequest.ArticleId;
+
         return article;
     }
 }

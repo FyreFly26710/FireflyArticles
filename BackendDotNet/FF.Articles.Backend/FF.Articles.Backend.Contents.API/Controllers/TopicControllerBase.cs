@@ -51,12 +51,12 @@ public abstract class TopicControllerBase : ControllerBase
     [Authorize(Roles = UserConstant.ADMIN_ROLE)]
     public async Task<ApiResponse<long>> AddByRequest([FromBody] TopicAddRequest topicAddRequest)
     {
-        string title = topicAddRequest.Title;
-        var existTopic = await _topicService.GetTopicByTitle(title);
-        if (existTopic != null)
-        {
-            return ResultUtil.Success(existTopic.Id);
-        }
+        //string title = topicAddRequest.Title;
+        //var existTopic = await _topicService.GetTopicByTitle(title);
+        //if (existTopic != null)
+        //{
+        //    return ResultUtil.Success(existTopic.Id);
+        //}
 
         var topic = topicAddRequest.ToEntity();
         var userDto = UserUtil.GetUserFromHttpRequest(Request);
