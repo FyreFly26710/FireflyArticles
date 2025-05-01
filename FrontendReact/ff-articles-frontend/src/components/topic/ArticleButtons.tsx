@@ -10,11 +10,10 @@ import { useRouter } from 'next/navigation';
 
 interface ArticleButtonsProps {
   topicId?: number;
-  articleId?: number;
   onEditModal?: () => void;
 }
 
-const ArticleButtons = ({ topicId, articleId, onEditModal }: ArticleButtonsProps) => {
+const ArticleButtons = ({ topicId, onEditModal }: ArticleButtonsProps) => {
   const router = useRouter();
 
   const handleNewArticle = () => {
@@ -43,6 +42,7 @@ const ArticleButtons = ({ topicId, articleId, onEditModal }: ArticleButtonsProps
     <FloatButton.Group
       trigger="hover"
       style={{ right: 24, bottom: 24 }}
+      shape="square"
       icon={<PlusOutlined />}
     >
       <FloatButton

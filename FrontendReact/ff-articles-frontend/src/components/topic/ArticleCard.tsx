@@ -1,8 +1,8 @@
 "use client";
 
 import { Row, Col } from 'antd';
+import { useState } from 'react';
 import dynamic from 'next/dynamic';
-import { useArticleModal } from '@/hooks/useArticleModal';
 
 // Dynamically import components to reduce initial bundle size
 const ArticleHeaderCard = dynamic(() => import('@/components/topic/ArticleHeaderCard'), {
@@ -27,11 +27,25 @@ interface ArticleCardProps {
 }
 
 const ArticleCard = ({ topicId, article }: ArticleCardProps) => {
-    const { openModal } = useArticleModal();
+    // Modal state
+    const [isVisible, setIsVisible] = useState(false);
+    const [currentArticle, setCurrentArticle] = useState<API.ArticleDto | null>(null);
 
-    // Handle opening the edit modal with the current article
-    const handleOpenModal = () => {
-        openModal(article);
+    // Open modal
+    const openModal = (article: API.ArticleDto) => {
+        setCurrentArticle(article);
+        setIsVisible(true);
+    };
+
+    // Close modal
+    const closeModal = () => {
+        setIsVisible(false);
+    };
+
+    // Handle modal success
+    const handleModalSuccess = () => {
+        closeModal();
+        // You could add a callback to refresh article data here if needed
     };
 
     return (
@@ -46,10 +60,17 @@ const ArticleCard = ({ topicId, article }: ArticleCardProps) => {
             </Row>
             <ArticleButtons
                 topicId={topicId}
-                articleId={article?.articleId ?? topicId}
-                onEditModal={handleOpenModal}
+                onEditModal={() => openModal(article)}
             />
-            <ArticleFormModal />
+            {/* Only render the modal when it's visible */}
+            {isVisible && (
+                <ArticleFormModal
+                    visible={isVisible}
+                    currentArticle={currentArticle}
+                    onCancel={closeModal}
+                    onSuccess={handleModalSuccess}
+                />
+            )}
         </div>
     );
 };

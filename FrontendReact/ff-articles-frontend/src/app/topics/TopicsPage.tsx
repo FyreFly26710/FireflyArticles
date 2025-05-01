@@ -1,6 +1,7 @@
 "use server";
 import { apiTopicGetByPage } from "@/api/contents/api/topic";
 import CategoryTopics from "@/components/topics/CategoryTopics";
+import { getTopicsByCategory } from "@/libs/utils/articleUtils";
 
 const TopicsPage = async () => {
     try {
@@ -16,17 +17,7 @@ const TopicsPage = async () => {
         const topicsData = response.data?.data || [];
 
         // Process topics by category
-        const topicsByCategory: Record<string, API.TopicDto[]> = {};
-
-        topicsData.forEach(topic => {
-            const category = topic.category || "Uncategorized";
-
-            if (!topicsByCategory[category]) {
-                topicsByCategory[category] = [];
-            }
-
-            topicsByCategory[category].push(topic);
-        });
+        const topicsByCategory = getTopicsByCategory(topicsData);
 
         return (
             <div className="max-width-content">

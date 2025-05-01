@@ -45,7 +45,7 @@ public class ArticleGenerationService : IArticleGenerationService
             },
             Options = new ChatOptions() { ResponseFormat = ChatOptions.GetResponseFormat<ArticlesAIResponseDto>() }
         };
-        var topicId = await _contentsApiRemoteService.AddTopicByTitleAsync(request.Topic);
+        var topicId = await _contentsApiRemoteService.AddTopicByTitleCategoryAsync(request.Topic, request.Category);
         _logger.LogInformation("Begin to generate topic: {topic}; TopicId: {topicId}", request.Topic, topicId);
         var response = await _aiChatAssistant.ChatAsync(chatRequest, cancellationToken);
         var jsonContent = response?.Message?.Content ?? "";

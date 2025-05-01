@@ -2,8 +2,8 @@
 import { PageContainer, ProTable } from "@ant-design/pro-components";
 import { Button } from "antd";
 import React, { useRef } from "react";
-import { getUserColumns } from "@/app/(admingroup)/admin/user/userColumns";
 import { apiUserGetByPage } from "@/api/identity/api/user";
+import { getUserColumns } from "./userColumns";
 
 const AdminUserPage: React.FC = () => {
     const actionRef = useRef<any>();

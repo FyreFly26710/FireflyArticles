@@ -6,7 +6,6 @@ export const useTopicAdmin = () => {
     const [createModalVisible, setCreateModalVisible] = useState<boolean>(false);
     const [updateModalVisible, setUpdateModalVisible] = useState<boolean>(false);
     const actionRef = useRef<any>();
-    const [currentRow, setCurrentRow] = useState<API.TopicDto>();
 
     const handleDelete = async (row: API.TopicDto) => {
         const hide = message.loading("Deleting");
@@ -51,9 +50,6 @@ export const useTopicAdmin = () => {
         setCreateModalVisible,
         updateModalVisible,
         setUpdateModalVisible,
-        actionRef,
-        currentRow,
-        setCurrentRow,
         handleDelete,
         fetchTopics,
     };

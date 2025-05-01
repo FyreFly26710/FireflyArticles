@@ -51,7 +51,7 @@ declare namespace API {
     IncludeUser?: boolean;
     IncludeArticles?: boolean;
     IncludeSubArticles?: boolean;
-    IncludeContent?: boolean;
+    // IncludeContent?: boolean;
     OnlyCategoryTopic?: boolean;
     PageNumber?: number;
     PageSize?: number;
@@ -163,7 +163,7 @@ declare namespace API {
   type TopicAddRequest = {
     title?: string;
     abstract?: string;
-    content?: string;
+    // content?: string;
     topicImage?: string;
     category?: string;
     sortNumber?: number;
@@ -176,7 +176,7 @@ declare namespace API {
     updateTime?: string;
     title?: string;
     abstract?: string;
-    content?: string;
+    // content?: string;
     category?: string;
     topicImage?: string;
     userId?: number;

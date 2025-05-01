@@ -55,9 +55,9 @@ public class ContentsApiRemoteService : IContentsApiRemoteService
         return true;
     }
 
-    public async Task<long> AddTopicByTitleAsync(string title)
+    public async Task<long> AddTopicByTitleCategoryAsync(string title, string category)
     {
-        var payload = new { title };
+        var payload = new { title, category };
         string url = RemoteApiUrlConstant.TopicUrl();
 
         var requestMessage = CreateHttpRequestMessage(HttpMethod.Post, url, payload, AdminUsers.SYSTEM_ADMIN_DEEPSEEK);

@@ -6,7 +6,6 @@ import dynamic from 'next/dynamic';
 import { useArticleEdit } from '@/hooks/useArticleEdit';
 import { useState, useEffect } from 'react';
 import TagSelect from '@/components/shared/TagSelect';
-import { useTagList } from '@/hooks/useTagList';
 import { apiTagGetAll } from '@/api/contents/api/tag';
 
 // Dynamically import MdViewer to avoid SSR issues with markdown rendering

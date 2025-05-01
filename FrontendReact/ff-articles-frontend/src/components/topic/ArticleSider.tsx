@@ -138,10 +138,11 @@ const ArticleSider = ({ topic, collapsed, onCollapse, articleId }: ArticleSiderP
           position: 'absolute',
           bottom: '0',
           width: '100%',
+          height: '40px',
           display: 'flex',
           justifyContent: 'center',
           background: 'white',
-          padding: '10px 0',
+          padding: '0 0',
           zIndex: 10,
           borderTop: '1px solid #f0f0f0'
         }}
@@ -150,6 +151,7 @@ const ArticleSider = ({ topic, collapsed, onCollapse, articleId }: ArticleSiderP
           type="text"
           icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
           onClick={onCollapse}
+          style={{ width: '100%', height: '100%' }}
         />
       </div>
     </Sider>
