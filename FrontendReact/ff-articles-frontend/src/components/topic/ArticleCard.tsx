@@ -19,26 +19,10 @@ const ArticleButtons = dynamic(() => import('@/components/topic/ArticleButtons')
 
 interface ArticleCardProps {
     topicId: number;
-    article: API.ArticleDto | null;
-    error: string | null;
+    article: API.ArticleDto;
 }
 
-const ArticleCard = ({ topicId, article, error }: ArticleCardProps) => {
-    if (error) {
-        return (
-            <div className="flex justify-center items-center h-screen">
-                <p className="text-red-500">{error}</p>
-            </div>
-        );
-    }
-
-    if (!article) {
-        return (
-            <div className="flex justify-center items-center h-screen">
-                <p>Article content not found or failed to load.</p>
-            </div>
-        );
-    }
+const ArticleCard = ({ topicId, article }: ArticleCardProps) => {
 
     return (
         <div>
@@ -50,7 +34,7 @@ const ArticleCard = ({ topicId, article, error }: ArticleCardProps) => {
                     <ArticleContentCard article={article} />
                 </Col>
             </Row>
-            <ArticleButtons topicId={topicId} />
+            <ArticleButtons topicId={topicId} articleId={article?.articleId ?? topicId} />
         </div>
     );
 };

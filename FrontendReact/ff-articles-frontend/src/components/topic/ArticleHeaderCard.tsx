@@ -17,8 +17,7 @@ interface ArticleHeaderCardProps {
 }
 
 const ArticleHeaderCard = ({ article }: ArticleHeaderCardProps) => {
-  const formatDate = (dateString?: string) => {
-    if (!dateString) return 'Unknown date';
+  const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-GB', {
       year: 'numeric',
       month: 'long',
@@ -48,11 +47,12 @@ const ArticleHeaderCard = ({ article }: ArticleHeaderCardProps) => {
             </Space>
           )}
           <Divider type="vertical" style={{ height: '20px', margin: '0 8px' }} />
-
-          <Space>
-            <CalendarOutlined />
-            <Text>{formatDate(article.updateTime || article.createTime)}</Text>
-          </Space>
+          {article.updateTime && article.createTime && (
+            <Space>
+              <CalendarOutlined />
+              <Text>{formatDate(article.updateTime || article.createTime)}</Text>
+            </Space>
+          )}
 
           {article.tags && article.tags.length > 0 && (
             <>

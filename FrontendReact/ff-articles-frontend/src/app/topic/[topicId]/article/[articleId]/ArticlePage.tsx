@@ -6,8 +6,7 @@ export const dynamic = 'force-dynamic';
 
 // Server component to fetch data
 const ArticlePage = async ({ params }: { params: { topicId: string, articleId: string } }) => {
-    let article: API.ArticleDto | null = null;
-    let error = null;
+    var article: API.ArticleDto;
 
     try {
         const response = await apiArticleGetById({
@@ -16,16 +15,21 @@ const ArticlePage = async ({ params }: { params: { topicId: string, articleId: s
             IncludeContent: true
         });
 
-        if (response.data) {
-            article = response.data;
+        if (!response.data) {
+            throw new Error('Empty article data');
         }
+
+        article = response.data;
+
     } catch (err) {
-        error = 'Failed to fetch article data';
+        var error = 'Failed to fetch article data';
         console.error(error, err);
+        return <div>Error: {error}</div>;
+
     }
 
     // Pass the server-fetched data to the client component
-    return <ArticleCard article={article} error={error} topicId={parseInt(params.topicId)} />;
+    return <ArticleCard article={article} topicId={parseInt(params.topicId)} />;
 };
 
 export default ArticlePage;

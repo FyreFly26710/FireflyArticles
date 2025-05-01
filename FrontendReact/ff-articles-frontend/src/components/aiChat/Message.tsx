@@ -2,8 +2,8 @@ import { useEffect, useState, useRef } from 'react'
 import { Avatar, Typography, Divider } from 'antd'
 import { UserOutlined, RobotOutlined } from '@ant-design/icons'
 import Markdown from './Markdown'
-import { storage } from '@/stores/storage'
-import { useChat } from '@/stores/ChatContext'
+import { storage } from '@/states/storage'
+import { useChat } from '@/states/ChatContext'
 import { DEFAULT_USER } from '@/libs/constants/user'
 const setOpenSettingWindow = (type: string) => console.log('Open settings:', type)
 

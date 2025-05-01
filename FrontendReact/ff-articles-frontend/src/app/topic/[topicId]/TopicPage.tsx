@@ -8,33 +8,37 @@ export const dynamic = 'force-dynamic'; // Options: 'auto' | 'force-dynamic' | '
 
 // Server component to fetch data
 const TopicPage = async ({ params }: { params: { topicId: string } }) => {
-    let topic: API.TopicDto | null = null;
-    let article: API.ArticleDto | null = null;
-    let error = null;
+    var article: API.ArticleDto;
     const topicId = parseInt(params.topicId);
 
     try {
         const topicResponse = await apiTopicGetById({
             id: topicId,
         });
+        var topic = topicResponse.data;
+
+        if (!topic) {
+            throw new Error('Empty topic data');
+        }
+
         const articleResponse = await apiArticleGetById({
             id: topicId,
             IncludeUser: true,
             IncludeContent: true
         });
-        if (topicResponse.data) {
-            topic = topicResponse.data;
-        }
-        if (articleResponse.data) {
-            article = articleResponse.data;
-        }
+        article = articleResponse.data ?? {
+            articleId: topicId,
+            title: topic?.title ?? '',
+            content: ''
+        };
     } catch (err) {
-        error = 'Failed to fetch topic data';
+        var error = 'Failed to fetch topic data';
         console.error(error, err);
+        return <div>Error: {error}</div>;
+
     }
 
-    // Pass the server-fetched data to the client component
-    return <ArticleCard topicId={topicId} article={article} error={error} />;
+    return <ArticleCard topicId={topicId} article={article} />;
 };
 
 export default TopicPage;

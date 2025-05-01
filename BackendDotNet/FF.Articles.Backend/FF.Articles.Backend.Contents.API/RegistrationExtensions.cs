@@ -31,10 +31,10 @@ namespace FF.Articles.Backend.Contents.API
             services.AddScoped<IArticleTagRepository, ArticleTagRepository>();
 
             // V2 repositories (Redis)
-            //services.AddScoped<ITopicRedisRepository, TopicRedisRepository>();
-            //services.AddScoped<IArticleRedisRepository, ArticleRedisRepository>();
-            //services.AddScoped<ITagRedisRepository, TagRedisRepository>();
-            //services.AddScoped<IArticleTagRedisRepository, ArticleTagRedisRepository>();
+            services.AddScoped<ITopicRedisRepository, TopicRedisRepository>();
+            services.AddScoped<IArticleRedisRepository, ArticleRedisRepository>();
+            services.AddScoped<ITagRedisRepository, TagRedisRepository>();
+            services.AddScoped<IArticleTagRedisRepository, ArticleTagRedisRepository>();
 
             return services;
         }

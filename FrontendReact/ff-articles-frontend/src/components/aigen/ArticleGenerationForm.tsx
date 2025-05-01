@@ -3,7 +3,7 @@
 import React from 'react';
 import { Form, Input, Button, InputNumber, Card, Typography, Row, Col, Tooltip } from 'antd';
 import { SendOutlined, InfoCircleOutlined } from '@ant-design/icons';
-import { useAiGen } from '@/stores/AiGenContext';
+import { useAiGen } from '@/states/AiGenContext';
 
 const { Title, Paragraph } = Typography;
 
@@ -23,8 +23,8 @@ const ArticleGenerationForm: React.FC = () => {
             Enter a topic and the number of articles you&apos;d like to generate. Our AI will create
             article suggestions with titles, abstracts, and relevant tags.
           </Paragraph>
-          
-          <Form 
+
+          <Form
             form={form}
             layout="vertical"
             onFinish={handleSubmit}
@@ -36,8 +36,8 @@ const ArticleGenerationForm: React.FC = () => {
               rules={[{ required: true, message: 'Please enter a category' }]}
               tooltip="Enter a specific category for which you want to generate articles"
             >
-              <Input 
-                placeholder="e.g., Technology, Health, Business" 
+              <Input
+                placeholder="e.g., Technology, Health, Business"
                 size="large"
                 suffix={
                   <Tooltip title="Be specific with your category for better results">
@@ -46,15 +46,15 @@ const ArticleGenerationForm: React.FC = () => {
                 }
               />
             </Form.Item>
-            
+
             <Form.Item
               name="topic"
               label="Topic"
               rules={[{ required: true, message: 'Please enter a topic' }]}
               tooltip="Enter a specific topic or subject area for which you want to generate articles"
             >
-              <Input 
-                placeholder="e.g., Artificial Intelligence in Healthcare" 
+              <Input
+                placeholder="e.g., Artificial Intelligence in Healthcare"
                 size="large"
                 suffix={
                   <Tooltip title="Be specific with your topic for better results">
@@ -70,19 +70,19 @@ const ArticleGenerationForm: React.FC = () => {
               rules={[{ required: true, message: 'Please enter the number of articles' }]}
               tooltip="How many article suggestions do you want to generate (1-20)"
             >
-              <InputNumber 
-                min={1} 
-                max={20} 
-                style={{ width: '100%' }} 
+              <InputNumber
+                min={1}
+                max={20}
+                style={{ width: '100%' }}
                 size="large"
               />
             </Form.Item>
 
             <Form.Item>
-              <Button 
-                type="primary" 
-                htmlType="submit" 
-                size="large" 
+              <Button
+                type="primary"
+                htmlType="submit"
+                size="large"
                 loading={loading}
                 icon={<SendOutlined />}
                 style={{ width: '100%', marginTop: 16 }}
@@ -92,11 +92,11 @@ const ArticleGenerationForm: React.FC = () => {
             </Form.Item>
           </Form>
         </Col>
-        
+
         <Col xs={24} md={8}>
-          <Card 
-            title="Tips for Better Results" 
-            size="small" 
+          <Card
+            title="Tips for Better Results"
+            size="small"
             style={{ height: '100%', backgroundColor: '#f9f9f9' }}
           >
             <ul style={{ paddingLeft: 16 }}>

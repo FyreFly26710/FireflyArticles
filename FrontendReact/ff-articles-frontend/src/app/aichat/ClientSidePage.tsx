@@ -1,4 +1,4 @@
-import { ChatProvider } from '../../stores/ChatContext';
+import { ChatProvider } from '../../states/ChatContext';
 import AiChatPage from './AiChatPage';
 
 export default function ClientSidePage() {

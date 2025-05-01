@@ -4,7 +4,7 @@ import { AntdRegistry } from "@ant-design/nextjs-registry";
 import "./globals.css";
 import AppLayout from "@/layouts/AppLayout";
 import { Provider, useDispatch, useSelector } from "react-redux";
-import store, { AppDispatch, RootState } from "@/stores/reduxStore";
+import store, { AppDispatch, RootState } from "@/states/reduxStore";
 import enGB from 'antd/locale/en_GB';
 import { ConfigProvider } from "antd";
 import Forbidden from "./forbidden";
@@ -13,10 +13,10 @@ import { findAllMenuItemByPath } from "../../config/menus";
 import { usePathname } from "next/navigation";
 import AccessEnum from "@/libs/constants/accessEnum";
 import { useEffect } from "react";
-import { storage } from "@/stores/storage";
+import { storage } from "@/states/storage";
 import { apiAuthGetLoginUser } from "@/api/identity/api/auth";
 import { useCallback } from "react";
-import { setLoginUser } from "@/stores/loginUser";
+import { setLoginUser } from "@/states/loginUser";
 
 
 const UserStateLayout: React.FC<Readonly<{ children: React.ReactNode; }>> = ({ children }) => {
@@ -24,7 +24,7 @@ const UserStateLayout: React.FC<Readonly<{ children: React.ReactNode; }>> = ({ c
 
     const doInitLoginUser = useCallback(async () => {
         try {
-            let user = storage.getUser();           
+            let user = storage.getUser();
             if (!user) {
                 const res = await apiAuthGetLoginUser();
                 user = res.data ?? null;
@@ -50,20 +50,20 @@ const UserStateLayout: React.FC<Readonly<{ children: React.ReactNode; }>> = ({ c
 };
 
 const AccessLayout: React.FC<
-  Readonly<{
-    children: React.ReactNode;
-  }>
+    Readonly<{
+        children: React.ReactNode;
+    }>
 > = ({ children }) => {
-  const pathname = usePathname();
-  const loginUser = useSelector((state: RootState) => state.loginUser);
-  // auth check
-  const menu = findAllMenuItemByPath(pathname) || {};
-  const needAccess = menu?.access ?? AccessEnum.NOT_LOGIN;
-  const canAccess = checkAccess(loginUser, needAccess);
-  if (!canAccess) {
-    return <Forbidden />;
-  }
-  return <>{children}</>;
+    const pathname = usePathname();
+    const loginUser = useSelector((state: RootState) => state.loginUser);
+    // auth check
+    const menu = findAllMenuItemByPath(pathname) || {};
+    const needAccess = menu?.access ?? AccessEnum.NOT_LOGIN;
+    const canAccess = checkAccess(loginUser, needAccess);
+    if (!canAccess) {
+        return <Forbidden />;
+    }
+    return <>{children}</>;
 };
 
 

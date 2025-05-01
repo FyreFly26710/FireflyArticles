@@ -6,8 +6,8 @@ import {
     MenuUnfoldOutlined
 } from '@ant-design/icons'
 import SessionList from './SessionList'
-import { useChat } from '@/stores/ChatContext'
-import { storage, LayoutSettings } from '@/stores/storage'
+import { useChat } from '@/states/ChatContext'
+import { storage, LayoutSettings } from '@/states/storage'
 const { Sider } = Layout
 
 export default function SessionSidebar() {
@@ -89,7 +89,7 @@ export default function SessionSidebar() {
                     <Button
                         type="primary"
                         icon={<PlusCircleOutlined />}
-                        onClick={sessions.find(session => session.sessionId === 0) 
+                        onClick={sessions.find(session => session.sessionId === 0)
                             ? () => setSession(sessions.find(session => session.sessionId === 0)!)
                             : handleCreateNewSession}
                         style={{ width: '100%', textAlign: 'left', height: 40 }}

@@ -10,7 +10,7 @@ import {
   SettingOutlined
 } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
-import { useChat } from '@/stores/ChatContext';
+import { useChat } from '@/states/ChatContext';
 
 interface ChatSidebarProps {
   collapsed: boolean;

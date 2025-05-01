@@ -11,7 +11,7 @@ import {
   apiChatRoundStreamResponse
 } from '@/api/ai/api/chatround';
 import { apiAiAssistantProviders } from '@/api/ai/api/assistant';
-import { ChatBehaviorSettings, SelectedModel, storage } from '@/stores/storage';
+import { ChatBehaviorSettings, SelectedModel, storage } from './storage';
 
 interface ChatContextType {
   session: API.SessionDto;

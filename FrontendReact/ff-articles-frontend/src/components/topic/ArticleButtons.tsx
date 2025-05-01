@@ -10,9 +10,10 @@ import { useRouter } from 'next/navigation';
 
 interface ArticleButtonsProps {
   topicId?: number;
+  articleId?: number;
 }
 
-const ArticleButtons = ({ topicId }: ArticleButtonsProps) => {
+const ArticleButtons = ({ topicId, articleId }: ArticleButtonsProps) => {
   const router = useRouter();
 
   const handleNewArticle = () => {
@@ -21,9 +22,9 @@ const ArticleButtons = ({ topicId }: ArticleButtonsProps) => {
     }
   };
 
-  const handleEditTopic = () => {
+  const handleEditArticle = () => {
     if (topicId) {
-      router.push(`/topics/edit/${topicId}`);
+      router.push(`/topic/${topicId}/article/${articleId}/edit`);
     }
   };
 
@@ -50,8 +51,8 @@ const ArticleButtons = ({ topicId }: ArticleButtonsProps) => {
       />
       <FloatButton 
         icon={<EditOutlined />} 
-        tooltip="Edit Topic" 
-        onClick={handleEditTopic} 
+        tooltip="Edit Article" 
+        onClick={handleEditArticle} 
       />
       <FloatButton 
         icon={<VerticalAlignTopOutlined />} 

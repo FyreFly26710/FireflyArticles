@@ -6,7 +6,7 @@ import Title from "antd/es/typography/Title";
 import ArticleGenerationForm from '../../components/aigen/ArticleGenerationForm';
 import styles from './aigen.module.css';
 import ArticleResults from '../../components/aigen/ArticleResults';
-import { useAiGen } from '@/stores/AiGenContext';
+import { useAiGen } from '@/states/AiGenContext';
 
 const AiGenPage = () => {
     const {

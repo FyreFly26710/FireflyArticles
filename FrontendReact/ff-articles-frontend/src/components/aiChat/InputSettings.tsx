@@ -11,7 +11,7 @@ import {
   RobotOutlined,
   CompressOutlined
 } from '@ant-design/icons';
-import { storage, ChatDisplaySettings, ChatBehaviorSettings, SelectedModel } from '@/stores/storage';
+import { storage, ChatDisplaySettings, ChatBehaviorSettings, SelectedModel } from '@/states/storage';
 import { apiAiAssistantProviders } from '@/api/ai/api/assistant';
 
 const { Text } = Typography;

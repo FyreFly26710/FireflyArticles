@@ -1,10 +1,10 @@
 import React from 'react';
 import { Button, message } from 'antd';
 import styled from "styled-components";
-import { setLoginUser } from '@/stores/loginUser';
-import { storage } from '@/stores/storage';
+import { setLoginUser } from '@/states/loginUser';
+import { storage } from '@/states/storage';
 import { apiAuthGetLoginUser } from '@/api/identity/api/auth';
-import { AppDispatch } from "@/stores/reduxStore";
+import { AppDispatch } from "@/states/reduxStore";
 import { useDispatch } from "react-redux";
 
 

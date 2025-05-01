@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
 import Message from './Message'
-import { useChat } from '@/stores/ChatContext'
-import { storage, ChatDisplaySettings } from '@/stores/storage'
+import { useChat } from '@/states/ChatContext'
+import { storage, ChatDisplaySettings } from '@/states/storage'
 
 export default function MessageList() {
     const ref = useRef<HTMLDivElement>(null)
     const { session } = useChat()
     const rounds = session.rounds
-    
+
     // Initialize display settings with state
     const [displaySettings, setDisplaySettings] = useState(() => storage.getChatDisplaySettings());
 
@@ -34,8 +34,8 @@ export default function MessageList() {
     }, []);
 
     // Filter messages if showOnlyActiveMessages is true
-    const filteredRounds = displaySettings.showOnlyActiveMessages 
-        ? rounds?.filter(round => round.isActive) 
+    const filteredRounds = displaySettings.showOnlyActiveMessages
+        ? rounds?.filter(round => round.isActive)
         : rounds;
 
     // Scroll to bottom on new messages or when a message is being generated
@@ -90,7 +90,7 @@ export default function MessageList() {
         <div
             className="w-full h-full py-4 overflow-y-auto bg-white scroll-smooth message-list-container"
             ref={ref}
-            style={{ 
+            style={{
                 overscrollBehavior: 'contain',
                 paddingBottom: '140px' // Ensure space at bottom for input box
             }}
@@ -102,8 +102,8 @@ export default function MessageList() {
                         id={`chat-round-${chatRound.chatRoundId}`}
                         className="scroll-mt-16 mb-1"
                     >
-                        <Message 
-                            chatRound={chatRound} 
+                        <Message
+                            chatRound={chatRound}
                             collapseThreshold={150}
                         />
                     </div>

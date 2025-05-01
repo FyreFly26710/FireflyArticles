@@ -6,8 +6,8 @@ import { FileTextOutlined, TagsOutlined, EditOutlined, SaveOutlined, CloseOutlin
 import Markdown from 'react-markdown';
 import styles from '@/app/aigen/aigen.module.css';
 import Link from 'next/link';
-import { useAiGen } from '@/stores/AiGenContext';
-import { EditableArticle } from '@/stores/AiGenContext';
+import { useAiGen } from '@/states/AiGenContext';
+import { EditableArticle } from '@/states/AiGenContext';
 
 const { Title, Paragraph } = Typography;
 const { TextArea } = Input;

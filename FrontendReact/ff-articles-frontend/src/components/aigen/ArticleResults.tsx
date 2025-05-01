@@ -2,16 +2,16 @@
 
 import React from 'react';
 import { Card, List, Alert } from 'antd';
-import { useAiGen } from '@/stores/AiGenContext';
+import { useAiGen } from '@/states/AiGenContext';
 import ArticleItem from './ArticleItem';
 import AiInsight from './AiInsight';
 import ArticleListHeader, { ArticleListActions } from './ArticleListHeader';
 import EmptyArticleState from './EmptyArticleState';
 
 const ArticleResults: React.FC = () => {
-  const { 
-    results, 
-    editableArticles, 
+  const {
+    results,
+    editableArticles,
     generationStatus,
     isGeneratingAll,
     generateAllArticles
@@ -25,13 +25,13 @@ const ArticleResults: React.FC = () => {
     <div>
       <AiInsight message={results.aiMessage} />
 
-      <Card 
+      <Card
         title={<ArticleListHeader articleCount={editableArticles.length} />}
         bordered={false}
         className="article-results-card"
         extra={
-          <ArticleListActions 
-            onGenerateAll={generateAllArticles} 
+          <ArticleListActions
+            onGenerateAll={generateAllArticles}
             isGeneratingAll={isGeneratingAll}
           />
         }
