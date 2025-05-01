@@ -2,6 +2,7 @@
 
 import { Row, Col } from 'antd';
 import dynamic from 'next/dynamic';
+import { useArticleModal } from '@/hooks/useArticleModal';
 
 // Dynamically import components to reduce initial bundle size
 const ArticleHeaderCard = dynamic(() => import('@/components/topic/ArticleHeaderCard'), {
@@ -16,6 +17,9 @@ const ArticleButtons = dynamic(() => import('@/components/topic/ArticleButtons')
     loading: () => <div />
 });
 
+const ArticleFormModal = dynamic(() => import('@/components/shared/ArticleFormModal'), {
+    loading: () => <div />
+});
 
 interface ArticleCardProps {
     topicId: number;
@@ -23,6 +27,12 @@ interface ArticleCardProps {
 }
 
 const ArticleCard = ({ topicId, article }: ArticleCardProps) => {
+    const { openModal } = useArticleModal();
+
+    // Handle opening the edit modal with the current article
+    const handleOpenModal = () => {
+        openModal(article);
+    };
 
     return (
         <div>
@@ -34,7 +44,12 @@ const ArticleCard = ({ topicId, article }: ArticleCardProps) => {
                     <ArticleContentCard article={article} />
                 </Col>
             </Row>
-            <ArticleButtons topicId={topicId} articleId={article?.articleId ?? topicId} />
+            <ArticleButtons
+                topicId={topicId}
+                articleId={article?.articleId ?? topicId}
+                onEditModal={handleOpenModal}
+            />
+            <ArticleFormModal />
         </div>
     );
 };

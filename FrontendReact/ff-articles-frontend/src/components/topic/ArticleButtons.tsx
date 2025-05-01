@@ -1,9 +1,9 @@
 "use client";
 
 import { FloatButton } from 'antd';
-import { 
-  PlusOutlined, 
-  EditOutlined, 
+import {
+  PlusOutlined,
+  EditOutlined,
   VerticalAlignTopOutlined
 } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
@@ -11,9 +11,10 @@ import { useRouter } from 'next/navigation';
 interface ArticleButtonsProps {
   topicId?: number;
   articleId?: number;
+  onEditModal?: () => void;
 }
 
-const ArticleButtons = ({ topicId, articleId }: ArticleButtonsProps) => {
+const ArticleButtons = ({ topicId, articleId, onEditModal }: ArticleButtonsProps) => {
   const router = useRouter();
 
   const handleNewArticle = () => {
@@ -22,9 +23,9 @@ const ArticleButtons = ({ topicId, articleId }: ArticleButtonsProps) => {
     }
   };
 
-  const handleEditArticle = () => {
-    if (topicId) {
-      router.push(`/topic/${topicId}/article/${articleId}/edit`);
+  const handleOpenArticleModal = () => {
+    if (onEditModal) {
+      onEditModal();
     }
   };
 
@@ -44,20 +45,20 @@ const ArticleButtons = ({ topicId, articleId }: ArticleButtonsProps) => {
       style={{ right: 24, bottom: 24 }}
       icon={<PlusOutlined />}
     >
-      <FloatButton 
-        icon={<PlusOutlined />} 
-        tooltip="New Article" 
-        onClick={handleNewArticle} 
+      <FloatButton
+        icon={<PlusOutlined />}
+        tooltip="New Article"
+        onClick={handleNewArticle}
       />
-      <FloatButton 
-        icon={<EditOutlined />} 
-        tooltip="Edit Article" 
-        onClick={handleEditArticle} 
+      <FloatButton
+        icon={<EditOutlined />}
+        tooltip="Edit Article"
+        onClick={handleOpenArticleModal}
       />
-      <FloatButton 
-        icon={<VerticalAlignTopOutlined />} 
-        tooltip="Back to Top" 
-        onClick={handleScrollToTop} 
+      <FloatButton
+        icon={<VerticalAlignTopOutlined />}
+        tooltip="Back to Top"
+        onClick={handleScrollToTop}
       />
     </FloatButton.Group>
   );
