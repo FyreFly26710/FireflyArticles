@@ -11,18 +11,22 @@ var builder = DistributedApplication.CreateBuilder(args);
 //    .WithRedisInsight(redisInsight => redisInsight.WithHostPort(8001));
 var rabbitMqUsername = builder.AddParameter("rabbitmqUsername", secret: false);
 var rabbitMqPassword = builder.AddParameter("rabbitmqPassword", secret: false);
+
+// Default 15672 and 5672, set to 15673 and 5673 to avoid port conflicts
 var rabbitMq = builder.AddRabbitMQ("rabbitmq", rabbitMqUsername, rabbitMqPassword)
     .WithLifetime(ContainerLifetime.Persistent)
-    .WithManagementPlugin(15672)
+    .WithManagementPlugin(15673)
     .WithEndpoint("tcp", e =>
     {
-        e.Port = 5672;
+        e.Port = 5673;
         e.IsProxied = false;
     });
 
 // Get postgres credentials from appsettings.json [parameters]
 var username = builder.AddParameter("username", secret: false);
 var password = builder.AddParameter("password", secret: false);
+
+// Default 5432, set to 5433 to avoid port conflicts
 var postgres = builder.AddPostgres("postgres", username, password)
     .WithImage("postgres")
     .WithImageTag("15")
