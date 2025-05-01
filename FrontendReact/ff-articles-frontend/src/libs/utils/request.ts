@@ -18,7 +18,7 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.request.use(
     function (config) {
         if (!ProdBaseUrl) {
-            console.log("request interceptors: ", config);
+            // console.log("request interceptors: ", config);
         }
         return config;
     },

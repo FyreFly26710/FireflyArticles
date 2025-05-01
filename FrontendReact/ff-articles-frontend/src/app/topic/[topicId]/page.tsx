@@ -1,1 +1,3 @@
-export { default } from './TopicPage';
+import TopicPage from './TopicPage';
+
+export default TopicPage;

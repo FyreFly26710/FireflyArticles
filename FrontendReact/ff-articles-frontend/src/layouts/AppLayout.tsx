@@ -5,7 +5,7 @@ import React, { useState, useEffect } from 'react';
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
-import menus from "../../../config/menus";
+import menus from "../../config/menus";
 import { AppDispatch, RootState } from "@/stores/reduxStore";
 import { useDispatch, useSelector } from "react-redux";
 import { setLoginUser } from "@/stores/loginUser";
@@ -25,7 +25,7 @@ interface Props {
 
 type MenuItem = Required<MenuProps>['items'][number];
 
-export default function BasicLayout({ children }: Props) {
+export default function AppLayout({ children }: Props) {
     const pathname = usePathname();
     const dispatch = useDispatch<AppDispatch>();
     const loginUser = useSelector((state: RootState) => state.loginUser);
@@ -54,7 +54,7 @@ export default function BasicLayout({ children }: Props) {
     // Return a simpler layout during server-side rendering to avoid hydration mismatch
     if (!mounted) {
         return (
-            <div id="basicLayout">
+            <div id="appLayout">
                 <div style={{ minHeight: '100vh' }}>
                     {children}
                 </div>
@@ -85,7 +85,7 @@ export default function BasicLayout({ children }: Props) {
     const menuItems = renderMenuItems(accessibleMenus);
 
     return (
-        <div id="basicLayout">
+        <div id="appLayout">
             <Layout style={{ minHeight: '100vh' }}>
                 <Header 
                     style={{ 

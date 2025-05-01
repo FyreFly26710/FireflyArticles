@@ -5,15 +5,13 @@ import Link from "antd/es/typography/Link";
 import TopicList from "@/components/home/TopicList";
 import ArticleList from "@/components/home/ArticleList";
 import { useHomePageData } from "./hooks";
-
+import LoadingSpin from "@/components/shared/LoadingSpin";
 export default function HomePage() {
     const { topicList, articleList, loading, error } = useHomePageData();
 
     if (loading) {
         return (
-            <div className="flex justify-center items-center h-screen">
-                <Spin size="large" />
-            </div>
+            <LoadingSpin />
         );
     }
 
