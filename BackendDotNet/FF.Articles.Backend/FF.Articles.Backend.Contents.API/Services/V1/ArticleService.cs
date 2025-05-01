@@ -233,6 +233,11 @@ public class ArticleService : BaseService<Article, ContentsDbContext>, IArticleS
         });
         return result;
     }
+    /// <summary>
+    /// Todo: This method cannot handle high volume requests.
+    /// Duplicate tags will be created for each article.
+    /// Need to use Redis.
+    /// </summary>
     public async Task<long> CreateByRequest(ArticleAddRequest articleAddRequest, long userId)
     {
         var entity = articleAddRequest.ToEntity(userId);

@@ -1,6 +1,6 @@
 "use client";
-import { Avatar, Card, List, Typography } from "antd";
-import Link from "next/link";
+import { List } from "antd";
+import TopicCard from "../shared/TopicCard";
 
 interface Props {
   topicList: API.TopicDto[];
@@ -16,23 +16,7 @@ const TopicList = (props: Props) => {
         dataSource={topicList}
         renderItem={(item: API.TopicDto) => (
           <List.Item>
-            <Card>
-              <Link href={`/topic/${item.topicId}`}>
-                <Card.Meta
-                  avatar={<Avatar src={item.topicImage} />}
-                  title={item.title}
-                  description={
-                    <Typography.Paragraph
-                      type="secondary"
-                      ellipsis={{ rows: 1 }}
-                      style={{ marginBottom: 0 }}
-                    >
-                      {item.abstract}
-                    </Typography.Paragraph>
-                  }
-                />
-              </Link>
-            </Card>
+            <TopicCard topic={item} />
           </List.Item>
         )}
       />

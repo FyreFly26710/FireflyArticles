@@ -87,11 +87,11 @@ export default function AppLayout({ children }: Props) {
     return (
         <div id="appLayout">
             <Layout style={{ minHeight: '100vh' }}>
-                <Header 
-                    style={{ 
-                        position: 'fixed', 
-                        zIndex: 10, 
-                        width: '100%', 
+                <Header
+                    style={{
+                        position: 'fixed',
+                        zIndex: 10,
+                        width: '100%',
                         background: '#fff',
                         padding: '0 12px',
                         display: 'flex',
@@ -102,8 +102,8 @@ export default function AppLayout({ children }: Props) {
                     }}
                 >
                     <div className="flex items-center">
-                        <div 
-                            className="flex items-center cursor-pointer" 
+                        <div
+                            className="flex items-center cursor-pointer"
                             onClick={() => router.push("/")}
                             style={{ marginRight: '40px' }}
                         >
@@ -113,11 +113,11 @@ export default function AppLayout({ children }: Props) {
                                 width={32}
                                 alt="Firefly Bird"
                             />
-                            <Title 
-                                level={4} 
-                                style={{ 
-                                    margin: 0, 
-                                    marginLeft: '12px', 
+                            <Title
+                                level={4}
+                                style={{
+                                    margin: 0,
+                                    marginLeft: '12px',
                                     color: '#1890ff',
                                 }}
                             >
@@ -127,8 +127,8 @@ export default function AppLayout({ children }: Props) {
                         <Menu
                             mode="horizontal"
                             selectedKeys={[pathname]}
-                            style={{ 
-                                flex: 1, 
+                            style={{
+                                flex: 1,
                                 minWidth: '700px',
                                 border: 'none',
                                 background: 'transparent',
@@ -141,9 +141,9 @@ export default function AppLayout({ children }: Props) {
                         <a
                             href="https://github.com/FyreFly26710/FireflyArticles"
                             target="_blank"
-                            style={{ 
+                            style={{
                                 fontSize: '20px',
-                                color: '#1890ff' 
+                                color: '#1890ff'
                             }}
                         >
                             <GithubFilled />
@@ -167,10 +167,10 @@ export default function AppLayout({ children }: Props) {
                                 }}
                             >
                                 <Space className="cursor-pointer">
-                                    <Avatar 
-                                        src={loginUser.userAvatar || "/assets/logo.png"} 
+                                    <Avatar
+                                        src={loginUser.userAvatar || "/assets/logo.png"}
                                         size="default"
-                                        style={{ 
+                                        style={{
                                             border: '1px solid #f0f0f0',
                                         }}
                                     />
@@ -180,8 +180,8 @@ export default function AppLayout({ children }: Props) {
                                 </Space>
                             </Dropdown>
                         ) : (
-                            <Space 
-                                className="cursor-pointer" 
+                            <Space
+                                className="cursor-pointer"
                                 onClick={() => router.push("/user/login")}
                                 style={{
                                     background: '#f0f0f0',
@@ -196,8 +196,8 @@ export default function AppLayout({ children }: Props) {
                                     e.currentTarget.style.background = '#f0f0f0';
                                 }}
                             >
-                                <Avatar 
-                                    src="/assets/logo.png" 
+                                <Avatar
+                                    src="/assets/logo.png"
                                     size="small"
                                 />
                                 <span>Login</span>
@@ -206,7 +206,7 @@ export default function AppLayout({ children }: Props) {
                     </Space>
                 </Header>
                 <Layout style={{ marginTop: 64 }}>
-                    <Content style={{ margin: '24px 16px', overflow: 'initial', padding: '24px', background: '#fff', borderRadius: '4px', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
+                    <Content>
                         {children}
                     </Content>
                 </Layout>

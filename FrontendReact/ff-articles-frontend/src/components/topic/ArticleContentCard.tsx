@@ -10,15 +10,15 @@ const MdViewer = dynamic(() => import('@/components/shared/MdViewer'), {
 });
 
 interface ArticleContentCardProps {
-  topic: API.TopicDto;
+  article: API.ArticleDto;
 }
 
-const ArticleContentCard = ({ topic }: ArticleContentCardProps) => {
-  if (!topic.content) {
+const ArticleContentCard = ({ article }: ArticleContentCardProps) => {
+  if (!article.content) {
     return (
       <Card className="shadow-sm">
         <div className="text-center text-gray-400 p-10">
-          No content available for this topic.
+          No content available for this article.
         </div>
       </Card>
     );
@@ -27,7 +27,7 @@ const ArticleContentCard = ({ topic }: ArticleContentCardProps) => {
   return (
     <Card className="shadow-sm">
       <div className="markdown-content">
-        <MdViewer value={topic.content} />
+        <MdViewer value={article.content} />
       </div>
     </Card>
   );

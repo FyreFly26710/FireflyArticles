@@ -3,7 +3,7 @@ using System.Text;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
-namespace FF.Articles.Backend.RabbitMQ;
+namespace FF.Articles.Backend.RabbitMQ.Helpers;
 
 public class QueueDeclareHelper
 {

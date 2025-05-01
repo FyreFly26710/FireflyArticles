@@ -14,6 +14,7 @@ using FF.Articles.Backend.AI.API.Models.Dtos;
 using FF.Articles.Backend.AI.API.Interfaces.Services;
 using FF.Articles.Backend.RabbitMQ;
 using FF.Articles.Backend.AI.API.MapperExtensions;
+using FF.Articles.Backend.RabbitMQ.Base;
 
 namespace FF.Articles.Backend.AI.API.Services;
 

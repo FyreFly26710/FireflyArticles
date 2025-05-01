@@ -9,9 +9,9 @@ import ArticleResults from '../../components/aigen/ArticleResults';
 import { useAiGen } from '@/stores/AiGenContext';
 
 const AiGenPage = () => {
-    const { 
-        loading, 
-        results, 
+    const {
+        loading,
+        results,
         showForm,
         newGeneration,
         clearResults

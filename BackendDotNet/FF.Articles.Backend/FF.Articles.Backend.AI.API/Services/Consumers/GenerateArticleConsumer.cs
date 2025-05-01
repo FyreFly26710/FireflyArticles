@@ -9,6 +9,8 @@ using FF.Articles.Backend.AI.API.MapperExtensions;
 using FF.Articles.Backend.Common.ApiDtos;
 using System.Threading;
 using System.Threading.Tasks;
+using FF.Articles.Backend.RabbitMQ.Base;
+using FF.Articles.Backend.RabbitMQ.Helpers;
 
 namespace FF.Articles.Backend.AI.API.Services.Consumers;
 

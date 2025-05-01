@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Card, Tag, Typography, Row, Col, Space, Divider, Button, Input, Form, Spin, message } from 'antd';
 import { FileTextOutlined, TagsOutlined, EditOutlined, SaveOutlined, CloseOutlined, PlusOutlined, RocketOutlined, LinkOutlined } from '@ant-design/icons';
 import Markdown from 'react-markdown';
-import styles from '../aigen.module.css';
+import styles from '@/app/aigen/aigen.module.css';
 import Link from 'next/link';
 import { useAiGen } from '@/stores/AiGenContext';
 import { EditableArticle } from '@/stores/AiGenContext';

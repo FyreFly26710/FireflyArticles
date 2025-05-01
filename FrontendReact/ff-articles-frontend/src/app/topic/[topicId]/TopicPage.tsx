@@ -1,40 +1,32 @@
-"use server";
-/* DO NOT REMOVE OR EDIT THIS
-ArticlePage&TopicPage: core function of the app
-They are identitical, articlepage get article from passing articleID, Topicpage get article from passing topicId
-Left: ArticleSider (layout):
-- Title: Topic Titile
-- Child: Artice Title, can expand if has sub articles
-- can collapse to give more space for ArticleCard
-- can expand to show article titles
-
-Mid&Right: ArticleCard: 
-- ArticleHeaderCard: show title, tags, abstract (render using @MdViewer)
-- ArticleContentCard: display content using @MdViewer
-
-Extra: ArticleButtons:
-- float button sets on the right
-- provide buttons for new page, edit, open edit modal, scroll to top
-
-*/
 import { apiTopicGetById } from '@/api/contents/api/topic';
-import TopicPageClient from './TopicPageClient';
+import { apiArticleGetById } from '@/api/contents/api/article';
+import ArticleCard from '@/components/topic/ArticleCard';
+
+// Set revalidation and dynamic rendering options
+export const dynamic = 'force-dynamic'; // Options: 'auto' | 'force-dynamic' | 'error' | 'force-static'
+// export const revalidate = 60; // Revalidate the data at most every 60 seconds
+
 // Server component to fetch data
 const TopicPage = async ({ params }: { params: { topicId: string } }) => {
     let topic: API.TopicDto | null = null;
+    let article: API.ArticleDto | null = null;
     let error = null;
-    
+    const topicId = parseInt(params.topicId);
+
     try {
-        const response = await apiTopicGetById({
-            id: parseInt(params.topicId),
+        const topicResponse = await apiTopicGetById({
+            id: topicId,
+        });
+        const articleResponse = await apiArticleGetById({
+            id: topicId,
             IncludeUser: true,
-            IncludeArticles: true,
-            IncludeSubArticles: true,
             IncludeContent: true
         });
-        
-        if (response.data) {
-            topic = response.data;
+        if (topicResponse.data) {
+            topic = topicResponse.data;
+        }
+        if (articleResponse.data) {
+            article = articleResponse.data;
         }
     } catch (err) {
         error = 'Failed to fetch topic data';
@@ -42,7 +34,7 @@ const TopicPage = async ({ params }: { params: { topicId: string } }) => {
     }
 
     // Pass the server-fetched data to the client component
-    return <TopicPageClient topic={topic} error={error} />;
+    return <ArticleCard topicId={topicId} article={article} error={error} />;
 };
 
 export default TopicPage;

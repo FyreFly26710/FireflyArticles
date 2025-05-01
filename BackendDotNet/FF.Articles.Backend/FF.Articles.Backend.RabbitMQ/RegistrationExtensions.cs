@@ -1,4 +1,5 @@
 using System;
+using FF.Articles.Backend.RabbitMQ.Base;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;

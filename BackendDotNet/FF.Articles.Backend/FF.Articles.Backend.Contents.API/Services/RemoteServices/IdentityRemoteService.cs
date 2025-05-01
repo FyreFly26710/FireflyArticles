@@ -8,10 +8,12 @@ namespace FF.Articles.Backend.Contents.API.Services.RemoteServices;
 public class IdentityRemoteService : IIdentityRemoteService
 {
     private readonly HttpClient _httpClient;
+    private readonly ILogger<IdentityRemoteService> _logger;
 
-    public IdentityRemoteService(HttpClient httpClient)
+    public IdentityRemoteService(HttpClient httpClient, ILogger<IdentityRemoteService> logger)
     {
         _httpClient = httpClient;
+        _logger = logger;
     }
 
     public async Task<UserApiDto?> GetUserByIdAsync(long userId)
@@ -23,8 +25,22 @@ public class IdentityRemoteService : IIdentityRemoteService
         {
             throw new ApiException(ErrorCode.SYSTEM_ERROR, "Failed to get user by id");
         }
-
-        var apiResponse = await response.Content.ReadFromJsonAsync<ApiResponse<UserApiDto>>();
-        return apiResponse?.Data;
+        UserApiDto userApiDto = new();
+        try
+        {
+            var apiResponse = await response.Content.ReadFromJsonAsync<ApiResponse<UserApiDto>>();
+            userApiDto = apiResponse?.Data ?? throw new ApiException(ErrorCode.SYSTEM_ERROR);
+        }
+        catch (Exception ex)
+        {
+            userApiDto = new UserApiDto
+            {
+                UserId = userId,
+                UserName = "Unknown",
+                UserAvatar = "https://via.placeholder.com/150"
+            };
+            _logger.LogError(ex, "Failed to get user by id");
+        }
+        return userApiDto;
     }
 }

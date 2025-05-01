@@ -29,6 +29,9 @@ public abstract class TopicControllerBase : ControllerBase
         return ResultUtil.Success(topicDto);
     }
 
+    /// <summary>
+    /// Todo: Need to refactor
+    /// </summary>
     [HttpGet]
     public async Task<ApiResponse<Paged<TopicDto>>> GetByPage([FromQuery] TopicQueryRequest pageRequest)
     {

@@ -1,23 +1,14 @@
 "use client";
 import React from 'react';
-import { Card, Col, Row, Typography, Space, Divider, Tag, Empty, Avatar } from 'antd';
-import { useRouter } from 'next/navigation';
-
-const { Title, Text, Paragraph } = Typography;
+import { Col, Row, Divider, Empty, List } from 'antd';
+import TopicCard from '../shared/TopicCard';
 
 interface CategoryTopicsProps {
     topicsByCategory: Record<string, API.TopicDto[]>;
-    }
+}
 
 const CategoryTopics: React.FC<CategoryTopicsProps> = ({ topicsByCategory }) => {
-    const router = useRouter();
     const categories = Object.keys(topicsByCategory).sort();
-
-    const handleTopicClick = (topicId: number | undefined) => {
-        if (topicId) {
-            router.push(`/topic/${topicId}`);
-        }
-    };
 
     if (Object.keys(topicsByCategory).length === 0) {
         return (
@@ -32,46 +23,15 @@ const CategoryTopics: React.FC<CategoryTopicsProps> = ({ topicsByCategory }) => 
             {categories.map((category) => (
                 <div key={category} className="mb-8">
                     <Divider orientation="left">{category}</Divider>
-                    
-                    <Row gutter={[16, 16]}>
-                        {topicsByCategory[category].map((topic) => (
-                            <Col 
-                                xs={24} 
-                                sm={12} 
-                                md={8} 
-                                lg={6} 
-                                key={topic.topicId}
-                            >
-                                <Card 
-                                    hoverable 
-                                    style={{ 
-                                        height: '100px',
-                                        width: '100%',
-                                        padding: '0 8px'
-                                    }}
-                                    onClick={() => handleTopicClick(topic.topicId)}
-                                >
-                                    <div className="flex items-start">
-                                        <Avatar 
-                                            src={topic.topicImage}
-                                            size={40}
-                                            shape="square"
-                                            style={{ marginRight: '12px', flexShrink: 0 }}
-                                        />
-                                        <div className="overflow-hidden">
-                                            <Text strong ellipsis>{topic.title}</Text>
-                                            <Paragraph 
-                                                ellipsis={{ rows: 2 }}
-                                                className="text-xs m-0 mt-1"
-                                            >
-                                                {topic.abstract || "No description available"}
-                                            </Paragraph>
-                                        </div>
-                                    </div>
-                                </Card>
-                            </Col>
-                        ))}
-                    </Row>
+                    <List
+                        grid={{ gutter: 16, column: 4, xs: 1, sm: 2, md: 3, lg: 3, }}
+                        dataSource={topicsByCategory[category]}
+                        renderItem={(item: API.TopicDto) => (
+                            <List.Item>
+                                <TopicCard topic={item} />
+                            </List.Item>
+                        )}
+                    />
                 </div>
             ))}
         </div>
