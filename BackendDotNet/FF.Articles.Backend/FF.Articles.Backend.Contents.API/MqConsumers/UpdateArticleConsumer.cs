@@ -6,8 +6,7 @@ using FF.Articles.Backend.Contents.API.Interfaces.Services;
 using FF.Articles.Backend.Common.ApiDtos;
 using FF.Articles.Backend.Contents.API.Models.Requests.Articles;
 using FF.Articles.Backend.Common.Constants;
-using FF.Articles.Backend.RabbitMQ.Base;
-
+using FF.Articles.Backend.Common.Exceptions;
 namespace FF.Articles.Backend.Contents.API.MqConsumers;
 
 public class UpdateArticleConsumer(IConnection connection, IServiceScopeFactory serviceScopeFactory, ILogger<UpdateArticleConsumer> logger)
@@ -30,8 +29,7 @@ public class UpdateArticleConsumer(IConnection connection, IServiceScopeFactory 
         var article = await articleService.GetByIdAsync(articleId);
         if (article is null)
         {
-            var createRequest = MapToCreateRequest(generateRequest);
-            await articleService.CreateByRequest(createRequest, AdminUsers.SYSTEM_ADMIN_DEEPSEEK.UserId);
+            throw new ApiException(ErrorCode.NOT_FOUND_ERROR, $"Article not found {articleId}, title: {generateRequest.Title}");
         }
         else
         {
@@ -60,21 +58,5 @@ public class UpdateArticleConsumer(IConnection connection, IServiceScopeFactory 
         }
 
         return editRequest;
-    }
-    private ArticleAddRequest MapToCreateRequest(ArticleApiUpsertRequest generateRequest)
-    {
-        var createRequest = new ArticleAddRequest
-        {
-            Title = generateRequest.Title,
-            Abstract = generateRequest.Abstract,
-            ArticleType = generateRequest.ArticleType,
-            ParentArticleId = generateRequest.ParentArticleId,
-            TopicId = generateRequest.TopicId,
-            Tags = generateRequest.Tags ?? new List<string>(),
-            SortNumber = generateRequest.SortNumber,
-            Content = generateRequest.Content,
-        };
-
-        return createRequest;
     }
 }

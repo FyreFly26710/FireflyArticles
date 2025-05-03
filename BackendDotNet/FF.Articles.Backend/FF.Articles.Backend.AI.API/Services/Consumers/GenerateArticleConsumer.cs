@@ -9,8 +9,7 @@ using FF.Articles.Backend.AI.API.MapperExtensions;
 using FF.Articles.Backend.Common.ApiDtos;
 using System.Threading;
 using System.Threading.Tasks;
-using FF.Articles.Backend.RabbitMQ.Base;
-using FF.Articles.Backend.RabbitMQ.Helpers;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace FF.Articles.Backend.AI.API.Services.Consumers;
 
@@ -18,14 +17,12 @@ public class GenerateArticleConsumer : BaseConsumer
 {
     private static bool IsProduction => Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Production";
     private Timer _windowCheckTimer;
-    // This semaphore ensures only one message is processed at a time, regardless of prefetch setting
-    private static readonly SemaphoreSlim _processingLock = new SemaphoreSlim(1, 1);
 
     public GenerateArticleConsumer(
         IConnection connection,
         IServiceScopeFactory serviceScopeFactory,
         ILogger<GenerateArticleConsumer> logger)
-        : base(connection, serviceScopeFactory, logger, QueueList.GenerateArticleQueue, prefetchCount: 1)
+        : base(connection, serviceScopeFactory, logger, QueueList.GenerateArticleQueue, prefetchCount: 3)
     {
     }
 
@@ -33,19 +30,19 @@ public class GenerateArticleConsumer : BaseConsumer
     {
         QueueDeclareHelper.DeclareQueues(_channel, _queue);
 
-        SetupConsumers();
-        StartConsumingDlq();
+        base.SetupConsumers();
+
+        base.StartConsumingDlq();
+
         if (!IsProduction)
         {
-            StartConsuming();
+            base.StartConsuming();
+            _logger.LogInformation("Started consuming main queue (non-production environment)");
         }
 
         if (IsProduction)
         {
-            if (IsWithinProcessingWindow())
-                StartConsuming();
-
-            _windowCheckTimer = new Timer(CheckProcessingWindow, null, TimeSpan.FromMinutes(5), TimeSpan.FromMinutes(5));
+            _windowCheckTimer = new Timer(CheckProcessingWindow, null, TimeSpan.Zero, TimeSpan.FromMinutes(5));
         }
 
         return Task.CompletedTask;
@@ -53,8 +50,18 @@ public class GenerateArticleConsumer : BaseConsumer
 
     private void CheckProcessingWindow(object state)
     {
-        if (IsWithinProcessingWindow())
-            StartConsuming();
+        var isWithinWindow = IsWithinProcessingWindow();
+        _logger.LogInformation("Checking processing window.");
+
+        if (isWithinWindow)
+        {
+            base.StartConsuming();
+            _logger.LogInformation("within processing window");
+        }
+        else
+        {
+            _logger.LogInformation("outside processing window");
+        }
     }
 
     /// <summary>
@@ -84,23 +91,12 @@ public class GenerateArticleConsumer : BaseConsumer
 
     protected override async Task HandleMessageAsync(string messageJson)
     {
-        // Use semaphore to ensure only one message is processed at a time
-        await _processingLock.WaitAsync();
-        try
-        {
-            _logger.LogInformation("Starting to process message (sequential processing enforced)");
-            await PublishArticleReadyMessage(messageJson);
-            _logger.LogInformation("Finished processing message");
-        }
-        finally
-        {
-            _processingLock.Release();
-        }
+        await PublishArticleReadyMessage(messageJson);
     }
 
     protected override async Task HandleDeadLetterMessageAsync(string messageJson)
     {
-        // DLQ messages can be processed concurrently since they're just recording errors
+        _logger.LogWarning("Processing dead letter message: {messageJson}", messageJson);
         await PublishArticleReadyMessage(messageJson, true);
     }
 

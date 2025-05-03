@@ -6,8 +6,7 @@ using RabbitMQ.Client.Events;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using FF.Articles.Backend.RabbitMQ.Helpers;
-namespace FF.Articles.Backend.RabbitMQ.Base;
+namespace FF.Articles.Backend.RabbitMQ;
 
 public abstract class BaseConsumer : BackgroundService
 {
@@ -16,7 +15,6 @@ public abstract class BaseConsumer : BackgroundService
     protected readonly IServiceScopeFactory _serviceScopeFactory;
     protected readonly string _queue;
     protected readonly ILogger<BaseConsumer> _logger;
-    protected readonly int _prefetchCount;
     private EventingBasicConsumer _consumer;
     private EventingBasicConsumer _dlqConsumer;
 
@@ -25,28 +23,27 @@ public abstract class BaseConsumer : BackgroundService
         IServiceScopeFactory serviceScopeFactory,
         ILogger<BaseConsumer> logger,
         string queue,
-        int prefetchCount = 10)
+        int prefetchCount = 3)
     {
         _connection = connection;
         _channel = _connection.CreateModel();
         _serviceScopeFactory = serviceScopeFactory;
         _queue = queue;
         _logger = logger;
-        _prefetchCount = prefetchCount;
+        // _prefetchCount = prefetchCount;
+
+        // Set prefetch in constructor to ensure it's applied before any consumer setup
+        _channel.BasicQos(prefetchSize: 0, prefetchCount: (ushort)prefetchCount, global: false);
+        _logger.LogInformation("Configured prefetch count: {prefetchCount} for queue: {queue}", prefetchCount, _queue);
     }
 
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
         QueueDeclareHelper.DeclareQueues(_channel, _queue);
 
-        // Configure prefetch count to allow concurrent processing
-        _channel.BasicQos(prefetchSize: 0, prefetchCount: (ushort)_prefetchCount, global: false);
-        _logger.LogInformation("Configured prefetch count: {prefetchCount} for queue: {queue}", _prefetchCount, _queue);
-
         // Set up consumers
         SetupConsumers();
 
-        // Start consuming
         StartConsuming();
         StartConsumingDlq();
 
@@ -60,6 +57,7 @@ public abstract class BaseConsumer : BackgroundService
         _consumer.Received += async (model, ea) =>
         {
             var messageJson = QueueDeclareHelper.GetJsonMessage(ea);
+            _logger.LogInformation("Received message: {messageJson}", messageJson);
 
             try
             {
@@ -70,7 +68,20 @@ public abstract class BaseConsumer : BackgroundService
             }
             catch (Exception ex)
             {
-                retryMessage(ex, ea);
+                var deathCount = QueueDeclareHelper.GetDeathCount(ea);
+                _logger.LogError(ex, "Error processing message: {messageJson}, Death count: {deathCount}", QueueDeclareHelper.GetJsonMessage(ea), deathCount);
+
+                if (deathCount >= 3)
+                {
+                    // After 3 attempts, move to DLQ manually
+                    _channel.BasicPublish(exchange: "", routingKey: $"{_queue}.dlq", basicProperties: null, body: ea.Body);
+                    _channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
+                }
+                else
+                {
+                    // Retry (send to retry queue automatically via nack)
+                    _channel.BasicNack(deliveryTag: ea.DeliveryTag, multiple: false, requeue: false);
+                }
             }
         };
 
@@ -95,46 +106,14 @@ public abstract class BaseConsumer : BackgroundService
             }
         };
     }
-
     protected string StartConsuming() => _channel.BasicConsume(queue: _queue, autoAck: false, consumer: _consumer);
     protected string StartConsumingDlq() => _channel.BasicConsume(queue: $"{_queue}.dlq", autoAck: false, consumer: _dlqConsumer);
 
-    protected void StopConsuming(string consumerTag)
-    {
-        if (!string.IsNullOrEmpty(consumerTag))
-        {
-            _logger.LogInformation("Stopping consumer with tag: {consumerTag}", consumerTag);
-            _channel.BasicCancel(consumerTag);
-        }
-    }
-
     protected abstract Task HandleMessageAsync(string messageJson);
-
-    // New method to handle dead letter messages
-    // Implement this in your derived class to handle DLQ messages
     protected virtual Task HandleDeadLetterMessageAsync(string messageJson)
     {
         _logger.LogWarning("HandleDeadLetterMessageAsync not implemented for message: {messageJson}", messageJson);
         return Task.CompletedTask;
-    }
-
-    private void retryMessage(Exception ex, BasicDeliverEventArgs ea)
-    {
-
-        var deathCount = QueueDeclareHelper.GetDeathCount(ea);
-        _logger.LogError(ex, "Error processing message: {messageJson}, Death count: {deathCount}", QueueDeclareHelper.GetJsonMessage(ea), deathCount);
-
-        if (deathCount >= 3)
-        {
-            // After 3 attempts, move to DLQ manually
-            _channel.BasicPublish(exchange: "", routingKey: $"{_queue}.dlq", basicProperties: null, body: ea.Body);
-            _channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
-        }
-        else
-        {
-            // Retry (send to retry queue automatically via nack)
-            _channel.BasicNack(deliveryTag: ea.DeliveryTag, multiple: false, requeue: false);
-        }
     }
 
     public override void Dispose()

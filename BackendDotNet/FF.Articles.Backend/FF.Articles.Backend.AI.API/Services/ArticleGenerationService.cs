@@ -14,7 +14,8 @@ using FF.Articles.Backend.AI.API.Models.Dtos;
 using FF.Articles.Backend.AI.API.Interfaces.Services;
 using FF.Articles.Backend.RabbitMQ;
 using FF.Articles.Backend.AI.API.MapperExtensions;
-using FF.Articles.Backend.RabbitMQ.Base;
+using FF.Articles.Backend.Common.Utils;
+using FF.Articles.Backend.Common.Constants;
 
 namespace FF.Articles.Backend.AI.API.Services;
 
@@ -45,7 +46,7 @@ public class ArticleGenerationService : IArticleGenerationService
             },
             Options = new ChatOptions() { ResponseFormat = ChatOptions.GetResponseFormat<ArticlesAIResponseDto>() }
         };
-        var topicId = await _contentsApiRemoteService.AddTopicByTitleCategoryAsync(request.Topic, request.Category);
+        var topicId = await _contentsApiRemoteService.AddTopicByTitleAsync(request.Topic);
         _logger.LogInformation("Begin to generate topic: {topic}; TopicId: {topicId}", request.Topic, topicId);
         var response = await _aiChatAssistant.ChatAsync(chatRequest, cancellationToken);
         var jsonContent = response?.Message?.Content ?? "";
@@ -109,10 +110,12 @@ public class ArticleGenerationService : IArticleGenerationService
     public async Task<long> DispatchArticleGenerationAsync(ContentRequest request)
     {
         var article = request.ToArticleApiUpsertRequest("Generating content...");
-        var articleId = await _contentsApiRemoteService.AddArticleAsync(article);
-        request.Id = articleId;
+        long id = EntityUtil.GenerateSnowflakeId();
+        article.Id = id;
+        article.UserId = AdminUsers.SYSTEM_ADMIN_DEEPSEEK.UserId;
+        await _rabbitMqPublisher.PublishAsync(QueueList.AddArticleQueue, article);
         await _rabbitMqPublisher.PublishAsync(QueueList.GenerateArticleQueue, request);
-        return articleId;
+        return id;
     }
 
 
