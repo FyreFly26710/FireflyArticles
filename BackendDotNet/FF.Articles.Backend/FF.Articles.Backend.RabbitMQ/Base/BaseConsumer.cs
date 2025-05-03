@@ -6,6 +6,7 @@ using RabbitMQ.Client.Events;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using FF.Articles.Backend.RabbitMQ.Helpers;
 namespace FF.Articles.Backend.RabbitMQ;
 
 public abstract class BaseConsumer : BackgroundService

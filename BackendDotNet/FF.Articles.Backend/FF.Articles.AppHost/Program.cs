@@ -16,6 +16,7 @@ var rabbitMqPassword = builder.AddParameter("rabbitmqPassword", secret: false);
 var rabbitMq = builder.AddRabbitMQ("rabbitmq", rabbitMqUsername, rabbitMqPassword)
     .WithLifetime(ContainerLifetime.Persistent)
     .WithManagementPlugin(15673)
+    .WithVolume("rabbitmq-data", "/data")
     .WithEndpoint("tcp", e =>
     {
         e.Port = 5673;

@@ -20,15 +20,8 @@ using FF.Articles.Backend.RabbitMQ;
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 
-builder.Services.AddDbContext<AIDbContext>(options =>
-{
-    var connectionString = builder.Configuration.GetConnectionString("aidb");
-
-    options.UseNpgsql(connectionString)
-           .LogTo(Console.WriteLine, LogLevel.Information)
-           .EnableSensitiveDataLogging();
-});
-
+var connectionString = configuration.GetConnectionString("aidb") ?? throw new Exception("aidb connection string not found");
+builder.AddNpgsql<AIDbContext>(connectionString);
 builder.AddRedisClient("redis");
 
 
