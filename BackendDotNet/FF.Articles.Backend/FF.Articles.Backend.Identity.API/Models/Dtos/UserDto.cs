@@ -14,7 +14,7 @@ public class UserDto
     public string? UserAvatar { get; set; }
     public string? UserProfile { get; set; }
     public string UserRole { get; set; }
-    public DateTime CreateTime { get; set; }
-    public DateTime UpdateTime { get; set; }
+    public DateTime? CreateTime { get; set; }
+    public DateTime? UpdateTime { get; set; }
 
 }

@@ -1,15 +1,11 @@
 ﻿using FF.Articles.Backend.Common.Bases;
 using FF.Articles.Backend.Common.Responses;
-using FF.Articles.Backend.Contents.API.Constants;
 using FF.Articles.Backend.Contents.API.Interfaces.Repositories.V2;
 using FF.Articles.Backend.Contents.API.Interfaces.Services;
+using FF.Articles.Backend.Contents.API.Interfaces.Services.RemoteServices;
 using FF.Articles.Backend.Contents.API.Models.Dtos;
 using FF.Articles.Backend.Contents.API.Models.Entities;
 using FF.Articles.Backend.Contents.API.Models.Requests.Articles;
-using FF.Articles.Backend.Contents.API.MapperExtensions.Articles;
-using FF.Articles.Backend.Common.ApiDtos;
-using FF.Articles.Backend.Contents.API.Interfaces.Services.RemoteServices;
-using FF.Articles.Backend.Common.Exceptions;
 
 namespace FF.Articles.Backend.Contents.API.Services.V2;
 public class ArticleService : RedisService<Article>, IArticleService

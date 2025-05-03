@@ -1,10 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import MessageList from '@/components/aichat/MessageList'
-import InputBox from '@/components/aichat/InputBox'
-import SessionSidebar from '@/components/aichat/SessionSidebar'
-import ChatSidebar from '@/components/aichat/ChatSidebar'
+import MessageList from '@/components/aiChat/MessageList'
+import InputBox from '@/components/aiChat/InputBox'
+import SessionSidebar from '@/components/aiChat/SessionSidebar'
+import ChatSidebar from '@/components/aiChat/ChatSidebar'
 import { storage, LayoutSettings } from '@/states/storage';
 
 export default function AiChatPage() {

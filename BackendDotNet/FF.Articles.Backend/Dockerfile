@@ -1,15 +1,31 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Copy all source files
+# COPY ["FF.Articles.Backend.sln", "."]
+# COPY ["FF.AI.Common/FF.AI.Common.csproj", "FF.AI.Common/"]
+# COPY ["FF.Articles.Backend.Common/FF.Articles.Backend.Common.csproj", "FF.Articles.Backend.Common/"]
+# COPY ["FF.Articles.Backend.RabbitMQ/FF.Articles.Backend.RabbitMQ.csproj", "FF.Articles.Backend.RabbitMQ/"]
+# COPY ["FF.Articles.Backend.ServiceDefaults/FF.Articles.Backend.ServiceDefaults.csproj", "FF.Articles.Backend.ServiceDefaults/"]
+
+# COPY ["FF.Articles.Backend.Gateway.API/FF.Articles.Backend.Gateway.API.csproj", "FF.Articles.Backend.Gateway.API/"]
+# COPY ["FF.Articles.Backend.Identity.API/FF.Articles.Backend.Identity.API.csproj", "FF.Articles.Backend.Identity.API/"]
+# COPY ["FF.Articles.Backend.Contents.API/FF.Articles.Backend.Contents.API.csproj", "FF.Articles.Backend.Contents.API/"]
+# COPY ["FF.Articles.Backend.AI.API/FF.Articles.Backend.AI.API.csproj", "FF.Articles.Backend.AI.API/"]
+
+COPY nuget.config .
+
 COPY . .
 
-# Restore as distinct layers
-RUN dotnet restore "FF.Articles.Backend.Gateway.API/FF.Articles.Backend.Gateway.API.csproj"
-RUN dotnet restore "FF.Articles.Backend.Identity.API/FF.Articles.Backend.Identity.API.csproj"
-RUN dotnet restore "FF.Articles.Backend.Contents.API/FF.Articles.Backend.Contents.API.csproj"
-RUN dotnet restore "FF.Articles.Backend.AI.API/FF.Articles.Backend.AI.API.csproj"
+# RUN dotnet restore "FF.Articles.Backend.Gateway.API/FF.Articles.Backend.Gateway.API.csproj"
+# RUN dotnet restore "FF.Articles.Backend.Identity.API/FF.Articles.Backend.Identity.API.csproj"
+# RUN dotnet restore "FF.Articles.Backend.Contents.API/FF.Articles.Backend.Contents.API.csproj" 
+# RUN dotnet restore "FF.Articles.Backend.AI.API/FF.Articles.Backend.AI.API.csproj"
 
+RUN dotnet restore "FF.Articles.Backend.Gateway.API/FF.Articles.Backend.Gateway.API.csproj" --configfile /src/nuget.config && \
+    dotnet restore "FF.Articles.Backend.Identity.API/FF.Articles.Backend.Identity.API.csproj" --configfile /src/nuget.config && \
+    dotnet restore "FF.Articles.Backend.Contents.API/FF.Articles.Backend.Contents.API.csproj" --configfile /src/nuget.config && \
+    dotnet restore "FF.Articles.Backend.AI.API/FF.Articles.Backend.AI.API.csproj" --configfile /src/nuget.config
+    
 # Build and publish each service
 RUN dotnet publish "FF.Articles.Backend.Gateway.API/FF.Articles.Backend.Gateway.API.csproj" -c Release -o /app/gateway
 RUN dotnet publish "FF.Articles.Backend.Identity.API/FF.Articles.Backend.Identity.API.csproj" -c Release -o /app/identity

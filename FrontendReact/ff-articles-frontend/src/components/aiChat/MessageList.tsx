@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
-import Message from './Message'
 import { useChat } from '@/states/ChatContext'
 import { storage, ChatDisplaySettings } from '@/states/storage'
+import Message from './Message'
 
 export default function MessageList() {
     const ref = useRef<HTMLDivElement>(null)

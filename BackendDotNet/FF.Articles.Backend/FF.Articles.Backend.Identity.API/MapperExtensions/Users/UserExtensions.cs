@@ -1,4 +1,3 @@
-using AutoMapper;
 using FF.Articles.Backend.Common.ApiDtos;
 using FF.Articles.Backend.Identity.API.Models.Dtos;
 using FF.Articles.Backend.Identity.API.Models.Entities;
@@ -6,30 +5,44 @@ using FF.Articles.Backend.Identity.API.Models.Entities;
 namespace FF.Articles.Backend.Identity.API.MapperExtensions.Users;
 public static class UserExtensions
 {
-    private static readonly IMapper _mapper;
-    static UserExtensions()
-    {
-        var config = new MapperConfiguration(cfg =>
-        {
-            cfg.CreateMap<User, UserDto>();
-            cfg.CreateMap<User, LoginUserDto>();
-            cfg.CreateMap<User, UserApiDto>().ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.Id));
-        });
-        _mapper = config.CreateMapper();
-    }
     public static UserDto ToDto(this User user)
     {
-        var userDto = _mapper.Map<UserDto>(user);
+        var userDto = new UserDto();
+        userDto.Id = user.Id;
+        userDto.UserAccount = user.UserAccount;
+        userDto.UserName = user.UserName;
+        userDto.UserEmail = user.UserEmail;
+        userDto.UserAvatar = user.UserAvatar;
+        userDto.UserProfile = user.UserProfile;
+        userDto.UserRole = user.UserRole;
+        userDto.CreateTime = user.CreateTime;
+        userDto.UpdateTime = user.UpdateTime;
         return userDto;
     }
     public static LoginUserDto ToLoginUserDto(this User user)
     {
-        var loginUserDto = _mapper.Map<LoginUserDto>(user);
+        var loginUserDto = new LoginUserDto();
+        loginUserDto.Id = user.Id;
+        loginUserDto.UserAccount = user.UserAccount;
+        loginUserDto.UserName = user.UserName;
+        loginUserDto.UserEmail = user.UserEmail;
+        loginUserDto.UserAvatar = user.UserAvatar;
+        loginUserDto.UserProfile = user.UserProfile;
+        loginUserDto.UserRole = user.UserRole;
+        loginUserDto.CreateTime = user.CreateTime;
         return loginUserDto;
     }
     public static UserApiDto ToUserApiDto(this User user)
     {
-        var userApiDto = _mapper.Map<UserApiDto>(user);
+        var userApiDto = new UserApiDto();
+        userApiDto.UserId = user.Id;
+        userApiDto.UserAccount = user.UserAccount;
+        userApiDto.UserName = user.UserName;
+        userApiDto.UserEmail = user.UserEmail;
+        userApiDto.UserAvatar = user.UserAvatar;
+        userApiDto.UserProfile = user.UserProfile;
+        userApiDto.UserRole = user.UserRole;
+        userApiDto.CreateTime = user.CreateTime;
         return userApiDto;
     }
 }

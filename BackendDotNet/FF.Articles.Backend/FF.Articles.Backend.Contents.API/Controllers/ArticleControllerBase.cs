@@ -3,7 +3,6 @@ using FF.Articles.Backend.Common.Exceptions;
 using FF.Articles.Backend.Common.Responses;
 using FF.Articles.Backend.Common.Utils;
 using FF.Articles.Backend.Contents.API.Interfaces.Services;
-using FF.Articles.Backend.Contents.API.MapperExtensions.Articles;
 using FF.Articles.Backend.Contents.API.Models.Dtos;
 using FF.Articles.Backend.Contents.API.Models.Requests.Articles;
 using Microsoft.AspNetCore.Authorization;
@@ -62,7 +61,7 @@ public abstract class ArticleControllerBase : ControllerBase
         if (article == null)
         {
 
-            await _articleService.CreateByRequest(articleEditRequest.ToAddRequest(), UserUtil.GetUserId(Request));
+            throw new ApiException(ErrorCode.NOT_FOUND_ERROR, "Article not found");
         }
         else
         {

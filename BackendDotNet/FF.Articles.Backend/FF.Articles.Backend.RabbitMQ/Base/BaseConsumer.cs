@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using FF.Articles.Backend.RabbitMQ.Helpers;
-namespace FF.Articles.Backend.RabbitMQ;
+namespace FF.Articles.Backend.RabbitMQ.Base;
 
 public abstract class BaseConsumer : BackgroundService
 {
