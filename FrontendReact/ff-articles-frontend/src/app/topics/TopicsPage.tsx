@@ -1,4 +1,3 @@
-"use server";
 import { apiTopicGetByPage } from "@/api/contents/api/topic";
 import CategoryTopics from "@/components/topics/CategoryTopics";
 import { getTopicsByCategory } from "@/libs/utils/articleUtils";

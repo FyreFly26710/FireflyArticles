@@ -16,7 +16,7 @@ RUN npm ci && \
 COPY . .
 
 # Set build arguments with defaults
-ARG NEXT_PUBLIC_API_URL=http://localhost:21000/api/identity/auth/signin-google
+ARG NEXT_PUBLIC_API_URL=xxx
 ARG NEXT_PUBLIC_GOOGLE_CLIENT_ID=xxx
 ARG NEXT_PUBLIC_BASE_URL=http://localhost:21000
 
