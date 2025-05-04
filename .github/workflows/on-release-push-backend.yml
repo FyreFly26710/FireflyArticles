@@ -108,6 +108,6 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "cd /Users/liqiangwang/Repo/FireflyArticles/Deploy && docker-compose -f docker-compose.backend.yml pull && docker-compose -f docker-compose.backend.yml up -d"
+          ssh -o StrictHostKeyChecking=no -p $SSH_PORT $SSH_USERNAME@$SSH_HOST "cd /Users/liqiangwang/Repo/FireflyArticles/Deploy && export PATH=/usr/local/bin:/opt/homebrew/bin:$PATH && docker compose -f docker-compose.backend.yml up -d"
 
           
