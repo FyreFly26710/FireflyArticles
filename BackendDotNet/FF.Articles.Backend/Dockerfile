@@ -12,19 +12,12 @@ WORKDIR /src
 # COPY ["FF.Articles.Backend.Contents.API/FF.Articles.Backend.Contents.API.csproj", "FF.Articles.Backend.Contents.API/"]
 # COPY ["FF.Articles.Backend.AI.API/FF.Articles.Backend.AI.API.csproj", "FF.Articles.Backend.AI.API/"]
 
-COPY nuget.config .
-
 COPY . .
 
-# RUN dotnet restore "FF.Articles.Backend.Gateway.API/FF.Articles.Backend.Gateway.API.csproj"
-# RUN dotnet restore "FF.Articles.Backend.Identity.API/FF.Articles.Backend.Identity.API.csproj"
-# RUN dotnet restore "FF.Articles.Backend.Contents.API/FF.Articles.Backend.Contents.API.csproj" 
-# RUN dotnet restore "FF.Articles.Backend.AI.API/FF.Articles.Backend.AI.API.csproj"
-
-RUN dotnet restore "FF.Articles.Backend.Gateway.API/FF.Articles.Backend.Gateway.API.csproj" --configfile /src/nuget.config && \
-    dotnet restore "FF.Articles.Backend.Identity.API/FF.Articles.Backend.Identity.API.csproj" --configfile /src/nuget.config && \
-    dotnet restore "FF.Articles.Backend.Contents.API/FF.Articles.Backend.Contents.API.csproj" --configfile /src/nuget.config && \
-    dotnet restore "FF.Articles.Backend.AI.API/FF.Articles.Backend.AI.API.csproj" --configfile /src/nuget.config
+RUN dotnet restore "FF.Articles.Backend.Gateway.API/FF.Articles.Backend.Gateway.API.csproj"
+RUN dotnet restore "FF.Articles.Backend.Identity.API/FF.Articles.Backend.Identity.API.csproj"
+RUN dotnet restore "FF.Articles.Backend.Contents.API/FF.Articles.Backend.Contents.API.csproj"
+RUN dotnet restore "FF.Articles.Backend.AI.API/FF.Articles.Backend.AI.API.csproj"
     
 # Build and publish each service
 RUN dotnet publish "FF.Articles.Backend.Gateway.API/FF.Articles.Backend.Gateway.API.csproj" -c Release -o /app/gateway
@@ -83,5 +76,10 @@ COPY --from=build /app/ai .
 # Expose the gateway port
 EXPOSE 21000
 
-# Hardcode the startup commands directly in the Dockerfile
-CMD ["bash", "-c", "dotnet /app/identity/FF.Articles.Backend.Identity.API.dll --urls=http://0.0.0.0:22000 & dotnet /app/contents/FF.Articles.Backend.Contents.API.dll --urls=http://0.0.0.0:23000 & dotnet /app/ai/FF.Articles.Backend.AI.API.dll --urls=http://0.0.0.0:24000 & sleep 3 && dotnet /app/gateway/FF.Articles.Backend.Gateway.API.dll --urls='http://0.0.0.0:21000' & wait"] 
+CMD ["bash", "-c", "\
+     dotnet /app/identity/FF.Articles.Backend.Identity.API.dll --urls=http://0.0.0.0:22000 & \
+     dotnet /app/contents/FF.Articles.Backend.Contents.API.dll --urls=http://0.0.0.0:23000 & \
+     dotnet /app/ai/FF.Articles.Backend.AI.API.dll --urls=http://0.0.0.0:24000 & \
+     sleep 3 && \
+     dotnet /app/gateway/FF.Articles.Backend.Gateway.API.dll --urls='http://0.0.0.0:21000' & \
+     wait"] 
