@@ -1,5 +1,10 @@
 # FireflyArticles Release Notes
 
+### Release App Version 0.0.4 (04/05/2025)
+- Overview: Testing release.
+- Changes:
+    - Bug fix: Fix Gmail OAuth and add more checks
+
 ### Release App Version 0.0.3 (27/04/2025)
 - Overview: Testing release.
 - Changes:
@@ -21,5 +26,15 @@
     - Bug fix:
     - Improvements:
 - ToDo:
+
+
+## TODO List:
+- improve log
+- add redis to frontend server
+- modify controllerbase to capture errors and return error types instead of middleware.
+
+
+
+
 
 
