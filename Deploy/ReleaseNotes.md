@@ -1,5 +1,10 @@
 # FireflyArticles Release Notes
 
+### Release Backend Version 0.0.4 (04/05/2025)
+- Overview: Testing release.
+- Changes:
+    - Bug fix: Fix Gmail Oauth
+
 ### Release App Version 0.0.3 (27/04/2025)
 - Overview: Testing release.
 - Changes:
