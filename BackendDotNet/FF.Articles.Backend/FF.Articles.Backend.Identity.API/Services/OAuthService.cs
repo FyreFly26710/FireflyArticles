@@ -5,30 +5,38 @@ using FF.Articles.Backend.Identity.API.Models.OAuth;
 
 namespace FF.Articles.Backend.Identity.API.Services;
 
-public class OAuthService(IConfiguration _configuration) : IOAuthService
+public class OAuthService(IConfiguration _configuration, ILogger<OAuthService> _logger) : IOAuthService
 {
     public async Task<TokenResponse> GetGmailToken(string code)
     {
         var tokenEndpoint = "https://oauth2.googleapis.com/token";
         string clientId = _configuration["GmailOAuth:ClientId"] ?? "";
         string clientSecret = _configuration["GmailOAuth:ClientSecret"] ?? "";
-        string RedirectUri = _configuration["Domain:Api"] ?? "" + "/api/identity/auth/signin-google";
+        string baseUrl = _configuration["Domain:Api"]?.TrimEnd('/') ?? "https://localhost:21000";
+        string redirectUri = $"{baseUrl}/api/identity/auth/signin-google";
+
         var requestBody = new Dictionary<string, string>
         {
             { "code", code },
             { "client_id", clientId},
             { "client_secret", clientSecret},
-            { "redirect_uri", RedirectUri},
+            { "redirect_uri", redirectUri},
             { "grant_type", "authorization_code" }
         };
 
         using var httpClient = new HttpClient();
         var content = new FormUrlEncodedContent(requestBody);
+
         var response = await httpClient.PostAsync(tokenEndpoint, content);
 
-        //response.EnsureSuccessStatusCode();
-
         var responseContent = await response.Content.ReadAsStringAsync();
+
+        if (!response.IsSuccessStatusCode)
+        {
+            _logger.LogError("Failed to get token from Google. Status code: {StatusCode}, Response: {Response}",
+                response.StatusCode, responseContent);
+        }
+
         var tokenResponse = JsonSerializer.Deserialize<TokenResponse>(responseContent);
 
         return tokenResponse ?? new TokenResponse();
@@ -43,13 +51,17 @@ public class OAuthService(IConfiguration _configuration) : IOAuthService
 
         using var httpClient = new HttpClient();
         httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", gmailToken);
+
         var response = await httpClient.GetAsync(userInfoEndpoint);
-
-        //response.EnsureSuccessStatusCode();
-
         var responseContent = await response.Content.ReadAsStringAsync();
-        var userInfo = JsonSerializer.Deserialize<UserInfo>(responseContent);
 
+        if (!response.IsSuccessStatusCode)
+        {
+            _logger.LogError("Failed to get user info from Google. Status code: {StatusCode}, Response: {Response}",
+                response.StatusCode, responseContent);
+        }
+
+        var userInfo = JsonSerializer.Deserialize<UserInfo>(responseContent);
         return userInfo ?? new UserInfo();
     }
 }
