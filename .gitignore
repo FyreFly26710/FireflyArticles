@@ -22,6 +22,7 @@ generate/
 FrontendReact/ff-articles-frontend/.env*
 appsettings.Development.json
 appsettings.Production.json
+Deploy/development-note.md
 
 .env
 
