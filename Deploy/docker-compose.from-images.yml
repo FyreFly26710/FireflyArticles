@@ -3,6 +3,7 @@
 services:
   backend:
     image: firefly26710/ffarticles-backend:manual-push-backend-image
+    platform: linux/arm64
     pull_policy: always
     environment:
       # CORS: Frontend App URL
@@ -32,6 +33,7 @@ services:
 
   rabbitmq:
     image: rabbitmq:3-management
+    platform: linux/arm64
     environment:
       - RABBITMQ_DEFAULT_USER=${RABBITMQ_USERNAME:-rabbitmq}
       - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD:-rabbitmq}
@@ -54,6 +56,7 @@ services:
 
   postgres:
     image: postgres:15
+    platform: linux/arm64
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
@@ -71,6 +74,7 @@ services:
 
   pgweb:
     image: sosedoff/pgweb
+    platform: linux/arm64
     ports:
       - "8081:8081"
     environment:

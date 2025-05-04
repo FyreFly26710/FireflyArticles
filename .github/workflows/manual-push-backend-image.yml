@@ -18,6 +18,9 @@ jobs:
         id: branch-name
         uses: tj-actions/branch-names@v6
 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+        
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
@@ -32,5 +35,6 @@ jobs:
         with:
           context: ./BackendDotNet/FF.Articles.Backend
           push: true
+          platforms: linux/amd64,linux/arm64
           tags: |
             firefly26710/ffarticles-backend:manual-push-backend-image
