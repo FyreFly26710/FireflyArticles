@@ -108,4 +108,4 @@ jobs:
       - name: Trigger deployment
         if: success()
         run: |
-          curl -X GET ${{ secrets.WEBHOOK_URL }}
+          curl -X GET ${{ secrets.WEBHOOK_URL }} --header 'Authorization: ${{ secrets.WEBHOOK_AUTH }}'
