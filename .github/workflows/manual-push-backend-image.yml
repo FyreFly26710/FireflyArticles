@@ -33,5 +33,4 @@ jobs:
           context: ./BackendDotNet/FF.Articles.Backend
           push: true
           tags: |
-            firefly26710/ffarticles-backend:latest
-            firefly26710/ffarticles-backend:${{ steps.branch-name.outputs.current_branch }}
+            firefly26710/ffarticles-backend:manual-push-backend-image
