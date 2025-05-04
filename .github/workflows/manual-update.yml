@@ -52,7 +52,6 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and push frontend image
-        if: needs.check-commit.outputs.build_frontend == 'true'
         uses: docker/build-push-action@v4
         with:
           context: ./FrontendReact/ff-articles-frontend
