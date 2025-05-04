@@ -34,8 +34,6 @@ ENV POSTGRES_PASSWORD=postgres \
 # Set environment variables
 ENV ASPNETCORE_ENVIRONMENT=Production \
     ASPNETCORE_URLS="http://+:21000" \
-    ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx \
-    ASPNETCORE_Kestrel__Certificates__Default__Password=YourSecurePassword \
     ConnectionStrings__identitydb="Host=postgres;Port=5432;Username=postgres;Password=${POSTGRES_PASSWORD};Database=identitydb;Trust Server Certificate=True;" \
     ConnectionStrings__contentdb="Host=postgres;Port=5432;Username=postgres;Password=${POSTGRES_PASSWORD};Database=contentdb;Trust Server Certificate=True;" \
     ConnectionStrings__aidb="Host=postgres;Port=5432;Username=postgres;Password=${POSTGRES_PASSWORD};Database=aidb;Trust Server Certificate=True;" \

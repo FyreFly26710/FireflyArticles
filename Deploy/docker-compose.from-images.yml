@@ -1,48 +1,23 @@
 # docker compose -f docker-compose.from-images.yml up -d
-services:
-  frontend:
-    image: firefly26710/ffarticles-frontend:latest
-    ports:
-      - "3000:3000"
-    depends_on:
-      - backend
-    networks:
-      - firefly-network
-    environment:
-      # Client-side environment variables (used in browser)
-      - NEXT_PUBLIC_GOOGLE_REDIRECT_URL=${GMAIL_OAUTH_REDIRECT_URI}
-      - NEXT_PUBLIC_GOOGLE_CLIENT_ID=${GMAIL_OAUTH_CLIENT_ID}
-      - NEXT_PUBLIC_BASE_URL=https://localhost:21000
-      # Server-side environment variables (used in SSR)
-      - SERVER_API_URL=https://backend:21000
-    extra_hosts:
-      - "localhost:host-gateway"
 
+services:
   backend:
-    image: firefly26710/ffarticles-backend:latest
-    ports:
-      - "21000:21000"
+    image: firefly26710/ffarticles-backend:manual-push-backend-image
+    pull_policy: always
     environment:
       # CORS: Frontend App URL
       - AllowedOrigins__0=http://localhost:3000
-      - AllowedOrigins__1=https://localhost:3000
       # GmailOAuth
       - GmailOAuth__ClientId=${GMAIL_OAUTH_CLIENT_ID}
       - GmailOAuth__ClientSecret=${GMAIL_OAUTH_CLIENT_SECRET}
       - GmailOAuth__RedirectUri=${GMAIL_OAUTH_REDIRECT_URI}
       # AI Services
       - DeepSeek__ApiKey=${DEEPSEEK_API_KEY}
-      - Ollama__ApiUrl=http://host.docker.internal:11434
+      # - Ollama__ApiUrl=${OLLAMA_API_URL}
       # Database credentials
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
       - RABBITMQ_USERNAME=${RABBITMQ_USERNAME:-rabbitmq}
       - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD:-rabbitmq}
-      # HTTPS Configuration
-      - ASPNETCORE_URLS=https://+:21000;http://+:21000
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
-      - ASPNETCORE_Kestrel__Certificates__Default__Password=YourSecurePassword
-    volumes:
-      - https-certs:/https:ro
     depends_on:
       postgres:
         condition: service_healthy
@@ -50,6 +25,8 @@ services:
         condition: service_healthy
     networks:
       - firefly-network
+    ports:
+      - "21000:21000"
     extra_hosts:
       - "localhost:host-gateway"
 
@@ -62,7 +39,6 @@ services:
       - rabbitmq-data:/var/lib/rabbitmq
     networks:
       - firefly-network
-    # Add memory limits to prevent OOM issues
     deploy:
       resources:
         limits:
@@ -112,4 +88,15 @@ networks:
 volumes:
   postgres-data:
   rabbitmq-data:
-  https-certs: 
+
+
+# Example .env file contents:
+# NEXT_PUBLIC_BASE_URL=http://localhost:3000
+# GMAIL_OAUTH_CLIENT_ID=xxx
+# GMAIL_OAUTH_CLIENT_SECRET=xxx
+# GMAIL_OAUTH_REDIRECT_URI=xxx
+# OLLAMA_API_URL=http://localhost:11434
+# DEEPSEEK_API_KEY=xxx
+# POSTGRES_PASSWORD=postgres
+# RABBITMQ_USERNAME=rabbitmq
+# RABBITMQ_PASSWORD=rabbitmq
