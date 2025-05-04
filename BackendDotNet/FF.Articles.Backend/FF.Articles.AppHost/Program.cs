@@ -9,13 +9,16 @@ var builder = DistributedApplication.CreateBuilder(args);
 //    })
 //    .WithVolume("redis-data", "/data") // Persist Redis data
 //    .WithRedisInsight(redisInsight => redisInsight.WithHostPort(8001));
+
 var rabbitMqUsername = builder.AddParameter("rabbitmqUsername", secret: false);
 var rabbitMqPassword = builder.AddParameter("rabbitmqPassword", secret: false);
+
 
 // Default 15672 and 5672, set to 15673 and 5673 to avoid port conflicts
 var rabbitMq = builder.AddRabbitMQ("rabbitmq", rabbitMqUsername, rabbitMqPassword)
     .WithLifetime(ContainerLifetime.Persistent)
     .WithManagementPlugin(15673)
+    .WithVolume("rabbitmq-data", "/data")
     .WithEndpoint("tcp", e =>
     {
         e.Port = 5673;
@@ -26,6 +29,8 @@ var rabbitMq = builder.AddRabbitMQ("rabbitmq", rabbitMqUsername, rabbitMqPasswor
 var username = builder.AddParameter("username", secret: false);
 var password = builder.AddParameter("password", secret: false);
 
+//var username = "postgres";
+//var password = "postgres";
 // Default 5432, set to 5433 to avoid port conflicts
 var postgres = builder.AddPostgres("postgres", username, password)
     .WithImage("postgres")

@@ -3,7 +3,7 @@ using FF.Articles.Backend.Common.Exceptions;
 using FF.Articles.Backend.Common.Responses;
 using FF.Articles.Backend.Common.Utils;
 using FF.Articles.Backend.Contents.API.Interfaces.Services;
-using FF.Articles.Backend.Contents.API.MapperExtensions.Topics;
+using FF.Articles.Backend.Contents.API.MapperExtensions;
 using FF.Articles.Backend.Contents.API.Models.Dtos;
 using FF.Articles.Backend.Contents.API.Models.Entities;
 using FF.Articles.Backend.Contents.API.Models.Requests.Topics;

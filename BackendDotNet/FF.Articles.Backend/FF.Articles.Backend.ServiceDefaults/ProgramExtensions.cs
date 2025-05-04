@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -53,17 +54,20 @@ public static class ProgramExtensions
     public static WebApplicationBuilder AddLogger(this WebApplicationBuilder builder)
     {
         builder.Logging.AddConsole();
+
+        // Filter out LogicalHandler logs but keep ClientHandler logs
+        builder.Logging.AddFilter("System.Net.Http.HttpClient.*.LogicalHandler", LogLevel.Warning);
+
         return builder;
     }
-    //public static WebApplicationBuilder AddEFSqlServer<TContext>(this WebApplicationBuilder builder, string connectionString) 
-    //    where TContext:DbContext
-    //{
-    //    builder.Services.AddDbContext<TContext>(options =>
-    //    {
-    //        options.UseSqlServer(connectionString)
-    //        .LogTo(Console.WriteLine, LogLevel.Information)
-    //        .EnableSensitiveDataLogging();
-    //    });
-    //    return builder;
-    //}
+    public static WebApplicationBuilder AddNpgsql<TContext>(this WebApplicationBuilder builder, string connectionString)
+       where TContext : DbContext
+    {
+        builder.Services.AddDbContext<TContext>(options =>
+        {
+            options.UseNpgsql(connectionString)
+                   .EnableSensitiveDataLogging();
+        });
+        return builder;
+    }
 }

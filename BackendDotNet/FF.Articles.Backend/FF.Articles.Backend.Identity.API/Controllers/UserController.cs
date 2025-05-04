@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using FF.Articles.Backend.Common.ApiDtos;
+﻿using FF.Articles.Backend.Common.ApiDtos;
 using FF.Articles.Backend.Common.Constants;
 using FF.Articles.Backend.Common.Exceptions;
 using FF.Articles.Backend.Common.Responses;

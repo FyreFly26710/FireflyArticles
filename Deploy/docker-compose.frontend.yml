@@ -1,0 +1,10 @@
+# docker compose -f docker-compose.frontend.yml up -d
+services:
+  frontend:
+    image: firefly26710/ffarticles-frontend:latest
+    pull_policy: always
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_GOOGLE_CLIENT_ID=${GMAIL_OAUTH_CLIENT_ID}
+      - NEXT_PUBLIC_BASE_URL=${BASE_URL_API}

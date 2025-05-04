@@ -1,11 +1,6 @@
 import React from 'react';
 import { Button, message } from 'antd';
 import styled from "styled-components";
-import { setLoginUser } from '@/states/loginUser';
-import { storage } from '@/states/storage';
-import { apiAuthGetLoginUser } from '@/api/identity/api/auth';
-import { AppDispatch } from "@/states/reduxStore";
-import { useDispatch } from "react-redux";
 
 
 const GoogleIcon = () => (
@@ -33,13 +28,12 @@ const StyledButton = styled(Button)`
 `;
 
 const GoogleLoginButton = () => {
-    const dispatch = useDispatch<AppDispatch>();
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+    const googleRedirectUrl = baseUrl + '/api/identity/auth/signin-google';
     const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
     const handleGoogleLogin = async () => {
-        console.log(apiUrl, googleClientId);
         const clientId = googleClientId ?? '';
-        const redirectUri = encodeURIComponent(apiUrl ?? '');
+        const redirectUri = encodeURIComponent(googleRedirectUrl ?? '');
         const scope = encodeURIComponent('profile email');
         const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=${scope}&access_type=offline&prompt=consent`;
         window.location.href = authUrl;

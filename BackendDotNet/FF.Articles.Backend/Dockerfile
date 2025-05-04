@@ -1,40 +1,38 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Copy solution and project files for better caching
-COPY ["FF.Articles.Backend.Identity.API/FF.Articles.Backend.Identity.API.csproj", "FF.Articles.Backend.Identity.API/"]
-COPY ["FF.Articles.Backend.Contents.API/FF.Articles.Backend.Contents.API.csproj", "FF.Articles.Backend.Contents.API/"]
-COPY ["FF.Articles.Backend.AI.API/FF.Articles.Backend.AI.API.csproj", "FF.Articles.Backend.AI.API/"]
-COPY ["FF.Articles.Backend.Gateway.API/FF.Articles.Backend.Gateway.API.csproj", "FF.Articles.Backend.Gateway.API/"]
-COPY ["FF.Articles.Backend.Common/FF.Articles.Backend.Common.csproj", "FF.Articles.Backend.Common/"]
-COPY ["FF.Articles.Backend.ServiceDefaults/FF.Articles.Backend.ServiceDefaults.csproj", "FF.Articles.Backend.ServiceDefaults/"]
-COPY ["FF.AI.Common/FF.AI.Common.csproj", "FF.AI.Common/"]
-COPY ["FF.Articles.Backend.sln", "."]
+COPY . .
 
-# Restore as distinct layers
+RUN dotnet restore "FF.AI.Common/FF.AI.Common.csproj"
+RUN dotnet restore "FF.Articles.Backend.Common/FF.Articles.Backend.Common.csproj"
+RUN dotnet restore "FF.Articles.Backend.RabbitMQ/FF.Articles.Backend.RabbitMQ.csproj"
+RUN dotnet restore "FF.Articles.Backend.ServiceDefaults/FF.Articles.Backend.ServiceDefaults.csproj"
+
 RUN dotnet restore "FF.Articles.Backend.Gateway.API/FF.Articles.Backend.Gateway.API.csproj"
 RUN dotnet restore "FF.Articles.Backend.Identity.API/FF.Articles.Backend.Identity.API.csproj"
 RUN dotnet restore "FF.Articles.Backend.Contents.API/FF.Articles.Backend.Contents.API.csproj"
 RUN dotnet restore "FF.Articles.Backend.AI.API/FF.Articles.Backend.AI.API.csproj"
-
-COPY . .
-
+    
 # Build and publish each service
-RUN dotnet publish "FF.Articles.Backend.Gateway.API/FF.Articles.Backend.Gateway.API.csproj" -c Release -o /app/gateway
-RUN dotnet publish "FF.Articles.Backend.Identity.API/FF.Articles.Backend.Identity.API.csproj" -c Release -o /app/identity
-RUN dotnet publish "FF.Articles.Backend.Contents.API/FF.Articles.Backend.Contents.API.csproj" -c Release -o /app/contents
-RUN dotnet publish "FF.Articles.Backend.AI.API/FF.Articles.Backend.AI.API.csproj" -c Release -o /app/ai
+RUN dotnet publish "FF.Articles.Backend.Gateway.API/FF.Articles.Backend.Gateway.API.csproj" -c Release -o /app/gateway --no-restore
+RUN dotnet publish "FF.Articles.Backend.Identity.API/FF.Articles.Backend.Identity.API.csproj" -c Release -o /app/identity --no-restore
+RUN dotnet publish "FF.Articles.Backend.Contents.API/FF.Articles.Backend.Contents.API.csproj" -c Release -o /app/contents --no-restore
+RUN dotnet publish "FF.Articles.Backend.AI.API/FF.Articles.Backend.AI.API.csproj" -c Release -o /app/ai --no-restore
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 
+# Set default environment variables for database credentials
+ENV POSTGRES_PASSWORD=postgres \
+    RABBITMQ_USERNAME=rabbitmq \
+    RABBITMQ_PASSWORD=rabbitmq
 # Set environment variables
 ENV ASPNETCORE_ENVIRONMENT=Production \
-    ASPNETCORE_URLS=http://+:21000 \
-    ConnectionStrings__identitydb="Host=postgres;Port=5432;Username=postgres;Password=postgres;Database=identitydb;Trust Server Certificate=True;" \
-    ConnectionStrings__contentdb="Host=postgres;Port=5432;Username=postgres;Password=postgres;Database=contentdb;Trust Server Certificate=True;" \
-    ConnectionStrings__aidb="Host=postgres;Port=5432;Username=postgres;Password=postgres;Database=aidb;Trust Server Certificate=True;" \
+    ASPNETCORE_URLS="http://+:21000" \
+    ConnectionStrings__identitydb="Host=postgres;Port=5432;Username=postgres;Password=${POSTGRES_PASSWORD};Database=identitydb;Trust Server Certificate=True;" \
+    ConnectionStrings__contentdb="Host=postgres;Port=5432;Username=postgres;Password=${POSTGRES_PASSWORD};Database=contentdb;Trust Server Certificate=True;" \
+    ConnectionStrings__aidb="Host=postgres;Port=5432;Username=postgres;Password=${POSTGRES_PASSWORD};Database=aidb;Trust Server Certificate=True;" \
     ConnectionStrings__redis="redis:6379" \
-    ConnectionStrings__rabbitmq="amqp://rabbitmq:rabbitmq@rabbitmq:5672" \
+    ConnectionStrings__rabbitmq="amqp://${RABBITMQ_USERNAME}:${RABBITMQ_PASSWORD}@rabbitmq:5672" \
     # AllowedOrigins__0="http://localhost:3000" \
     # YARP Route Configuration
     ReverseProxy__Routes__contents-route__ClusterId=contentsCluster \
@@ -52,7 +50,7 @@ ENV ASPNETCORE_ENVIRONMENT=Production \
     # GmailOAuth__ClientSecret="xxxx" \
     # GmailOAuth__RedirectUri="http://localhost:21000/api/identity/auth/signin-google"
     # AI Services
-    # DeepSeek__ApiKey="sk-a63f33e0571547789e392edb9d325da6" \
+    # DeepSeek__ApiKey="sk-xxx" \
     Ollama__ApiUrl="http://host.docker.internal:11434"
 
 WORKDIR /app/gateway
@@ -67,12 +65,13 @@ COPY --from=build /app/contents .
 WORKDIR /app/ai
 COPY --from=build /app/ai .
 
-# Create and copy the startup script
-WORKDIR /app
-COPY scripts/start.sh .
-RUN chmod +x /app/start.sh
-
 # Expose the gateway port
 EXPOSE 21000
 
-CMD ["/app/start.sh"] 
+CMD ["bash", "-c", "\
+     dotnet /app/identity/FF.Articles.Backend.Identity.API.dll --urls=http://0.0.0.0:22000 & \
+     dotnet /app/contents/FF.Articles.Backend.Contents.API.dll --urls=http://0.0.0.0:23000 & \
+     dotnet /app/ai/FF.Articles.Backend.AI.API.dll --urls=http://0.0.0.0:24000 & \
+     sleep 3 && \
+     dotnet /app/gateway/FF.Articles.Backend.Gateway.API.dll --urls='http://0.0.0.0:21000' & \
+     wait"] 

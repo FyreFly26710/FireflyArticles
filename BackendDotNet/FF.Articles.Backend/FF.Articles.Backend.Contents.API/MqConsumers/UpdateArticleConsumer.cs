@@ -7,6 +7,7 @@ using FF.Articles.Backend.Common.ApiDtos;
 using FF.Articles.Backend.Contents.API.Models.Requests.Articles;
 using FF.Articles.Backend.Common.Constants;
 using FF.Articles.Backend.Common.Exceptions;
+using FF.Articles.Backend.RabbitMQ.Base;
 namespace FF.Articles.Backend.Contents.API.MqConsumers;
 
 public class UpdateArticleConsumer(IConnection connection, IServiceScopeFactory serviceScopeFactory, ILogger<UpdateArticleConsumer> logger)

@@ -6,10 +6,9 @@ using FF.Articles.Backend.AI.API.Models.Requests.ArticleGenerations;
 using RabbitMQ.Client;
 using FF.Articles.Backend.RabbitMQ;
 using FF.Articles.Backend.AI.API.MapperExtensions;
-using FF.Articles.Backend.Common.ApiDtos;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
+using FF.Articles.Backend.RabbitMQ.Base;
+using FF.Articles.Backend.RabbitMQ.Helpers;
+using FF.Articles.Backend.Common.Exceptions;
 
 namespace FF.Articles.Backend.AI.API.Services.Consumers;
 
@@ -106,7 +105,13 @@ public class GenerateArticleConsumer : BaseConsumer
 
         if (generateRequest is not null)
         {
+            if (generateRequest.Id == null)
+            {
+                throw new ApiException(ErrorCode.SYSTEM_ERROR, "GenerateRequest.Id is null");
+            }
             using var scope = _serviceScopeFactory.CreateScope();
+
+            // If dead letter, we don't need to generate article content
             string articleContent = "Error generating article";
             if (!isDeadLetter)
             {

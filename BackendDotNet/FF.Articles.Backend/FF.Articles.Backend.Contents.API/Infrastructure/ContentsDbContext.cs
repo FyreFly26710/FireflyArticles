@@ -61,7 +61,7 @@ public class ContentsDbContext : DbContext
             entity.ToTable("Topic");
             entity.Property(e => e.Title).HasMaxLength(64).IsRequired().HasDefaultValue("");
             entity.Property(e => e.Abstract).HasMaxLength(512).IsRequired().HasDefaultValue("");
-            entity.Property(e => e.Content).HasDefaultValue("");
+            //entity.Property(e => e.Content).HasDefaultValue("");
             entity.Property(e => e.Category).HasMaxLength(64).IsRequired().HasDefaultValue("");
             entity.Property(e => e.TopicImage).HasMaxLength(2048).IsRequired().HasDefaultValue("");
             entity.Property(e => e.UserId).HasDefaultValue(0L);

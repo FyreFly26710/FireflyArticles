@@ -17,7 +17,6 @@ export function useHomePageData() {
                 const [topicsResponse, articlesResponse] = await Promise.all([
                     apiTopicGetByPage({
                         PageSize: 12,
-                        IncludeContent: false,
                         IncludeArticles: false,
                         IncludeSubArticles: false,
                         IncludeUser: false,

@@ -1,0 +1,95 @@
+# docker compose -f docker-compose.backend.yml up -d
+
+services:
+  backend:
+    image: firefly26710/ffarticles-backend:latest
+    platform: linux/arm64
+    pull_policy: always
+    environment:
+      # CORS: Frontend App URL
+      - AllowedOrigins__0=${BASE_URL_FRONTEND}
+      # Auth API
+      - GmailOAuth__ClientId=${GMAIL_OAUTH_CLIENT_ID}
+      - GmailOAuth__ClientSecret=${GMAIL_OAUTH_CLIENT_SECRET}
+      - Domain__Api=${BASE_URL_API}
+      - Domain__Home=${BASE_URL_FRONTEND}
+      # AI Services
+      - DeepSeek__ApiKey=${DEEPSEEK_API_KEY}
+      # Database credentials
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - RABBITMQ_USERNAME=${RABBITMQ_USERNAME:-rabbitmq}
+      - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD:-rabbitmq}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - firefly-network
+    ports:
+      - "21000:21000"
+    extra_hosts:
+      - "localhost:host-gateway"
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    platform: linux/arm64
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_USERNAME:-rabbitmq}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD:-rabbitmq}
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    networks:
+      - firefly-network
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "check_port_connectivity"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "15672:15672"  # Management UI
+      - "5672:5672"    # AMQP port
+
+  postgres:
+    image: postgres:15
+    platform: linux/arm64
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - firefly-network
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  pgweb:
+    image: sosedoff/pgweb
+    platform: linux/arm64
+    ports:
+      - "8081:8081"
+    environment:
+      - DATABASE_URL=postgres://postgres:${POSTGRES_PASSWORD:-postgres}@postgres:5432/postgres?sslmode=disable
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - firefly-network
+
+networks:
+  firefly-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  rabbitmq-data:
+

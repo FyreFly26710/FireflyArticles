@@ -13,17 +13,8 @@ builder.AddServiceDefaults();
 
 builder.Services.AddMigration<ContentsDbContext, ContentsDbSeed>();
 
-builder.Services.AddDbContext<ContentsDbContext>(options =>
-{
-    var connectionString = builder.Configuration.GetConnectionString("contentdb");
-
-    options.UseNpgsql(connectionString)
-           .LogTo(
-               (eventData) => Console.WriteLine($"{DateTime.Now:dd/MM/yyyy HH:mm:ss.fff} {eventData}"),
-               new[] { Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.CommandExecuted },
-               LogLevel.Information)
-           .EnableSensitiveDataLogging();
-});
+var connectionString = configuration.GetConnectionString("contentdb") ?? throw new Exception("contentdb connection string not found");
+builder.AddNpgsql<ContentsDbContext>(connectionString);
 
 builder.AddRedisClient("redis");
 
@@ -31,6 +22,7 @@ builder.Services.AddContentsServices();
 
 builder.AddRabbitMq();
 builder.Services.AddHostedService<UpdateArticleConsumer>();
+builder.Services.AddHostedService<AddArticleConsumer>();
 
 builder.Services.AddControllers();
 

@@ -1,6 +1,10 @@
-import TopicsPage from "./TopicsPage";
+import TopicsPage from './TopicsPage';
 
-export default TopicsPage;
+export const dynamic = 'force-dynamic'; // Options: 'auto' | 'force-dynamic' | 'error' | 'force-static'
+
+export default function Page() {
+  return <TopicsPage />;
+}
 
 export const metadata = {
   title: 'Topics - Firefly Articles',

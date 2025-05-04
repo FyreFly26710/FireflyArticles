@@ -11,15 +11,8 @@ var configuration = builder.Configuration;
 
 builder.AddServiceDefaults();
 
-builder.Services.AddDbContext<IdentityDbContext>(options =>
-{
-    var connectionString = builder.Configuration.GetConnectionString("identitydb");
-
-    options.UseNpgsql(connectionString)
-           .LogTo(Console.WriteLine, LogLevel.Information)
-           .EnableSensitiveDataLogging();
-});
-
+var connectionString = configuration.GetConnectionString("identitydb") ?? throw new Exception("identitydb connection string not found");
+builder.AddNpgsql<IdentityDbContext>(connectionString);
 builder.Services.AddHttpClient();
 
 builder.Services.AddScoped<IUserService, UserService>();
