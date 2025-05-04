@@ -24,3 +24,5 @@ appsettings.Development.json
 appsettings.Production.json
 
 .env
+
+.DS_Store

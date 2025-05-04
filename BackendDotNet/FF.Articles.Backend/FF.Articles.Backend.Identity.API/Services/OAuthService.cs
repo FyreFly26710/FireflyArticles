@@ -5,14 +5,14 @@ using FF.Articles.Backend.Identity.API.Models.OAuth;
 
 namespace FF.Articles.Backend.Identity.API.Services;
 
-public class OAuthService(IConfiguration _configuration): IOAuthService
+public class OAuthService(IConfiguration _configuration) : IOAuthService
 {
     public async Task<TokenResponse> GetGmailToken(string code)
     {
         var tokenEndpoint = "https://oauth2.googleapis.com/token";
-        string clientId = _configuration["GmailOAuth:ClientId"]??"";
-        string clientSecret = _configuration["GmailOAuth:ClientSecret"]??"";
-        string RedirectUri = _configuration["GmailOAuth:RedirectUri"]??"";
+        string clientId = _configuration["GmailOAuth:ClientId"] ?? "";
+        string clientSecret = _configuration["GmailOAuth:ClientSecret"] ?? "";
+        string RedirectUri = _configuration["Domain:Api"] ?? "" + "/api/identity/auth/signin-google";
         var requestBody = new Dictionary<string, string>
         {
             { "code", code },

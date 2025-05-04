@@ -28,10 +28,10 @@ const StyledButton = styled(Button)`
 `;
 
 const GoogleLoginButton = () => {
-    const googleRedirectUrl = process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URL;
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+    const googleRedirectUrl = baseUrl + '/api/identity/auth/signin-google';
     const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
     const handleGoogleLogin = async () => {
-        console.log(googleRedirectUrl, googleClientId);
         const clientId = googleClientId ?? '';
         const redirectUri = encodeURIComponent(googleRedirectUrl ?? '');
         const scope = encodeURIComponent('profile email');
