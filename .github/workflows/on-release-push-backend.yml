@@ -96,3 +96,23 @@ jobs:
           tags: |
             firefly26710/ffarticles-backend:latest
             firefly26710/ffarticles-backend:${{ needs.check-commit.outputs.version }}
+
+  deploy-backend-to-server:
+    needs: [check-commit, build-and-push-backend]
+    if: needs.check-commit.outputs.build_backend == 'true'
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Install SSH key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          if_key_exists: replace
+      
+      - name: Deploy to macOS server
+        env:
+          SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_PORT: '22'
+        run: |
+          ssh -o StrictHostKeyChecking=no -p $SSH_PORT $SSH_USERNAME@$SSH_HOST "cd /Users/liqiangwang/Repo/FireflyArticles/Deploy && docker-compose -f docker-compose.backend.yml up -d"

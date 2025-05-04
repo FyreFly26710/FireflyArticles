@@ -99,3 +99,13 @@ jobs:
           build-args: |
             NEXT_PUBLIC_GOOGLE_CLIENT_ID=${{ secrets.GMAIL_OAUTH_CLIENT_ID }}
             NEXT_PUBLIC_BASE_URL=${{ secrets.BASE_URL_API }}
+
+  deploy-frontend-to-server:
+    needs: build-and-push-frontend
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Trigger deployment
+        if: success()
+        run: |
+          curl -X GET ${{ secrets.WEBHOOK_URL }}
