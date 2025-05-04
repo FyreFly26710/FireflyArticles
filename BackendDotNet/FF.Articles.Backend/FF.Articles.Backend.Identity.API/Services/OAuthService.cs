@@ -12,7 +12,8 @@ public class OAuthService(IConfiguration _configuration) : IOAuthService
         var tokenEndpoint = "https://oauth2.googleapis.com/token";
         string clientId = _configuration["GmailOAuth:ClientId"] ?? "";
         string clientSecret = _configuration["GmailOAuth:ClientSecret"] ?? "";
-        string RedirectUri = _configuration["Domain:Api"] ?? "" + "/api/identity/auth/signin-google";
+        string apiDomain = _configuration["Domain:Api"] ?? "https://localhost:21000/";
+        string RedirectUri = $"{apiDomain.TrimEnd('/')}/api/identity/auth/signin-google";
         var requestBody = new Dictionary<string, string>
         {
             { "code", code },
@@ -47,6 +48,6 @@ public class OAuthService(IConfiguration _configuration) : IOAuthService
         var responseContent = await response.Content.ReadAsStringAsync();
         var userInfo = JsonSerializer.Deserialize<UserInfo>(responseContent);
 
-        return userInfo;
+        return userInfo ?? new UserInfo();
     }
 }

@@ -73,7 +73,17 @@ public class AuthController(
 
         var tokenResponse = await _oAuthService.GetGmailToken(code);
 
+        if (string.IsNullOrEmpty(tokenResponse?.AccessToken))
+        {
+            throw new ApiException(ErrorCode.PARAMS_ERROR, "Failed to obtain access token.");
+        }
+
         var userInfo = await _oAuthService.GetUserInfoFromGmailToken(tokenResponse.AccessToken);
+
+        if (string.IsNullOrEmpty(userInfo.Email))
+        {
+            throw new ApiException(ErrorCode.PARAMS_ERROR, "Email is missing in user info.");
+        }
 
         var user = await _userService.GetUserByEmail(userInfo.Email);
 
