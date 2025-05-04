@@ -31,11 +31,14 @@ public class OAuthService(IConfiguration _configuration) : IOAuthService
         var responseContent = await response.Content.ReadAsStringAsync();
         var tokenResponse = JsonSerializer.Deserialize<TokenResponse>(responseContent);
 
-        return tokenResponse;
+        return tokenResponse ?? new TokenResponse();
     }
 
     public async Task<UserInfo> GetUserInfoFromGmailToken(string gmailToken)
     {
+        if (string.IsNullOrEmpty(gmailToken))
+            return new UserInfo();
+
         var userInfoEndpoint = "https://www.googleapis.com/oauth2/v2/userinfo";
 
         using var httpClient = new HttpClient();
@@ -47,6 +50,6 @@ public class OAuthService(IConfiguration _configuration) : IOAuthService
         var responseContent = await response.Content.ReadAsStringAsync();
         var userInfo = JsonSerializer.Deserialize<UserInfo>(responseContent);
 
-        return userInfo;
+        return userInfo ?? new UserInfo();
     }
 }

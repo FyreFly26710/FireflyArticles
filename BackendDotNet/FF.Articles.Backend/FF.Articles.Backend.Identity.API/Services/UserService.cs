@@ -111,15 +111,7 @@ public class UserService(IUserRepository _userRepository, ILogger<UserService> _
             throw new ApiException(ErrorCode.PARAMS_ERROR, "Password length less than 8");
     }
 
-    public async Task<User> GetUserByEmail(string email)
-    {
-        var user = await _userRepository.GetUserByEmail(email);
-        if (user == null)
-        {
-            user = new User() { Id = -1, UserAccount = email, UserRole = "user", UserName = "Guest" };
-        }
-        return user;
-    }
+    public async Task<User?> GetUserByEmail(string email) => await _userRepository.GetUserByEmail(email);
 
     public async Task SignInUser(User user, HttpContext httpContext)
     {

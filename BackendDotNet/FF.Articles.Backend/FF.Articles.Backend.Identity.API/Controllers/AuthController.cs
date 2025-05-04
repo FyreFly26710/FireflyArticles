@@ -72,10 +72,16 @@ public class AuthController(
         if (string.IsNullOrEmpty(code)) throw new ApiException(ErrorCode.PARAMS_ERROR, "Authorization code is missing.");
 
         var tokenResponse = await _oAuthService.GetGmailToken(code);
+        if (string.IsNullOrEmpty(tokenResponse.AccessToken))
+            throw new ApiException(ErrorCode.OPERATION_ERROR, "Failed to get access token from Google.");
 
         var userInfo = await _oAuthService.GetUserInfoFromGmailToken(tokenResponse.AccessToken);
+        if (string.IsNullOrEmpty(userInfo.Email))
+            throw new ApiException(ErrorCode.OPERATION_ERROR, "Failed to get user email from Google.");
 
         var user = await _userService.GetUserByEmail(userInfo.Email);
+        if (user == null)
+            throw new ApiException(ErrorCode.OPERATION_ERROR, "User not found with provided email.");
 
         await _userService.SignInUser(user, HttpContext);
 

@@ -10,12 +10,19 @@ public class UserRepository : BaseRepository<User, IdentityDbContext>, IUserRepo
     }
     public async Task<User?> GetUserByAccount(string account)
     {
+        if (string.IsNullOrEmpty(account))
+            return null;
+
         return await GetQueryable()
-            .FirstOrDefaultAsync(u => account.ToLower() == (u.UserAccount ?? "").ToLower());
+            .FirstOrDefaultAsync(u => account == u.UserAccount);
     }
     public async Task<User?> GetUserByEmail(string email)
     {
+        if (string.IsNullOrEmpty(email))
+            return null;
+
+        string emailLower = email.ToLower();
         return await GetQueryable()
-            .FirstOrDefaultAsync(u => email.ToLower() == (u.UserEmail ?? "").ToLower());
+            .FirstOrDefaultAsync(u => emailLower == (u.UserEmail ?? "").ToLower());
     }
 }
