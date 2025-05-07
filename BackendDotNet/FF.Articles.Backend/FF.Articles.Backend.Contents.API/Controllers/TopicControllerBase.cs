@@ -20,6 +20,12 @@ public abstract class TopicControllerBase : ControllerBase
         _topicService = topicService(version);
     }
 
+    /// <summary>
+    /// Retrieves a topic by its unique identifier
+    /// </summary>
+    /// <param name="id">The unique identifier of the topic</param>
+    /// <param name="query">Query parameters to customize the response</param>
+    /// <returns>A topic with its details</returns>
     [HttpGet("{id}")]
     public async Task<ApiResponse<TopicDto>> GetById(long id, [FromQuery] TopicQueryRequest query)
     {

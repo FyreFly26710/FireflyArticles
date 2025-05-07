@@ -12,36 +12,34 @@ public class TagRepository : BaseRepository<Tag, ContentsDbContext>, ITagReposit
     }
     public async Task<List<Tag>> GetByNamesAsync(List<string> names)
     {
-        names = names.Select(n => n.ToLower().Trim()).Distinct().ToList();
+        names = names.Select(n => n.Normalize()).Distinct().ToList();
         names = names.Where(n => !string.IsNullOrEmpty(n)).ToList();
-        return await base.GetQueryable().Where(t => names.Contains(t.TagName.ToLower().Trim())).ToListAsync();
+        return await base.GetQueryable().Where(t => names.Contains(t.TagName.Normalize())).ToListAsync();
     }
 
     public async Task<List<Tag>> GetOrCreateByNamesAsync(List<string> names)
     {
         // Normalize and deduplicate the names
-        names = names.Select(n => n.ToLower().Trim())
+        names = names.Select(n => n.Normalize())
                     .Distinct()
                     .Where(n => !string.IsNullOrEmpty(n))
                     .ToList();
 
-        if (!names.Any())
-        {
-            return new List<Tag>();
-        }
+        if (names.Count == 0) return [];
+
 
         // Get all existing tags in one query with case-insensitive comparison
+        // Db may have duplicates, so we need to handle them by taking the first tag for each name
         var allExistingTags = await base.GetQueryable()
-            .Where(t => names.Contains(t.TagName.ToLower().Trim()))
+            .Where(t => names.Contains(t.TagName.Normalize()))
             .ToListAsync();
 
         // Handle potential duplicates in the database by taking the first tag for each name
         var existingTags = new List<Tag>();
         var processedNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
         foreach (var tag in allExistingTags)
         {
-            var normalizedName = tag.TagName.ToLower().Trim();
+            var normalizedName = tag.TagName.Normalize();
             if (!processedNames.Contains(normalizedName))
             {
                 existingTags.Add(tag);
@@ -49,45 +47,17 @@ public class TagRepository : BaseRepository<Tag, ContentsDbContext>, ITagReposit
             }
         }
 
-        // Create a dictionary of existing tags by normalized name for faster lookup
-        var existingTagsByName = existingTags
-            .ToDictionary(
-                t => t.TagName.ToLower().Trim(),
-                t => t,
-                StringComparer.OrdinalIgnoreCase
-            );
-
-        // Find names that don't exist yet
         var tagsToCreate = names
-            .Where(name => !existingTagsByName.ContainsKey(name))
+            .Where(name => !existingTags.Any(t => t.TagName.Normalize() == name.Normalize()))
             .ToList();
 
         // Create new tags if needed
         foreach (var name in tagsToCreate)
         {
-            try
-            {
-                var tag = new Tag { TagName = name };
-                var id = await CreateAsync(tag);
-                tag.Id = id;
-                existingTags.Add(tag);
-            }
-            catch (Exception ex)
-            {
-                _context.ChangeTracker.Clear(); // Clear the context to avoid tracking conflicts
-
-                // Try to find the tag again - it might have been created by another process
-                // or there might be duplicates in the DB
-                var existingTag = await base.GetQueryable()
-                    .Where(t => t.TagName.ToLower().Trim() == name.ToLower().Trim())
-                    .OrderBy(t => t.Id) // Take the first one if there are duplicates
-                    .FirstOrDefaultAsync();
-
-                if (existingTag != null && !existingTags.Any(t => t.Id == existingTag.Id))
-                {
-                    existingTags.Add(existingTag);
-                }
-            }
+            var tag = new Tag { TagName = name };
+            var id = await CreateAsync(tag);
+            tag.Id = id;
+            existingTags.Add(tag);
         }
 
         return existingTags;

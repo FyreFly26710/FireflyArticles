@@ -51,7 +51,7 @@ public class ArticleRepository : BaseRepository<Article, ContentsDbContext>, IAr
         }
         if (!string.IsNullOrEmpty(keyword))
         {
-            query = query.Where(x => EF.Functions.Like(x.Title, $"%{keyword}%"));
+            query = query.Where(x => EF.Functions.ILike(x.Title, $"%{keyword}%"));
         }
         if (topicIds != null && topicIds.Count > 0)
         {

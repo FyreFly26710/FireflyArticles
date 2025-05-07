@@ -41,6 +41,13 @@ namespace FF.Articles.Backend.ServiceDefaults
         {
             builder.Services.AddSwaggerGen(c =>
             {
+                // Include XML comments
+                var xmlFiles = Directory.GetFiles(AppContext.BaseDirectory, "*.xml");
+                foreach (var xmlFile in xmlFiles)
+                {
+                    c.IncludeXmlComments(xmlFile);
+                }
+
                 c.CustomOperationIds(apiDesc =>
                 {
                     if (apiDesc.ActionDescriptor is ControllerActionDescriptor descriptor)
