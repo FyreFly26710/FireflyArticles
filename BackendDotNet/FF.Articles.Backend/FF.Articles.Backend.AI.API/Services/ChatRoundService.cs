@@ -38,9 +38,9 @@ public class ChatRoundService(
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
     };
 
-    public async Task<ChatRoundDto> NewChatRound(ChatRoundCreateRequest request, HttpRequest httpRequest, CancellationToken cancellationToken = default)
+    public async Task<ChatRoundDto> NewChatRound(ChatRoundCreateRequest request, UserApiDto user, CancellationToken cancellationToken = default)
     {
-        var newRound = await getChatRound(request, httpRequest);
+        var newRound = await getChatRound(request, user);
         var chatRequest = await getChatRequest(newRound.SessionId, request);
 
         var response = await _aiChatAssistant.ChatAsync(chatRequest, new CancellationToken());
@@ -60,9 +60,9 @@ public class ChatRoundService(
         return newRound.ToDto();
     }
 
-    public async IAsyncEnumerable<SseDto> StreamChatRound(ChatRoundCreateRequest request, HttpRequest httpRequest, CancellationToken cancellationToken = default)
+    public async IAsyncEnumerable<SseDto> StreamChatRound(ChatRoundCreateRequest request, UserApiDto user, CancellationToken cancellationToken = default)
     {
-        var newRound = await getChatRound(request, httpRequest);
+        var newRound = await getChatRound(request, user);
         var chatRequest = await getChatRequest(newRound.SessionId, request);
 
         // Send initial data
@@ -111,7 +111,7 @@ public class ChatRoundService(
         };
     }
 
-    private async Task<ChatRound> getChatRound(ChatRoundCreateRequest request, HttpRequest httpRequest)
+    private async Task<ChatRound> getChatRound(ChatRoundCreateRequest request, UserApiDto user)
     {
         if (string.IsNullOrEmpty(request.UserMessage?.Trim()))
             throw new ApiException(ErrorCode.PARAMS_ERROR, "User message is required");
@@ -123,7 +123,7 @@ public class ChatRoundService(
             var session = new Session
             {
                 Id = EntityUtil.GenerateSnowflakeId(),
-                UserId = UserUtil.GetUserId(httpRequest),
+                UserId = user.UserId,
                 TimeStamp = request.SessionTimeStamp,
             };
             sessionId = await _sessionRepository.CreateAsync(session);

@@ -18,14 +18,15 @@ public class ChatRoundController(IChatRoundService chatRoundService) : Controlle
     [HttpPost]
     public async Task<ApiResponse<ChatRoundDto>> NewChatByRequest([FromBody] ChatRoundCreateRequest request, CancellationToken cancellationToken)
     {
-        var result = await chatRoundService.NewChatRound(request, Request, cancellationToken);
+        var user = UserUtil.GetUserFromHttpRequest(Request);
+        var result = await chatRoundService.NewChatRound(request, user, cancellationToken);
         return ResultUtil.Success(result);
     }
 
     [HttpPost("stream")]
     public async Task StreamChat([FromBody] ChatRoundCreateRequest request, CancellationToken cancellationToken)
     {
-        var userId = UserUtil.GetUserId(Request);
+        var user = UserUtil.GetUserFromHttpRequest(Request);
 
         // Set content type for SSE
         Response.Headers.Add("Content-Type", "text/event-stream");
@@ -35,7 +36,7 @@ public class ChatRoundController(IChatRoundService chatRoundService) : Controlle
         try
         {
             // Use the service to stream the response
-            await foreach (var sseDto in chatRoundService.StreamChatRound(request, Request, cancellationToken))
+            await foreach (var sseDto in chatRoundService.StreamChatRound(request, user, cancellationToken))
             {
                 // Format according to SSE specification: event: <event>\ndata: <data>\n\n
                 var message = $"event: {sseDto.Event}\ndata: {sseDto.Data}\n\n";

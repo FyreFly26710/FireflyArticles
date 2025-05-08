@@ -32,16 +32,18 @@ public class SessionController(ISessionService sessionService) : ControllerBase
 
     [HttpPut]
     [Authorize]
-    public async Task<ApiResponse<bool>> UpdateSession(SessionEditRequest request, CancellationToken cancellationToken)
+    public async Task<ApiResponse<bool>> UpdateSession(SessionEditRequest request)
     {
-        var result = await sessionService.UpdateSession(request, cancellationToken);
+        var user = UserUtil.GetUserFromHttpRequest(Request);
+        var result = await sessionService.UpdateSession(request, user);
         return ResultUtil.Success(result);
     }
     [HttpDelete("{id}")]
     [Authorize]
-    public async Task<ApiResponse<bool>> DeleteSession(long id, CancellationToken cancellationToken)
+    public async Task<ApiResponse<bool>> DeleteSession(long id)
     {
-        var result = await sessionService.DeleteAsync(id);
+        var user = UserUtil.GetUserFromHttpRequest(Request);
+        var result = await sessionService.DeleteSession(id, user);
         return ResultUtil.Success(result);
     }
 }

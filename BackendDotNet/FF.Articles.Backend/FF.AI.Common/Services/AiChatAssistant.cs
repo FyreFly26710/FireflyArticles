@@ -3,12 +3,14 @@ using FF.AI.Common.Constants;
 using FF.AI.Common.Interfaces;
 using FF.AI.Common.Models;
 using FF.AI.Common.Providers;
+using Microsoft.Extensions.Logging;
 
 namespace FF.AI.Common.Services;
 
 public class AiChatAssistant(
     IAssistant<OllamaProvider> _ollamaAssistant,
-    IAssistant<DeepSeekProvider> _deepSeekAssistant
+    IAssistant<DeepSeekProvider> _deepSeekAssistant,
+    ILogger<AiChatAssistant> _logger
     ) : IAssistant
 {
     public Task<ChatResponse> ChatAsync(ChatRequest request, CancellationToken cancellationToken)
@@ -31,9 +33,6 @@ public class AiChatAssistant(
         };
     }
 
-    /// <summary>
-    /// Todo: Cache this
-    /// </summary>
     public async Task<List<ChatProvider>> GetProviderAsync(CancellationToken cancellationToken)
     {
         var tasks = new List<Task<ChatProvider>>
@@ -41,7 +40,31 @@ public class AiChatAssistant(
             _ollamaAssistant.GetProviderAsync(cancellationToken),
             _deepSeekAssistant.GetProviderAsync(cancellationToken)
         };
-        var providers = await Task.WhenAll(tasks);
-        return providers.ToList();
+
+        var timeoutTask = Task.Delay(TimeSpan.FromSeconds(5), cancellationToken);
+        var allTasks = Task.WhenAll(tasks);
+
+        if (await Task.WhenAny(allTasks, timeoutTask) == allTasks && !allTasks.IsFaulted)
+        {
+            return (await allTasks).ToList();
+        }
+
+        var results = new List<ChatProvider>();
+        foreach (var task in tasks)
+        {
+            if (task.IsCompleted && !task.IsFaulted && !task.IsCanceled)
+            {
+                try
+                {
+                    results.Add(await task);
+                }
+                catch (Exception e)
+                {
+                    _logger.LogError(e, "Error getting provider");
+                }
+            }
+        }
+
+        return results;
     }
 }

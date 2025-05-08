@@ -31,10 +31,12 @@ axiosInstance.interceptors.request.use(
 // response interceptors
 axiosInstance.interceptors.response.use(
     // 2xx response
+    // All api responses have 200 status code, including error responses
     function (response: AxiosResponse<any>) {
         return response.data;
     },
     // non 2xx error
+    // these requests are not handled by the backend
     function (error) {
         return Promise.reject(error);
     },

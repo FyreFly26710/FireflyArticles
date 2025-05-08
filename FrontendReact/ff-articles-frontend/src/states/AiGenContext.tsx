@@ -71,6 +71,10 @@ export function AiGenProvider({ children }: { children: ReactNode }) {
     setRequest(articleListRequest);
     try {
       const response = await apiAiArticlesGenerateList(articleListRequest);
+      if (response.code !== 200) {
+        console.log('Error generating articles:', response.message);
+        throw new Error(response.message);
+      }
       const data = response.data;
       setResults(data);
 

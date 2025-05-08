@@ -9,6 +9,7 @@ using FF.Articles.Backend.Common.Utils;
 using FF.Articles.Backend.AI.API.MapperExtensions;
 using FF.Articles.Backend.Common.Exceptions;
 using FF.Articles.Backend.AI.API.Models.Requests.Sessions;
+using FF.Articles.Backend.Common.ApiDtos;
 namespace FF.Articles.Backend.AI.API.Services;
 
 public class SessionService(
@@ -54,7 +55,7 @@ public class SessionService(
         UpdateTime = session.UpdateTime ?? DateTime.Now
     };
 
-    public async Task<bool> UpdateSession(SessionEditRequest request, CancellationToken cancellationToken)
+    public async Task<bool> UpdateSession(SessionEditRequest request, UserApiDto user)
     {
         var session = await _sessionRepository.GetByIdAsync(request.SessionId);
         if (session == null)
@@ -62,6 +63,17 @@ public class SessionService(
         if (!string.IsNullOrEmpty(request?.SessionName?.Trim()))
             session.SessionName = request.SessionName;
         await _sessionRepository.UpdateAsync(session);
+        await _sessionRepository.SaveChangesAsync();
+        return true;
+    }
+    public async Task<bool> DeleteSession(long id, UserApiDto user)
+    {
+        var session = await _sessionRepository.GetByIdAsync(id);
+        if (session == null)
+            throw new ApiException(ErrorCode.NOT_FOUND_ERROR, "Session not found");
+        if (session.UserId != user.UserId)
+            throw new ApiException(ErrorCode.FORBIDDEN_ERROR, "You are not allowed to delete this session");
+        await _sessionRepository.DeleteAsync(id);
         await _sessionRepository.SaveChangesAsync();
         return true;
     }

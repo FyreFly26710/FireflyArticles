@@ -16,8 +16,7 @@ public class AiArticlesController(IArticleGenerationService articleGenerationSer
     [HttpPost("generate-article-list")]
     public async Task<ApiResponse<ArticlesAIResponseDto>> GenerateArticleList(ArticleListRequest request, CancellationToken cancellationToken)
     {
-        request.Model = "deepseek-chat";
-        request.Provider = ProviderList.DeepSeek;
+        var user = UserUtil.GetUserFromHttpRequest(Request);
         var article = await articleGenerationService.GenerateArticleListsAsync(request, cancellationToken);
         return ResultUtil.Success<ArticlesAIResponseDto>(article);
     }
@@ -25,8 +24,7 @@ public class AiArticlesController(IArticleGenerationService articleGenerationSer
     [HttpPost("generate-article-content")]
     public async Task<ApiResponse<long>> GenerateArticleContent(ContentRequest request)
     {
-        request.Model = "deepseek-reasoner";
-        request.Provider = ProviderList.DeepSeek;
+        var user = UserUtil.GetUserFromHttpRequest(Request);
         var articleId = await articleGenerationService.DispatchArticleGenerationAsync(request);
         return ResultUtil.Success<long>(articleId);
     }
