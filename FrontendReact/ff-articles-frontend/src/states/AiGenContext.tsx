@@ -218,7 +218,6 @@ export function AiGenProvider({ children }: { children: ReactNode }) {
         topic: request.topic,
         topicAbstract: request.topicAbstract,
         topicId: results.topicId,
-        model: request.model,
         provider: request.provider
       };
 

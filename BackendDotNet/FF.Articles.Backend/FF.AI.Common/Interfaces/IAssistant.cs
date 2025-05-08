@@ -1,8 +1,3 @@
-using System;
-using FF.AI.Common.Constants;
-using FF.AI.Common.Models;
-using FF.AI.Common.Providers;
-
 namespace FF.AI.Common.Interfaces;
 
 public interface IAssistant<TProvider> where TProvider : IProvider

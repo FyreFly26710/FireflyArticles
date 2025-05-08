@@ -1,15 +1,4 @@
-using System;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Text.Encodings.Web;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using System.Text.Unicode;
-using FF.AI.Common.Constants;
-using FF.AI.Common.Interfaces;
-using FF.AI.Common.Models;
 using FF.AI.Common.Models.DeepSeek;
-using FF.AI.Common.Providers;
 namespace FF.AI.Common.Services.ChatAssistants;
 
 public class DeepSeekAssistant : BaseAssistant, IAssistant<DeepSeekProvider>

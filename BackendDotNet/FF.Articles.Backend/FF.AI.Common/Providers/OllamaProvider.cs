@@ -1,7 +1,3 @@
-using System;
-using Microsoft.Extensions.Configuration;
-using FF.AI.Common.Interfaces;
-using FF.AI.Common.Constants;
 namespace FF.AI.Common.Providers;
 public class OllamaProvider : IProvider
 {

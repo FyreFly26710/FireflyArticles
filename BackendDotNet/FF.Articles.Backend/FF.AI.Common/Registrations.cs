@@ -9,7 +9,7 @@ namespace FF.AI.Common;
 
 public static class Registrations
 {
-    public static IServiceCollection AddAI(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddAI(this IServiceCollection services)
     {
         services.AddHttpClient("ai-client", client =>
         {
@@ -18,9 +18,11 @@ public static class Registrations
 
         services.AddSingleton<DeepSeekProvider>();
         services.AddSingleton<OllamaProvider>();
+        services.AddSingleton<GeminiProvider>();
 
         services.AddScoped<IAssistant<DeepSeekProvider>, DeepSeekAssistant>();
         services.AddScoped<IAssistant<OllamaProvider>, OllamaAssistant>();
+        services.AddScoped<IAssistant<GeminiProvider>, GeminiAssistant>();
 
         services.AddScoped<IAssistant, AiChatAssistant>();
 

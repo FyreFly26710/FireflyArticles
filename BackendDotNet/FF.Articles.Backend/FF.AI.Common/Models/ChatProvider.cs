@@ -1,5 +1,3 @@
-using System;
-
 namespace FF.AI.Common.Models;
 
 public class ChatProvider

@@ -35,7 +35,7 @@ builder.Services.AddScoped<ISessionRepository, SessionRepository>();
 builder.Services.AddScoped<ISystemMessageRepository, SystemMessageRepository>();
 
 // Services
-builder.Services.AddAI(configuration);
+builder.Services.AddAI();
 builder.Services.AddScoped<IArticleGenerationService, ArticleGenerationService>();
 builder.Services.AddScoped<IChatRoundService, ChatRoundService>();
 builder.Services.AddScoped<ISessionService, SessionService>();

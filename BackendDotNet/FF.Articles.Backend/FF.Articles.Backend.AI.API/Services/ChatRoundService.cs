@@ -52,7 +52,7 @@ public class ChatRoundService(
         newRound.CompletionTokens = response?.ExtraInfo?.OutputTokens ?? 0;
         newRound.TimeTaken = response?.ExtraInfo?.Duration ?? 0;
 
-        _logger.LogInformation($"Non-streaming response - Prompt tokens: {newRound.PromptTokens}, Completion tokens: {newRound.CompletionTokens}");
+        this._logger.LogInformation($"Non-streaming response - Prompt tokens: {newRound.PromptTokens}, Completion tokens: {newRound.CompletionTokens}");
 
         await _chatRoundRepository.CreateAsync(newRound);
         await _chatRoundRepository.SaveChangesAsync();
@@ -86,7 +86,7 @@ public class ChatRoundService(
                 newRound.CompletionTokens = chatResponse.ExtraInfo?.OutputTokens ?? 0;
                 newRound.TimeTaken = chatResponse.ExtraInfo?.Duration ?? 0;
                 fullResponse = chatResponse.Message?.Content ?? string.Empty;
-                _logger.LogInformation($"Received token counts - Prompt: {newRound.PromptTokens}, Completion: {newRound.CompletionTokens}");
+                this._logger.LogInformation($"Received token counts - Prompt: {newRound.PromptTokens}, Completion: {newRound.CompletionTokens}");
                 break;
             }
             // Stream the content chunk

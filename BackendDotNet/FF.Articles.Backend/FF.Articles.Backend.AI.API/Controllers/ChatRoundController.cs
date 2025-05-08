@@ -1,3 +1,4 @@
+using FF.AI.Common.Constants;
 using FF.Articles.Backend.AI.API.Interfaces.Services;
 using FF.Articles.Backend.AI.API.Models.Dtos;
 using FF.Articles.Backend.AI.API.Models.Requests.ChatRounds;
@@ -18,6 +19,10 @@ public class ChatRoundController(IChatRoundService chatRoundService) : Controlle
     [HttpPost]
     public async Task<ApiResponse<ChatRoundDto>> NewChatByRequest([FromBody] ChatRoundCreateRequest request, CancellationToken cancellationToken)
     {
+        if (request.Provider == ProviderList.Gemini)
+        {
+            throw new ApiException(ErrorCode.SYSTEM_ERROR, "Gemini is not supported yet");
+        }
         var user = UserUtil.GetUserFromHttpRequest(Request);
         var result = await chatRoundService.NewChatRound(request, user, cancellationToken);
         return ResultUtil.Success(result);
@@ -26,6 +31,11 @@ public class ChatRoundController(IChatRoundService chatRoundService) : Controlle
     [HttpPost("stream")]
     public async Task StreamChat([FromBody] ChatRoundCreateRequest request, CancellationToken cancellationToken)
     {
+        if (request.Provider == ProviderList.Gemini)
+        {
+            throw new ApiException(ErrorCode.SYSTEM_ERROR, "Gemini is not supported yet");
+        }
+
         var user = UserUtil.GetUserFromHttpRequest(Request);
 
         // Set content type for SSE

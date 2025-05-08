@@ -1,9 +1,5 @@
-using System;
-using FF.AI.Common.Interfaces;
-using System.Text.Json;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
-using System.Text.Json.Serialization;
 namespace FF.AI.Common.Services.ChatAssistants;
 
 public abstract class BaseAssistant

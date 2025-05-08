@@ -95,7 +95,6 @@ declare namespace API {
     topicAbstract: string;
     category: string;
     articleCount?: number;
-    model: string;
     provider: string;
   };
 
@@ -126,7 +125,6 @@ declare namespace API {
     title: string;
     abstract: string;
     tags: string[];
-    model: string;
     provider: string;
   };
   type ChatProvider = {

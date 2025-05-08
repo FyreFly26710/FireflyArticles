@@ -8,6 +8,5 @@ public class ArticleListRequest
     public string Topic { get; set; } = "";
     public string TopicAbstract { get; set; } = "";
     public int ArticleCount { get; set; } = 8;
-    public string? Model { get; set; } = "deepseek-chat";
     public string? Provider { get; set; } = ProviderList.DeepSeek;
 }

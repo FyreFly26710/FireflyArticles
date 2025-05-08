@@ -38,14 +38,15 @@ public class ArticleGenerationService : IArticleGenerationService
     // Round 1
     public async Task<ArticlesAIResponseDto> GenerateArticleListsAsync(ArticleListRequest request, CancellationToken cancellationToken = default)
     {
+        var model = getModel(request.Provider);
         var chatRequest = new ChatRequest
         {
-            Model = request.Model!,
+            Model = model,
             Provider = request.Provider!,
             Messages = {
                 Message.User(Prompts.User_ArticleList(request)),
             },
-            Options = new ChatOptions() { ResponseFormat = ChatOptions.GetResponseFormat<ArticlesAIResponseDto>() }
+            Options = new ChatOptions() { ResponseFormat = ChatOptions.GetResponseFormat<ArticlesAIResponseDto>(), Temperature = 0.5 }
         };
         var topic = new TopicApiAddRequest
         {
@@ -54,7 +55,7 @@ public class ArticleGenerationService : IArticleGenerationService
             Abstract = request.TopicAbstract
         };
         var topicId = await _contentsApiRemoteService.AddTopicByTitleCategoryAsync(topic, AdminUsers.SYSTEM_ADMIN_DEEPSEEK);
-        _logger.LogInformation("Begin to generate topic: {topic}; TopicId: {topicId}", request.Topic, topicId);
+        _logger.LogInformation("AI:{model};Begin to generate topic: {topic}; TopicId: {topicId}", model, request.Topic, topicId);
         var response = await _aiChatAssistant.ChatAsync(chatRequest, cancellationToken);
         var jsonContent = response?.Message?.Content ?? "";
         _logger.LogInformation("Request to generate topic: {topic}; Milliseconds taken : {time}; Tokens: {tokens}", request.Topic, response?.ExtraInfo?.Duration, response?.ExtraInfo?.OutputTokens);
@@ -67,7 +68,7 @@ public class ArticleGenerationService : IArticleGenerationService
         {
             jsonContent = jsonContent.Substring(firstBrace, lastBrace - firstBrace + 1);
         }
-        //Console.WriteLine(jsonContent);
+
         ArticlesAIResponseDto? articlesResponse = null;
         try
         {
@@ -90,15 +91,16 @@ public class ArticleGenerationService : IArticleGenerationService
         if (request.TopicId == 0 || string.IsNullOrEmpty(request.Title) || string.IsNullOrEmpty(request.Abstract) || request.Id == null)
             throw new ApiException(ErrorCode.PARAMS_ERROR, "Invalid request");
 
+        var model = getModel(request.Provider);
         var chatRequest = new ChatRequest
         {
-            Model = request.Model!,
+            Model = model,
             Provider = request.Provider!,
             Messages = [
                 Message.User(Prompts.User_ArticleContent(request)),
             ],
         };
-        _logger.LogInformation("Begin to generate article: {title}", request.Title);
+        _logger.LogInformation("AI: {model}. Begin to generate article: {title}", model, request.Title);
         var response = await _aiChatAssistant.ChatAsync(chatRequest, new CancellationToken());
 
         var content = response?.Message?.Content ?? "";
@@ -144,5 +146,19 @@ public class ArticleGenerationService : IArticleGenerationService
         }
         return content;
     }
-
+    private string getModel(string? provider, bool isSecondRound = false)
+    {
+        if (provider is null || provider == ProviderList.DeepSeek)
+        {
+            return isSecondRound ? "deepseek-reasoner" : "deepseek-chat";
+        }
+        else if (provider == ProviderList.Gemini)
+        {
+            return isSecondRound ? "gemini-2.5-flash-preview-04-17" : "gemini-2.5-flash-preview-04-17";
+        }
+        else
+        {
+            throw new ApiException(ErrorCode.PARAMS_ERROR, "Invalid provider");
+        }
+    }
 }

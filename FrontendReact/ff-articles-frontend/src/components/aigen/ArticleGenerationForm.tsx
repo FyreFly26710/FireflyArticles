@@ -50,15 +50,14 @@ const ArticleGenerationForm: React.FC = () => {
   };
 
   const modelOptions = [
-    { label: 'DeepSeek-V3', value: 'DeepSeek-V3', provider: 'DeepSeek' },
-    { label: 'Gemini 2.5', value: 'Gemini 2.5', provider: 'Gemini' }
+    { label: 'DeepSeek-V3', provider: 'deepseek' },
+    { label: 'Gemini 2.5', provider: 'gemini' }
   ];
 
   const handleModelChange = (e: any) => {
-    const selectedModel = modelOptions.find(model => model.value === e.target.value);
+    const selectedModel = modelOptions.find(model => model.provider === e.target.value);
     if (selectedModel) {
       form.setFieldsValue({
-        model: selectedModel.value,
         provider: selectedModel.provider
       });
     }
@@ -79,7 +78,6 @@ const ArticleGenerationForm: React.FC = () => {
             onFinish={handleSubmit}
             initialValues={{ 
               articleCount: 5,
-              model: modelOptions[0].value,
               provider: modelOptions[0].provider
             }}
           >
@@ -143,21 +141,16 @@ const ArticleGenerationForm: React.FC = () => {
             {/* Model Selection */}
             <Form.Item
               label="AI Model"
-              name="model"
+              name="provider"
               rules={[{ required: true, message: 'Please select an AI model' }]}
             >
               <Radio.Group onChange={handleModelChange}>
                 {modelOptions.map(option => (
-                  <Radio.Button key={option.value} value={option.value}>
+                  <Radio.Button key={option.provider} value={option.provider}>
                     {option.label}
                   </Radio.Button>
                 ))}
               </Radio.Group>
-            </Form.Item>
-
-            {/* Hidden field for provider */}
-            <Form.Item name="provider" hidden>
-              <Input />
             </Form.Item>
 
             <Form.Item>

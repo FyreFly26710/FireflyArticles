@@ -1,6 +1,4 @@
-﻿using FF.Articles.Backend.Common.Bases;
-
-namespace FF.Articles.Backend.Common.ApiDtos;
+﻿namespace FF.Articles.Backend.Common.ApiDtos;
 
 /// <summary>
 /// Transfer user data between API microservices
