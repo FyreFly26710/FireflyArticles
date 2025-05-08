@@ -92,7 +92,6 @@ const ArticleItem: React.FC<ArticleItemProps> = ({
 
   // If generating, show loading spinner
   if (isGenerating) {
-    const topicUrl = `/topic/${topicId}`;
     return (
       <Card className="article-card">
         <div style={{ textAlign: 'center', padding: '30px 0' }}>

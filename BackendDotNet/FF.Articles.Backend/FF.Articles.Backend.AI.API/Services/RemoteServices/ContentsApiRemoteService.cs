@@ -27,10 +27,10 @@ public class ContentsApiRemoteService : IContentsApiRemoteService
         _httpClient.BaseAddress = new Uri(RemoteApiUrlConstant.GetContentsBaseUrl());
     }
 
-    public async Task<long> AddArticleAsync(ArticleApiUpsertRequest payload)
+    public async Task<long> AddArticleAsync(ArticleApiUpsertRequest payload, UserApiDto user)
     {
         string url = RemoteApiUrlConstant.ArticleUrl();
-        var requestMessage = CreateHttpRequestMessage(HttpMethod.Post, url, payload, AdminUsers.SYSTEM_ADMIN_DEEPSEEK);
+        var requestMessage = CreateHttpRequestMessage(HttpMethod.Post, url, payload, user);
 
         var response = await _httpClient.SendAsync(requestMessage);
 
@@ -41,10 +41,10 @@ public class ContentsApiRemoteService : IContentsApiRemoteService
         var res = await response.Content.ReadFromJsonAsync<ApiResponse<long>>();
         return res?.Data ?? 0;
     }
-    public async Task<bool> EditArticleAsync(ArticleApiUpsertRequest payload)
+    public async Task<bool> EditArticleAsync(ArticleApiUpsertRequest payload, UserApiDto user)
     {
         string url = RemoteApiUrlConstant.ArticleUrl();
-        var requestMessage = CreateHttpRequestMessage(HttpMethod.Put, url, payload, AdminUsers.SYSTEM_ADMIN_DEEPSEEK);
+        var requestMessage = CreateHttpRequestMessage(HttpMethod.Put, url, payload, user);
 
         var response = await _httpClient.SendAsync(requestMessage);
 
@@ -55,12 +55,11 @@ public class ContentsApiRemoteService : IContentsApiRemoteService
         return true;
     }
 
-    public async Task<long> AddTopicByTitleCategoryAsync(string title, string category)
+    public async Task<long> AddTopicByTitleCategoryAsync(TopicApiAddRequest payload, UserApiDto user)
     {
-        var payload = new { title, category };
         string url = RemoteApiUrlConstant.TopicUrl();
 
-        var requestMessage = CreateHttpRequestMessage(HttpMethod.Post, url, payload, AdminUsers.SYSTEM_ADMIN_DEEPSEEK);
+        var requestMessage = CreateHttpRequestMessage(HttpMethod.Post, url, payload, user);
 
         var response = await _httpClient.SendAsync(requestMessage);
 

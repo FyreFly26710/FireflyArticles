@@ -43,11 +43,17 @@ public class ArticleGenerationService : IArticleGenerationService
             Model = request.Model!,
             Provider = request.Provider!,
             Messages = {
-                Message.User(Prompts.User_ArticleList(request.Topic, request.ArticleCount, request.Category)),
+                Message.User(Prompts.User_ArticleList(request)),
             },
             Options = new ChatOptions() { ResponseFormat = ChatOptions.GetResponseFormat<ArticlesAIResponseDto>() }
         };
-        var topicId = await _contentsApiRemoteService.AddTopicByTitleCategoryAsync(request.Topic, request.Category);
+        var topic = new TopicApiAddRequest
+        {
+            Title = request.Topic,
+            Category = request.Category,
+            Abstract = request.TopicAbstract
+        };
+        var topicId = await _contentsApiRemoteService.AddTopicByTitleCategoryAsync(topic, AdminUsers.SYSTEM_ADMIN_DEEPSEEK);
         _logger.LogInformation("Begin to generate topic: {topic}; TopicId: {topicId}", request.Topic, topicId);
         var response = await _aiChatAssistant.ChatAsync(chatRequest, cancellationToken);
         var jsonContent = response?.Message?.Content ?? "";
@@ -89,7 +95,7 @@ public class ArticleGenerationService : IArticleGenerationService
             Model = request.Model!,
             Provider = request.Provider!,
             Messages = [
-                Message.User(Prompts.User_ArticleContent(request.Category, request.Topic, request.Title, request.Abstract, request.Tags)),
+                Message.User(Prompts.User_ArticleContent(request)),
             ],
         };
         _logger.LogInformation("Begin to generate article: {title}", request.Title);

@@ -25,6 +25,7 @@ namespace FF.Articles.Backend.Identity.API.Infrastructure
 
                 await context.Users.AddAsync(CreateUser(defaultUser, "0732d07230a94c9318ecdfc223dfb310"));//12345678
                 await context.Users.AddAsync(CreateUser(AdminUsers.SYSTEM_ADMIN_DEEPSEEK, "11111111"));
+                await context.Users.AddAsync(CreateUser(AdminUsers.SYSTEM_ADMIN_GEMINI, "11111111"));
                 await context.SaveChangesAsync();
             }
         }

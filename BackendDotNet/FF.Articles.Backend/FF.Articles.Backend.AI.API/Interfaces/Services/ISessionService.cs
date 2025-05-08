@@ -6,7 +6,7 @@ namespace FF.Articles.Backend.AI.API.Interfaces.Services;
 
 public interface ISessionService : IBaseService<Session>
 {
-    Task<List<SessionDto>> GetSessions(SessionQueryRequest request, HttpRequest httpRequest, CancellationToken cancellationToken);
-    Task<SessionDto> GetSession(long id, CancellationToken cancellationToken);
+    Task<List<SessionDto>> GetSessions(SessionQueryRequest request, long userId, CancellationToken cancellationToken);
+    Task<SessionDto> GetSession(long id, long userId, CancellationToken cancellationToken);
     Task<bool> UpdateSession(SessionEditRequest request, CancellationToken cancellationToken);
 }

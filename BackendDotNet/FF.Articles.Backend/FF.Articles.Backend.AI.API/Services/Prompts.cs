@@ -1,4 +1,5 @@
 using System;
+using FF.Articles.Backend.AI.API.Models.Requests.ArticleGenerations;
 
 namespace FF.Articles.Backend.AI.API.Services;
 
@@ -6,23 +7,27 @@ public static class Prompts
 {
     private const string magicPrompt = "Take a deep breath. Think step by step.";
 
-    public static string User_ArticleList(string topic, int articleCount, string category) =>
+    public static string User_ArticleList(ArticleListRequest request) =>
     magicPrompt
     + Environment.NewLine +
     $"""
-    Generate {articleCount} article titles covering the {topic} in {category}.
+    Generate {request.ArticleCount} articles covering Topic: {request.Topic} in Category: {request.Category}.
+    {(!string.IsNullOrWhiteSpace(request.TopicAbstract) ? $"Topic Description: {request.TopicAbstract}" : "")}
     Each article should include:
         Title: Clear and concise, describing the article's focus.
         Abstract:
-            - Provide 2-3 key points, each in a single concise sentence. 
-            - It does not need to be proper full sentences. Just key words and very brief explanation.
+            - Write abstract in plain text, do not use markdown
+            - One paragraph maximum 300 characters, very briefly cover what will be in the article. 
+            - You have the overview of all articles in the topic. Carefully deside abstract. 
+            - Another AI Assistant will write the ariticle based on category, topic, title, abstract, and tags for that article. He does not know what other articles are in the topic.
         Tags:
             - Provide tags for the article following the tags rules below.
         Each title should explore a distinct subtopic or angle related to the main topic.
     You should also provide a message.
         If the topic is valid: List key subtopics covered and confirm completion.
         If invalid/off-topic: Leave `Articles` an empty list and explain why in `AIMessage`.
-    Follow the tags rules. Be very careful with the tags.
+    Follow the tags rules. Be very careful with abstract and tags.
+    You do not have to provide exact number of articles. The number of articles is flexible. You can provide +- 3 articles.
     """
     + Environment.NewLine +
     TagRules
@@ -34,7 +39,7 @@ public static class Prompts
         {
         "SortNumber": 1,
         "Title": "Rapid HTML Enhancement & Best Practices",
-        "Abstract": "**Semantic HTML** - Using elements that convey meaning for better accessibility and SEO.  \n**Metadata & SEO** - `<meta> tags`, `<title>`, how HTML influences search engines.  \n**Accessibility Considerations** - `aria-*` attributes, proper use of headings and labels.",
+        "Abstract": Your concise abstract written in plain text (DO NOT USE MARKDOWN)",
         "Tags": ["Advanced", "Web Development", "HTML", "Best-practices", "Technical"]
         }
     ],
@@ -42,18 +47,19 @@ public static class Prompts
     }    
     """;
 
-    public static string User_ArticleContent(string category, string topic, string title, string @abstract, List<string> tags) =>
+    public static string User_ArticleContent(ContentRequest request) =>
     magicPrompt
     + Environment.NewLine +
     $"""
     You are an expert content writer and programming specialist. Your job is to turn the information I give you into a polished, engaging, and well-structured article suitable for publication on a professional tech blog.
 
     Inputs:
-    • Category: {category}  
-    • Topic: {topic}  
-    • Title: {title}  
-    • Abstract: {@abstract}  
-    • Tags: {string.Join(", ", [.. tags])} 
+    • Category: {request.Category}  
+    • Topic: {request.Topic}  
+    • Topic Description: {request.TopicAbstract}
+    • Article Title: {request.Title}  
+    • Article Abstract: {request.Abstract}  
+    • Article Tags: {string.Join(", ", [.. request.Tags])} 
 
     Article Structure (Markdown):
     - All your content should be displayed to the user as content of the article.
@@ -76,8 +82,8 @@ public static class Prompts
     private static string TagRules = """
     Tags list (exactly four/five, following the same order):
     1. **Skill Level**: Beginner / Advanced / Expert / General  
-    2. **Focus Area**: (choose one relevant to the article, e.g. “API Design,” “Performance Optimization,” “Testing”)  
-    3. **Tech Stack/Language**: (e.g. ORM,” “JavaScript,” “Kubernetes”; only when applicable, if not applicable, leave blank)  
+    2. **Focus Area**: (choose one relevant to the article, e.g. "API Design," "Performance Optimization," "Testing")  
+    3. **Tech Stack/Language**: (e.g. ORM," "JavaScript," "Kubernetes"; only when applicable, if not applicable, leave blank)  
     4. **Article Style**: Overview / Deep-dive / Best-practices / Listicle / Q&A / Comparison  
     5. **Tone**: Conversational / Academic / Technical / Code-heavy
 
@@ -99,7 +105,7 @@ public static class Prompts
     - **Article Style**  
     • Overview → broad survey with high-level descriptions.  
     • Deep-dive → long-form sections, detailed explanations, diagrams or pseudocode.  
-    • Best-practices → “Do’s and Don’ts,” common pitfalls, recommended patterns.  
+    • Best-practices → "Do's and Don'ts," common pitfalls, recommended patterns.  
     • Listicle → numbered or bulleted list of key points.  
     • Q&A → simulate an interview or FAQ format.  
     • Comparison → side-by-side pros/cons, feature matrix or benchmark notes.

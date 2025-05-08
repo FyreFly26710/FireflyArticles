@@ -3,6 +3,7 @@ using FF.Articles.Backend.AI.API.Models.Dtos;
 using FF.Articles.Backend.AI.API.Models.Requests.Sessions;
 using FF.Articles.Backend.Common.Responses;
 using FF.Articles.Backend.Common.Utils;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FF.Articles.Backend.AI.API.Controllers;
@@ -12,26 +13,32 @@ namespace FF.Articles.Backend.AI.API.Controllers;
 public class SessionController(ISessionService sessionService) : ControllerBase
 {
     [HttpGet("{id}")]
+    [Authorize]
     public async Task<ApiResponse<SessionDto>> GetSession(long id, CancellationToken cancellationToken)
     {
-        var result = await sessionService.GetSession(id, cancellationToken);
+        var userId = UserUtil.GetUserId(Request);
+        var result = await sessionService.GetSession(id, userId, cancellationToken);
         return ResultUtil.Success(result);
     }
     [HttpGet]
+    [Authorize]
     public async Task<ApiResponse<List<SessionDto>>> GetSessions([FromQuery] bool includeChatRounds = false, CancellationToken cancellationToken = default)
     {
+        var userId = UserUtil.GetUserId(Request);
         var request = new SessionQueryRequest { IncludeChatRounds = includeChatRounds };
-        var result = await sessionService.GetSessions(request, HttpContext.Request, cancellationToken);
+        var result = await sessionService.GetSessions(request, userId, cancellationToken);
         return ResultUtil.Success(result);
     }
 
     [HttpPut]
+    [Authorize]
     public async Task<ApiResponse<bool>> UpdateSession(SessionEditRequest request, CancellationToken cancellationToken)
     {
         var result = await sessionService.UpdateSession(request, cancellationToken);
         return ResultUtil.Success(result);
     }
     [HttpDelete("{id}")]
+    [Authorize]
     public async Task<ApiResponse<bool>> DeleteSession(long id, CancellationToken cancellationToken)
     {
         var result = await sessionService.DeleteAsync(id);

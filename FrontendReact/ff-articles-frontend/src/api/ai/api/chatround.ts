@@ -33,13 +33,10 @@ export function apiChatRoundStreamResponse(
 ) {
   // Create a new AbortController to cancel the request if needed
   const controller = new AbortController();
-  console.log("Streaming request started");
 
   // Ensure we don't have double slashes in the URL
   const baseUrl = url.endsWith('/') ? url.slice(0, -1) : url;
   const streamUrl = `${baseUrl}/api/ai/chat-rounds/stream`;
-
-  console.log("Using stream URL:", streamUrl);
 
   // Make a fetch request to the streaming endpoint
   fetch(streamUrl, {
@@ -53,15 +50,14 @@ export function apiChatRoundStreamResponse(
   })
     .then(response => {
       if (!response.ok) {
-        console.log(response);
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-
       const reader = response.body!.getReader();
       const decoder = new TextDecoder();
       let buffer = "";
 
       function processChunk({ done, value }: { done: boolean, value?: Uint8Array }): Promise<void> | void {
+
         if (done) {
           // Handle any remaining buffer data
           if (buffer.length > 0) {
@@ -72,6 +68,20 @@ export function apiChatRoundStreamResponse(
 
         // Decode the chunk and add it to our buffer
         const chunk = decoder.decode(value, { stream: true });
+
+        // Check if the chunk is an error response object instead of SSE data
+        if (chunk.trim().startsWith('{')) {
+          const errorObj = JSON.parse(chunk);
+          if (errorObj.code && errorObj.message) {
+            // This appears to be an error response, not SSE data
+            const errorMessage = `API Error (${errorObj.code}): ${errorObj.message}`;
+            callbacks.onError?.(new Error(errorMessage));
+            // Abort the controller to terminate the stream
+            controller.abort();
+            return;
+          }
+        }
+
         buffer += chunk;
 
         // Process any complete events in the buffer
@@ -104,6 +114,17 @@ export function apiChatRoundStreamResponse(
             }
           }
 
+          // Validate event type is one of the expected values
+          const validEventTypes = ["start", "generate", "finish", "error"];
+          if (!validEventTypes.includes(eventType)) {
+            const errorMsg = `Invalid event type: "${eventType}". Expected one of: ${validEventTypes.join(', ')}`;
+            console.error(errorMsg);
+            callbacks.onError?.(new Error(errorMsg));
+            // Abort the controller to terminate the stream on invalid event type
+            controller.abort();
+            continue;
+          }
+
           if (eventType && data) {
             // Handle different event types based on the updated backend
             switch (eventType) {
@@ -111,8 +132,11 @@ export function apiChatRoundStreamResponse(
                 try {
                   const initData = JSON.parse(data);
                   callbacks.onInit?.(initData);
-                } catch (e) {
+                } catch (e: any) {
                   console.error("Error parsing init event data:", e);
+                  callbacks.onError?.(new Error(`Invalid JSON in start event: ${e.message}`));
+                  // Abort the controller to terminate the stream on parse error
+                  controller.abort();
                 }
                 break;
               case "generate":
@@ -123,12 +147,17 @@ export function apiChatRoundStreamResponse(
                 try {
                   const doneData = JSON.parse(data);
                   callbacks.onDone?.(doneData);
-                } catch (e) {
+                } catch (e: any) {
                   console.error("Error parsing done event data:", e);
+                  callbacks.onError?.(new Error(`Invalid JSON in finish event: ${e.message}`));
+                  // Abort the controller to terminate the stream on parse error
+                  controller.abort();
                 }
                 break;
               case "error":
                 callbacks.onError?.(data);
+                // Abort the controller to terminate the stream on error event
+                controller.abort();
                 break;
             }
           }

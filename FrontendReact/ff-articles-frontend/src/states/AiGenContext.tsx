@@ -14,10 +14,9 @@ interface AiGenContextType {
 
   // Article list actions
   generateArticles: (articleListRequest: API.ArticleListRequest) => Promise<void>;
-  updateResults: (updatedResults: API.ArticlesAIResponse) => void;
-  newGeneration: () => void;
+  // updateResults: (updatedResults: API.ArticlesAIResponse) => void;
+  //newGeneration: () => void;
   clearResults: () => void;
-
   // Article edit actions
   updateEditableArticles: (articles: EditableArticle[]) => void;
   handleEditArticle: (articleId: number) => void;
@@ -49,6 +48,7 @@ export function AiGenProvider({ children }: { children: ReactNode }) {
   // Main states
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<API.ArticlesAIResponse>();
+  const [request, setRequest] = useState<API.ArticleListRequest>();
   const [showForm, setShowForm] = useState(true);
 
   // Article edit states
@@ -68,11 +68,12 @@ export function AiGenProvider({ children }: { children: ReactNode }) {
     setResults(undefined);
     setTopic(topic);
     setGenerationStatus({});
+    setRequest(articleListRequest);
     try {
       const response = await apiAiArticlesGenerateList(articleListRequest);
       const data = response.data;
       setResults(data);
-      
+
       // Initialize editable articles
       if (data && data.articles) {
         setEditableArticles(
@@ -82,7 +83,7 @@ export function AiGenProvider({ children }: { children: ReactNode }) {
           }))
         );
       }
-      
+
       setShowForm(false);
     } catch (error) {
       console.error('Error generating articles:', error);
@@ -96,13 +97,10 @@ export function AiGenProvider({ children }: { children: ReactNode }) {
     setResults(updatedResults);
   };
 
-  const newGeneration = () => {
-    setShowForm(true);
-    // Keep results in state until new generation completes
-  };
 
   const clearResults = () => {
     setResults(undefined);
+    setRequest(undefined);
     setEditableArticles([]);
     setGenerationStatus({});
     setShowForm(true);
@@ -110,10 +108,10 @@ export function AiGenProvider({ children }: { children: ReactNode }) {
 
   // Article editing functions
   const handleEditArticle = (sortNumber: number) => {
-    setEditableArticles(prevArticles => 
-      prevArticles.map(article => 
-        article.sortNumber === sortNumber 
-          ? { ...article, isEditing: true } 
+    setEditableArticles(prevArticles =>
+      prevArticles.map(article =>
+        article.sortNumber === sortNumber
+          ? { ...article, isEditing: true }
           : article
       )
     );
@@ -121,12 +119,12 @@ export function AiGenProvider({ children }: { children: ReactNode }) {
 
   const handleSaveArticle = (sortNumber: number) => {
     setEditableArticles(prevArticles => {
-      const newArticles = prevArticles.map(article => 
-        article.sortNumber === sortNumber 
-          ? { ...article, isEditing: false } 
+      const newArticles = prevArticles.map(article =>
+        article.sortNumber === sortNumber
+          ? { ...article, isEditing: false }
           : article
       );
-      
+
       if (results) {
         // Update the results with the edited articles
         updateResults({
@@ -134,13 +132,13 @@ export function AiGenProvider({ children }: { children: ReactNode }) {
           articles: newArticles.map(({ isEditing, ...rest }) => rest)
         });
       }
-      
+
       return newArticles;
     });
   };
 
   const handleCancelEdit = (sortNumber: number) => {
-    setEditableArticles(prevArticles => 
+    setEditableArticles(prevArticles =>
       prevArticles.map(article => {
         if (article.sortNumber === sortNumber && results?.articles) {
           // Find the original article from results to restore its data
@@ -156,17 +154,17 @@ export function AiGenProvider({ children }: { children: ReactNode }) {
   };
 
   const handleUpdateField = (sortNumber: number, field: keyof API.AIGenArticleDto, value: any) => {
-    setEditableArticles(prevArticles => 
-      prevArticles.map(article => 
-        article.sortNumber === sortNumber 
-          ? { ...article, [field]: value } 
+    setEditableArticles(prevArticles =>
+      prevArticles.map(article =>
+        article.sortNumber === sortNumber
+          ? { ...article, [field]: value }
           : article
       )
     );
   };
 
   const handleAddTag = (sortNumber: number, tag: string) => {
-    setEditableArticles(prevArticles => 
+    setEditableArticles(prevArticles =>
       prevArticles.map(article => {
         if (article.sortNumber === sortNumber) {
           const updatedTags = [...article.tags, tag];
@@ -178,7 +176,7 @@ export function AiGenProvider({ children }: { children: ReactNode }) {
   };
 
   const handleRemoveTag = (sortNumber: number, tagIndex: number) => {
-    setEditableArticles(prevArticles => 
+    setEditableArticles(prevArticles =>
       prevArticles.map(article => {
         if (article.sortNumber === sortNumber) {
           const updatedTags = [...article.tags];
@@ -198,44 +196,49 @@ export function AiGenProvider({ children }: { children: ReactNode }) {
         ...prev,
         [article.sortNumber]: { isGenerating: true }
       }));
-      
+
       if (!results?.topicId) {
         throw new Error('Missing topicId in results');
       }
-      
+
+      if (!request) {
+        throw new Error('Missing request');
+      }
+
       const contentRequest: API.ContentRequest = {
         sortNumber: article.sortNumber,
-        category: results.category,
+        category: request.category,
         title: article.title,
         abstract: article.abstract,
         tags: article.tags,
-        topic: topic,
+        topic: request.topic,
+        topicAbstract: request.topicAbstract,
         topicId: results.topicId,
-        model: 'qwq:32b',
-        provider: 'ollama'
+        model: request.model,
+        provider: request.provider
       };
-      
+
       const articleId = (await apiAiArticlesGenerateContent(contentRequest)).data;
 
       // Update status with generated article ID
       setGenerationStatus(prev => ({
         ...prev,
-        [article.sortNumber]: { 
+        [article.sortNumber]: {
           isGenerating: false,
           generatedArticleId: articleId
         }
       }));
-      
+
       return articleId;
     } catch (error) {
       console.error(`Error generating content for article ${article.sortNumber}:`, error);
-      
+
       // Update status to show error
       setGenerationStatus(prev => ({
         ...prev,
         [article.sortNumber]: { isGenerating: false }
       }));
-      
+
       message.error(`Failed to generate content for "${article.title}"`);
       return undefined;
     }
@@ -244,30 +247,30 @@ export function AiGenProvider({ children }: { children: ReactNode }) {
   const generateAllArticles = async () => {
     try {
       setIsGeneratingAll(true);
-      
+
       // Filter articles that haven't been generated yet AND aren't currently generating
       const articlesToGenerate = editableArticles.filter(
-        article => !generationStatus[article.sortNumber]?.generatedArticleId && 
-                  !generationStatus[article.sortNumber]?.isGenerating
+        article => !generationStatus[article.sortNumber]?.generatedArticleId &&
+          !generationStatus[article.sortNumber]?.isGenerating
       );
-      
+
       if (articlesToGenerate.length === 0) {
         message.info('All articles have already been generated or are in progress.');
         setIsGeneratingAll(false);
         return;
       }
-      
+
       message.info(`Generating ${articlesToGenerate.length} articles for topic: "${topic}".`);
-      
+
       // Generate all articles concurrently
       const generationPromises = articlesToGenerate.map(article => {
         // Return a promise that resolves to the article ID or null for errors
         return generateArticleContent(article);
       });
-      
+
       // Wait for all promises to resolve
       const results = await Promise.all(generationPromises);
-      
+
       // Count successful generations
       const successCount = results.filter(result => result !== null).length;
       message.success(`Successfully generated ${successCount} out of ${articlesToGenerate.length} articles!`);
@@ -289,8 +292,8 @@ export function AiGenProvider({ children }: { children: ReactNode }) {
       isGeneratingAll,
       // Article list actions
       generateArticles,
-      updateResults,
-      newGeneration,
+      // updateResults,
+      // newGeneration,
       clearResults,
       // Article edit actions
       updateEditableArticles,

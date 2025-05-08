@@ -10,7 +10,7 @@ public static class AdminUsers
         UserName = "Firefly Admin",
         UserRole = UserConstant.ADMIN_ROLE,
         UserAccount = "firefly",
-        UserAvatar = "https://media.tenor.com/73ZvmoXxc-IAAAAe/firefly-honkai-star-rail.png",
+        UserAvatar = "https://i.imgur.com/64GJYtY.png",
         UserProfile = "",
         UserEmail = "lee.wan1204@gmail.com",
     };
@@ -20,7 +20,17 @@ public static class AdminUsers
         UserName = "DeepSeek Assistant",
         UserRole = UserConstant.ADMIN_ROLE,
         UserAccount = "deepseek",
-        UserAvatar = "https://www-cdn.morphcast.com/wp-content/uploads/2025/01/deepseek.jpg.webp",
+        UserAvatar = "https://i.imgur.com/f6X5kDM.jpg",
+        // UserProfile = "",
+        // UserEmail = "",
+    };
+    public static readonly UserApiDto SYSTEM_ADMIN_GEMINI = new UserApiDto
+    {
+        UserId = 11,
+        UserName = "Gemini Assistant",
+        UserRole = UserConstant.ADMIN_ROLE,
+        UserAccount = "gemini",
+        UserAvatar = "https://i.imgur.com/o7ujFyz.png",
         // UserProfile = "",
         // UserEmail = "",
     };

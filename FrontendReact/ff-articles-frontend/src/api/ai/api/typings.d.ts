@@ -95,8 +95,8 @@ declare namespace API {
     topicAbstract: string;
     category: string;
     articleCount?: number;
-    model?: string;
-    provider?: string;
+    model: string;
+    provider: string;
   };
 
   type ArticlesAIResponseDto = {
@@ -121,6 +121,7 @@ declare namespace API {
     sortNumber: number;
     topicId: number;
     topic: string;
+    topicAbstract: string;
     category: string;
     title: string;
     abstract: string;

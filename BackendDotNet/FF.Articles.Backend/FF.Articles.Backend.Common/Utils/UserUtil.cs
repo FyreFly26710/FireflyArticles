@@ -30,7 +30,7 @@ public class UserUtil
             var availableClaims = request.HttpContext.User.Claims.Select(c => $"{c.Type}: {c.Value}").ToList();
             var claimsMessage = string.Join(", ", availableClaims);
 
-            throw new ApiException(ErrorCode.NOT_LOGIN_ERROR, $"User claim not found in the authenticated user. Available claims: {claimsMessage}");
+            throw new ApiException(ErrorCode.NOT_LOGIN_ERROR, $"User claim not found in the authenticated user.");
         }
 
         try

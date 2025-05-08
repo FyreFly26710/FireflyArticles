@@ -13,7 +13,6 @@ const AiGenPage = () => {
         loading,
         results,
         showForm,
-        newGeneration,
         clearResults
     } = useAiGen();
 
@@ -24,7 +23,6 @@ const AiGenPage = () => {
                     <Title level={3}>AI Article Generator</Title>
                     {results && !showForm && (
                         <Space>
-                            <Button onClick={newGeneration}>New Generation</Button>
                             <Button danger onClick={clearResults}>Clear Results</Button>
                         </Space>
                     )}

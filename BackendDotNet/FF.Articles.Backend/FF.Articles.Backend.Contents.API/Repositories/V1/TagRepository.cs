@@ -12,7 +12,7 @@ public class TagRepository : BaseRepository<Tag, ContentsDbContext>, ITagReposit
     }
     public async Task<List<Tag>> GetByNamesAsync(List<string> names)
     {
-        names = names.Select(n => n.Normalize()).Distinct().ToList();
+        names = names.Select(n => n.Trim().ToLower()).Distinct().ToList();
         names = names.Where(n => !string.IsNullOrEmpty(n)).ToList();
         return await base.GetQueryable().Where(t => names.Contains(t.TagName.Normalize())).ToListAsync();
     }
@@ -20,7 +20,7 @@ public class TagRepository : BaseRepository<Tag, ContentsDbContext>, ITagReposit
     public async Task<List<Tag>> GetOrCreateByNamesAsync(List<string> names)
     {
         // Normalize and deduplicate the names
-        names = names.Select(n => n.Normalize())
+        names = names.Select(n => n.Trim().ToLower())
                     .Distinct()
                     .Where(n => !string.IsNullOrEmpty(n))
                     .ToList();
@@ -31,7 +31,7 @@ public class TagRepository : BaseRepository<Tag, ContentsDbContext>, ITagReposit
         // Get all existing tags in one query with case-insensitive comparison
         // Db may have duplicates, so we need to handle them by taking the first tag for each name
         var allExistingTags = await base.GetQueryable()
-            .Where(t => names.Contains(t.TagName.Normalize()))
+            .Where(t => names.Contains(t.TagName.Trim().ToLower()))
             .ToListAsync();
 
         // Handle potential duplicates in the database by taking the first tag for each name
@@ -39,7 +39,7 @@ public class TagRepository : BaseRepository<Tag, ContentsDbContext>, ITagReposit
         var processedNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         foreach (var tag in allExistingTags)
         {
-            var normalizedName = tag.TagName.Normalize();
+            var normalizedName = tag.TagName.Trim().ToLower();
             if (!processedNames.Contains(normalizedName))
             {
                 existingTags.Add(tag);
@@ -48,7 +48,7 @@ public class TagRepository : BaseRepository<Tag, ContentsDbContext>, ITagReposit
         }
 
         var tagsToCreate = names
-            .Where(name => !existingTags.Any(t => t.TagName.Normalize() == name.Normalize()))
+            .Where(name => !existingTags.Any(t => t.TagName.Trim().ToLower() == name.Trim().ToLower()))
             .ToList();
 
         // Create new tags if needed

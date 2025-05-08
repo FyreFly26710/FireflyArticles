@@ -18,10 +18,9 @@ public class SessionService(
 )
 : BaseService<Session, AIDbContext>(_sessionRepository, _logger), ISessionService
 {
-    public async Task<List<SessionDto>> GetSessions(SessionQueryRequest request, HttpRequest httpRequest, CancellationToken cancellationToken)
+    public async Task<List<SessionDto>> GetSessions(SessionQueryRequest request, long userId, CancellationToken cancellationToken)
     {
-        //var user = UserUtil.GetUserFromHttpRequest(httpRequest);
-        var sessions = await _sessionRepository.GetSessionsByUserId(1);
+        var sessions = await _sessionRepository.GetSessionsByUserId(userId);
         if (sessions == null || sessions.Count == 0) return [];
 
         var chatRounds = await _chatRoundRepository.GetChatsBySessionIds(sessions.Select(s => s.Id).ToList());
@@ -32,11 +31,13 @@ public class SessionService(
         return sessionDtos;
     }
 
-    public async Task<SessionDto> GetSession(long id, CancellationToken cancellationToken)
+    public async Task<SessionDto> GetSession(long id, long userId, CancellationToken cancellationToken)
     {
         var session = await _sessionRepository.GetByIdAsync(id);
         if (session == null)
             throw new ApiException(ErrorCode.NOT_FOUND_ERROR, "Session not found");
+        if (session.UserId != userId)
+            throw new ApiException(ErrorCode.FORBIDDEN_ERROR, "You are not allowed to access this session");
         var chatRounds = await _chatRoundRepository.GetChatsBySessionId(id);
         return getSessionDto(session, chatRounds, true);
     }

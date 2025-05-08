@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Card, List, Alert } from 'antd';
-import { useAiGen } from '@/states/AiGenContext';
+import { EditableArticle, useAiGen } from '@/states/AiGenContext';
 import ArticleItem from './ArticleItem';
 import AiInsight from './AiInsight';
 import ArticleListHeader, { ArticleListActions } from './ArticleListHeader';
@@ -39,7 +39,7 @@ const ArticleResults: React.FC = () => {
         <List
           itemLayout="vertical"
           dataSource={editableArticles}
-          renderItem={(article) => (
+          renderItem={(article: EditableArticle) => (
             <List.Item key={article.sortNumber}>
               <ArticleItem
                 article={article}

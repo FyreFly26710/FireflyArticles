@@ -19,7 +19,7 @@ public class QueueDeclareHelper
         {
             { "x-dead-letter-exchange", "" },
             { "x-dead-letter-routing-key", queueName }, // resend to the main queue
-            { "x-message-ttl", 10000 } // 10 seconds delay
+            { "x-message-ttl", 60000 } // 60 seconds delay
         };
 
         // Declare main queue

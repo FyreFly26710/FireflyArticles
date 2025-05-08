@@ -14,7 +14,7 @@ public static class TopicExtensions
             Title = topic.Title,
             Abstract = topic.Abstract,
             Category = topic.Category,
-            TopicImage = topic.TopicImage,
+            TopicImage = topic.TopicImage ?? "",
             UserId = topic.UserId,
             SortNumber = topic.SortNumber,
             IsHidden = topic.IsHidden

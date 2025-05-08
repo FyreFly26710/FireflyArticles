@@ -233,9 +233,8 @@ export function ChatProvider({ children }: { children: ReactNode }) {
               };
               updateSessionsByChatRound(data);
             },
-            onError: (error) => {
+            onError: (error: Error) => {
               setIsGenerating(false);  // Stop generating on error
-              console.error('Error streaming response:', error);
               setSession(prev => {
                 const updatedSession = { ...prev };
                 // Ensure rounds is always an array
@@ -247,7 +246,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
                 if (updatedRounds.length > 0) {
                   const lastRound = { ...updatedRounds[updatedRounds.length - 1] };
                   lastRound.assistantMessage = (lastRound.assistantMessage || '') +
-                    "\n\nSorry, there was an error generating the rest of the response.";
+                    "\n\nSorry, there was an error generating the rest of the response: \n\n" + error.message;
                   lastRound.isActive = true; // Keep message active even on error
                   updatedRounds[updatedRounds.length - 1] = lastRound;
                 }
