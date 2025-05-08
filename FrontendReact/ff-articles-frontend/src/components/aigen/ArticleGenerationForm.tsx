@@ -1,81 +1,163 @@
 'use client';
 
-import React from 'react';
-import { Form, Input, Button, InputNumber, Card, Typography, Row, Col, Tooltip } from 'antd';
-import { SendOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import React, { useEffect, useState } from 'react';
+import { Form, Input, Button, InputNumber, Card, Typography, Row, Col, Tooltip, AutoComplete, Spin, Radio } from 'antd';
+import { SendOutlined, InfoCircleOutlined, LoadingOutlined } from '@ant-design/icons';
 import { useAiGen } from '@/states/AiGenContext';
+import { apiTopicGetByPage } from '@/api/contents/api/topic';
 
 const { Title, Paragraph } = Typography;
 
 const ArticleGenerationForm: React.FC = () => {
-  const [form] = Form.useForm();
+  const [form] = Form.useForm<API.ArticleListRequest>();
   const { generateArticles, loading } = useAiGen();
+  const [categories, setCategories] = useState<string[]>([]);
+  const [loadingCategories, setLoadingCategories] = useState(false);
 
-  const handleSubmit = (values: { topic: string; count: number; category: string }) => {
-    generateArticles({ topic: values.topic, category: values.category, articleCount: values.count });
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const fetchCategories = async () => {
+    setLoadingCategories(true);
+    try {
+      const response = await apiTopicGetByPage({
+        OnlyCategoryTopic: true,
+        PageSize: 100, 
+      });
+
+      if (response.data?.data) {
+        // Extract unique categories
+        const uniqueCategories = Array.from(
+          new Set(
+            response.data.data
+              .map((topic: API.TopicDto) => topic.category)
+              .filter(Boolean) as string[]
+          )
+        ).sort();
+        
+        setCategories(uniqueCategories);
+      }
+    } catch (error) {
+      console.error('Failed to fetch categories:', error);
+    } finally {
+      setLoadingCategories(false);
+    }
+  };
+
+  const handleSubmit = (values: API.ArticleListRequest) => {
+    generateArticles(values);
+  };
+
+  const modelOptions = [
+    { label: 'DeepSeek-V3', value: 'DeepSeek-V3', provider: 'DeepSeek' },
+    { label: 'Gemini 2.5', value: 'Gemini 2.5', provider: 'Gemini' }
+  ];
+
+  const handleModelChange = (e: any) => {
+    const selectedModel = modelOptions.find(model => model.value === e.target.value);
+    if (selectedModel) {
+      form.setFieldsValue({
+        model: selectedModel.value,
+        provider: selectedModel.provider
+      });
+    }
   };
 
   return (
     <div>
+      <Paragraph className="mb-4">
+        Enter a topic and description for the articles you&apos;d like to generate. Our AI will create
+        article suggestions with titles, abstracts, and relevant tags.
+      </Paragraph>
+
       <Row gutter={[16, 24]}>
         <Col xs={24} md={16}>
-          <Paragraph>
-            Enter a topic and the number of articles you&apos;d like to generate. Our AI will create
-            article suggestions with titles, abstracts, and relevant tags.
-          </Paragraph>
-
           <Form
             form={form}
             layout="vertical"
             onFinish={handleSubmit}
-            initialValues={{ count: 3 }}
+            initialValues={{ 
+              articleCount: 5,
+              model: modelOptions[0].value,
+              provider: modelOptions[0].provider
+            }}
           >
-            <Form.Item
-              name="category"
-              label="Category"
-              rules={[{ required: true, message: 'Please enter a category' }]}
-              tooltip="Enter a specific category for which you want to generate articles"
-            >
-              <Input
-                placeholder="e.g., Technology, Health, Business"
-                size="large"
-                suffix={
-                  <Tooltip title="Be specific with your category for better results">
-                    <InfoCircleOutlined style={{ color: 'rgba(0,0,0,.45)' }} />
-                  </Tooltip>
-                }
-              />
-            </Form.Item>
+            {/* Row for Category and Number of Articles */}
+            <Row gutter={16}>
+              <Col xs={24} md={18}>
+                <Form.Item
+                  name="category"
+                  label={
+                    <span>
+                      Category {loadingCategories && <Spin indicator={<LoadingOutlined style={{ marginLeft: 8 }} spin />} />}
+                    </span>
+                  }
+                  rules={[{ required: true, message: 'Please enter a category' }]}
+                >
+                  <AutoComplete
+                    options={categories.map(category => ({ value: category }))}
+                    size="large"
+                    filterOption={(inputValue, option) =>
+                      option!.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+                    }
+                  >
+                    <Input size="large" />
+                  </AutoComplete>
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={6}>
+                <Form.Item
+                  name="articleCount"
+                  label="Number of Articles"
+                  rules={[{ required: true, message: 'Required' }]}
+                >
+                  <InputNumber
+                    min={1}
+                    max={20}
+                    style={{ width: '100%' }}
+                    size="large"
+                  />
+                </Form.Item>
+              </Col>
+            </Row>
 
+            {/* Topic - Full Width */}
             <Form.Item
               name="topic"
               label="Topic"
               rules={[{ required: true, message: 'Please enter a topic' }]}
-              tooltip="Enter a specific topic or subject area for which you want to generate articles"
             >
-              <Input
-                placeholder="e.g., Artificial Intelligence in Healthcare"
-                size="large"
-                suffix={
-                  <Tooltip title="Be specific with your topic for better results">
-                    <InfoCircleOutlined style={{ color: 'rgba(0,0,0,.45)' }} />
-                  </Tooltip>
-                }
-              />
+              <Input size="large" />
+            </Form.Item>
+            
+            {/* Description - Full Width, 2 lines */}
+            <Form.Item
+              name="topicAbstract"
+              label="Description"
+              rules={[{ required: true, message: 'Please enter topic description' }]}
+            >
+              <Input.TextArea rows={2} size="large" style={{ resize: 'none' }} />
             </Form.Item>
 
+            {/* Model Selection */}
             <Form.Item
-              name="count"
-              label="Number of Articles"
-              rules={[{ required: true, message: 'Please enter the number of articles' }]}
-              tooltip="How many article suggestions do you want to generate (1-20)"
+              label="AI Model"
+              name="model"
+              rules={[{ required: true, message: 'Please select an AI model' }]}
             >
-              <InputNumber
-                min={1}
-                max={20}
-                style={{ width: '100%' }}
-                size="large"
-              />
+              <Radio.Group onChange={handleModelChange}>
+                {modelOptions.map(option => (
+                  <Radio.Button key={option.value} value={option.value}>
+                    {option.label}
+                  </Radio.Button>
+                ))}
+              </Radio.Group>
+            </Form.Item>
+
+            {/* Hidden field for provider */}
+            <Form.Item name="provider" hidden>
+              <Input />
             </Form.Item>
 
             <Form.Item>

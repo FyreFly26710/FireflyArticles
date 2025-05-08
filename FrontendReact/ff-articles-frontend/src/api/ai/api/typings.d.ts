@@ -92,6 +92,7 @@ declare namespace API {
   // AI Articles models
   type ArticleListRequest = {
     topic: string;
+    topicAbstract: string;
     category: string;
     articleCount?: number;
     model?: string;
