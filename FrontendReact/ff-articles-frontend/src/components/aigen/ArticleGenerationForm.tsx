@@ -3,16 +3,17 @@
 import React, { useEffect, useState } from 'react';
 import { Form, Input, Button, InputNumber, Card, Typography, Row, Col, Tooltip, AutoComplete, Spin, Radio } from 'antd';
 import { SendOutlined, InfoCircleOutlined, LoadingOutlined } from '@ant-design/icons';
-import { useAiGen } from '@/states/AiGenContext';
 import { apiTopicGetByPage } from '@/api/contents/api/topic';
-
+import { useArticleGeneration } from '@/hooks/useAiGenArticle';
+import { useAiGenContext } from '@/states/AiGenContext';
 const { Title, Paragraph } = Typography;
 
 const ArticleGenerationForm: React.FC = () => {
   const [form] = Form.useForm<API.ArticleListRequest>();
-  const { generateArticles, loading } = useAiGen();
+  const { generateArticles } = useArticleGeneration();
   const [categories, setCategories] = useState<string[]>([]);
   const [loadingCategories, setLoadingCategories] = useState(false);
+  const { loading } = useAiGenContext();
 
   useEffect(() => {
     fetchCategories();
@@ -23,7 +24,7 @@ const ArticleGenerationForm: React.FC = () => {
     try {
       const response = await apiTopicGetByPage({
         OnlyCategoryTopic: true,
-        PageSize: 100, 
+        PageSize: 100,
       });
 
       if (response.data?.data) {
@@ -35,7 +36,7 @@ const ArticleGenerationForm: React.FC = () => {
               .filter(Boolean) as string[]
           )
         ).sort();
-        
+
         setCategories(uniqueCategories);
       }
     } catch (error) {
@@ -45,8 +46,12 @@ const ArticleGenerationForm: React.FC = () => {
     }
   };
 
-  const handleSubmit = (values: API.ArticleListRequest) => {
-    generateArticles(values);
+  const handleSubmit = async (values: API.ArticleListRequest) => {
+    try {
+      await generateArticles(values);
+    } catch (error) {
+      console.error('Failed to generate articles:', error);
+    }
   };
 
   const modelOptions = [
@@ -76,7 +81,7 @@ const ArticleGenerationForm: React.FC = () => {
             form={form}
             layout="vertical"
             onFinish={handleSubmit}
-            initialValues={{ 
+            initialValues={{
               articleCount: 5,
               provider: modelOptions[0].provider
             }}
@@ -128,7 +133,7 @@ const ArticleGenerationForm: React.FC = () => {
             >
               <Input size="large" />
             </Form.Item>
-            
+
             {/* Description - Full Width, 2 lines */}
             <Form.Item
               name="topicAbstract"
@@ -158,9 +163,10 @@ const ArticleGenerationForm: React.FC = () => {
                 type="primary"
                 htmlType="submit"
                 size="large"
-                loading={loading}
                 icon={<SendOutlined />}
                 style={{ width: '100%', marginTop: 16 }}
+                loading={loading}
+                disabled={loading}
               >
                 {loading ? 'Generating...' : 'Generate Articles'}
               </Button>

@@ -101,7 +101,8 @@ declare namespace API {
   type ArticlesAIResponseDto = {
     code?: number;
     message?: string;
-    data?: ArticlesAIResponse;
+    //data?: ArticlesAIResponse;
+    data?: string;
   };
   type ArticlesAIResponse = {
     articles: AIGenArticleDto[];

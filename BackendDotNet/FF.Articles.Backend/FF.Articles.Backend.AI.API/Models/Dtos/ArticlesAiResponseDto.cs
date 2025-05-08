@@ -6,7 +6,7 @@ public class ArticlesAIResponseDto
 {
     public List<AIGenArticleDto> Articles { get; set; } = new();
 
-    public string AIMessage { get; set; } = "";
+    public string AiMessage { get; set; } = "";
 
     public long? TopicId { get; set; }
 

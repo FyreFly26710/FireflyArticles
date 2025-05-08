@@ -6,26 +6,20 @@ import Title from "antd/es/typography/Title";
 import ArticleGenerationForm from '../../components/aigen/ArticleGenerationForm';
 import styles from './aigen.module.css';
 import ArticleResults from '../../components/aigen/ArticleResults';
-import { useAiGen } from '@/states/AiGenContext';
+import { useAiGenContext } from '@/states/AiGenContext';
 
 const AiGenPage = () => {
-    const {
-        loading,
-        results,
-        showForm,
-        clearResults
-    } = useAiGen();
+    const { loading, clearResults, responseData } = useAiGenContext();
+    const showForm = !responseData || responseData.length === 0;
 
     return (
         <div className={styles.container}>
             <Space direction="vertical" style={{ width: '100%' }} size="large">
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <Title level={3}>AI Article Generator</Title>
-                    {results && !showForm && (
-                        <Space>
-                            <Button danger onClick={clearResults}>Clear Results</Button>
-                        </Space>
-                    )}
+                    <Space>
+                        <Button danger onClick={clearResults}>Clear Results</Button>
+                    </Space>
                 </div>
 
                 {showForm && (
@@ -45,9 +39,7 @@ const AiGenPage = () => {
                     </Card>
                 )}
 
-                {results && !loading && (
-                    <ArticleResults />
-                )}
+                {!loading && <ArticleResults />}
             </Space>
         </div>
     );

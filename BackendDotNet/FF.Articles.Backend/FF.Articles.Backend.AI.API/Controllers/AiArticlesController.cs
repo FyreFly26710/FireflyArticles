@@ -14,11 +14,11 @@ public class AiArticlesController(IArticleGenerationService articleGenerationSer
 {
 
     [HttpPost("generate-article-list")]
-    public async Task<ApiResponse<ArticlesAIResponseDto>> GenerateArticleList(ArticleListRequest request, CancellationToken cancellationToken)
+    public async Task<ApiResponse<string>> GenerateArticleList(ArticleListRequest request, CancellationToken cancellationToken)
     {
         var user = UserUtil.GetUserFromHttpRequest(Request);
         var article = await articleGenerationService.GenerateArticleListsAsync(request, cancellationToken);
-        return ResultUtil.Success<ArticlesAIResponseDto>(article);
+        return ResultUtil.Success<string>(article);
     }
 
     [HttpPost("generate-article-content")]

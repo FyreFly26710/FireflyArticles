@@ -1,56 +1,71 @@
 'use client';
 
-import React from 'react';
-import { Card, List, Alert } from 'antd';
-import { EditableArticle, useAiGen } from '@/states/AiGenContext';
-import ArticleItem from './ArticleItem';
-import AiInsight from './AiInsight';
-import ArticleListHeader, { ArticleListActions } from './ArticleListHeader';
-import EmptyArticleState from './EmptyArticleState';
+import React, { useEffect } from 'react';
+import { Card, Alert, Row, Col } from 'antd';
+import { useAiGenContext } from '@/states/AiGenContext';
+import { useAiGenEdit } from '@/hooks/useAiGenEditArticle';
+import ArticleRawJson from './ArticleRawJson';
+import ArticleCardList from './ArticleCardList';
 
 const ArticleResults: React.FC = () => {
   const {
-    results,
-    editableArticles,
-    generationStatus,
-    isGeneratingAll,
-    generateAllArticles
-  } = useAiGen();
+    responseData,
+    parsedArticles,
+    error,
+    articleListRequest
+  } = useAiGenContext();
+  const { parseArticleData, handleDataChange } = useAiGenEdit();
 
-  if (!results || !results.articles || results.articles.length === 0) {
-    return <EmptyArticleState message={results?.aiMessage} />;
+  // Try to parse data when the component mounts
+  useEffect(() => {
+    if (responseData) {
+      parseArticleData(responseData);
+    }
+  }, []);
+
+  // Try to parse data when responseData changes
+  useEffect(() => {
+    if (responseData) {
+      parseArticleData(responseData);
+    }
+  }, [responseData]);
+
+  if (!responseData && !parsedArticles && !error) {
+    return null; // Nothing to display yet
   }
 
   return (
-    <div>
-      <AiInsight message={results.aiMessage} />
-
-      <Card
-        title={<ArticleListHeader articleCount={editableArticles.length} />}
-        bordered={false}
-        className="article-results-card"
-        extra={
-          <ArticleListActions
-            onGenerateAll={generateAllArticles}
-            isGeneratingAll={isGeneratingAll}
+    <Card title="Article Results">
+      <Row gutter={[24, 24]}>
+        {/* Left side: JSON Response Text Area */}
+        <Col xs={24} md={12}>
+          <ArticleRawJson
+            responseData={responseData}
+            onDataChange={handleDataChange}
+            onTryParse={() => parseArticleData(responseData)}
           />
-        }
-      >
-        <List
-          itemLayout="vertical"
-          dataSource={editableArticles}
-          renderItem={(article: EditableArticle) => (
-            <List.Item key={article.sortNumber}>
-              <ArticleItem
-                article={article}
-                generationStatus={generationStatus[article.sortNumber]}
-                topicId={results.topicId}
-              />
-            </List.Item>
+        </Col>
+
+        {/* Right side: Parsed Data Display or Error */}
+        <Col xs={24} md={12}>
+          {/* Error Display */}
+          {error && (
+            <Alert
+              message="Parse Error"
+              description={error}
+              type="error"
+              showIcon
+              style={{ marginBottom: 16 }}
+            />
           )}
-        />
-      </Card>
-    </div>
+
+          {/* Parsed Articles */}
+          {parsedArticles && (
+            <ArticleCardList parsedArticles={parsedArticles} />
+          )}
+        </Col>
+      </Row>
+    </Card>
   );
 };
 
