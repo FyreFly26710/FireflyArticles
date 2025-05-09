@@ -1,5 +1,20 @@
 # FireflyArticles Release Notes
 
+
+
+
+### Release App Version 0.0.5 (09/05/2025)
+- Overview: Testing release.
+- Changes:
+    - Feature: 
+        - Add Gemini AI
+    - Improvements:
+        - Add loading page
+        - Completed CICD
+        - Enable Authentication in AI Chat
+        - Improved AI Article Gen process: 
+            Ai.API send back the entire response to client. Client handle json parse.
+
 ### Release App Version 0.0.4 (04/05/2025)
 - Overview: Testing release.
 - Changes:
