@@ -15,6 +15,7 @@ services:
       - Domain__Home=${BASE_URL_FRONTEND}
       # AI Services
       - DeepSeek__ApiKey=${DEEPSEEK_API_KEY}
+      - Gemini__ApiKey=${GEMINI_API_KEY}
       # Database credentials
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
       - RABBITMQ_USERNAME=${RABBITMQ_USERNAME:-rabbitmq}
