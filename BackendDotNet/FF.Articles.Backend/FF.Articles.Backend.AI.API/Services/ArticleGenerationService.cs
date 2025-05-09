@@ -35,10 +35,13 @@ public class ArticleGenerationService : IArticleGenerationService
     _rabbitMqPublisher = rabbitMqPublisher;
     // _redis = redis.GetDatabase();
   }
-  // Round 1
+  /// <summary>
+  /// Round 1: Generate article lists
+  /// Ai may not generate valid json response. Send the string let frontend parse it.
+  /// </summary>
   public async Task<string> GenerateArticleListsAsync(ArticleListRequest request, CancellationToken cancellationToken = default)
   {
-    return mockResponse();
+    // return mockResponse();
     var model = getModel(request.Provider);
     var chatRequest = new ChatRequest
     {
@@ -47,6 +50,7 @@ public class ArticleGenerationService : IArticleGenerationService
       Messages = {
                 Message.User(Prompts.User_ArticleList(request)),
             },
+      //Options = new ChatOptions() { Temperature = 0.5 }
       Options = new ChatOptions() { ResponseFormat = ChatOptions.GetResponseFormat<ArticlesAIResponseDto>(), Temperature = 0.5 }
     };
     var topic = new TopicApiAddRequest
@@ -55,35 +59,47 @@ public class ArticleGenerationService : IArticleGenerationService
       Category = request.Category,
       Abstract = request.TopicAbstract
     };
-    var topicId = await _contentsApiRemoteService.AddTopicByTitleCategoryAsync(topic, AdminUsers.SYSTEM_ADMIN_DEEPSEEK);
+    var topicId = await _contentsApiRemoteService.AddTopic(topic, AdminUsers.SYSTEM_ADMIN_DEEPSEEK);
     _logger.LogInformation("AI:{model};Begin to generate topic: {topic}; TopicId: {topicId}", model, request.Topic, topicId);
     var response = await _aiChatAssistant.ChatAsync(chatRequest, cancellationToken);
     var jsonContent = response?.Message?.Content ?? "";
     _logger.LogInformation("Request to generate topic: {topic}; Milliseconds taken : {time}; Tokens: {tokens}", request.Topic, response?.ExtraInfo?.Duration, response?.ExtraInfo?.OutputTokens);
 
-    // Extract content between first { and last }
-    int firstBrace = jsonContent.IndexOf('{');
-    int lastBrace = jsonContent.LastIndexOf('}');
+    var extractedJson = extractJson(jsonContent, topicId, request.Category);
 
-    if (firstBrace >= 0 && lastBrace > firstBrace)
+    return extractedJson;
+  }
+
+  private string extractJson(string jsonContent, long topicId, string category)
+  {
+    try
     {
-      jsonContent = jsonContent.Substring(firstBrace, lastBrace - firstBrace + 1);
+      // Extract content between first { and last }
+      int firstBrace = jsonContent.IndexOf('{');
+      int lastBrace = jsonContent.LastIndexOf('}');
+
+      if (firstBrace >= 0 && lastBrace > firstBrace && lastBrace < jsonContent.Length)
+      {
+        // Get the JSON content
+        string extractedJson = jsonContent.Substring(firstBrace, lastBrace - firstBrace + 1);
+
+        // Remove the closing brace to add our properties
+        string jsonWithoutClosingBrace = extractedJson.Substring(0, extractedJson.Length - 1);
+
+        // Append TopicId and Category and add the closing brace back
+        jsonContent = jsonWithoutClosingBrace +
+                    $", \"TopicId\": {topicId}, \"Category\": \"{category}\"" +
+                    "}";
+      }
+      else
+      {
+        jsonContent += $"\"TopicId\": {topicId}, \"Category\": \"{category}\", \"ErrorMessage\": \"Failed to generate articles properly.\"";
+      }
     }
-
-    // ArticlesAIResponseDto? articlesResponse = null;
-    // try
-    // {
-    //     articlesResponse = JsonSerializer.Deserialize<ArticlesAIResponseDto>(jsonContent);
-    // }
-    // catch (Exception ex)
-    // {
-    //     throw new ApiException(ErrorCode.SYSTEM_ERROR, $"Exception: {ex.Message}; AI Response cannot be parsed:{jsonContent}");
-    // }
-    // if (articlesResponse == null)
-    //     throw new ApiException(ErrorCode.SYSTEM_ERROR, $"AI Response cannot be parsed:{jsonContent}");
-    // articlesResponse.TopicId = topicId;
-    // articlesResponse.Category = request.Category;
-
+    catch (Exception ex)
+    {
+      jsonContent += $"\"TopicId\": {topicId}, \"Category\": \"{category}\", \"ErrorMessage\": \"Error generating articles: {ex.Message}\"";
+    }
     return jsonContent;
   }
 
@@ -92,7 +108,7 @@ public class ArticleGenerationService : IArticleGenerationService
     if (request.TopicId == 0 || string.IsNullOrEmpty(request.Title) || string.IsNullOrEmpty(request.Abstract) || request.Id == null)
       throw new ApiException(ErrorCode.PARAMS_ERROR, "Invalid request");
 
-    var model = getModel(request.Provider);
+    var model = getModel(request.Provider, true);
     var chatRequest = new ChatRequest
     {
       Model = model,
@@ -100,6 +116,7 @@ public class ArticleGenerationService : IArticleGenerationService
       Messages = [
             Message.User(Prompts.User_ArticleContent(request)),
             ],
+      Options = new ChatOptions() { Temperature = 0.5 }
     };
     _logger.LogInformation("AI: {model}. Begin to generate article: {title}", model, request.Title);
     var response = await _aiChatAssistant.ChatAsync(chatRequest, new CancellationToken());
@@ -121,13 +138,13 @@ public class ArticleGenerationService : IArticleGenerationService
   {
     var article = request.ToArticleApiUpsertRequest("Generating content...");
     long id = EntityUtil.GenerateSnowflakeId();
-     _logger.LogInformation("AI: Begin to dispatch article generation: {title}", request.Title);
-        //request.Id = id;
-        //article.Id = id;
-        //article.UserId = AdminUsers.SYSTEM_ADMIN_DEEPSEEK.UserId;
-        //await _rabbitMqPublisher.PublishAsync(QueueList.AddArticleQueue, article);
-        //await _rabbitMqPublisher.PublishAsync(QueueList.GenerateArticleQueue, request);
-     return id;
+    _logger.LogInformation("AI: Begin to dispatch article generation: {title}", request.Title);
+    request.Id = id;
+    article.Id = id;
+    article.UserId = AdminUsers.SYSTEM_ADMIN_DEEPSEEK.UserId;
+    await _rabbitMqPublisher.PublishAsync(QueueList.AddArticleQueue, article);
+    await _rabbitMqPublisher.PublishAsync(QueueList.GenerateArticleQueue, request);
+    return id;
   }
 
 

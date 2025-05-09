@@ -55,7 +55,7 @@ public class ContentsApiRemoteService : IContentsApiRemoteService
         return true;
     }
 
-    public async Task<long> AddTopicByTitleCategoryAsync(TopicApiAddRequest payload, UserApiDto user)
+    public async Task<long> AddTopic(TopicApiAddRequest payload, UserApiDto user)
     {
         string url = RemoteApiUrlConstant.TopicUrl();
 

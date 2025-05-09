@@ -43,7 +43,7 @@ public static class Prompts
         "Tags": ["Advanced", "Web Development", "HTML", "Best-practices", "Technical"]
         }
     ],
-    "AIMessage": "Your message here."
+    "AiMessage": "Your message here."
     }    
     """;
 

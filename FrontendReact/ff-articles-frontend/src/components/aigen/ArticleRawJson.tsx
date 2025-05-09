@@ -34,8 +34,7 @@ const ArticleRawJson: React.FC<ArticleRawJsonProps> = ({
                 <TextArea
                     value={responseData}
                     onChange={(e) => onDataChange(e.target.value)}
-                    autoSize={{ minRows: 10, maxRows: 50 }}
-                    style={{ fontFamily: 'monospace' }}
+                    autoSize={{ minRows: 10 }}
                 />
             </div>
         </Space>
