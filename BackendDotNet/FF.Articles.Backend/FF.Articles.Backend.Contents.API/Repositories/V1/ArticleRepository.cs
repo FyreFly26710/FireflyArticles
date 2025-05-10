@@ -1,5 +1,6 @@
 using FF.Articles.Backend.Common.Bases;
 using FF.Articles.Backend.Contents.API.Constants;
+using FF.Articles.Backend.Contents.API.ElasticSearch;
 using FF.Articles.Backend.Contents.API.Infrastructure;
 using FF.Articles.Backend.Contents.API.Interfaces.Repositories.V1;
 using FF.Articles.Backend.Contents.API.Models.Entities;
@@ -7,14 +8,9 @@ using FF.Articles.Backend.Contents.API.Models.Requests.Articles;
 using Microsoft.EntityFrameworkCore;
 
 namespace FF.Articles.Backend.Contents.API.Repositories.V1;
-public class ArticleRepository : BaseRepository<Article, ContentsDbContext>, IArticleRepository
+public class ArticleRepository(ContentsDbContext _context)
+    : BaseRepository<Article, ContentsDbContext>(_context), IArticleRepository
 {
-    public ArticleRepository(ContentsDbContext _context) : base(_context)
-    {
-    }
-
-
-
     public IQueryable<Article> BuildTagIdsSearchQuery(List<long> tagIds, IQueryable<Article> query)
     {
         return from a in query
@@ -63,6 +59,7 @@ public class ArticleRepository : BaseRepository<Article, ContentsDbContext>, IAr
         }
         return query;
     }
+
     public async Task SetTopicIdToZero(long topicId)
     {
         var articles = await GetQueryable().AsTracking().Where(x => x.TopicId == topicId).ToListAsync();

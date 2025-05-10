@@ -3,6 +3,7 @@ using FF.Articles.Backend.Common.Bases;
 using FF.Articles.Backend.Common.Exceptions;
 using FF.Articles.Backend.Common.Responses;
 using FF.Articles.Backend.Contents.API.Constants;
+using FF.Articles.Backend.Contents.API.ElasticSearch;
 using FF.Articles.Backend.Contents.API.Infrastructure;
 using FF.Articles.Backend.Contents.API.Interfaces.Repositories.V1;
 using FF.Articles.Backend.Contents.API.Interfaces.Services;
@@ -15,32 +16,17 @@ using FF.Articles.Backend.Contents.API.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
 
 namespace FF.Articles.Backend.Contents.API.Services.V1;
-public class ArticleService : BaseService<Article, ContentsDbContext>, IArticleService
+public class ArticleService(
+    IArticleRepository _articleRepository,
+    ITagRepository _tagRepository,
+    ITopicRepository _topicRepository,
+    IIdentityRemoteService _identityRemoteService,
+    IArticleTagRepository _articleTagRepository,
+    IContentsUnitOfWork _contentsUnitOfWork,
+    IElasticSearchArticleService _elasticsearchService,
+    ElasticsearchSyncService _elasticsearchSyncService,
+    ILogger<ArticleService> _logger) : BaseService<Article, ContentsDbContext>(_articleRepository, _logger), IArticleService
 {
-    private readonly IIdentityRemoteService _identityRemoteService;
-    private readonly ITagRepository _tagRepository;
-    private readonly ITopicRepository _topicRepository;
-    private readonly IContentsUnitOfWork _contentsUnitOfWork;
-    private readonly IArticleRepository _articleRepository;
-    private readonly IArticleTagRepository _articleTagRepository;
-
-    public ArticleService(
-        IArticleRepository articleRepository,
-        ITagRepository tagRepository,
-        ITopicRepository topicRepository,
-        IIdentityRemoteService identityRemoteService,
-        IArticleTagRepository articleTagRepository,
-        IContentsUnitOfWork contentsUnitOfWork,
-        ILogger<ArticleService> logger
-    ) : base(articleRepository, logger)
-    {
-        _tagRepository = tagRepository;
-        _identityRemoteService = identityRemoteService;
-        _topicRepository = topicRepository;
-        _contentsUnitOfWork = contentsUnitOfWork;
-        _articleRepository = articleRepository;
-        _articleTagRepository = articleTagRepository;
-    }
 
     public async Task<ArticleDto> GetArticleDto(Article article) => await GetArticleDto(article, new ArticleQueryRequest());
 
@@ -182,7 +168,16 @@ public class ArticleService : BaseService<Article, ContentsDbContext>, IArticleS
     public async Task<Paged<ArticleDto>> GetPagedArticlesByRequest(ArticleQueryRequest pageRequest)
     {
         var query = _articleRepository.BuildSearchQueryFromRequest(pageRequest);
-        var pagedData = await _articleRepository.GetPagedFromQueryAsync(query, pageRequest);
+        Paged<Article> pagedData;
+        if (pageRequest.SortByRelevance && !string.IsNullOrEmpty(pageRequest.Keyword))
+        {
+            pagedData = await _elasticsearchService.SearchArticlesAsync(pageRequest.Keyword, pageRequest.PageSize, pageRequest.PageNumber, pageRequest.TopicIds, pageRequest.TagIds);
+        }
+        else
+        {
+            pagedData = await _articleRepository.GetPagedFromQueryAsync(query, pageRequest);
+        }
+
         var articleList = await GetArticleDtos(pagedData.Data, pageRequest);
         var res = new Paged<ArticleDto>(pagedData.GetPageInfo(), articleList);
 

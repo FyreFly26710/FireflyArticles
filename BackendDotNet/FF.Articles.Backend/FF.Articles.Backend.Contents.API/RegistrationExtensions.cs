@@ -1,4 +1,5 @@
-﻿using FF.Articles.Backend.Contents.API.Interfaces.Repositories.V1;
+﻿using FF.Articles.Backend.Contents.API.ElasticSearch;
+using FF.Articles.Backend.Contents.API.Interfaces.Repositories.V1;
 using FF.Articles.Backend.Contents.API.Interfaces.Repositories.V2;
 using FF.Articles.Backend.Contents.API.Interfaces.Services;
 using FF.Articles.Backend.Contents.API.Interfaces.Services.RemoteServices;
@@ -7,6 +8,7 @@ using FF.Articles.Backend.Contents.API.Repositories.V2;
 using FF.Articles.Backend.Contents.API.Services.RemoteServices;
 using FF.Articles.Backend.Contents.API.UnitOfWork;
 using Microsoft.EntityFrameworkCore.Internal;
+using Nest;
 
 namespace FF.Articles.Backend.Contents.API
 {
@@ -18,6 +20,9 @@ namespace FF.Articles.Backend.Contents.API
             RegisteredServices<IArticleService, Services.V1.ArticleService, Services.V2.ArticleService>(services);
             RegisteredServices<ITagService, Services.V1.TagService, Services.V2.TagService>(services);
             RegisteredServices<ITopicService, Services.V1.TopicService, Services.V2.TopicService>(services);
+
+            // Elasticsearch services
+            services.AddScoped<IElasticSearchArticleService, ESArticleService>();
 
             // Add HttpClient for IdentityRemoteService
             services.AddHttpClient<IIdentityRemoteService, IdentityRemoteService>();
@@ -67,6 +72,21 @@ namespace FF.Articles.Backend.Contents.API
                     _ => serviceProvider.GetService<S1>()!,
                 };
             });
+        }
+
+        public static void AddElasticsearch(this IServiceCollection services)
+        {
+            services.AddSingleton<IElasticClient>(sp =>
+            {
+                // Hard-coded URL - no authentication
+                var elasticUri = "http://localhost:9200";
+                var settings = new ConnectionSettings(new Uri(elasticUri))
+                    .DefaultIndex("articles");
+
+                return new ElasticClient(settings);
+            });
+            services.AddScoped<IElasticSearchArticleService, ESArticleService>();
+            services.AddScoped<ElasticsearchSyncService>();
         }
     }
 }

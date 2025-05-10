@@ -1,3 +1,5 @@
+using Aspire.Hosting;
+
 var builder = DistributedApplication.CreateBuilder(args);
 
 //var redis = builder.AddRedis("redis")
@@ -51,6 +53,15 @@ var identityDb = postgres.AddDatabase("identitydb");
 var contentDb = postgres.AddDatabase("contentdb");
 var aidb = postgres.AddDatabase("aidb");
 
+var passwordElastic = builder.AddParameter("passwordElastic", secret: false);
+var elasticsearch = builder.AddElasticsearch("elasticsearch", password: passwordElastic)
+    .WithDataVolume()
+    .WithLifetime(ContainerLifetime.Persistent)
+    .WithHttpEndpoint(port: 9200, targetPort: 9200, name: "es-http")
+    .WithEnvironment("xpack.security.enabled", "false")
+    .WithEnvironment("xpack.security.transport.ssl.enabled", "false")
+    .WithEnvironment("xpack.security.http.ssl.enabled", "false")
+    .WithEnvironment("discovery.type", "single-node");
 var launchProfileName = "https";
 
 // Services
@@ -62,6 +73,7 @@ builder.AddProject<Projects.FF_Articles_Backend_Identity_API>("identity-api", la
 builder.AddProject<Projects.FF_Articles_Backend_Contents_API>("contents-api", launchProfileName)
     .WithReference(contentDb)
     .WithReference(rabbitMq)
+    .WithReference(elasticsearch)
     //.WithReference(redis)
     ;
 

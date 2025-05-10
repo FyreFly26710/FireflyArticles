@@ -28,8 +28,19 @@ builder.Services.AddControllers();
 
 builder.AddCustomApiVersioning();
 
+builder.Services.AddElasticsearch();
+
 
 var app = builder.Build();
+
+// var scope = app.Services.CreateScope();
+// var esService = scope.ServiceProvider.GetRequiredService<IElasticSearchArticleService>();
+// var esSyncService = scope.ServiceProvider.GetRequiredService<ElasticsearchSyncService>();
+// if (app.Environment.IsDevelopment())
+// {
+//     await esService.ReCreateIndexAsync();
+//     await esSyncService.IndexAllExistingArticles();
+// }
 
 app.UseMiddleware<GlobalExceptionMiddleware>();
 
@@ -40,5 +51,7 @@ app.UseHttpsRedirection();
 app.AddCookieAuthMiddleware();
 
 app.MapControllers();
+
+
 
 app.Run();

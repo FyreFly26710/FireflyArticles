@@ -15,7 +15,8 @@
 			<TreatAsUsed>true</TreatAsUsed>
 		</PackageReference>
 		<PackageReference Include="Aspire.StackExchange.Redis" Version="9.1.0" />
-
+		<PackageReference Include="NEST" Version="7.17.5" />
+		<PackageReference Include="Aspire.Elastic.Clients.Elasticsearch" Version="9.1.0-preview.1.25121.10" />
 
 	</ItemGroup>
 	<ItemGroup>
