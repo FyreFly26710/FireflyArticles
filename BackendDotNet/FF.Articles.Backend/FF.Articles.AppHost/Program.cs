@@ -1,4 +1,7 @@
 using Aspire.Hosting;
+using Aspire.Hosting.Elasticsearch;
+using FF.Articles.AppHost;
+using Microsoft.Extensions.Configuration;
 
 var builder = DistributedApplication.CreateBuilder(args);
 
@@ -55,13 +58,8 @@ var aidb = postgres.AddDatabase("aidb");
 
 var passwordElastic = builder.AddParameter("passwordElastic", secret: false);
 var elasticsearch = builder.AddElasticsearch("elasticsearch", password: passwordElastic)
-    .WithDataVolume()
-    .WithLifetime(ContainerLifetime.Persistent)
-    .WithHttpEndpoint(port: 9200, targetPort: 9200, name: "es-http")
-    .WithEnvironment("xpack.security.enabled", "false")
-    .WithEnvironment("xpack.security.transport.ssl.enabled", "false")
-    .WithEnvironment("xpack.security.http.ssl.enabled", "false")
-    .WithEnvironment("discovery.type", "single-node");
+    .ConfigureElasticsearch(builder.Configuration);
+
 var launchProfileName = "https";
 
 // Services

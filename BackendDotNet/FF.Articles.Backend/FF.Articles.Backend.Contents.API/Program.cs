@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using FF.Articles.Backend.Common.Extensions;
 using FF.Articles.Backend.Contents.API.MqConsumers;
 using FF.Articles.Backend.RabbitMQ;
+using FF.Articles.Backend.Contents.API.ElasticSearch;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -28,19 +29,23 @@ builder.Services.AddControllers();
 
 builder.AddCustomApiVersioning();
 
-builder.Services.AddElasticsearch();
+builder.Services.AddElasticsearch(configuration);
 
 
 var app = builder.Build();
 
-// var scope = app.Services.CreateScope();
-// var esService = scope.ServiceProvider.GetRequiredService<IElasticSearchArticleService>();
-// var esSyncService = scope.ServiceProvider.GetRequiredService<ElasticsearchSyncService>();
-// if (app.Environment.IsDevelopment())
-// {
-//     await esService.ReCreateIndexAsync();
-//     await esSyncService.IndexAllExistingArticles();
-// }
+var scope = app.Services.CreateScope();
+var esService = scope.ServiceProvider.GetRequiredService<IElasticSearchArticleService>();
+var esSyncService = scope.ServiceProvider.GetRequiredService<ElasticsearchSyncService>();
+if (app.Environment.IsDevelopment())
+{
+    var articleIndexCount = await esService.GetArticleIndexCount();
+    if (articleIndexCount == 0)
+    {
+        await esService.ReCreateIndexAsync();
+        await esSyncService.IndexAllExistingArticles();
+    }
+}
 
 app.UseMiddleware<GlobalExceptionMiddleware>();
 

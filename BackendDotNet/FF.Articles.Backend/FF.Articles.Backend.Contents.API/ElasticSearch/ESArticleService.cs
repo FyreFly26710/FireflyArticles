@@ -10,7 +10,7 @@ public interface IElasticSearchArticleService
         List<long>? topicIds = null, List<long>? articleIds = null);
     Task DeleteArticleAsync(long id);
     Task ReCreateIndexAsync();
-    Task<bool> IsReadyAsync();
+    Task<int> GetArticleIndexCount();
 }
 public class ESArticleService(IElasticClient _elasticClient, ILogger<ESArticleService> _logger)
     : IElasticSearchArticleService
@@ -150,32 +150,32 @@ public class ESArticleService(IElasticClient _elasticClient, ILogger<ESArticleSe
         }
     }
 
-    public async Task<bool> IsReadyAsync()
+    public async Task<int> GetArticleIndexCount()
     {
         try
         {
-            // Check if we can connect
+            // Check if we can connect, if not return -1
             var pingResponse = await _elasticClient.PingAsync();
             if (!pingResponse.IsValid)
-                return false;
+                return -1;
 
-            // Check if index exists
+            // Check if index exists, if not return 0
             var indexExistsResponse = await _elasticClient.Indices.ExistsAsync("articles");
             if (!indexExistsResponse.Exists)
-                return false;
+                return 0;
 
             // Check if index has any documents
             var countResponse = await _elasticClient.CountAsync<Article>(c => c.Index("articles"));
             if (!countResponse.IsValid || countResponse.Count == 0)
-                return false;
+                return 0;
 
             // All checks passed
-            return true;
+            return (int)countResponse.Count;
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Elasticsearch readiness check failed");
-            return false;
+            return -1;
         }
     }
 }

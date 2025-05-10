@@ -74,12 +74,11 @@ namespace FF.Articles.Backend.Contents.API
             });
         }
 
-        public static void AddElasticsearch(this IServiceCollection services)
+        public static void AddElasticsearch(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddSingleton<IElasticClient>(sp =>
             {
-                // Hard-coded URL - no authentication
-                var elasticUri = "http://localhost:9200";
+                var elasticUri = configuration.GetConnectionString("elasticsearch") ?? "http://localhost:9200";
                 var settings = new ConnectionSettings(new Uri(elasticUri))
                     .DefaultIndex("articles");
 
