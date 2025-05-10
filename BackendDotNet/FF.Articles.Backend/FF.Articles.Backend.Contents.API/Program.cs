@@ -7,6 +7,9 @@ using FF.Articles.Backend.Common.Extensions;
 using FF.Articles.Backend.Contents.API.MqConsumers;
 using FF.Articles.Backend.RabbitMQ;
 using FF.Articles.Backend.Contents.API.ElasticSearch;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using FF.Articles.Backend.Contents.API.Validators.Articles;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -24,6 +27,9 @@ builder.Services.AddContentsServices();
 builder.AddRabbitMq();
 builder.Services.AddHostedService<UpdateArticleConsumer>();
 builder.Services.AddHostedService<AddArticleConsumer>();
+
+// Add FluentValidation
+builder.Services.AddFluentValidation();
 
 builder.Services.AddControllers();
 

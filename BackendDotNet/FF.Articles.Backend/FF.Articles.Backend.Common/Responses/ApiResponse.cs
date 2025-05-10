@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FF.Articles.Backend.Common.Exceptions;
+﻿using FF.Articles.Backend.Common.Exceptions;
 
 namespace FF.Articles.Backend.Common.Responses;
 /// <summary>
@@ -33,15 +28,5 @@ public class ApiResponse<T>
     {
         Code = 200;
         Message = "OK";
-    }
-    public ApiResponse(ApiException apiException)
-    {
-        Code = apiException.Code;
-        Message = apiException.Message;
-    }
-    public ApiResponse(ErrorCode errorCode)
-    {
-        Code = errorCode.Code;
-        Message = errorCode.Message;
     }
 }

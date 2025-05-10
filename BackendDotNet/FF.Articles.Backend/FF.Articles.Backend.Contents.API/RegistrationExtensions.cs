@@ -7,6 +7,9 @@ using FF.Articles.Backend.Contents.API.Repositories.V1;
 using FF.Articles.Backend.Contents.API.Repositories.V2;
 using FF.Articles.Backend.Contents.API.Services.RemoteServices;
 using FF.Articles.Backend.Contents.API.UnitOfWork;
+using FF.Articles.Backend.Contents.API.Validators.Articles;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore.Internal;
 using Nest;
 
@@ -86,6 +89,14 @@ namespace FF.Articles.Backend.Contents.API
             });
             services.AddScoped<IElasticSearchArticleService, ESArticleService>();
             services.AddScoped<ElasticsearchSyncService>();
+        }
+        public static void AddFluentValidation(this IServiceCollection services)
+        {
+            // This will add the FluentValidation middleware to the pipeline
+            services.AddFluentValidationAutoValidation();
+            services.AddValidatorsFromAssemblyContaining<ArticleAddRequestValidator>();
+            services.AddValidatorsFromAssemblyContaining<ArticleEditRequestValidator>();
+            services.AddValidatorsFromAssemblyContaining<ArticleQueryRequestValidator>();
         }
     }
 }

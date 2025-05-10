@@ -10,28 +10,15 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace FF.Articles.Backend.Contents.API.Controllers;
 
-/// <summary>
-/// Article Controller Base
-/// </summary>
 public abstract class ArticleControllerBase : ControllerBase
 {
     private readonly IArticleService _articleService;
-    /// <summary>
-    /// Constructor
-    /// </summary>
     public ArticleControllerBase(Func<string, IArticleService> articleService, string version)
     {
         _articleService = articleService(version);
     }
 
     #region REST API
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="id"></param>
-    /// <param name="request"></param>
-    /// <returns></returns>
-    /// <exception cref="ApiException"></exception>
     [HttpGet("{id}")]
     public async Task<ApiResponse<ArticleDto>> GetById(long id, [FromQuery] ArticleQueryRequest request)
     {
@@ -41,23 +28,18 @@ public abstract class ArticleControllerBase : ControllerBase
         return ResultUtil.Success(articleResponse);
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="pageRequest"></param>
-    /// <returns></returns>
     [HttpGet]
     public async Task<ApiResponse<Paged<ArticleDto>>> GetByPage([FromQuery] ArticleQueryRequest pageRequest)
     {
+        if (pageRequest.PageSize > 30)
+        {
+            pageRequest.PageSize = 30;
+        }
+
         var pagedArticles = await _articleService.GetPagedArticlesByRequest(pageRequest);
         return ResultUtil.Success(pagedArticles);
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="articleAddRequest"></param>
-    /// <returns></returns>
     [HttpPost]
     [Authorize(Roles = UserConstant.ADMIN_ROLE)]
     public async Task<ApiResponse<long>> AddByRequest([FromBody] ArticleAddRequest articleAddRequest)
@@ -66,9 +48,6 @@ public abstract class ArticleControllerBase : ControllerBase
         return ResultUtil.Success(articleId);
     }
 
-    /// <summary>
-    /// Create articles and return a dictionary of article id and title
-    /// </summary>
     [HttpPost("batch")]
     [Authorize(Roles = UserConstant.ADMIN_ROLE)]
     public async Task<ApiResponse<Dictionary<long, string>>> AddBatchByRequest([FromBody] List<ArticleAddRequest> articleAddRequests)
@@ -77,12 +56,6 @@ public abstract class ArticleControllerBase : ControllerBase
         return ResultUtil.Success(result);
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="articleEditRequest"></param>
-    /// <returns></returns>
-    /// <exception cref="ApiException"></exception>
     [HttpPut]
     [Authorize(Roles = UserConstant.ADMIN_ROLE)]
     public async Task<ApiResponse<bool>> EditByRequest([FromBody] ArticleEditRequest articleEditRequest)
@@ -100,20 +73,6 @@ public abstract class ArticleControllerBase : ControllerBase
         return ResultUtil.Success(true);
     }
 
-    //[HttpPut("batch/content")]
-    //[Authorize(Roles = UserConstant.ADMIN_ROLE)]
-    //public async Task<ApiResponse<bool>> EditContentBatch([FromBody] Dictionary<long, string> batchEditConentRequests)
-    //{
-    //    var result = await _articleService.EditContentBatch(batchEditConentRequests);
-    //    return ResultUtil.Success(result);
-    //}
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
-    /// <exception cref="ApiException"></exception>
     [HttpDelete("{id}")]
     [Authorize(Roles = UserConstant.ADMIN_ROLE)]
     public async Task<ApiResponse<bool>> DeleteById(long id)
