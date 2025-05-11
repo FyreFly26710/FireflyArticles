@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '@/states/reduxStore';
+import { RootState } from '@/states/ReduxStore';
 import { startEditing, updateEditingArticle, cancelEditing } from '@/states/editArticle';
 import { apiArticleEditByRequest } from '@/api/contents/api/article';
 import { message } from 'antd';

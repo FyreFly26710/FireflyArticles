@@ -24,6 +24,7 @@ declare namespace API {
     PageSize?: number;
     SortField?: string;
     SortOrder?: string;
+    SortByRelevance?: boolean;
   };
 
   type apiTagDeleteByIdParams = {

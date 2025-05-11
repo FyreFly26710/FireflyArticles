@@ -11,10 +11,10 @@ const menus = [
         path: "/topics",
         name: "Topics",
     },
-    // {
-    //     path: "/articles",
-    //     name: "Article",
-    // },
+    {
+        path: "/articles",
+        name: "Articles",
+    },
     {
         path: "/aichat",
         name: "AI Chat",

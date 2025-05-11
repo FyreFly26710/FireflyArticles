@@ -17,7 +17,7 @@ public static class AdminUsers
     public static readonly UserApiDto SYSTEM_ADMIN_DEEPSEEK = new UserApiDto
     {
         UserId = 10,
-        UserName = "DeepSeek Assistant",
+        UserName = "DeepSeek",
         UserRole = UserConstant.ADMIN_ROLE,
         UserAccount = "deepseek",
         UserAvatar = "https://i.imgur.com/f6X5kDM.jpg",
@@ -27,7 +27,7 @@ public static class AdminUsers
     public static readonly UserApiDto SYSTEM_ADMIN_GEMINI = new UserApiDto
     {
         UserId = 11,
-        UserName = "Gemini Assistant",
+        UserName = "Gemini",
         UserRole = UserConstant.ADMIN_ROLE,
         UserAccount = "gemini",
         UserAvatar = "https://i.imgur.com/o7ujFyz.png",

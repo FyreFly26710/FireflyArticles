@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useChat } from '@/states/ChatContext'
-import { storage, ChatDisplaySettings } from '@/states/storage'
+import { storage, ChatDisplaySettings } from '@/states/localStorage'
 import Message from './Message'
 
 export default function MessageList() {

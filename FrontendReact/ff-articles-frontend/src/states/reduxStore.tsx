@@ -1,16 +1,64 @@
-import { configureStore } from "@reduxjs/toolkit";
-import loginUser from "@/states/loginUser";
-import editArticle from "@/states/editArticle";
+import { configureStore, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { DEFAULT_USER } from "@/libs/constants/user";
 
-const store = configureStore({
-    reducer: {
-        // store states
-        loginUser,
-        editArticle,
+// Login User Slice
+const loginUserSlice = createSlice({
+    name: "loginUser",
+    initialState: DEFAULT_USER,
+    reducers: {
+        setLoginUser: (state, action: PayloadAction<API.LoginUserDto>) => {
+            return {
+                ...action.payload,
+            };
+        },
     },
 });
 
-export type RootState = ReturnType<typeof store.getState>
-export type AppDispatch = typeof store.dispatch
+export const { setLoginUser } = loginUserSlice.actions;
+
+// Edit Article Slice
+interface EditArticleState {
+    isEditing: boolean;
+    currentArticle: API.ArticleDto | null;
+}
+
+const initialState: EditArticleState = {
+    isEditing: false,
+    currentArticle: null,
+};
+
+const editArticleSlice = createSlice({
+    name: "editArticle",
+    initialState,
+    reducers: {
+        startEditing: (state, action: PayloadAction<API.ArticleDto>) => {
+            state.isEditing = true;
+            state.currentArticle = action.payload;
+        },
+        updateEditingArticle: (state, action: PayloadAction<Partial<API.ArticleDto>>) => {
+            if (state.currentArticle) {
+                state.currentArticle = { ...state.currentArticle, ...action.payload };
+            }
+        },
+        cancelEditing: (state) => {
+            state.isEditing = false;
+            state.currentArticle = null;
+        },
+    },
+});
+
+export const { startEditing, updateEditingArticle, cancelEditing } = editArticleSlice.actions;
+
+// Store Configuration
+const store = configureStore({
+    reducer: {
+        loginUser: loginUserSlice.reducer,
+        editArticle: editArticleSlice.reducer,
+    },
+});
+
+// Types
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;
 
 export default store;

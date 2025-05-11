@@ -7,7 +7,7 @@ import {
 } from '@ant-design/icons'
 import SessionList from './SessionList'
 import { useChat } from '@/states/ChatContext'
-import { storage, LayoutSettings } from '@/states/storage'
+import { storage, LayoutSettings } from '@/states/localStorage'
 const { Sider } = Layout
 
 export default function SessionSidebar() {

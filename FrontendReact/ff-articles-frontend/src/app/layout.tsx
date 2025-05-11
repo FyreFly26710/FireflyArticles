@@ -13,10 +13,10 @@ import { findAllMenuItemByPath } from "../../config/menus";
 import { usePathname } from "next/navigation";
 import AccessEnum from "@/libs/constants/accessEnum";
 import { useEffect } from "react";
-import { storage } from "@/states/storage";
+import { storage } from "@/states/localStorage";
 import { apiAuthGetLoginUser } from "@/api/identity/api/auth";
 import { useCallback } from "react";
-import { setLoginUser } from "@/states/loginUser";
+import { setLoginUser } from "@/states/reduxStore";
 
 
 const UserStateLayout: React.FC<Readonly<{ children: React.ReactNode; }>> = ({ children }) => {

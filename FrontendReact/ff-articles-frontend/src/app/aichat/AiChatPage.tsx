@@ -5,7 +5,7 @@ import MessageList from '@/components/aiChat/MessageList'
 import InputBox from '@/components/aiChat/InputBox'
 import SessionSidebar from '@/components/aiChat/SessionSidebar'
 import ChatSidebar from '@/components/aiChat/ChatSidebar'
-import { storage, LayoutSettings } from '@/states/storage';
+import { storage, LayoutSettings } from '@/states/localStorage';
 
 export default function AiChatPage() {
   const [layoutSettings, setLayoutSettings] = useState<LayoutSettings>(() => storage.getLayoutSettings());

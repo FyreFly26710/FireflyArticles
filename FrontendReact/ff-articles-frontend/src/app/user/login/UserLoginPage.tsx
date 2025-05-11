@@ -7,12 +7,12 @@ import { LockOutlined, UserOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { AppDispatch } from "@/states/reduxStore";
+import { AppDispatch } from "@/states/ReduxStore";
 import { setLoginUser } from "@/states/loginUser";
 import { useDispatch } from "react-redux";
 import { apiAuthLogin } from "@/api/identity/api/auth";
 import GoogleLoginButton from "@/components/shared/GmailLoginBtn";
-import { storage } from "@/states/storage";
+import { storage } from "@/states/localStorage";
 
 /**
  * User login page
