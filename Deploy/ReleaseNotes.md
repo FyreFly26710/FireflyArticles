@@ -1,7 +1,20 @@
 # FireflyArticles Release Notes
 
-
-
+### Release App Version 0.0.6 (11/05/2025)
+- Overview: Nearly Ready.
+- Changes:
+    - Feature:
+        - Add Elastic Search for improved search capabilities. 
+        - Add Articles page UI and search function
+        - Add Validators
+    - Bug fix:
+        - Reduced ElasticSearch RAM usage in dev environment
+        - Disabled ElasticSearch temporarily for further testing
+    - Improvements:
+        - Fixed ArticlesPage
+        - Implemented Global Exception Middleware
+        - Added and organized global usings across all projects
+        - Clean up backend codebase
 
 ### Release App Version 0.0.5 (09/05/2025)
 - Overview: Testing release.
