@@ -9,8 +9,8 @@ COPY FF.Articles.Backend.Common/FF.Articles.Backend.Common.csproj ./FF.Articles.
 COPY FF.Articles.Backend.Contents.API/FF.Articles.Backend.Contents.API.csproj ./FF.Articles.Backend.Contents.API/
 COPY FF.Articles.Backend.Gateway.API/FF.Articles.Backend.Gateway.API.csproj ./FF.Articles.Backend.Gateway.API/
 COPY FF.Articles.Backend.Identity.API/FF.Articles.Backend.Identity.API.csproj ./FF.Articles.Backend.Identity.API/
-COPY FF.Articles.Backend.RabbitMQ/FF.Articles.Backend.RabbitMQ.csproj ./FF.Articles.Backend.RabbitMQ/
-COPY FF.Articles.Backend.ServiceDefaults/FF.Articles.Backend.ServiceDefaults.csproj ./FF.Articles.Backend.ServiceDefaults/
+# COPY FF.Articles.Backend.RabbitMQ/FF.Articles.Backend.RabbitMQ.csproj ./FF.Articles.Backend.RabbitMQ/
+# COPY FF.Articles.Backend.ServiceDefaults/FF.Articles.Backend.ServiceDefaults.csproj ./FF.Articles.Backend.ServiceDefaults/
 
 RUN dotnet restore
 
