@@ -1,6 +1,4 @@
-﻿using FF.Articles.Backend.Common.Bases;
-
-namespace FF.Articles.Backend.Identity.API.Models.Entities;
+﻿namespace FF.Articles.Backend.Identity.API.Models.Entities;
 public class User : BaseEntity
 {
     public string UserAccount { get; set; }

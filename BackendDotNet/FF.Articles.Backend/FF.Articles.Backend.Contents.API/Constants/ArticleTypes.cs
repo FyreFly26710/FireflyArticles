@@ -1,5 +1,3 @@
-using System;
-
 namespace FF.Articles.Backend.Contents.API.Constants;
 
 public static class ArticleTypes

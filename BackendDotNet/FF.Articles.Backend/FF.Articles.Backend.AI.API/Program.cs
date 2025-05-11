@@ -1,6 +1,5 @@
 using FF.Articles.Backend.Common.Extensions;
 using FF.Articles.Backend.Common.Middlewares;
-using FF.Articles.Backend.ServiceDefaults;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -27,7 +26,6 @@ builder.Services.AddScoped<ISessionService, SessionService>();
 
 builder.AddRabbitMq();
 builder.Services.AddHostedService<GenerateArticleConsumer>();
-
 
 // Stores
 

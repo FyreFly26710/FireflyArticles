@@ -1,5 +1,3 @@
-using System;
-using FF.Articles.Backend.Contents.API.Models.Entities;
 using StackExchange.Redis;
 
 namespace FF.Articles.Backend.Contents.API.Repositories.V2;

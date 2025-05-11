@@ -1,19 +1,10 @@
-using FF.Articles.Backend.Common.ApiDtos;
-using FF.Articles.Backend.Common.Bases;
-using FF.Articles.Backend.Common.Constants;
-using FF.Articles.Backend.Common.Exceptions;
-using FF.Articles.Backend.Common.Utils;
-using FF.Articles.Backend.Identity.API.Infrastructure;
-using FF.Articles.Backend.Identity.API.MapperExtensions.Users;
-using FF.Articles.Backend.Identity.API.Models.Dtos;
-using FF.Articles.Backend.Identity.API.Models.Entities;
-using FF.Articles.Backend.Identity.API.Repositories;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using FF.Articles.Backend.Identity.API.Repositories;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace FF.Articles.Backend.Identity.API.Services;
 

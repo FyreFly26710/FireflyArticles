@@ -1,8 +1,4 @@
-﻿using FF.Articles.Backend.Common.Utils;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Microsoft.EntityFrameworkCore;
-using FF.Articles.Backend.Contents.API.Models.Entities;
-using FF.Articles.Backend.Contents.API.Constants;
+﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace FF.Articles.Backend.Contents.API.Infrastructure;
 public class ContentsDbContext : DbContext

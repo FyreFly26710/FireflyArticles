@@ -1,11 +1,4 @@
-﻿using FF.Articles.Backend.Common.Bases.Interfaces;
-using FF.Articles.Backend.Common.Responses;
-using FF.Articles.Backend.Contents.API.Infrastructure;
-using FF.Articles.Backend.Contents.API.Models.Dtos;
-using FF.Articles.Backend.Contents.API.Models.Entities;
-using FF.Articles.Backend.Contents.API.Models.Requests.Articles;
-
-namespace FF.Articles.Backend.Contents.API.Interfaces.Services;
+﻿namespace FF.Articles.Backend.Contents.API.Interfaces.Services;
 public interface IArticleService : IBaseService<Article>
 {
     Task<ArticleDto> GetArticleDto(Article article);

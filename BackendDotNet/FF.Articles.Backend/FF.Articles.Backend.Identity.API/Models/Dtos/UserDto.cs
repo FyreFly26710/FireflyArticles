@@ -1,5 +1,3 @@
-using System;
-
 namespace FF.Articles.Backend.Identity.API.Models.Dtos;
 
 /// <summary>

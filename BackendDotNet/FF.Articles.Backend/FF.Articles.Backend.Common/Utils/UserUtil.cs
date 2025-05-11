@@ -1,16 +1,4 @@
-﻿using FF.Articles.Backend.Common.ApiDtos;
-using FF.Articles.Backend.Common.Exceptions;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Security.Claims;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
+﻿using FF.Articles.Backend.Common.Exceptions;
 
 namespace FF.Articles.Backend.Common.Utils;
 

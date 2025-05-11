@@ -1,9 +1,7 @@
-using System;
-using FF.Articles.Backend.RabbitMQ.Base;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
+using FF.Articles.Backend.Common.RabbitMQ;
 using Microsoft.Extensions.Hosting;
-namespace FF.Articles.Backend.RabbitMQ;
+
+namespace FF.Articles.Backend.Common.Extensions;
 
 public static class RegistrationExtensions
 {

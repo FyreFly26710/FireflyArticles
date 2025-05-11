@@ -1,6 +1,3 @@
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
-
 public interface IUnitOfWork<TContext>
     where TContext : DbContext
 {

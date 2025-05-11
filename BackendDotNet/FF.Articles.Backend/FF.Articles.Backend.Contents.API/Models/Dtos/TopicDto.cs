@@ -1,6 +1,4 @@
-﻿using FF.Articles.Backend.Common.ApiDtos;
-
-namespace FF.Articles.Backend.Contents.API.Models.Dtos;
+﻿namespace FF.Articles.Backend.Contents.API.Models.Dtos;
 public class TopicDto
 {
     public long TopicId { get; set; }

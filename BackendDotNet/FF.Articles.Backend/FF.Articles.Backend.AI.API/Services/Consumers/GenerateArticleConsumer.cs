@@ -1,4 +1,3 @@
-using FF.Articles.Backend.RabbitMQ.Helpers;
 using RabbitMQ.Client;
 
 namespace FF.Articles.Backend.AI.API.Services.Consumers;

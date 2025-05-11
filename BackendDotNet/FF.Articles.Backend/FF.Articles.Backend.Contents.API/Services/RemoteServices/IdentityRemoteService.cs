@@ -1,10 +1,4 @@
-﻿using FF.Articles.Backend.Common.ApiDtos;
-using FF.Articles.Backend.Common.Constants;
-using FF.Articles.Backend.Common.Exceptions;
-using FF.Articles.Backend.Common.Responses;
-using FF.Articles.Backend.Contents.API.Interfaces.Services.RemoteServices;
-
-namespace FF.Articles.Backend.Contents.API.Services.RemoteServices;
+﻿namespace FF.Articles.Backend.Contents.API.Services.RemoteServices;
 public class IdentityRemoteService : IIdentityRemoteService
 {
     private readonly HttpClient _httpClient;

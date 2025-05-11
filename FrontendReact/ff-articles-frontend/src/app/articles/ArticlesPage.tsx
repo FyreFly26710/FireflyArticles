@@ -19,34 +19,34 @@ import { apiTagGetAll } from "@/api/contents/api/tag";
 const ArticlesPage = async () => {
     try {
         // Fetch initial articles with server-side rendering
-        const articlesResponse = await apiArticleGetByPage({
-            PageNumber: 1,
-            PageSize: 10,
-            IncludeUser: true,
-            DisplaySubArticles: true,
-            SortByRelevance: true,
-        });
+        // const articlesResponse = await apiArticleGetByPage({
+        //     PageNumber: 1,
+        //     PageSize: 10,
+        //     IncludeUser: true,
+        //     DisplaySubArticles: true,
+        //     SortByRelevance: true,
+        // });
 
-        const articles = articlesResponse.data?.data || [];
-        const totalCount = articlesResponse.data?.counts || 0;
+        // const articles = articlesResponse.data?.data || [];
+        // const totalCount = articlesResponse.data?.counts || 0;
 
-        const topicsResponse = await apiTopicGetByPage({
-            PageNumber: 1,
-            PageSize: 100,
-            OnlyCategoryTopic: true,
-        });
+        // const topicsResponse = await apiTopicGetByPage({
+        //     PageNumber: 1,
+        //     PageSize: 100,
+        //     OnlyCategoryTopic: true,
+        // });
 
-        const topics = topicsResponse.data?.data || [];
-        const topicsByCategory = getTopicsByCategory(topics);
+        // const topics = topicsResponse.data?.data || [];
+        // const topicsByCategory = getTopicsByCategory(topics);
 
-        const tagsResponse = await apiTagGetAll();
-        const tags = tagsResponse.data || [];
+        // const tagsResponse = await apiTagGetAll();
+        // const tags = tagsResponse.data || [];
         
         
         return (
             <div className="max-width-content">                
                 <Suspense fallback={<div>Loading filters...</div>}>
-                    <ClientArticles initialArticles={articles} totalCount={totalCount} />
+                    <ClientArticles />
                 </Suspense>
             </div>
         );

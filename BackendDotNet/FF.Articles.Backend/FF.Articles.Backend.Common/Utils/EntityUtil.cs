@@ -1,6 +1,3 @@
-using System.Security.Principal;
-using FF.Articles.Backend.Common.Bases;
-
 namespace FF.Articles.Backend.Common.Utils;
 
 // Consider using Guid instead, or maintain max id in redis.
@@ -21,7 +18,7 @@ public static class EntityUtil
     private const long MaxSequence = (1L << SequenceBits) - 1;
     private static long _lastTimestamp = -1L;
     private static long _sequence = 0L;
-    private static long _machineId = 1L; 
+    private static long _machineId = 1L;
 
     private static readonly object _lock = new object();
     public static long GenerateSnowflakeId()

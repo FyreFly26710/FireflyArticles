@@ -1,7 +1,5 @@
-using System;
 using System.Net.Http.Headers;
 using System.Text.Json;
-using FF.Articles.Backend.Identity.API.Models.OAuth;
 
 namespace FF.Articles.Backend.Identity.API.Services;
 

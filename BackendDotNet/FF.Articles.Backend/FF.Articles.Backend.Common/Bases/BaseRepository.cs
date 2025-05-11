@@ -1,12 +1,5 @@
-
-
-using FF.Articles.Backend.Common.Bases.Interfaces;
-using FF.Articles.Backend.Common.Constants;
-using FF.Articles.Backend.Common.Responses;
-using FF.Articles.Backend.Common.Utils;
-using Microsoft.EntityFrameworkCore;
-
 namespace FF.Articles.Backend.Common.Bases;
+
 public abstract class BaseRepository<TEntity, TContext>
     : IBaseRepository<TEntity, TContext>
     where TEntity : BaseEntity

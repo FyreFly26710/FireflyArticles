@@ -1,6 +1,4 @@
-﻿using FF.Articles.Backend.Common.Bases;
-
-namespace FF.Articles.Backend.Contents.API.Models.Entities;
+﻿namespace FF.Articles.Backend.Contents.API.Models.Entities;
 /// <summary>
 /// Ignore BaseEntity optional columns
 /// </summary>

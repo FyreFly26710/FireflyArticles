@@ -1,8 +1,3 @@
-using FF.Articles.Backend.Common.Utils;
-using FF.Articles.Backend.Contents.API.Models.Dtos;
-using FF.Articles.Backend.Contents.API.Models.Entities;
-using FF.Articles.Backend.Contents.API.Models.Requests.Articles;
-
 namespace FF.Articles.Backend.Contents.API.MapperExtensions;
 public static class ArticleExtensions
 {

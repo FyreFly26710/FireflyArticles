@@ -1,6 +1,4 @@
-﻿using FF.Articles.Backend.Contents.API.Constants;
-
-namespace FF.Articles.Backend.Contents.API.Models.Requests.Topics;
+﻿namespace FF.Articles.Backend.Contents.API.Models.Requests.Topics;
 public class TopicAddRequest
 {
     public long? Id { get; set; }

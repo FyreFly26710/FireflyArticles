@@ -18,10 +18,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="../FF.Articles.Backend.RabbitMQ/FF.Articles.Backend.RabbitMQ.csproj" />
 	  <ProjectReference Include="..\FF.AI.Common\FF.AI.Common.csproj" />
 	  <ProjectReference Include="..\FF.Articles.Backend.Common\FF.Articles.Backend.Common.csproj" />
-	  <ProjectReference Include="..\FF.Articles.Backend.ServiceDefaults\FF.Articles.Backend.ServiceDefaults.csproj" />
 	</ItemGroup>
 
 </Project>

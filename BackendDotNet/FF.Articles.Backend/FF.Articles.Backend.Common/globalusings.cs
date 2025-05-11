@@ -1,0 +1,19 @@
+global using Microsoft.AspNetCore.Http;
+global using Microsoft.EntityFrameworkCore;
+global using Microsoft.Extensions.DependencyInjection;
+global using Microsoft.Extensions.Logging;
+global using StackExchange.Redis;
+global using System.Text.Json;
+global using RabbitMQ.Client;
+global using RabbitMQ.Client.Events;
+
+global using FF.Articles.Backend.Common.ApiDtos;
+global using FF.Articles.Backend.Common.BackgoundJobs;
+global using FF.Articles.Backend.Common.Bases;
+global using FF.Articles.Backend.Common.Bases.Interfaces;
+global using FF.Articles.Backend.Common.Constants;
+global using FF.Articles.Backend.Common.Responses;
+global using FF.Articles.Backend.Common.Utils;
+global using Microsoft.AspNetCore.Authentication.Cookies;
+global using Microsoft.AspNetCore.Authentication.JwtBearer;
+global using Microsoft.AspNetCore.Builder;

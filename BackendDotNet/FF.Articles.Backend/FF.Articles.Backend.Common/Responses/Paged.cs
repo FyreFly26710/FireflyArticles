@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace FF.Articles.Backend.Common.Responses;
+﻿namespace FF.Articles.Backend.Common.Responses;
 
 public class Paged<T> where T : class
 {
@@ -18,7 +12,7 @@ public class Paged<T> where T : class
     public Paged() { Data = new List<T>(); }
 
     public Paged(int pageIndex, int pageSize, int count, List<T> data)
-    { 
+    {
         PageIndex = pageIndex;
         PageSize = pageSize;
         Counts = count;
@@ -41,6 +35,6 @@ public class Paged<T> where T : class
         Counts = pageInfo.count;
         Data = data;
     }
-    public (int pageIndex, int pageSize, int count) GetPageInfo()=>(PageIndex, PageSize, Counts);
+    public (int pageIndex, int pageSize, int count) GetPageInfo() => (PageIndex, PageSize, Counts);
 
 }

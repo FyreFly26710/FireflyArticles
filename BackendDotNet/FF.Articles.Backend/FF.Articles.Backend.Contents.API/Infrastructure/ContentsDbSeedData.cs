@@ -1,7 +1,3 @@
-using System;
-using FF.Articles.Backend.Contents.API.Models.Entities;
-using FF.Articles.Backend.Contents.API.Constants;
-
 namespace FF.Articles.Backend.Contents.API.Infrastructure;
 
 public static class ContentsDbSeedData

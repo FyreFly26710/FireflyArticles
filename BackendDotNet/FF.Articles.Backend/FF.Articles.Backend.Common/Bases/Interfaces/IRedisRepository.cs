@@ -1,8 +1,3 @@
-using System;
-using FF.Articles.Backend.Common.BackgoundJobs;
-using FF.Articles.Backend.Common.Responses;
-using StackExchange.Redis;
-
 namespace FF.Articles.Backend.Common.Bases.Interfaces;
 
 public interface IRedisRepository<TEntity> where TEntity : BaseEntity

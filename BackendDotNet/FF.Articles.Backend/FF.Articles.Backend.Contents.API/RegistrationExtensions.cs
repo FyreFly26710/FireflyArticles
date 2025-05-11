@@ -1,16 +1,8 @@
-﻿using FF.Articles.Backend.Contents.API.ElasticSearch;
-using FF.Articles.Backend.Contents.API.Interfaces.Repositories.V1;
-using FF.Articles.Backend.Contents.API.Interfaces.Repositories.V2;
-using FF.Articles.Backend.Contents.API.Interfaces.Services;
-using FF.Articles.Backend.Contents.API.Interfaces.Services.RemoteServices;
-using FF.Articles.Backend.Contents.API.Repositories.V1;
+﻿using FF.Articles.Backend.Contents.API.Repositories.V1;
 using FF.Articles.Backend.Contents.API.Repositories.V2;
 using FF.Articles.Backend.Contents.API.Services.RemoteServices;
-using FF.Articles.Backend.Contents.API.UnitOfWork;
 using FF.Articles.Backend.Contents.API.Validators.Articles;
-using FluentValidation;
 using FluentValidation.AspNetCore;
-using Microsoft.EntityFrameworkCore.Internal;
 using Nest;
 
 namespace FF.Articles.Backend.Contents.API

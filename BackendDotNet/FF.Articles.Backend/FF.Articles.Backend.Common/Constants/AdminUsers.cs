@@ -1,5 +1,3 @@
-using FF.Articles.Backend.Common.ApiDtos;
-
 namespace FF.Articles.Backend.Common.Constants;
 
 public static class AdminUsers

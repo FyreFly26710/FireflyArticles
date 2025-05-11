@@ -1,14 +1,5 @@
-﻿using FF.Articles.Backend.Common.Utils;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-
-namespace FF.Articles.Backend.ServiceDefaults;
-public static class ProgramExtensions
+﻿namespace FF.Articles.Backend.Common.Extensions;
+public static class ServiceDefaultsExtensions
 {
     public static WebApplicationBuilder AddServiceDefaults(this WebApplicationBuilder builder)
     {

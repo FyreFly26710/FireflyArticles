@@ -1,6 +1,4 @@
-﻿using FF.Articles.Backend.Contents.API.Constants;
-
-namespace FF.Articles.Backend.Contents.API.Models.Requests.Articles;
+﻿namespace FF.Articles.Backend.Contents.API.Models.Requests.Articles;
 public class ArticleEditRequest
 {
     public long ArticleId { get; set; }

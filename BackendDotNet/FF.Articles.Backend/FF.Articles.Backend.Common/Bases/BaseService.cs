@@ -1,10 +1,4 @@
-﻿using FF.Articles.Backend.Common.Bases.Interfaces;
-using FF.Articles.Backend.Common.Constants;
-using FF.Articles.Backend.Common.Responses;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-
-namespace FF.Articles.Backend.Common.Bases;
+﻿namespace FF.Articles.Backend.Common.Bases;
 public abstract class BaseService<TEntity, TContext>
     : IBaseService<TEntity>
     where TEntity : BaseEntity

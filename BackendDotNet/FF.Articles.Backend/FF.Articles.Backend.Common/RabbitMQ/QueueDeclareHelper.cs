@@ -1,9 +1,6 @@
-using System;
 using System.Text;
-using RabbitMQ.Client;
-using RabbitMQ.Client.Events;
 
-namespace FF.Articles.Backend.RabbitMQ.Helpers;
+namespace FF.Articles.Backend.Common.RabbitMQ;
 
 public class QueueDeclareHelper
 {

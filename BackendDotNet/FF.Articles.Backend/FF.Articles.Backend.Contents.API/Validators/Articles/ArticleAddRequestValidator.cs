@@ -1,8 +1,3 @@
-using FF.Articles.Backend.Contents.API.Constants;
-using FF.Articles.Backend.Contents.API.Models.Requests.Articles;
-using FluentValidation;
-using System;
-
 namespace FF.Articles.Backend.Contents.API.Validators.Articles;
 
 public class ArticleAddRequestValidator : AbstractValidator<ArticleAddRequest>

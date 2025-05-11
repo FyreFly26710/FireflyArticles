@@ -1,10 +1,6 @@
-using FF.Articles.Backend.Common.Middlewares;
-using FF.Articles.Backend.Identity.API.Infrastructure;
-using FF.Articles.Backend.Identity.API.Repositories;
-using FF.Articles.Backend.Identity.API.Services;
-using FF.Articles.Backend.ServiceDefaults;
-using Microsoft.EntityFrameworkCore;
 using FF.Articles.Backend.Common.Extensions;
+using FF.Articles.Backend.Common.Middlewares;
+using FF.Articles.Backend.Identity.API.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;

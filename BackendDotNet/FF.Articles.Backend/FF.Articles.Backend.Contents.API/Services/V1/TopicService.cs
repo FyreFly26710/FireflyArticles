@@ -1,17 +1,4 @@
-﻿using FF.Articles.Backend.Common.Bases;
-using FF.Articles.Backend.Common.Exceptions;
-using FF.Articles.Backend.Contents.API.Constants;
-using FF.Articles.Backend.Contents.API.Infrastructure;
-using FF.Articles.Backend.Contents.API.Interfaces.Repositories.V1;
-using FF.Articles.Backend.Contents.API.Interfaces.Services;
-using FF.Articles.Backend.Contents.API.Interfaces.Services.RemoteServices;
-using FF.Articles.Backend.Contents.API.MapperExtensions;
-using FF.Articles.Backend.Contents.API.Models.Dtos;
-using FF.Articles.Backend.Contents.API.Models.Entities;
-using FF.Articles.Backend.Contents.API.Models.Requests.Topics;
-using FF.Articles.Backend.Contents.API.UnitOfWork;
-using Microsoft.EntityFrameworkCore;
-namespace FF.Articles.Backend.Contents.API.Services.V1;
+﻿namespace FF.Articles.Backend.Contents.API.Services.V1;
 public class TopicService : BaseService<Topic, ContentsDbContext>, ITopicService
 {
     private readonly ITopicRepository _topicRepository;

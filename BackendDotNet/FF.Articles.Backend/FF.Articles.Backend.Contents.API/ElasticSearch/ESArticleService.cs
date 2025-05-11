@@ -1,5 +1,3 @@
-using FF.Articles.Backend.Common.Responses;
-using FF.Articles.Backend.Contents.API.Models.Entities;
 using Nest;
 
 namespace FF.Articles.Backend.Contents.API.ElasticSearch;

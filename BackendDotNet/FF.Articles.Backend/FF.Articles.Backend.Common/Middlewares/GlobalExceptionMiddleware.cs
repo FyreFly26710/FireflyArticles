@@ -1,10 +1,7 @@
-using FF.Articles.Backend.Common.Exceptions;
-using FF.Articles.Backend.Common.Responses;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
 using System.Diagnostics;
-using System.Text.Json;
 using System.Text.Json.Serialization;
+using FF.Articles.Backend.Common.Exceptions;
+using Microsoft.AspNetCore.Http;
 
 namespace FF.Articles.Backend.Common.Middlewares
 {

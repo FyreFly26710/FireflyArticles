@@ -32,5 +32,4 @@ global using FF.Articles.Backend.Common.Exceptions;
 global using FF.Articles.Backend.Common.Responses;
 global using FF.Articles.Backend.Common.Utils;
 
-global using FF.Articles.Backend.RabbitMQ;
-global using FF.Articles.Backend.RabbitMQ.Base;
+global using FF.Articles.Backend.Common.RabbitMQ;

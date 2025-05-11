@@ -1,8 +1,3 @@
-using FF.Articles.Backend.Contents.API.Models.Dtos;
-using FF.Articles.Backend.Contents.API.Models.Entities;
-using FF.Articles.Backend.Contents.API.Models.Requests.Articles;
-using FF.Articles.Backend.Contents.API.Models.Requests.Topics;
-
 namespace FF.Articles.Backend.Contents.API.MapperExtensions;
 public static class TopicExtensions
 {

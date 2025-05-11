@@ -1,7 +1,3 @@
-using System;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using FF.Articles.Backend.Common.BackgoundJobs;
 using static FF.Articles.Backend.Common.BackgoundJobs.MigrationWorker;
 namespace FF.Articles.Backend.Common.Extensions;
 

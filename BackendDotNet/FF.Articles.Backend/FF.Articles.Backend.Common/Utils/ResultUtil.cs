@@ -1,12 +1,4 @@
-﻿using FF.Articles.Backend.Common.Exceptions;
-using FF.Articles.Backend.Common.Responses;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace FF.Articles.Backend.Common.Utils;
+﻿namespace FF.Articles.Backend.Common.Utils;
 
 /// <summary>
 /// Return result util class

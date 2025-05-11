@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace FF.Articles.Backend.Common.Constants;
+﻿namespace FF.Articles.Backend.Common.Constants;
 public static class RemoteApiUrlConstant
 {
     /// <summary>

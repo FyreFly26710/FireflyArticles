@@ -1,13 +1,6 @@
-using System;
-using System.Text;
-using System.Text.Json;
-using RabbitMQ.Client;
-using RabbitMQ.Client.Events;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using FF.Articles.Backend.RabbitMQ.Helpers;
-namespace FF.Articles.Backend.RabbitMQ.Base;
+
+namespace FF.Articles.Backend.Common.RabbitMQ;
 
 public abstract class BaseConsumer : BackgroundService
 {

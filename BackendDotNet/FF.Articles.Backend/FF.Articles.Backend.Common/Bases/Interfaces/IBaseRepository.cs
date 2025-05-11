@@ -1,7 +1,5 @@
-using FF.Articles.Backend.Common.Responses;
-using Microsoft.EntityFrameworkCore;
-
 namespace FF.Articles.Backend.Common.Bases.Interfaces;
+
 public interface IBaseRepository<TEntity, TContext>
     where TEntity : BaseEntity
     where TContext : DbContext

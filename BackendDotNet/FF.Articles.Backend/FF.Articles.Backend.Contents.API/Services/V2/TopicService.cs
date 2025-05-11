@@ -1,11 +1,3 @@
-using FF.Articles.Backend.Common.Bases;
-using FF.Articles.Backend.Contents.API.Interfaces.Repositories.V2;
-using FF.Articles.Backend.Contents.API.Interfaces.Services;
-using FF.Articles.Backend.Contents.API.Interfaces.Services.RemoteServices;
-using FF.Articles.Backend.Contents.API.Models.Dtos;
-using FF.Articles.Backend.Contents.API.Models.Entities;
-using FF.Articles.Backend.Contents.API.Models.Requests.Topics;
-
 namespace FF.Articles.Backend.Contents.API.Services.V2;
 
 public class TopicService : RedisService<Topic>, ITopicService

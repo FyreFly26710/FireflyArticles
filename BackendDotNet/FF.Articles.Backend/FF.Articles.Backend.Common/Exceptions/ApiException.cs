@@ -1,8 +1,5 @@
 ﻿namespace FF.Articles.Backend.Common.Exceptions;
 
-using System;
-using System.Collections.Generic;
-
 public class ApiException : Exception
 {
     public int Code { get; }

@@ -1,8 +1,3 @@
-using System;
-using FF.Articles.Backend.Contents.API.Interfaces.Repositories.V1;
-using FF.Articles.Backend.Contents.API.Models.Entities;
-using Microsoft.EntityFrameworkCore;
-
 namespace FF.Articles.Backend.Contents.API.ElasticSearch;
 
 public class ElasticsearchSyncService

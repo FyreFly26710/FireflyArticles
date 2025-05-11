@@ -1,14 +1,4 @@
-﻿using FF.Articles.Backend.Common.Exceptions;
-using FF.Articles.Backend.Common.Responses;
-using FF.Articles.Backend.Common.Utils;
-using FF.Articles.Backend.Identity.API.MapperExtensions.Users;
-using FF.Articles.Backend.Identity.API.Models.Dtos;
-using FF.Articles.Backend.Identity.API.Models.Requests;
-using FF.Articles.Backend.Identity.API.Services;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-
-namespace FF.Articles.Backend.Identity.API.Controllers;
+﻿namespace FF.Articles.Backend.Identity.API.Controllers;
 
 /// <summary>
 /// Authentication funcaional API

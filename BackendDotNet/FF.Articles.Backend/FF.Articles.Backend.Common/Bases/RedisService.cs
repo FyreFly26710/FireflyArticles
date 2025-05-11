@@ -1,8 +1,3 @@
-using System;
-using FF.Articles.Backend.Common.Bases.Interfaces;
-using FF.Articles.Backend.Common.Responses;
-using Microsoft.Extensions.Logging;
-
 namespace FF.Articles.Backend.Common.Bases;
 
 public class RedisService<TEntity> : IBaseService<TEntity>

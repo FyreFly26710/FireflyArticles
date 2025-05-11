@@ -6,12 +6,8 @@ import dynamic from "next/dynamic";
 const ArticleFilters = dynamic(() => import("@/components/articles/ArticleFilters"), { ssr: false });
 const ArticleTable = dynamic(() => import("@/components/articles/ArticleTable"), { ssr: false });
 
-interface ClientArticlesProps {
-    initialArticles: API.ArticleDto[];
-    totalCount: number;
-}
 
-export default function ClientArticles({ initialArticles, totalCount }: ClientArticlesProps) {
+export default function ClientArticles() {
     const {
         articles,
         loading,
@@ -28,18 +24,6 @@ export default function ClientArticles({ initialArticles, totalCount }: ClientAr
         removeTopicFilter,
         removeTagFilter,
     } = useArticleTable();
-
-    // Initialize with server-rendered data
-    // useEffect(() => {
-    //     if (initialArticles.length > 0 && articles.length === 0) {
-    //         const articleState = {
-    //             articles: initialArticles,
-    //             loading: false,
-    //             total: totalCount,
-    //         };
-    //         // We can't directly update state here, but the hook will show initialArticles on first render
-    //     }
-    // }, [initialArticles, totalCount, articles]);
 
     return (
         <div>
@@ -59,7 +43,7 @@ export default function ClientArticles({ initialArticles, totalCount }: ClientAr
             <ArticleTable
                 articles={articles}
                 loading={loading}
-                total={total > 0 ? total : totalCount}
+                total={total}
                 pageNumber={pageNumber}
                 pageSize={pageSize}
                 onPageChange={handlePageChange}

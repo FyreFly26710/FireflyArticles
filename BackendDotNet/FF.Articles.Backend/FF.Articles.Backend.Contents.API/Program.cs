@@ -1,11 +1,7 @@
+using FF.Articles.Backend.Common.Extensions;
 using FF.Articles.Backend.Common.Middlewares;
 using FF.Articles.Backend.Contents.API;
-using FF.Articles.Backend.Contents.API.Infrastructure;
-using FF.Articles.Backend.ServiceDefaults;
-using Microsoft.EntityFrameworkCore;
-using FF.Articles.Backend.Common.Extensions;
 using FF.Articles.Backend.Contents.API.MqConsumers;
-using FF.Articles.Backend.RabbitMQ;
 using FluentValidation.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);

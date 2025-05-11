@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace FF.Articles.Backend.Common.Bases;
+﻿namespace FF.Articles.Backend.Common.Bases;
 
 public abstract class BaseEntity
 {

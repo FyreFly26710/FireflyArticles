@@ -1,19 +1,12 @@
-﻿using System.Text;
+﻿using System.Security.Claims;
+using System.Text;
 using FF.Articles.Backend.Common.Exceptions;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using System.Security.Claims;
-using System.Collections.Generic;
-using System.Linq;
 
-namespace FF.Articles.Backend.ServiceDefaults;
+namespace FF.Articles.Backend.Common.Extensions;
 public static class AuthenticationExtensions
 {
     public static WebApplicationBuilder AddCookieAuth(this WebApplicationBuilder builder)

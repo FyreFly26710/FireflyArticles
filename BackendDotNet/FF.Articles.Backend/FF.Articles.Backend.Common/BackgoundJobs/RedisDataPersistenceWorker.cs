@@ -1,9 +1,4 @@
-using System;
-using System.Text.Json;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using StackExchange.Redis;
 
 namespace FF.Articles.Backend.Common.BackgoundJobs;
 

@@ -1,13 +1,6 @@
 ﻿using FF.Articles.Backend.Common.BackgoundJobs;
-using FF.Articles.Backend.Common.Bases;
-using FF.Articles.Backend.Common.Responses;
-using FF.Articles.Backend.Contents.API.Constants;
 using FF.Articles.Backend.Contents.API.Interfaces.Repositories.V2;
-using FF.Articles.Backend.Contents.API.Models.Entities;
-using FF.Articles.Backend.Contents.API.Models.Requests.Articles;
-using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
-using System.Text.Json;
 
 namespace FF.Articles.Backend.Contents.API.Repositories.V2
 {

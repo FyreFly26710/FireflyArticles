@@ -1,8 +1,4 @@
-﻿using FF.Articles.Backend.Common.Utils;
-using FF.Articles.Backend.Identity.API.Models.Entities;
-using Microsoft.EntityFrameworkCore;
-
-namespace FF.Articles.Backend.Identity.API.Infrastructure;
+﻿namespace FF.Articles.Backend.Identity.API.Infrastructure;
 public class IdentityDbContext : DbContext
 {
     public DbSet<User> Users { get; set; }

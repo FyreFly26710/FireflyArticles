@@ -1,6 +1,3 @@
-using FF.Articles.Backend.Contents.API.Models.Dtos;
-using FF.Articles.Backend.Contents.API.Models.Entities;
-
 namespace FF.Articles.Backend.Contents.API.MapperExtensions;
 public static class TagExtensions
 {

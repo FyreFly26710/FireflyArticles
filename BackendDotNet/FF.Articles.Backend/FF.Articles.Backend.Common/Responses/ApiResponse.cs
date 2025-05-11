@@ -1,6 +1,4 @@
-﻿using FF.Articles.Backend.Common.Exceptions;
-
-namespace FF.Articles.Backend.Common.Responses;
+﻿namespace FF.Articles.Backend.Common.Responses;
 /// <summary>
 /// All api should return this response
 /// </summary>

@@ -1,13 +1,3 @@
-using FF.Articles.Backend.Common.Constants;
-using FF.Articles.Backend.Common.Exceptions;
-using FF.Articles.Backend.Common.Responses;
-using FF.Articles.Backend.Common.Utils;
-using FF.Articles.Backend.Contents.API.Interfaces.Services;
-using FF.Articles.Backend.Contents.API.Models.Dtos;
-using FF.Articles.Backend.Contents.API.Models.Requests.Articles;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-
 namespace FF.Articles.Backend.Contents.API.Controllers;
 
 public abstract class ArticleControllerBase : ControllerBase

@@ -1,10 +1,6 @@
-using System;
 using System.Text;
-using System.Text.Json;
-using FF.Articles.Backend.RabbitMQ.Helpers;
-using RabbitMQ.Client;
 
-namespace FF.Articles.Backend.RabbitMQ.Base;
+namespace FF.Articles.Backend.Common.RabbitMQ;
 
 public interface IRabbitMqPublisher
 {

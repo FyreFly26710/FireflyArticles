@@ -1,5 +1,3 @@
-using System;
-
 namespace FF.Articles.Backend.Contents.API.Constants;
 
 public static class TopicCategories
@@ -12,5 +10,5 @@ public static class TopicCategories
     public const string CloudDevOps = "Cloud Computing & DevOps";
     public const string MobileDevelopment = "Mobile Development";
     public const string Other = "Other";
-    
+
 }

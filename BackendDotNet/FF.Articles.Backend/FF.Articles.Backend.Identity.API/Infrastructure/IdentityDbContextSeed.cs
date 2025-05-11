@@ -1,9 +1,5 @@
-﻿using FF.Articles.Backend.Common.Constants;
-using FF.Articles.Backend.Identity.API.Models.Entities;
-using Microsoft.EntityFrameworkCore;
+﻿using FF.Articles.Backend.Common.BackgoundJobs;
 using Npgsql;
-using FF.Articles.Backend.Common.BackgoundJobs;
-using FF.Articles.Backend.Common.ApiDtos;
 
 namespace FF.Articles.Backend.Identity.API.Infrastructure
 {

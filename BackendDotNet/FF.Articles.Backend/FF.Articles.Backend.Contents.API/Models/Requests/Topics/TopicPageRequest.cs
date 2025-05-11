@@ -1,6 +1,4 @@
-﻿using FF.Articles.Backend.Common.Responses;
-
-namespace FF.Articles.Backend.Contents.API.Models.Requests.Topics
+﻿namespace FF.Articles.Backend.Contents.API.Models.Requests.Topics
 {
     public class TopicQueryRequest : PageRequest
     {

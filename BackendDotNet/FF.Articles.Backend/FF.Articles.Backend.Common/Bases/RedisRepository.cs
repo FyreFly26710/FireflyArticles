@@ -1,12 +1,3 @@
-using System;
-using System.Text.Json;
-using FF.Articles.Backend.Common.BackgoundJobs;
-using FF.Articles.Backend.Common.Bases.Interfaces;
-using FF.Articles.Backend.Common.Responses;
-using FF.Articles.Backend.Common.Utils;
-using Microsoft.Extensions.Logging;
-using StackExchange.Redis;
-
 namespace FF.Articles.Backend.Common.Bases;
 public abstract class RedisRepository<TEntity> : IRedisRepository<TEntity>
     where TEntity : BaseEntity, new()
@@ -34,7 +25,7 @@ public abstract class RedisRepository<TEntity> : IRedisRepository<TEntity>
     //     long baseId = startId - count + 1;
     //     return (int)baseId;
     // }
-    
+
     public string GetFieldKey(long id) => id.ToString();
     public virtual async Task<bool> ExistsAsync(long id)
     {

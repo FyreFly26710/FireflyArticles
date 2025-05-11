@@ -1,5 +1,3 @@
-using System;
-
 namespace FF.Articles.Backend.Common.BackgoundJobs;
 
 public enum ChangeType

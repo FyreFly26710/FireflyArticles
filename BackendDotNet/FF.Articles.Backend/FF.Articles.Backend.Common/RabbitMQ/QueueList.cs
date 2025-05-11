@@ -1,6 +1,4 @@
-using System;
-
-namespace FF.Articles.Backend.RabbitMQ;
+namespace FF.Articles.Backend.Common.RabbitMQ;
 
 public static class QueueList
 {

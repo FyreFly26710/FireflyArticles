@@ -1,7 +1,3 @@
-using FF.Articles.Backend.Common.ApiDtos;
-using FF.Articles.Backend.Identity.API.Models.Dtos;
-using FF.Articles.Backend.Identity.API.Models.Entities;
-
 namespace FF.Articles.Backend.Identity.API.MapperExtensions.Users;
 public static class UserExtensions
 {

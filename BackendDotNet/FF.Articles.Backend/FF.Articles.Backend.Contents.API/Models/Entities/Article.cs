@@ -1,7 +1,4 @@
-﻿using FF.Articles.Backend.Common.Bases;
-using FF.Articles.Backend.Contents.API.Constants;
-
-namespace FF.Articles.Backend.Contents.API.Models.Entities;
+﻿namespace FF.Articles.Backend.Contents.API.Models.Entities;
 public class Article : BaseEntity
 {
     public string Title { get; set; }

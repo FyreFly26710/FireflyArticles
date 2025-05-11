@@ -1,5 +1,4 @@
-﻿
-using FF.Articles.Backend.Contents.API.Constants;
+﻿using FF.Articles.Backend.Contents.API.Constants;
 
 namespace FF.Articles.Backend.Contents.API.Models.Requests.Articles;
 public class ArticleAddRequest
