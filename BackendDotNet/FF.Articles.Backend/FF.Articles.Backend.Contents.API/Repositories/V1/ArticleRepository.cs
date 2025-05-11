@@ -1,6 +1,5 @@
 using FF.Articles.Backend.Common.Bases;
 using FF.Articles.Backend.Contents.API.Constants;
-using FF.Articles.Backend.Contents.API.ElasticSearch;
 using FF.Articles.Backend.Contents.API.Infrastructure;
 using FF.Articles.Backend.Contents.API.Interfaces.Repositories.V1;
 using FF.Articles.Backend.Contents.API.Models.Entities;
@@ -11,13 +10,6 @@ namespace FF.Articles.Backend.Contents.API.Repositories.V1;
 public class ArticleRepository(ContentsDbContext _context)
     : BaseRepository<Article, ContentsDbContext>(_context), IArticleRepository
 {
-    public IQueryable<Article> BuildTagIdsSearchQuery(List<long> tagIds, IQueryable<Article> query)
-    {
-        return from a in query
-               join at in _context.Set<ArticleTag>() on a.Id equals at.ArticleId
-               where tagIds.Contains(at.TagId)
-               select a;
-    }
 
     public async Task PromoteSubArticlesToArticles(long articleId)
     {
@@ -30,6 +22,7 @@ public class ArticleRepository(ContentsDbContext _context)
             subArticle.ArticleType = ArticleTypes.Article;
             subArticle.UpdateTime = DateTime.UtcNow;
         }
+        await Task.CompletedTask;
         //await SaveChangesAsync();
     }
 
@@ -48,6 +41,7 @@ public class ArticleRepository(ContentsDbContext _context)
         if (!string.IsNullOrEmpty(keyword))
         {
             query = query.Where(x => EF.Functions.ILike(x.Title, $"%{keyword}%"));
+            //|| EF.Functions.ILike(x.Abstract, $"%{keyword}%"));
         }
         if (topicIds != null && topicIds.Count > 0)
         {
@@ -55,7 +49,10 @@ public class ArticleRepository(ContentsDbContext _context)
         }
         if (tagIds != null && tagIds.Count > 0)
         {
-            query = BuildTagIdsSearchQuery(tagIds, query);
+            query = from a in query
+                    join at in _context.Set<ArticleTag>() on a.Id equals at.ArticleId
+                    where tagIds.Contains(at.TagId)
+                    select a;
         }
         return query;
     }

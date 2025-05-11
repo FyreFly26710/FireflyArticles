@@ -24,9 +24,6 @@ namespace FF.Articles.Backend.Contents.API
             RegisteredServices<ITagService, Services.V1.TagService, Services.V2.TagService>(services);
             RegisteredServices<ITopicService, Services.V1.TopicService, Services.V2.TopicService>(services);
 
-            // Elasticsearch services
-            services.AddScoped<IElasticSearchArticleService, ESArticleService>();
-
             // Add HttpClient for IdentityRemoteService
             services.AddHttpClient<IIdentityRemoteService, IdentityRemoteService>();
 
@@ -50,10 +47,6 @@ namespace FF.Articles.Backend.Contents.API
         /// <summary>
         /// Used to register V1(EF with sql) and V2(Redis) services with same interface
         /// </summary>
-        /// <typeparam name="I">Interface</typeparam>
-        /// <typeparam name="S1">V1 Service</typeparam>
-        /// <typeparam name="S2">V2 Service</typeparam>
-        /// <param name="services"></param>
         public static void RegisteredServices<I, S1, S2>(IServiceCollection services)
             where I : class
             where S1 : class, I

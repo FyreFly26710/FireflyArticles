@@ -23,8 +23,7 @@ public class ArticleService(
     IIdentityRemoteService _identityRemoteService,
     IArticleTagRepository _articleTagRepository,
     IContentsUnitOfWork _contentsUnitOfWork,
-    IElasticSearchArticleService _elasticsearchService,
-    ElasticsearchSyncService _elasticsearchSyncService,
+    // IElasticSearchArticleService _elasticsearchService,
     ILogger<ArticleService> _logger) : BaseService<Article, ContentsDbContext>(_articleRepository, _logger), IArticleService
 {
 
@@ -167,14 +166,25 @@ public class ArticleService(
 
     public async Task<Paged<ArticleDto>> GetPagedArticlesByRequest(ArticleQueryRequest pageRequest)
     {
-        var query = _articleRepository.BuildSearchQueryFromRequest(pageRequest);
         Paged<Article> pagedData;
+
+        // Disable elasticsearch, need more testing
         if (pageRequest.SortByRelevance && !string.IsNullOrEmpty(pageRequest.Keyword))
         {
-            pagedData = await _elasticsearchService.SearchArticlesAsync(pageRequest.Keyword, pageRequest.PageSize, pageRequest.PageNumber, pageRequest.TopicIds, pageRequest.TagIds);
+            // List<long>? articleIds = null;
+            // // tagid - articleId is many to many, get all articleIds from tagIds and pass articleIds to elasticsearch
+            // if (pageRequest.TagIds?.Count > 0)
+            // {
+            //     var articleTags = await _articleTagRepository.GetByIdsAsync(pageRequest.TagIds);
+            //     articleIds = articleTags.Select(at => at.ArticleId).Distinct().ToList();
+            // }
+            // pagedData = await _elasticsearchService.SearchArticlesAsync(pageRequest.Keyword, pageRequest.PageSize, pageRequest.PageNumber, pageRequest.TopicIds, articleIds);
+            var query = _articleRepository.BuildSearchQueryFromRequest(pageRequest);
+            pagedData = await _articleRepository.GetPagedFromQueryAsync(query, pageRequest);
         }
         else
         {
+            var query = _articleRepository.BuildSearchQueryFromRequest(pageRequest);
             pagedData = await _articleRepository.GetPagedFromQueryAsync(query, pageRequest);
         }
 

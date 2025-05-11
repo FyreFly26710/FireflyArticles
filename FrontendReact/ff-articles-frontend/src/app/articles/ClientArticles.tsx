@@ -30,16 +30,16 @@ export default function ClientArticles({ initialArticles, totalCount }: ClientAr
     } = useArticleTable();
 
     // Initialize with server-rendered data
-    useEffect(() => {
-        if (initialArticles.length > 0 && articles.length === 0) {
-            const articleState = {
-                articles: initialArticles,
-                loading: false,
-                total: totalCount,
-            };
-            // We can't directly update state here, but the hook will show initialArticles on first render
-        }
-    }, [initialArticles, totalCount, articles]);
+    // useEffect(() => {
+    //     if (initialArticles.length > 0 && articles.length === 0) {
+    //         const articleState = {
+    //             articles: initialArticles,
+    //             loading: false,
+    //             total: totalCount,
+    //         };
+    //         // We can't directly update state here, but the hook will show initialArticles on first render
+    //     }
+    // }, [initialArticles, totalCount, articles]);
 
     return (
         <div>
@@ -57,7 +57,7 @@ export default function ClientArticles({ initialArticles, totalCount }: ClientAr
             />
 
             <ArticleTable
-                articles={articles.length > 0 ? articles : initialArticles}
+                articles={articles}
                 loading={loading}
                 total={total > 0 ? total : totalCount}
                 pageNumber={pageNumber}
