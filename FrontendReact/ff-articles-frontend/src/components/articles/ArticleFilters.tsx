@@ -1,7 +1,8 @@
-import { Card } from 'antd';
+import { Card, Row, Col } from 'antd';
 import TopicSelector from './TopicSelector';
 import TagSelector from './TagSelector';
 import SelectedOptions from './SelectedOptions';
+import SearchBar from './SearchBar';
 
 interface ArticleFiltersProps {
   keyword?: string;
@@ -29,26 +30,34 @@ const ArticleFilters = ({
   onRemoveTag
 }: ArticleFiltersProps) => {
   return (
-    <Card 
-      style={{ marginBottom: '1rem'}} 
+    <Card
+      style={{ marginBottom: '1rem' }}
       bodyStyle={{ paddingBottom: '12px' }}
       className="mb-4"
     >
       <TopicSelector
         onTopicSelect={onTopicChange}
         selectedTopicIds={topicIds}
-        keyword={keyword}
-        onSearch={onSearch}
-        onClearSearch={onClearSearch}
       />
-      
+
       <div className="mt-3 mb-3">
-        <TagSelector
-          onTagSelect={onTagChange}
-          selectedTagIds={tagIds}
-        />
+        <Row gutter={16} align="middle">
+          <Col xs={24} sm={24} md={12} lg={16} xl={16}>
+            <TagSelector
+              onTagSelect={onTagChange}
+              selectedTagIds={tagIds}
+            />
+          </Col>
+          <Col xs={24} sm={24} md={12} lg={8} xl={8} className="mt-2 md:mt-0">
+            <SearchBar
+              onSearch={onSearch}
+              onClear={onClearSearch}
+              initialValue={keyword}
+            />
+          </Col>
+        </Row>
       </div>
-      
+
       <SelectedOptions
         selectedTopicIds={topicIds}
         selectedTagIds={tagIds}

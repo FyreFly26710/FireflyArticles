@@ -11,23 +11,23 @@ interface ArticlesContextType {
   loading: boolean;
   total: number;
   initialTotal: number;
-  
+
   // Topics and Tags data
   topics: API.TopicDto[];
   topicsByCategory: Record<string, API.TopicDto[]>;
   tags: API.TagDto[];
-  
+
   // Pagination
   pageNumber: number;
   pageSize: number;
-  
+
   // Filters
   filters: {
     keyword?: string;
     topicIds?: number[];
     tagIds?: number[];
   };
-  
+
   // Actions
   handleSearch: (keyword: string) => void;
   handleClearSearch: () => void;
@@ -52,15 +52,15 @@ const defaultValue: ArticlesContextType = {
   pageNumber: 1,
   pageSize: 10,
   filters: {},
-  handleSearch: () => {},
-  handleClearSearch: () => {},
-  handleTopicChange: () => {},
-  handleTagChange: () => {},
-  handleClearFilters: () => {},
-  handlePageChange: () => {},
-  removeTopicFilter: () => {},
-  removeTagFilter: () => {},
-  refresh: async () => {},
+  handleSearch: () => { },
+  handleClearSearch: () => { },
+  handleTopicChange: () => { },
+  handleTagChange: () => { },
+  handleClearFilters: () => { },
+  handlePageChange: () => { },
+  removeTopicFilter: () => { },
+  removeTagFilter: () => { },
+  refresh: async () => { },
 };
 
 const ArticlesContext = createContext<ArticlesContextType>(defaultValue);
@@ -101,7 +101,7 @@ export const ArticlesProvider = ({
       const response = await apiArticleGetByPage({
         PageNumber: pageNumber,
         PageSize: pageSize,
-        IncludeUser: true,
+        IncludeUser: false,
         DisplaySubArticles: true,
         Keyword: filters.keyword,
         TopicIds: filters.topicIds,
@@ -157,7 +157,7 @@ export const ArticlesProvider = ({
 
   const removeTopicFilter = (topicId: number) => {
     if (!filters.topicIds) return;
-    
+
     const newTopicIds = filters.topicIds.filter(id => id !== topicId);
     setFilters(prev => ({
       ...prev,
@@ -167,7 +167,7 @@ export const ArticlesProvider = ({
 
   const removeTagFilter = (tagId: number) => {
     if (!filters.tagIds) return;
-    
+
     const newTagIds = filters.tagIds.filter(id => id !== tagId);
     setFilters(prev => ({
       ...prev,

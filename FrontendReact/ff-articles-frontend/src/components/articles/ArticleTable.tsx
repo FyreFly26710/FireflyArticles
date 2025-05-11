@@ -2,7 +2,7 @@ import { Table, Typography, Tag, Space, Avatar } from 'antd';
 import Link from 'next/link';
 import { UserOutlined } from '@ant-design/icons';
 
-const { Text, Title } = Typography;
+const { Text, Title, Paragraph } = Typography;
 
 interface ArticleTableProps {
   articles: API.ArticleDto[];
@@ -29,9 +29,20 @@ const ArticleTable = ({
       render: (_: unknown, record: API.ArticleDto) => (
         <div>
           <Link href={`/topic/${record.topicId}/article/${record.articleId}`}>
-            <Title level={5} className="mb-1 text-blue-600 hover:text-blue-800">
+            <div
+              className="mb-1 text-black hover:text-blue-800"
+              style={{
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                fontWeight: 600,
+                fontSize: '16px',
+                maxWidth: '280px'
+              }}
+              title={record.title || 'Untitled Article'}
+            >
               {record.title || 'Untitled Article'}
-            </Title>
+            </div>
           </Link>
           <Space size={[0, 4]} wrap className="mb-1">
             {record.tags?.map((tag, index) => (
@@ -44,34 +55,26 @@ const ArticleTable = ({
       ),
     },
     {
-        title: 'Description',
-        key: 'abstract',
-        width: 300,
-        render: (_: unknown, record: API.ArticleDto) => (
-            <Text>{record.abstract}</Text>
-        ),
+      title: 'Description',
+      key: 'abstract',
+      width: 300,
+      render: (_: unknown, record: API.ArticleDto) => (
+        <Paragraph
+          ellipsis={{ rows: 2, tooltip: record.abstract }}
+          style={{ marginBottom: 0 }}
+        >
+          {record.abstract}
+        </Paragraph>
+      ),
     },
     {
       title: 'Topic',
       key: 'topic',
-      width: 150,
+      width: 100,
       render: (_: unknown, record: API.ArticleDto) => (
-        <Text>{record.topicTitle || 'Uncategorized'}</Text>
-      ),
-    },
-    {
-      title: 'Author',
-      key: 'author',
-      width: 150,
-      render: (_: unknown, record: API.ArticleDto) => (
-        <Space>
-          <Avatar 
-            size="small" 
-            src={record.user?.userAvatar} 
-            icon={<UserOutlined />} 
-          />
-          <Text>{record.user?.userName || 'Unknown'}</Text>
-        </Space>
+        <Text ellipsis={{ tooltip: record.topicTitle }}>
+          {record.topicTitle || 'Uncategorized'}
+        </Text>
       ),
     },
   ];
@@ -92,6 +95,8 @@ const ArticleTable = ({
         showTotal: (total) => `Total ${total} articles`,
       }}
       size="small"
+      className="table-with-padding"
+      style={{ padding: '8px 16px', background: '#fff', borderRadius: '8px' }}
     />
   );
 };

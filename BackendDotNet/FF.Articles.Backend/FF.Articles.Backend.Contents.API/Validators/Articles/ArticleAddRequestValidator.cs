@@ -6,14 +6,14 @@ public class ArticleAddRequestValidator : AbstractValidator<ArticleAddRequest>
     {
         RuleFor(x => x.Title)
             .NotEmpty().WithMessage("Title is required")
-            .MaximumLength(200).WithMessage("Title cannot exceed 200 characters");
+            .MaximumLength(400).WithMessage("Title cannot exceed 400 characters");
 
         RuleFor(x => x.Content)
             .NotEmpty().WithMessage("Content is required")
-            .MaximumLength(20000).WithMessage("Content cannot exceed 20000 characters");
+            .MaximumLength(80000).WithMessage("Content cannot exceed 80000 characters");
 
         RuleFor(x => x.Abstract)
-            .MaximumLength(800).WithMessage("Abstract cannot exceed 800 characters");
+            .MaximumLength(1000).WithMessage("Abstract cannot exceed 1000 characters");
 
         RuleFor(x => x.ArticleType)
             .NotEmpty().WithMessage("Article type is required")

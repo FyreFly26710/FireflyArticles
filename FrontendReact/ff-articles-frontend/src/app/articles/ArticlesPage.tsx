@@ -13,7 +13,7 @@ const ArticlesPage = async () => {
         const articlesResponse = await apiArticleGetByPage({
             PageNumber: 1,
             PageSize: 10,
-            IncludeUser: true,
+            IncludeUser: false,
             DisplaySubArticles: true,
             SortByRelevance: true,
         });
@@ -32,11 +32,11 @@ const ArticlesPage = async () => {
 
         const tagsResponse = await apiTagGetAll();
         const tags = tagsResponse.data || [];
-        
+
         return (
-            <div className="max-width-content">                
+            <div className="max-width-content">
                 <Suspense fallback={<div>Loading filters...</div>}>
-                    <ArticlesProvider 
+                    <ArticlesProvider
                         initialArticles={articles}
                         initialTotal={totalCount}
                         initialTopics={topics}
