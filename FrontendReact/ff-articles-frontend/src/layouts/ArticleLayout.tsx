@@ -6,7 +6,7 @@ import dynamic from 'next/dynamic';
 import { useParams } from 'next/navigation';
 
 // Dynamically import components to reduce initial bundle size
-const ArticleSider = dynamic(() => import('@/components/topic/ArticleSider'), {
+const ArticleSider = dynamic(() => import('@/components/article/ArticleSider'), {
     loading: () => <div className="h-full w-64 bg-gray-100" />
 });
 

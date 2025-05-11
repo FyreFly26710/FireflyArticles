@@ -63,7 +63,7 @@ const AccessLayout: React.FC<
     if (!canAccess) {
         return <Forbidden />;
     }
-    return <>{children}</>;
+    return <div className="h-full">{children}</div>;
 };
 
 

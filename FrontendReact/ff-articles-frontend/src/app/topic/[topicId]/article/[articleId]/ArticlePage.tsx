@@ -1,6 +1,6 @@
 
 import { apiArticleGetById } from '@/api/contents/api/article';
-import ArticleCard from '@/components/topic/ArticleCard';
+import ArticleCard from '@/components/article/ArticleCard';
 
 export const dynamic = 'force-dynamic';
 

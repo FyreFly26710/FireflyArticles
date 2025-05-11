@@ -16,6 +16,10 @@
         /// Display sub articles as parent articles (flat display)
         /// </summary>
         public bool DisplaySubArticles { get; set; } = false;
+        /// <summary>
+        /// Display topic articles
+        /// </summary>
+        public bool DisplayTopicArticles { get; set; } = false;
 
         public override string? SortField { get; set; } = "SortNumber";
 

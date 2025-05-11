@@ -55,8 +55,10 @@ export default function AppLayout({ children }: Props) {
     if (!mounted) {
         return (
             <div id="appLayout">
-                <div style={{ minHeight: '100vh' }}>
-                    {children}
+                <div style={{ minHeight: '100vh', overflow: 'hidden' }}>
+                    <div className="content-container">
+                        {children}
+                    </div>
                 </div>
             </div>
         );
@@ -86,7 +88,7 @@ export default function AppLayout({ children }: Props) {
 
     return (
         <div id="appLayout">
-            <Layout style={{ minHeight: '100vh' }}>
+            <Layout style={{ minHeight: '100vh', overflow: 'hidden' }}>
                 <Header
                     style={{
                         position: 'fixed',
@@ -126,7 +128,7 @@ export default function AppLayout({ children }: Props) {
                             </Title>
                         </div>
                     </div>
-                    
+
                     <div className="flex flex-1 items-center justify-between ml-4">
                         <Menu
                             mode="horizontal"
@@ -137,9 +139,9 @@ export default function AppLayout({ children }: Props) {
                                 fontSize: '16px',
                             }}
                             items={menuItems}
-                            className="flex-grow overflow-auto"
+                            className="flex-grow"
                         />
-                        
+
                         <div className="flex-shrink-0 ml-2">
                             <Space size={16}>
                                 <a
@@ -212,8 +214,8 @@ export default function AppLayout({ children }: Props) {
                         </div>
                     </div>
                 </Header>
-                <Layout style={{ marginTop: 64 }}>
-                    <Content>
+                <Layout style={{ marginTop: 64, height: 'calc(100vh - 64px)', display: 'flex', flexDirection: 'column' }}>
+                    <Content className="content-container">
                         {children}
                     </Content>
                 </Layout>

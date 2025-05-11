@@ -6,6 +6,7 @@ import InputBox from '@/components/aiChat/InputBox'
 import SessionSidebar from '@/components/aiChat/SessionSidebar'
 import ChatSidebar from '@/components/aiChat/ChatSidebar'
 import { storage, LayoutSettings } from '@/states/localStorage';
+import styles from './AiChatPage.module.css';
 
 export default function AiChatPage() {
   const [layoutSettings, setLayoutSettings] = useState<LayoutSettings>(() => storage.getLayoutSettings());
@@ -44,13 +45,13 @@ export default function AiChatPage() {
   };
 
   return (
-    <div className="h-screen flex overflow-hidden bg-white">
+    <div className={styles.container}>
       {/* Left Sidebar */}
       <SessionSidebar />
 
       {/* Main content area */}
       <main
-        className="flex-1 flex flex-col bg-white transition-all duration-300"
+        className={styles.main}
         style={{
           marginLeft: sidebarWidth,
           marginRight: rightSidebarWidth
@@ -58,38 +59,23 @@ export default function AiChatPage() {
       >
         {/* Chat container - handles positioning of both message list and input */}
         <div
-          className="fixed inset-0 bg-white"
+          className={styles.chatContainer}
           style={{
             top: '64px', // Header height
             left: sidebarWidth,
-            right: rightSidebarWidth,
-            transition: 'all 0.3s'
+            right: rightSidebarWidth
           }}
         >
           {/* Flexbox container for vertical layout */}
-          <div className="relative h-full flex flex-col">
+          <div className={styles.flexContainer}>
             {/* Message list container */}
-            <div
-              className="flex-1 overflow-hidden"
-              style={{ paddingBottom: '140px' }} // Make room for input box
-            >
-              <div className="h-full max-w-4xl mx-auto px-4 w-full">
-                <MessageList />
-              </div>
+            <div className={styles.messageContainer}>
+              <MessageList />
             </div>
 
             {/* Input box container */}
-            <div
-              className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200"
-              style={{
-                height: 'auto',
-                maxHeight: '400px',  // Allow more space for settings panel
-                transition: 'all 0.3s'
-              }}
-            >
-              <div className="h-full max-w-4xl mx-auto px-4 w-full">
-                <InputBox />
-              </div>
+            <div className={styles.inputContainer}>
+              <InputBox />
             </div>
           </div>
         </div>

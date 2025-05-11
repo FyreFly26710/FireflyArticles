@@ -9,21 +9,13 @@
   padding: 0;
 }
 
-/* 
-*::-webkit-scrollbar {
-  display: none;
-}
-
-* {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-} */
 
 /* Custom utility classes */
 .max-width-content {
   max-width: 1200px;
   width: 100%;
   margin: 0 auto;
+  padding: 0 16px;
 }
 
 /* Ant Design overrides */
@@ -34,4 +26,19 @@
 .ant-layout-content {
   margin: 12px !important;
   padding: 8px !important;
+}
+
+/* Body and HTML default behavior */
+html,
+body {
+  overflow: hidden;
+  height: 100%;
+}
+
+/* Content area scrolling */
+.content-container {
+  overflow-y: auto;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }

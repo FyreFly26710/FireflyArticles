@@ -5,15 +5,15 @@ import { useState } from 'react';
 import dynamic from 'next/dynamic';
 
 // Dynamically import components to reduce initial bundle size
-const ArticleHeaderCard = dynamic(() => import('@/components/topic/ArticleHeaderCard'), {
+const ArticleHeaderCard = dynamic(() => import('@/components/article/ArticleHeaderCard'), {
     loading: () => <div className="h-24 w-full bg-gray-100 rounded" />
 });
 
-const ArticleContentCard = dynamic(() => import('@/components/topic/ArticleContentCard'), {
+const ArticleContentCard = dynamic(() => import('@/components/article/ArticleContentCard'), {
     loading: () => <div className="h-96 w-full bg-gray-100 rounded" />
 });
 
-const ArticleButtons = dynamic(() => import('@/components/topic/ArticleButtons'), {
+const ArticleButtons = dynamic(() => import('@/components/article/ArticleButtons'), {
     loading: () => <div />
 });
 

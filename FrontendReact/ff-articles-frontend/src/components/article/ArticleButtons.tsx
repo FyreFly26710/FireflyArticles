@@ -29,10 +29,13 @@ const ArticleButtons = ({ topicId, onEditModal }: ArticleButtonsProps) => {
   };
 
   const handleScrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
+    const contentContainer = document.querySelector('.content-container');
+    if (contentContainer) {
+      contentContainer.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }
   };
 
   // Don't show buttons if no topicId

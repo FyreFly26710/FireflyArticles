@@ -1,6 +1,6 @@
 import { apiTopicGetById } from '@/api/contents/api/topic';
 import { apiArticleGetById } from '@/api/contents/api/article';
-import ArticleCard from '@/components/topic/ArticleCard';
+import ArticleCard from '@/components/article/ArticleCard';
 
 // Set revalidation and dynamic rendering options
 export const dynamic = 'force-dynamic'; // Options: 'auto' | 'force-dynamic' | 'error' | 'force-static'

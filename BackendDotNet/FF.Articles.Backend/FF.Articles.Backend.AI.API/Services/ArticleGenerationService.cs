@@ -21,7 +21,7 @@ public class ArticleGenerationService : IArticleGenerationService
   /// </summary>
   public async Task<string> GenerateArticleListsAsync(ArticleListRequest request, CancellationToken cancellationToken = default)
   {
-    // return mockResponse();
+    //return mockResponse();
     var model = getModel(request.Provider);
     var chatRequest = new ChatRequest
     {
@@ -118,7 +118,6 @@ public class ArticleGenerationService : IArticleGenerationService
   {
     var article = request.ToArticleApiUpsertRequest("Generating content...");
     long id = EntityUtil.GenerateSnowflakeId();
-    _logger.LogInformation("AI: Begin to dispatch article generation: {title}", request.Title);
     request.Id = id;
     article.Id = id;
     article.UserId = AdminUsers.SYSTEM_ADMIN_DEEPSEEK.UserId;

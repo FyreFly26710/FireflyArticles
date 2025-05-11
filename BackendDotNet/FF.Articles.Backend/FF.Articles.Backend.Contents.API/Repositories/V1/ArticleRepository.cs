@@ -24,12 +24,19 @@ public class ArticleRepository(ContentsDbContext _context)
         List<long>? topicIds = request.TopicIds;
         var tagIds = request.TagIds;
         var displaySubArticles = request.DisplaySubArticles;
+        var displayTopicArticles = request.DisplayTopicArticles;
 
         var query = GetQueryable();
-        if (!displaySubArticles)
+        List<string> articleTypes = [ArticleTypes.Article];
+        if (displaySubArticles)
         {
-            query = query.Where(x => x.ArticleType == ArticleTypes.Article);
+            articleTypes.Add(ArticleTypes.SubArticle);
         }
+        if (displayTopicArticles)
+        {
+            articleTypes.Add(ArticleTypes.TopicArticle);
+        }
+        query = query.Where(x => articleTypes.Contains(x.ArticleType));
         if (!string.IsNullOrEmpty(keyword))
         {
             query = query.Where(x => EF.Functions.ILike(x.Title, $"%{keyword}%"));

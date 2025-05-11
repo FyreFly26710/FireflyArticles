@@ -19,7 +19,7 @@ const TopicsPage = async () => {
         const topicsByCategory = getTopicsByCategory(topicsData);
 
         return (
-            <div className="max-width-content">
+            <div className="max-width-content flex-grow">
                 <CategoryTopics
                     topicsByCategory={topicsByCategory}
                 />
@@ -28,7 +28,7 @@ const TopicsPage = async () => {
     } catch (error) {
         console.error("Failed to fetch topics:", error);
         return (
-            <div className="error-container">
+            <div className="error-container flex-grow flex items-center justify-center">
                 <h2>Error loading topics</h2>
                 <p>Something went wrong while fetching topics. Please try again later.</p>
             </div>

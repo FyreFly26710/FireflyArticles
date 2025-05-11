@@ -19,7 +19,7 @@ const CategoryTopics: React.FC<CategoryTopicsProps> = ({ topicsByCategory }) => 
     }
 
     return (
-        <div style={{ padding: '0 8px' }}>
+        <div>
             {categories.map((category) => (
                 <div key={category} className="mb-8">
                     <Divider orientation="left">{category}</Divider>
