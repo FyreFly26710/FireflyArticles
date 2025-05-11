@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Tag, Button, Space } from 'antd';
-import { apiTopicGetById } from '@/api/contents/api/topic';
-import { apiTagGetById } from '@/api/contents/api/tag';
+import { useArticlesContext } from '@/states/ArticlesContext';
 
 interface SelectedOptionsProps {
   selectedTopicIds?: number[];
@@ -18,74 +17,30 @@ const SelectedOptions = ({
   onRemoveTag,
   onClearAll
 }: SelectedOptionsProps) => {
+  const { topics, tags } = useArticlesContext();
   const [topicNames, setTopicNames] = useState<Record<number, string>>({});
   const [tagNames, setTagNames] = useState<Record<number, string>>({});
-  const [loading, setLoading] = useState(false);
 
+  // Prepare topic and tag names from context data instead of API calls
   useEffect(() => {
-    const fetchNames = async () => {
-      if (selectedTopicIds.length === 0 && selectedTagIds.length === 0) return;
-      
-      setLoading(true);
-      
-      try {
-        // Fetch topics
-        const topicPromises = selectedTopicIds.map(async (id) => {
-          try {
-            const response = await apiTopicGetById({ id });
-            if (response?.data?.title) {
-              return { id, name: response.data.title };
-            }
-            return null;
-          } catch (error) {
-            console.error(`Failed to fetch topic ${id}:`, error);
-            return null;
-          }
-        });
-
-        // Fetch tags
-        const tagPromises = selectedTagIds.map(async (id) => {
-          try {
-            const response = await apiTagGetById({ id });
-            if (response?.data?.tagName) {
-              return { id, name: response.data.tagName };
-            }
-            return null;
-          } catch (error) {
-            console.error(`Failed to fetch tag ${id}:`, error);
-            return null;
-          }
-        });
-
-        const topicResults = await Promise.all(topicPromises);
-        const tagResults = await Promise.all(tagPromises);
-
-        const newTopicNames: Record<number, string> = {};
-        const newTagNames: Record<number, string> = {};
-
-        topicResults.forEach(result => {
-          if (result) {
-            newTopicNames[result.id] = result.name;
-          }
-        });
-
-        tagResults.forEach(result => {
-          if (result) {
-            newTagNames[result.id] = result.name;
-          }
-        });
-
-        setTopicNames(newTopicNames);
-        setTagNames(newTagNames);
-      } catch (error) {
-        console.error("Failed to fetch filter names:", error);
-      } finally {
-        setLoading(false);
+    // Map topic IDs to names
+    const newTopicNames: Record<number, string> = {};
+    topics.forEach(topic => {
+      if (topic.topicId && selectedTopicIds.includes(topic.topicId)) {
+        newTopicNames[topic.topicId] = topic.title || 'Unknown Topic';
       }
-    };
+    });
+    setTopicNames(newTopicNames);
 
-    fetchNames();
-  }, [selectedTopicIds, selectedTagIds]);
+    // Map tag IDs to names
+    const newTagNames: Record<number, string> = {};
+    tags.forEach(tag => {
+      if (tag.tagId && selectedTagIds.includes(tag.tagId)) {
+        newTagNames[tag.tagId] = tag.tagName || 'Unknown Tag';
+      }
+    });
+    setTagNames(newTagNames);
+  }, [selectedTopicIds, selectedTagIds, topics, tags]);
 
   const noFiltersSelected = selectedTopicIds.length === 0 && selectedTagIds.length === 0;
 
@@ -112,7 +67,7 @@ const SelectedOptions = ({
               className="m-1"
               onClose={() => onRemoveTopic(id)}
             >
-              Topic: {topicNames[id]}
+              Topic: {topicNames[id] || 'Loading...'}
             </Tag>
           ))}
           
@@ -124,7 +79,7 @@ const SelectedOptions = ({
               className="m-1"
               onClose={() => onRemoveTag(id)}
             >
-              Tag: {tagNames[id]}
+              Tag: {tagNames[id] || 'Loading...'}
             </Tag>
           ))}
         </Space>

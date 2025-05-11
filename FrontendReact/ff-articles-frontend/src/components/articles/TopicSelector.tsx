@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Tabs, Spin, Empty, List, Row, Col } from 'antd';
-import { apiTopicGetByPage } from '@/api/contents/api/topic';
-import { getTopicsByCategory } from '@/libs/utils/articleUtils';
+import { Tabs, Spin, Empty, List } from 'antd';
+import { useArticlesContext } from '@/states/ArticlesContext';
 import SearchBar from './SearchBar';
 
 interface TopicSelectorProps {
@@ -19,38 +18,14 @@ const TopicSelector = ({
   onSearch,
   onClearSearch
 }: TopicSelectorProps) => {
-  const [loading, setLoading] = useState(true);
-  const [topicsByCategory, setTopicsByCategory] = useState<Record<string, API.TopicDto[]>>({});
+  const { topicsByCategory } = useArticlesContext();
   const [selectedTopics, setSelectedTopics] = useState<Set<number>>(new Set(selectedTopicIds));
+  const [loading, setLoading] = useState(false);
 
   // Update selectedTopics when selectedTopicIds changes
   useEffect(() => {
     setSelectedTopics(new Set(selectedTopicIds));
   }, [selectedTopicIds]);
-
-  useEffect(() => {
-    const fetchTopics = async () => {
-      try {
-        const response = await apiTopicGetByPage({
-          PageNumber: 1,
-          PageSize: 100,
-          OnlyCategoryTopic: true,
-        });
-
-        if (response.data?.data) {
-          const topicsData = response.data.data || [];
-          const categorizedTopics = getTopicsByCategory(topicsData);
-          setTopicsByCategory(categorizedTopics);
-        }
-      } catch (error) {
-        console.error("Failed to fetch topics:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchTopics();
-  }, []);
 
   const handleTopicClick = (topicId: number) => {
     const updatedSelectedTopics = new Set(selectedTopics);

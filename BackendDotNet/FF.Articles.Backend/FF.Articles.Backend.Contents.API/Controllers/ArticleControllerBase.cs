@@ -21,9 +21,9 @@ public abstract class ArticleControllerBase : ControllerBase
     [HttpGet]
     public async Task<ApiResponse<Paged<ArticleDto>>> GetByPage([FromQuery] ArticleQueryRequest pageRequest)
     {
-        if (pageRequest.PageSize > 30)
+        if (pageRequest.PageSize > 50)
         {
-            pageRequest.PageSize = 30;
+            pageRequest.PageSize = 50;
         }
 
         var pagedArticles = await _articleService.GetPagedArticlesByRequest(pageRequest);

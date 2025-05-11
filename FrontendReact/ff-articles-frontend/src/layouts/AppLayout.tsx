@@ -101,11 +101,10 @@ export default function AppLayout({ children }: Props) {
                         height: 64
                     }}
                 >
-                    <div className="flex items-center">
+                    <div className="flex items-center flex-shrink-0" style={{ minWidth: 'max-content' }}>
                         <div
                             className="flex items-center cursor-pointer"
                             onClick={() => router.push("/")}
-                            style={{ marginRight: '40px' }}
                         >
                             <Image
                                 src="/assets/logo.png"
@@ -119,91 +118,99 @@ export default function AppLayout({ children }: Props) {
                                     margin: 0,
                                     marginLeft: '12px',
                                     color: '#1890ff',
+                                    textWrap: 'nowrap',
                                 }}
+                                className="hidden md:block"
                             >
                                 FireFly Articles
                             </Title>
                         </div>
+                    </div>
+                    
+                    <div className="flex flex-1 items-center justify-between ml-4">
                         <Menu
                             mode="horizontal"
                             selectedKeys={[pathname]}
                             style={{
-                                flex: 1,
-                                minWidth: '700px',
                                 border: 'none',
                                 background: 'transparent',
                                 fontSize: '16px',
                             }}
                             items={menuItems}
+                            className="flex-grow overflow-auto"
                         />
-                    </div>
-                    <Space size="large">
-                        <a
-                            href="https://github.com/FyreFly26710/FireflyArticles"
-                            target="_blank"
-                            style={{
-                                fontSize: '20px',
-                                color: '#1890ff'
-                            }}
-                        >
-                            <GithubFilled />
-                        </a>
-                        {loginUser.id ? (
-                            <Dropdown
-                                menu={{
-                                    items: [
-                                        {
-                                            key: "logout",
-                                            icon: <LogoutOutlined />,
-                                            label: "Logout",
-                                        },
-                                    ],
-                                    onClick: async (event: { key: React.Key }) => {
-                                        const { key } = event;
-                                        if (key === "logout") {
-                                            userLogout();
-                                        }
-                                    },
-                                }}
-                            >
-                                <Space className="cursor-pointer">
-                                    <Avatar
-                                        src={loginUser.userAvatar || "/assets/logo.png"}
-                                        size="default"
-                                        style={{
-                                            border: '1px solid #f0f0f0',
+                        
+                        <div className="flex-shrink-0 ml-2">
+                            <Space size={16}>
+                                <a
+                                    href="https://github.com/FyreFly26710/FireflyArticles"
+                                    target="_blank"
+                                    style={{
+                                        fontSize: '20px',
+                                        color: '#1890ff'
+                                    }}
+                                >
+                                    <GithubFilled />
+                                </a>
+                                {loginUser.id ? (
+                                    <Dropdown
+                                        menu={{
+                                            items: [
+                                                {
+                                                    key: "logout",
+                                                    icon: <LogoutOutlined />,
+                                                    label: "Logout",
+                                                },
+                                            ],
+                                            onClick: async (event: { key: React.Key }) => {
+                                                const { key } = event;
+                                                if (key === "logout") {
+                                                    userLogout();
+                                                }
+                                            },
                                         }}
-                                    />
-                                    <span style={{ fontWeight: '500' }}>
-                                        {loginUser.userName || "Bird"}
-                                    </span>
-                                </Space>
-                            </Dropdown>
-                        ) : (
-                            <Space
-                                className="cursor-pointer"
-                                onClick={() => router.push("/user/login")}
-                                style={{
-                                    background: '#f0f0f0',
-                                    padding: '6px 12px',
-                                    borderRadius: '4px',
-                                    transition: 'all 0.3s',
-                                }}
-                                onMouseEnter={(e) => {
-                                    e.currentTarget.style.background = '#e0e0e0';
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.currentTarget.style.background = '#f0f0f0';
-                                }}
-                            >
-                                <Avatar
-                                    src="/assets/logo.png"
-                                    size="small"
-                                />
-                                <span>Login</span>
+                                    >
+                                        <Space className="cursor-pointer">
+                                            <Avatar
+                                                src={loginUser.userAvatar || "/assets/logo.png"}
+                                                size="default"
+                                                style={{
+                                                    border: '1px solid #f0f0f0',
+                                                }}
+                                            />
+                                            <span style={{ fontWeight: '500', textWrap: 'nowrap' }}>
+                                                {loginUser.userName || "Bird"}
+                                            </span>
+                                        </Space>
+                                    </Dropdown>
+                                ) : (
+                                    <Space
+                                        className="cursor-pointer"
+                                        onClick={() => router.push("/user/login")}
+                                        style={{
+                                            background: 'transparent',
+                                            padding: '0px 12px',
+                                            borderRadius: '4px',
+                                            transition: 'all 0.3s',
+                                            marginRight: '12px',
+                                        }}
+                                        onMouseEnter={(e) => {
+                                            e.currentTarget.style.background = '#e0e0e0';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.currentTarget.style.background = 'transparent';
+                                        }}
+                                    >
+                                        <Avatar
+                                            src="/assets/logo.png"
+                                            size="small"
+                                        />
+                                        <span>Login</span>
+                                    </Space>
+                                )}
                             </Space>
-                        )}
-                    </Space>
+                        </div>
+                    </div>
                 </Header>
                 <Layout style={{ marginTop: 64 }}>
                     <Content>
