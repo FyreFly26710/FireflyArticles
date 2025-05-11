@@ -1,11 +1,3 @@
-using FF.Articles.Backend.AI.API.Interfaces.Services.RemoteServices;
-using FF.Articles.Backend.Common.ApiDtos;
-using FF.Articles.Backend.Common.Constants;
-using FF.Articles.Backend.Common.Exceptions;
-using FF.Articles.Backend.Common.Responses;
-using FF.Articles.Backend.Common.Utils;
-using System.Net.Http.Headers;
-
 namespace FF.Articles.Backend.AI.API.Services.RemoteServices;
 
 public class ContentsApiRemoteService : IContentsApiRemoteService

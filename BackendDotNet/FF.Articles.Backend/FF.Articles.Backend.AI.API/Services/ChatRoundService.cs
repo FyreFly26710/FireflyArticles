@@ -1,25 +1,6 @@
-using FF.Articles.Backend.Common.Bases;
-using FF.Articles.Backend.AI.API.Models.Entities;
-using FF.Articles.Backend.AI.API.Models.Dtos;
-using FF.Articles.Backend.AI.API.Infrastructure;
-using FF.Articles.Backend.AI.API.Interfaces.Services;
-using FF.Articles.Backend.AI.API.Interfaces.Repositories;
-using FF.Articles.Backend.Common.Exceptions;
-using FF.Articles.Backend.Common.Utils;
-using FF.Articles.Backend.Common.ApiDtos;
-using FF.Articles.Backend.AI.API.MapperExtensions;
-using FF.Articles.Backend.AI.API.Interfaces.Services.RemoteServices;
-using System.Diagnostics;
-using System.Text;
-using System.Text.Json;
 using System.Text.Encodings.Web;
-using System.Text.Unicode;
 using System.Text.Json.Serialization;
-using FF.AI.Common.Interfaces;
-using FF.AI.Common.Models;
-using FF.AI.Common.Providers;
-using FF.AI.Common.Constants;
-using FF.Articles.Backend.AI.API.Models.Requests.ChatRounds;
+using System.Text.Unicode;
 
 namespace FF.Articles.Backend.AI.API.Services;
 

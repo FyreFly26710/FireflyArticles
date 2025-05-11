@@ -1,14 +1,5 @@
-using System;
-using System.Text;
-using System.Text.Json;
-using FF.Articles.Backend.AI.API.Interfaces.Services;
-using FF.Articles.Backend.AI.API.Models.Requests.ArticleGenerations;
-using RabbitMQ.Client;
-using FF.Articles.Backend.RabbitMQ;
-using FF.Articles.Backend.AI.API.MapperExtensions;
-using FF.Articles.Backend.RabbitMQ.Base;
 using FF.Articles.Backend.RabbitMQ.Helpers;
-using FF.Articles.Backend.Common.Exceptions;
+using RabbitMQ.Client;
 
 namespace FF.Articles.Backend.AI.API.Services.Consumers;
 

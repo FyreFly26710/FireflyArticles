@@ -1,7 +1,3 @@
-using System.Reflection;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-
 namespace FF.AI.Common.Models.Gemini;
 //https://ai.google.dev/api/caching#Content
 internal class GeminiRequest

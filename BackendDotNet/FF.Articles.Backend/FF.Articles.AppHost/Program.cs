@@ -1,7 +1,3 @@
-using Aspire.Hosting;
-using Aspire.Hosting.Elasticsearch;
-using FF.Articles.AppHost;
-using Microsoft.Extensions.Configuration;
 
 var builder = DistributedApplication.CreateBuilder(args);
 

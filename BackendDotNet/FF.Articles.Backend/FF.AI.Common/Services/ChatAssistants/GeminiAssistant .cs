@@ -1,5 +1,5 @@
-using FF.AI.Common.Models.DeepSeek;
 using FF.AI.Common.Models.Gemini;
+
 namespace FF.AI.Common.Services.ChatAssistants;
 
 public class GeminiAssistant : BaseAssistant, IAssistant<GeminiProvider>

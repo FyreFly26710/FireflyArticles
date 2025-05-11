@@ -1,21 +1,6 @@
-using FF.Articles.Backend.AI;
-using FF.Articles.Backend.AI.API.Infrastructure;
-using FF.Articles.Backend.AI.API.Interfaces.Repositories;
-using FF.Articles.Backend.AI.API.Interfaces.Services;
-using FF.Articles.Backend.AI.API.Interfaces.Services.RemoteServices;
-using FF.Articles.Backend.AI.API.Repositories;
-using FF.Articles.Backend.AI.API.Services;
-using FF.Articles.Backend.AI.API.Services.RemoteServices;
-using FF.Articles.Backend.AI.API.UnitOfWork;
+using FF.Articles.Backend.Common.Extensions;
 using FF.Articles.Backend.Common.Middlewares;
 using FF.Articles.Backend.ServiceDefaults;
-using Microsoft.EntityFrameworkCore;
-using FF.Articles.Backend.Common.Extensions;
-using FF.AI.Common;
-using FF.Articles.Backend.Common.Constants;
-using FF.Articles.Backend.AI.API.Services.Consumers;
-using FF.Articles.Backend.RabbitMQ;
-
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;

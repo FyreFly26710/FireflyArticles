@@ -1,6 +1,3 @@
-using System;
-using FF.Articles.Backend.Common.Bases;
-
 namespace FF.Articles.Backend.AI.API.Models.Entities;
 
 public class SystemMessage : BaseEntity

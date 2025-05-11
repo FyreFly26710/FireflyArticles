@@ -1,6 +1,3 @@
-using System;
-using FF.Articles.Backend.AI.API.Models.Requests.ArticleGenerations;
-
 namespace FF.Articles.Backend.AI.API.Services;
 
 public static class Prompts

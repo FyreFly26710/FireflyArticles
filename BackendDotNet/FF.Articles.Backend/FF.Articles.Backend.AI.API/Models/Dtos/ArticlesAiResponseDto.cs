@@ -1,6 +1,3 @@
-using System;
-using System.Text.Json.Serialization;
-
 namespace FF.Articles.Backend.AI.API.Models.Dtos;
 public class ArticlesAIResponseDto
 {

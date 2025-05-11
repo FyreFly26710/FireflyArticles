@@ -1,7 +1,3 @@
-using FF.Articles.Backend.AI.API.Models.Dtos;
-using FF.Articles.Backend.AI.API.Models.Requests.ArticleGenerations;
-using FF.Articles.Backend.Common.ApiDtos;
-
 namespace FF.Articles.Backend.AI.API.MapperExtensions;
 
 public static class ArticleGenerationExtensions

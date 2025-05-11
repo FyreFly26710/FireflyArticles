@@ -1,10 +1,5 @@
-using FF.Articles.Backend.AI.API.Interfaces.Services;
-using FF.Articles.Backend.AI.API.Models.Dtos;
 using FF.Articles.Backend.AI.API.Models.Requests.Sessions;
-using FF.Articles.Backend.Common.Responses;
-using FF.Articles.Backend.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 
 namespace FF.Articles.Backend.AI.API.Controllers;
 

@@ -1,23 +1,3 @@
-using System;
-using FF.Articles.Backend.AI.API.Interfaces.Services.RemoteServices;
-using System.Text.Json;
-using FF.Articles.Backend.Common.Exceptions;
-using FF.Articles.Backend.Common.ApiDtos;
-using StackExchange.Redis;
-using FF.Articles.Backend.AI.API.Models.Entities;
-using FF.AI.Common.Interfaces;
-using FF.AI.Common.Providers;
-using FF.AI.Common.Models;
-using FF.Articles.Backend.AI.API.Models.Requests.ArticleGenerations;
-using FF.AI.Common.Constants;
-using FF.Articles.Backend.AI.API.Models.Dtos;
-using FF.Articles.Backend.AI.API.Interfaces.Services;
-using FF.Articles.Backend.RabbitMQ;
-using FF.Articles.Backend.AI.API.MapperExtensions;
-using FF.Articles.Backend.Common.Utils;
-using FF.Articles.Backend.Common.Constants;
-using FF.Articles.Backend.RabbitMQ.Base;
-
 namespace FF.Articles.Backend.AI.API.Services;
 
 public class ArticleGenerationService : IArticleGenerationService

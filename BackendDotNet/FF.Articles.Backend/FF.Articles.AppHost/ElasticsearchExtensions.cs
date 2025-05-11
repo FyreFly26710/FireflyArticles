@@ -1,5 +1,3 @@
-using Aspire.Hosting;
-using Aspire.Hosting.Elasticsearch;
 using Microsoft.Extensions.Configuration;
 
 namespace FF.Articles.AppHost;

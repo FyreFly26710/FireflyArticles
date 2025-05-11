@@ -1,8 +1,3 @@
-using FF.AI.Common.Constants;
-using FF.AI.Common.Models;
-using FF.Articles.Backend.AI.API.Models.Dtos;
-using FF.Articles.Backend.AI.API.Models.Entities;
-
 namespace FF.Articles.Backend.AI.API.MapperExtensions;
 
 public static class ChatMessageRequestExtensions
