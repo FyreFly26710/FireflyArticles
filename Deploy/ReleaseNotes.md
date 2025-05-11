@@ -18,6 +18,7 @@
 - Fix:
     - 0.0.61: Fixed dockerfile
     - 0.0.62: Fixed scrollbar and Topic articles
+    - 0.0.63: FIxed ArticleTable
 
 ### Release App Version 0.0.5 (09/05/2025)
 - Overview: Testing release.
