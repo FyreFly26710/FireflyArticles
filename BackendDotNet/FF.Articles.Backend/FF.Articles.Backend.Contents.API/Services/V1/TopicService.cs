@@ -33,6 +33,7 @@ public class TopicService : BaseService<Topic, ContentsDbContext>, ITopicService
                 TopicId = topic.Id,
                 Title = topic.Title,
                 Category = topic.Category,
+                TopicImage = topic.TopicImage ?? "",
             };
             return topicDto;
         }
