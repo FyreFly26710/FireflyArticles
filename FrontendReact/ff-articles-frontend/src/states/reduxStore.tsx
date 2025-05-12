@@ -14,8 +14,6 @@ const loginUserSlice = createSlice({
     },
 });
 
-export const { setLoginUser } = loginUserSlice.actions;
-
 // Edit Article Slice
 interface EditArticleState {
     isEditing: boolean;
@@ -47,7 +45,6 @@ const editArticleSlice = createSlice({
     },
 });
 
-export const { startEditing, updateEditingArticle, cancelEditing } = editArticleSlice.actions;
 
 // Store Configuration
 const store = configureStore({
@@ -57,8 +54,14 @@ const store = configureStore({
     },
 });
 
+
+// Actions
+export const { setLoginUser } = loginUserSlice.actions;
+export const { startEditing, updateEditingArticle, cancelEditing } = editArticleSlice.actions;
+
 // Types
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
 
 export default store;
+

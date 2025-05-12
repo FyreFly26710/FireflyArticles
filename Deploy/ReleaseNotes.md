@@ -1,5 +1,23 @@
 # FireflyArticles Release Notes
- 
+
+### To Do List
+- Backend:
+    - P1: Remove V2 Api
+    - P1: Remove Redis repository
+    - P5: Add Redis for caching or store identity API
+    - P3: Refactor Contents.API to clean archtecture or DDD
+    - P2: Tag: Add tag group, add tag colour
+    - P5: Add quick article generation
+    - P4: Generate Topic Article
+    - P4: Generate existing topic
+- Frontend:
+    - P2: Improve tag selector
+    - P3: Refactor Contexts, use reduxStore + hooks.
+    - P3: Refactor localStorage
+    - P2: Add Tag managemnet
+
+
+
 ### Release App Version 0.0.6 (11/05/2025)
 - Overview: Nearly Ready.
 - Changes:
