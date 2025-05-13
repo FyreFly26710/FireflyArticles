@@ -26,4 +26,6 @@ Deploy/development-note.md
 
 .env
 
+backups/
+
 .DS_Store
