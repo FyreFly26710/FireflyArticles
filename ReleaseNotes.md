@@ -17,7 +17,19 @@
     - P3: Refactor localStorage
     - P4: Add Tag managemnet
 
-
+### Release App Version 0.0.7 (13/05/2025)
+- Overview: Tag Selector Improvements
+- Changes:
+    - Feature:
+        - Added tag group functionality
+        - Improved tag selector UI
+    - Improvements:
+        - Removed V2 API endpoints
+        - Removed Redis repository
+        - Added backup folder to gitignore
+    - Bug fix:
+        - Fixed topic image display
+        - Adjusted article table layout
 
 ### Release App Version 0.0.6 (11/05/2025)
 - Overview: Nearly Ready.
