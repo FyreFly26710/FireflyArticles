@@ -1,9 +1,9 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-COPY *.sln ./
+# COPY *.sln ./
 COPY FF.AI.Common/FF.AI.Common.csproj ./FF.AI.Common/
-COPY FF.Articles.AppHost/FF.Articles.AppHost.csproj ./FF.Articles.AppHost/
+# COPY FF.Articles.AppHost/FF.Articles.AppHost.csproj ./FF.Articles.AppHost/
 COPY FF.Articles.Backend.AI.API/FF.Articles.Backend.AI.API.csproj ./FF.Articles.Backend.AI.API/
 COPY FF.Articles.Backend.Common/FF.Articles.Backend.Common.csproj ./FF.Articles.Backend.Common/
 COPY FF.Articles.Backend.Contents.API/FF.Articles.Backend.Contents.API.csproj ./FF.Articles.Backend.Contents.API/
@@ -12,7 +12,14 @@ COPY FF.Articles.Backend.Identity.API/FF.Articles.Backend.Identity.API.csproj ./
 # COPY FF.Articles.Backend.RabbitMQ/FF.Articles.Backend.RabbitMQ.csproj ./FF.Articles.Backend.RabbitMQ/
 # COPY FF.Articles.Backend.ServiceDefaults/FF.Articles.Backend.ServiceDefaults.csproj ./FF.Articles.Backend.ServiceDefaults/
 
-RUN dotnet restore
+# RUN dotnet restore
+# Restore each project individually
+RUN dotnet restore FF.Articles.Backend.Common/FF.Articles.Backend.Common.csproj
+RUN dotnet restore FF.AI.Common/FF.AI.Common.csproj
+RUN dotnet restore FF.Articles.Backend.AI.API/FF.Articles.Backend.AI.API.csproj
+RUN dotnet restore FF.Articles.Backend.Contents.API/FF.Articles.Backend.Contents.API.csproj
+RUN dotnet restore FF.Articles.Backend.Identity.API/FF.Articles.Backend.Identity.API.csproj
+RUN dotnet restore FF.Articles.Backend.Gateway.API/FF.Articles.Backend.Gateway.API.csproj
 
 # Copy the rest of the application source code
 COPY . .

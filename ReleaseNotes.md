@@ -2,20 +2,17 @@
 
 ### To Do List
 - Backend:
-    - P1: Remove V2 Api ✓
-    - P1: Remove Redis repository ✓
     - P5: Add Redis for caching or store identity API
     - P3: Refactor Contents.API to clean archtecture or DDD
-    - P2: Tag: Add tag group, add tag colour ✓
     - P5: Add quick article generation
     - P4: Generate Topic Article
     - P4: Generate existing topic
     - P4: Fix Ai Gen possible codefence
 - Frontend:
-    - P2: Improve tag selector ✓
     - P3: Refactor Contexts, use reduxStore + hooks.
     - P3: Refactor localStorage
-    - P4: Add Tag managemnet
+    - P2: Add Tag managemnet
+    - P2: Improve Article Table
 
 ### Release App Version 0.0.7 (13/05/2025)
 - Overview: Tag Selector Improvements
