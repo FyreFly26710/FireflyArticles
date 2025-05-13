@@ -7,8 +7,11 @@ using FluentValidation.AspNetCore;
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 builder.AddServiceDefaults();
-
-builder.Services.AddMigration<ContentsDbContext, ContentsDbSeed>();
+if (builder.Environment.IsDevelopment())
+{
+    // Only run migrations in development
+    builder.Services.AddMigration<ContentsDbContext, ContentsDbSeed>();
+}
 
 var connectionString = configuration.GetConnectionString("contentdb") ?? throw new Exception("contentdb connection string not found");
 builder.AddNpgsql<ContentsDbContext>(connectionString);

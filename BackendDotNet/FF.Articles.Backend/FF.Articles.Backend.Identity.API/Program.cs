@@ -15,7 +15,10 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IOAuthService, OAuthService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
-builder.Services.AddMigration<IdentityDbContext, IdentityDbContextSeed>();
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddMigration<IdentityDbContext, IdentityDbContextSeed>();
+}
 
 builder.Services.AddControllers();
 
