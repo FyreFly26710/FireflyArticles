@@ -1,4 +1,4 @@
-namespace FF.Articles.Backend.Contents.API.Interfaces.Repositories.V1;
+namespace FF.Articles.Backend.Contents.API.Interfaces.Repositories;
 public interface ITopicRepository : IBaseRepository<Topic, ContentsDbContext>
 {
 }

@@ -1,15 +1,9 @@
 ﻿namespace FF.Articles.Backend.Contents.API.Services.RemoteServices;
-public class IdentityRemoteService : IIdentityRemoteService
+public class IdentityRemoteService(
+    HttpClient _httpClient,
+    ILogger<IdentityRemoteService> _logger
+) : IIdentityRemoteService
 {
-    private readonly HttpClient _httpClient;
-    private readonly ILogger<IdentityRemoteService> _logger;
-
-    public IdentityRemoteService(HttpClient httpClient, ILogger<IdentityRemoteService> logger)
-    {
-        _httpClient = httpClient;
-        _logger = logger;
-    }
-
     public async Task<UserApiDto?> GetUserByIdAsync(long userId)
     {
         var baseUrl = RemoteApiUrlConstant.GetIdentityBaseUrl();

@@ -1,9 +1,7 @@
-namespace FF.Articles.Backend.Contents.API.Repositories.V1;
-public class TagRepository : BaseRepository<Tag, ContentsDbContext>, ITagRepository
+namespace FF.Articles.Backend.Contents.API.Repositories;
+public class TagRepository(ContentsDbContext _context)
+    : BaseRepository<Tag, ContentsDbContext>(_context), ITagRepository
 {
-    public TagRepository(ContentsDbContext _context) : base(_context)
-    {
-    }
     public async Task<List<Tag>> GetByNamesAsync(List<string> names)
     {
         names = names.Select(n => n.Trim().ToLower()).Distinct().ToList();

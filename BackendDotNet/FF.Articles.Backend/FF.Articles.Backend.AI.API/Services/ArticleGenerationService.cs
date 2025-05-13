@@ -121,8 +121,8 @@ public class ArticleGenerationService : IArticleGenerationService
     request.Id = id;
     article.Id = id;
     article.UserId = AdminUsers.SYSTEM_ADMIN_DEEPSEEK.UserId;
-    await _rabbitMqPublisher.PublishAsync(QueueList.AddArticleQueue, article);
-    await _rabbitMqPublisher.PublishAsync(QueueList.GenerateArticleQueue, request);
+    _rabbitMqPublisher.Publish(QueueList.AddArticleQueue, article);
+    _rabbitMqPublisher.Publish(QueueList.GenerateArticleQueue, request);
     return id;
   }
 

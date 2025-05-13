@@ -1,14 +1,9 @@
 namespace FF.Articles.Backend.Contents.API.Controllers;
 
-public abstract class ArticleControllerBase : ControllerBase
+[ApiController]
+[Route("api/contents/articles")]
+public class ArticleController(IArticleService _articleService) : ControllerBase
 {
-    private readonly IArticleService _articleService;
-    public ArticleControllerBase(Func<string, IArticleService> articleService, string version)
-    {
-        _articleService = articleService(version);
-    }
-
-    #region REST API
     [HttpGet("{id}")]
     public async Task<ApiResponse<ArticleDto>> GetById(long id, [FromQuery] ArticleQueryRequest request)
     {
@@ -70,5 +65,4 @@ public abstract class ArticleControllerBase : ControllerBase
         var result = await _articleService.DeleteArticleById(id);
         return ResultUtil.Success(result);
     }
-    #endregion
 }

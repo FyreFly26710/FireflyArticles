@@ -26,7 +26,7 @@ builder.Services.AddFluentValidation();
 
 builder.Services.AddControllers();
 
-builder.AddCustomApiVersioning();
+builder.AddBasicApi();
 
 //builder.Services.AddElasticsearch(configuration);
 
@@ -48,7 +48,7 @@ var app = builder.Build();
 
 app.UseMiddleware<GlobalExceptionMiddleware>();
 
-app.UseCustomSwagger();
+app.UseBasicSwagger();
 
 app.UseHttpsRedirection();
 

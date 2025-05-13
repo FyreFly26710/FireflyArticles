@@ -1,4 +1,4 @@
-namespace FF.Articles.Backend.Contents.API.Repositories.V1;
+namespace FF.Articles.Backend.Contents.API.Repositories;
 public class ArticleRepository(ContentsDbContext _context)
     : BaseRepository<Article, ContentsDbContext>(_context), IArticleRepository
 {

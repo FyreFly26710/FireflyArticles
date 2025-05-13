@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using System.Text.Json.Serialization;
 using FF.Articles.Backend.Common.Exceptions;
-using Microsoft.AspNetCore.Http;
 
 namespace FF.Articles.Backend.Common.Middlewares
 {
@@ -75,10 +74,4 @@ namespace FF.Articles.Backend.Common.Middlewares
 
     }
 
-    public class ErrorResponse
-    {
-        public int ErrorCode { get; set; }
-        public string Message { get; set; } = string.Empty;
-        public string RequestId { get; set; } = string.Empty;
-    }
 }

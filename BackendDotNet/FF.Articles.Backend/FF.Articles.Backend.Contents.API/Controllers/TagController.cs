@@ -1,12 +1,9 @@
 namespace FF.Articles.Backend.Contents.API.Controllers;
 
-public abstract class TagControllerBase : ControllerBase
+[ApiController]
+[Route("api/contents/tags")]
+public class TagController(ITagService _tagService) : ControllerBase
 {
-    private readonly ITagService _tagService;
-    public TagControllerBase(Func<string, ITagService> tagService, string version)
-    {
-        _tagService = tagService(version);
-    }
     [HttpGet("{id}")]
     public async Task<ApiResponse<TagDto>> GetById(long id)
     {
@@ -18,13 +15,12 @@ public abstract class TagControllerBase : ControllerBase
     [HttpGet]
     public async Task<ApiResponse<List<TagDto>>> GetAll()
     {
-        //var user = UserUtil.GetUserFromHttpRequest(Request);
         var tags = await _tagService.GetAllAsync();
         var tagResponse = tags.Select(t => t.ToDto()).ToList();
         return ResultUtil.Success(tagResponse);
     }
     [HttpPost]
-    //[Authorize(Roles = UserConstant.ADMIN_ROLE)]
+    [Authorize(Roles = UserConstant.ADMIN_ROLE)]
     public async Task<ApiResponse<string>> AddByRequest([FromBody] TagAddRequest tagAddRequest)
     {
         var tag = await _tagService.GetTagByNameAsync(tagAddRequest.TagName);

@@ -4,7 +4,7 @@ namespace FF.Articles.Backend.Common.RabbitMQ;
 
 public interface IRabbitMqPublisher
 {
-    Task PublishAsync<T>(string queueName, T message);
+    void Publish<T>(string queueName, T message);
 }
 public class RabbitMqPublisher : IRabbitMqPublisher
 {
@@ -17,7 +17,7 @@ public class RabbitMqPublisher : IRabbitMqPublisher
         _channel = _connection.CreateModel();
     }
 
-    public async Task PublishAsync<T>(string queueName, T message)
+    public void Publish<T>(string queueName, T message)
     {
         QueueDeclareHelper.DeclareQueues(_channel, queueName);
 

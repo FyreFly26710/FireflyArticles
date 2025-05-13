@@ -1,9 +1,7 @@
-namespace FF.Articles.Backend.Contents.API.Repositories.V1;
-public class ArticleTagRepository : BaseRepository<ArticleTag, ContentsDbContext>, IArticleTagRepository
+namespace FF.Articles.Backend.Contents.API.Repositories;
+public class ArticleTagRepository(ContentsDbContext _context)
+    : BaseRepository<ArticleTag, ContentsDbContext>(_context), IArticleTagRepository
 {
-    public ArticleTagRepository(ContentsDbContext _context) : base(_context)
-    {
-    }
 
     public async Task<List<ArticleTag>> GetByArticleId(long articleId)
     {

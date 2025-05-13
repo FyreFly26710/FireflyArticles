@@ -1,4 +1,4 @@
-namespace FF.Articles.Backend.Contents.API.Interfaces.Repositories.V1;
+namespace FF.Articles.Backend.Contents.API.Interfaces.Repositories;
 public interface IArticleRepository : IBaseRepository<Article, ContentsDbContext>
 {
     public Task PromoteSubArticlesToArticles(long articleId);

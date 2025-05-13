@@ -16,7 +16,7 @@ public static class ApiVersioningExtensions
 
         return builder;
     }
-
+    [Obsolete]
     public static WebApplicationBuilder AddCustomApiVersioning(this WebApplicationBuilder builder)
     {
         // Add API versioning
@@ -106,7 +106,7 @@ public static class ApiVersioningExtensions
         });
         return builder;
     }
-
+    [Obsolete]
     public static WebApplication UseCustomSwagger(this WebApplication app)
     {
         app.UseSwagger();

@@ -1,5 +1,5 @@
 ﻿
-namespace FF.Articles.Backend.Contents.API.Services.V1;
+namespace FF.Articles.Backend.Contents.API.Services;
 public class ArticleService(
     IArticleRepository _articleRepository,
     ITagRepository _tagRepository,

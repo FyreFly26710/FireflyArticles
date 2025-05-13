@@ -1,27 +1,13 @@
-﻿namespace FF.Articles.Backend.Contents.API.Services.V1;
-public class TopicService : BaseService<Topic, ContentsDbContext>, ITopicService
+﻿namespace FF.Articles.Backend.Contents.API.Services;
+public class TopicService(
+    ITopicRepository _topicRepository,
+    IArticleRepository _articleRepository,
+    IArticleService _articleService,
+    IIdentityRemoteService _identityRemoteService,
+    IContentsUnitOfWork _contentsUnitOfWork,
+    ILogger<TopicService> _logger
+) : BaseService<Topic, ContentsDbContext>(_topicRepository, _logger), ITopicService
 {
-    private readonly ITopicRepository _topicRepository;
-    private readonly IArticleRepository _articleRepository;
-    private readonly IArticleService _articleService;
-    private readonly IIdentityRemoteService _identityRemoteService;
-    private readonly IContentsUnitOfWork _contentsUnitOfWork;
-    public TopicService(
-        ITopicRepository topicRepository,
-        IArticleRepository articleRepository,
-        Func<string, IArticleService> articleService,
-        IIdentityRemoteService identityRemoteService,
-        IContentsUnitOfWork contentsUnitOfWork,
-        ILogger<TopicService> logger
-    )
-    : base(topicRepository, logger)
-    {
-        _topicRepository = topicRepository;
-        _articleRepository = articleRepository;
-        _articleService = articleService("v1");
-        _identityRemoteService = identityRemoteService;
-        _contentsUnitOfWork = contentsUnitOfWork;
-    }
     public async Task<TopicDto> GetTopicDto(Topic topic) => await GetTopicDto(topic, new TopicQueryRequest());
     public async Task<TopicDto> GetTopicDto(Topic topic, TopicQueryRequest topicRequest)
     {

@@ -111,7 +111,7 @@ public class GenerateArticleConsumer : BaseConsumer
             var newRequest = generateRequest.ToArticleApiUpsertRequest(articleContent);
 
             var rabbitMqPublisher = scope.ServiceProvider.GetRequiredService<IRabbitMqPublisher>();
-            await rabbitMqPublisher.PublishAsync(QueueList.ArticleReadyQueue, newRequest);
+            rabbitMqPublisher.Publish(QueueList.ArticleReadyQueue, newRequest);
         }
     }
 
