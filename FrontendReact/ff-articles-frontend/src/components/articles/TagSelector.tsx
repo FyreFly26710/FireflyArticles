@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import { Select, Space, Typography, Row, Col } from 'antd';
 import { useArticlesContext } from '@/states/ArticlesContext';
 
@@ -9,7 +8,6 @@ interface TagSelectorProps {
 
 const TagSelector = ({ onTagSelect, selectedTagIds = [] }: TagSelectorProps) => {
   const { tags } = useArticlesContext();
-  const [loading, setLoading] = useState(false);
 
   // Group tags by tagGroup
   const groupedTags = tags.reduce((acc, tag) => {
@@ -43,30 +41,28 @@ const TagSelector = ({ onTagSelect, selectedTagIds = [] }: TagSelectorProps) => 
     // Combine new selections with existing selections from other groups
     const otherGroupSelections = selectedTagIds.filter(id => otherGroupTags.includes(id));
     const newSelections = [...otherGroupSelections, ...newGroupSelections];
-    
+
     onTagSelect(newSelections);
   };
 
   // Convert grouped tags to array for easier mapping
-  const groupEntries = Object.entries(groupedTags);
 
   return (
     <Space direction="vertical" style={{ width: '100%' }}>
       <Row gutter={[16, 16]}>
-        {groupEntries.map(([group, groupTags]) => (
+        {Object.entries(groupedTags).map(([group, groupTags]) => (
           <Col key={group} span={4.8}>
             <Space direction="vertical" style={{ width: '100%' }}>
               <Typography.Text strong>{group}</Typography.Text>
               <Select
                 mode="multiple"
-                value={selectedTagIds.filter(id => 
+                value={selectedTagIds.filter(id =>
                   groupTags.some(tag => tag.tagId === id)
                 )}
                 onChange={(value) => handleChange(value, group)}
                 style={{ width: '100%', minWidth: '200px' }}
-                loading={loading}
-                disabled={loading}
                 optionFilterProp="label"
+                placeholder="Select tags"
                 options={[
                   { label: 'All', value: -1 },
                   ...groupTags.map(tag => ({

@@ -77,7 +77,7 @@ public static class Prompts
     TagRules;
 
     private static string TagRules = """
-    Tags list (exactly four/five, following the same order):
+    Tags list (following the same order,exactly four/five tags, you can omit Tech Stack/Language if not applicable):
     1. **Skill Level**: Beginner / Advanced / Expert / General  
     2. **Focus Area**: (choose one relevant to the article, e.g. "API Design," "Performance Optimization," "Testing")  
     3. **Tech Stack/Language**: (e.g. ORM," "JavaScript," "Kubernetes"; only when applicable, if not applicable, leave blank)  
@@ -97,7 +97,7 @@ public static class Prompts
     - **Tech Stack/Language**  
     → Write all code samples, configuration snippets, and idiomatic examples in this stack.  
     → Follow its best practices and naming conventions.
-    → If not applicable, leave blank.
+    → Optional, if not applicable, leave blank.
 
     - **Article Style**  
     • Overview → broad survey with high-level descriptions.  

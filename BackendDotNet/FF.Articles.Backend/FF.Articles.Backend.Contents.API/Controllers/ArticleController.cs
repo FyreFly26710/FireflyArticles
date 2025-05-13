@@ -33,13 +33,13 @@ public class ArticleController(IArticleService _articleService) : ControllerBase
         return ResultUtil.Success(articleId);
     }
 
-    [HttpPost("batch")]
-    [Authorize(Roles = UserConstant.ADMIN_ROLE)]
-    public async Task<ApiResponse<Dictionary<long, string>>> AddBatchByRequest([FromBody] List<ArticleAddRequest> articleAddRequests)
-    {
-        var result = await _articleService.CreateBatchAsync(articleAddRequests, UserUtil.GetUserId(Request));
-        return ResultUtil.Success(result);
-    }
+    // [HttpPost("batch")]
+    // [Authorize(Roles = UserConstant.ADMIN_ROLE)]
+    // public async Task<ApiResponse<Dictionary<long, string>>> AddBatchByRequest([FromBody] List<ArticleAddRequest> articleAddRequests)
+    // {
+    //     var result = await _articleService.CreateBatchAsync(articleAddRequests, UserUtil.GetUserId(Request));
+    //     return ResultUtil.Success(result);
+    // }
 
     [HttpPut]
     [Authorize(Roles = UserConstant.ADMIN_ROLE)]

@@ -198,32 +198,28 @@ public class ArticleService(
     /// <summary>
     /// Create articles and return a dictionary of article id and title
     /// </summary>
-    public async Task<Dictionary<long, string>> CreateBatchAsync(List<ArticleAddRequest> articleAddRequests, long userId)
-    {
-        var result = await _contentsUnitOfWork.ExecuteInTransactionAsync(async () =>
-        {
-            var articles = articleAddRequests.Select(request => request.ToEntity(userId)).ToList();
-            articles = await _articleRepository.CreateBatchAsync(articles);
-            // todo: add tags
-            var tagNames = articleAddRequests.SelectMany(r => r.Tags)
-                .Select(t => t.ToLower().Trim())
-                .Where(t => !string.IsNullOrEmpty(t))
-                .Distinct()
-                .ToList();
-            var tagIds = (await _tagRepository.GetOrCreateByNamesAsync(tagNames)).Select(t => t.Id).ToList();
-            foreach (var article in articles)
-            {
-                await _articleTagRepository.EditArticleTags(article.Id, tagIds);
-            }
-            return articles.ToDictionary(a => a.Id, a => a.Title);
-        });
-        return result;
-    }
-    /// <summary>
-    /// Todo: This method cannot handle high volume requests.
-    /// Duplicate tags will be created for each article.
-    /// Need to use Redis.
-    /// </summary>
+    // public async Task<Dictionary<long, string>> CreateBatchAsync(List<ArticleAddRequest> articleAddRequests, long userId)
+    // {
+    //     var result = await _contentsUnitOfWork.ExecuteInTransactionAsync(async () =>
+    //     {
+    //         var articles = articleAddRequests.Select(request => request.ToEntity(userId)).ToList();
+    //         articles = await _articleRepository.CreateBatchAsync(articles);
+    //         // todo: add tags
+    //         var tagNames = articleAddRequests.SelectMany(r => r.Tags)
+    //             .Select(t => t.ToLower().Trim())
+    //             .Where(t => !string.IsNullOrEmpty(t))
+    //             .Distinct()
+    //             .ToList();
+    //         var tagIds = (await _tagRepository.GetOrCreateByNamesAsync(tagNames)).Select(t => t.Id).ToList();
+    //         foreach (var article in articles)
+    //         {
+    //             await _articleTagRepository.EditArticleTags(article.Id, tagIds);
+    //         }
+    //         return articles.ToDictionary(a => a.Id, a => a.Title);
+    //     });
+    //     return result;
+    // }
+
     public async Task<long> CreateByRequest(ArticleAddRequest articleAddRequest, long userId)
     {
         var entity = articleAddRequest.ToEntity(userId);
