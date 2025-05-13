@@ -2,14 +2,15 @@
 
 ### To Do List
 - Backend:
-    - P1: Remove V2 Api
-    - P1: Remove Redis repository
+    - P1: Remove V2 Api ✓
+    - P1: Remove Redis repository ✓
     - P5: Add Redis for caching or store identity API
     - P3: Refactor Contents.API to clean archtecture or DDD
-    - P2: Tag: Add tag group, add tag colour
+    - P2: Tag: Add tag group, add tag colour ✓
     - P5: Add quick article generation
     - P4: Generate Topic Article
     - P4: Generate existing topic
+    - P4: Fix Ai Gen possible codefence
 - Frontend:
     - P2: Improve tag selector
     - P3: Refactor Contexts, use reduxStore + hooks.

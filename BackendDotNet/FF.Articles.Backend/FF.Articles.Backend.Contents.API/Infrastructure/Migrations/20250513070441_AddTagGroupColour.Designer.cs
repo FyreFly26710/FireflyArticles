@@ -3,6 +3,7 @@ using System;
 using FF.Articles.Backend.Contents.API.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FF.Articles.Backend.Contents.API.Infrastructure.Migrations
 {
     [DbContext(typeof(ContentsDbContext))]
-    partial class ContentsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250513070441_AddTagGroupColour")]
+    partial class AddTagGroupColour
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

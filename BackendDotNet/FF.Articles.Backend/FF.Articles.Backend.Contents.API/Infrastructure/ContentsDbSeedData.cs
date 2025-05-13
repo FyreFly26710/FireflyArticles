@@ -6,18 +6,25 @@ public static class ContentsDbSeedData
     {
         return new List<Tag>
         {
-            new Tag { Id = 1, TagName = "Programming" },
-            new Tag { Id = 2, TagName = "Web Development" },
-            new Tag { Id = 3, TagName = "Database" },
-            new Tag { Id = 4, TagName = "Design Patterns" },
-            new Tag { Id = 5, TagName = "Testing" },
-            new Tag { Id = 6, TagName = "Performance" },
-            new Tag { Id = 7, TagName = "Security" },
-            new Tag { Id = 8, TagName = "Architecture" },
-            new Tag { Id = 9, TagName = "Best Practices" },
-            new Tag { Id = 10, TagName = "Tutorial" }
+            new Tag { Id = 1, TagName = "Beginner", TagGroup="Skill Level"},
+            new Tag { Id = 2, TagName = "Advanced", TagGroup="Skill Level"},
+            new Tag { Id = 3, TagName = "Expert", TagGroup="Skill Level"},
+            new Tag { Id = 4, TagName = "General", TagGroup="Skill Level"},
+            new Tag { Id = 5, TagName = "Overview", TagGroup="Article Style"},
+            new Tag { Id = 6, TagName = "Deep-dive", TagGroup="Article Style"},
+            new Tag { Id = 7, TagName = "Best-practices", TagGroup="Article Style"},
+            new Tag { Id = 8, TagName = "Listicle", TagGroup="Article Style"},
+            new Tag { Id = 9, TagName = "Q&A", TagGroup="Article Style"},
+            new Tag { Id = 10, TagName = "Comparison", TagGroup="Article Style"},
+            new Tag { Id = 11, TagName = "Conversational", TagGroup="Tone"},
+            new Tag { Id = 12, TagName = "Academic", TagGroup="Tone"},
+            new Tag { Id = 13, TagName = "Technical", TagGroup="Tone"},
+            new Tag { Id = 14, TagName = "Code-heavy", TagGroup="Tone"},
+            new Tag { Id = 15, TagName = "Performance Optimization", TagGroup="Focus Area"},
+            new Tag { Id = 16, TagName = "C#", TagGroup="Tech Stack/Language"},
         };
     }
+
 
     public static List<Topic> GetTopics()
     {

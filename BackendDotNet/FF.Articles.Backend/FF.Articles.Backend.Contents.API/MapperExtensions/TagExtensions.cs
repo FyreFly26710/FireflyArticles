@@ -6,7 +6,9 @@ public static class TagExtensions
         var tagDto = new TagDto
         {
             TagId = tag.Id,
-            TagName = tag.TagName
+            TagName = tag.TagName,
+            TagGroup = tag.TagGroup,
+            TagColour = tag.TagColour
         };
         return tagDto;
     }

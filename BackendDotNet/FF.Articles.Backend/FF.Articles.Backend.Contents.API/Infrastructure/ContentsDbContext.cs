@@ -73,6 +73,8 @@ public class ContentsDbContext : DbContext
         {
             entity.ToTable("Tag");
             entity.Property(e => e.TagName).HasMaxLength(64).IsRequired();
+            entity.Property(e => e.TagGroup).HasMaxLength(128);
+            entity.Property(e => e.TagColour).HasMaxLength(128);
         });
     }
     private void ConfigureArticleTag(ModelBuilder modelBuilder)

@@ -17,7 +17,7 @@ var rabbitMqPassword = builder.AddParameter("rabbitmqPassword", secret: false);
 var rabbitMq = builder.AddRabbitMQ("rabbitmq", rabbitMqUsername, rabbitMqPassword)
     .WithLifetime(ContainerLifetime.Persistent)
     .WithManagementPlugin(15673)
-    .WithVolume("rabbitmq-data", "/data")
+    .WithVolume("rabbitmq-data", "/rabbitmqdata")
     .WithEndpoint("tcp", e =>
     {
         e.Port = 5673;
@@ -27,6 +27,7 @@ var rabbitMq = builder.AddRabbitMQ("rabbitmq", rabbitMqUsername, rabbitMqPasswor
 var username = builder.AddParameter("username", secret: false);
 var password = builder.AddParameter("password", secret: false);
 // Default 5432, set to 5433 to avoid port conflicts
+// Todo, data is not yet persisted
 var postgres = builder.AddPostgres("postgres", username, password)
     .WithImage("postgres")
     .WithImageTag("15")
@@ -38,7 +39,7 @@ var postgres = builder.AddPostgres("postgres", username, password)
     })
     .WithEnvironment("POSTGRES_USER", username)
     .WithEnvironment("POSTGRES_PASSWORD", password)
-    .WithVolume("postgres-data", "/data")
+    .WithVolume("postgres-data", "/pgsqldata")
     .WithPgWeb(pgweb => pgweb.WithHostPort(5050));
 
 // Todo: these databases are not created by apphost, need to create them manually

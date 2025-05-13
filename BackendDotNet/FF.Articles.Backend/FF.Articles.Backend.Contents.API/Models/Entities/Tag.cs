@@ -5,4 +5,6 @@
 public class Tag : BaseEntity
 {
     public string TagName { get; set; }
+    public string? TagGroup { get; set; }
+    public string? TagColour { get; set; }
 }
