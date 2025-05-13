@@ -34,7 +34,17 @@ public static class ContentsDbSeedData
             new Topic { Id = 200, Title = "Advanced Java", Abstract = "Advanced Java topics", Category = "Java", UserId = 1, SortNumber = 2, IsHidden = 0 },
             new Topic { Id = 300, Title = "C# Basics", Abstract = "C# fundamentals", Category = "C#", UserId = 1, SortNumber = 3, IsHidden = 0 },
             new Topic { Id = 400, Title = "C# Advanced", Abstract = "Advanced C# topics", Category = "C#", UserId = 1, SortNumber = 4, IsHidden = 0 },
-            new Topic { Id = 500, Title = "Cross-Platform Development", Abstract = "Cross-platform development", Category = "C#", UserId = 1, SortNumber = 5, IsHidden = 0 }
+            new Topic { Id = 500, Title = "Cross-Platform Development", Abstract = "Cross-platform development", Category = "C#", UserId = 1, SortNumber = 5, IsHidden = 0 },
+            new Topic { Id = 600, Title = "Test1", Abstract = "Test1", Category = "TestCategory1", UserId = 1, SortNumber = 1, IsHidden = 0 },
+            new Topic { Id = 700, Title = "Test2", Abstract = "Test2", Category = "TestCategory2", UserId = 1, SortNumber = 1, IsHidden = 0 },
+            new Topic { Id = 800, Title = "Test3", Abstract = "Test3", Category = "TestCategory3", UserId = 1, SortNumber = 1, IsHidden = 0 },
+            new Topic { Id = 900, Title = "Test4", Abstract = "Test4", Category = "TestCategory4", UserId = 1, SortNumber = 1, IsHidden = 0 },
+            new Topic { Id = 1000, Title = "Test5", Abstract = "Test5", Category = "TestCategory5", UserId = 1, SortNumber = 1, IsHidden = 0 },
+            new Topic { Id = 1100, Title = "Test6", Abstract = "Test6", Category = "TestCategory6", UserId = 1, SortNumber = 1, IsHidden = 0 },
+            new Topic { Id = 1200, Title = "Test7", Abstract = "Test7", Category = "TestCategory7", UserId = 1, SortNumber = 1, IsHidden = 0 },
+            new Topic { Id = 1300, Title = "Test8", Abstract = "Test8", Category = "TestCategory8", UserId = 1, SortNumber = 1, IsHidden = 0 },
+            new Topic { Id = 1400, Title = "Test9", Abstract = "Test9", Category = "TestCategory9", UserId = 1, SortNumber = 1, IsHidden = 0 },
+            new Topic { Id = 1500, Title = "Test10", Abstract = "Test10", Category = "TestCategory10", UserId = 1, SortNumber = 1, IsHidden = 0 }
         };
     }
     public static List<Article> GetTopicArticles()

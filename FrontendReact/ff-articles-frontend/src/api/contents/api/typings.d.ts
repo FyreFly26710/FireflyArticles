@@ -142,6 +142,8 @@ declare namespace API {
   type TagDto = {
     tagId?: number;
     tagName?: string;
+    tagGroup?: string;
+    tagColour?: string;
   };
 
   type TagDtoApiResponse = {

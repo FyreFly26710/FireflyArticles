@@ -12,10 +12,10 @@
     - P4: Generate existing topic
     - P4: Fix Ai Gen possible codefence
 - Frontend:
-    - P2: Improve tag selector
+    - P2: Improve tag selector ✓
     - P3: Refactor Contexts, use reduxStore + hooks.
     - P3: Refactor localStorage
-    - P2: Add Tag managemnet
+    - P4: Add Tag managemnet
 
 
 
