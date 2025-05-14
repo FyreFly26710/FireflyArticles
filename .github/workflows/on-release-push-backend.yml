@@ -106,6 +106,10 @@ jobs:
       - name: Install cloudflared
         run: |
           sudo apt update
+          sudo apt install -y curl gnupg lsb-release
+          curl -fsSL https://pkg.cloudflare.com/cloudflare-main.gpg | sudo gpg --dearmor -o /usr/share/keyrings/cloudflare-main.gpg
+          echo "deb [signed-by=/usr/share/keyrings/cloudflare-main.gpg] https://pkg.cloudflare.com/cloudflared $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/cloudflared.list
+          sudo apt update
           sudo apt install -y cloudflared
 
       - name: Install SSH key
