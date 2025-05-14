@@ -44,6 +44,11 @@ const menus = [
                 name: "Article Management",
                 access: ACCESS_ENUM.ADMIN,
             },
+            {
+                path: "/admin/tag",
+                name: "Tag Management",
+                access: ACCESS_ENUM.ADMIN,
+            },
         ],
     }
 

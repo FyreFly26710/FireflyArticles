@@ -161,6 +161,8 @@ declare namespace API {
   type TagEditRequest = {
     tagId?: number;
     tagName?: string;
+    tagGroup?: string;
+    tagColour?: string;
   };
 
   type TopicAddRequest = {
