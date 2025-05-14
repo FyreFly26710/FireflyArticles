@@ -8,19 +8,28 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
+      - name: Install cloudflared
+        run: |
+          sudo apt update
+          sudo apt install -y cloudflared
+
       - name: Install SSH key
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-      
-      - name: Deploy to macOS server
-        env:
-          SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
-          SSH_HOST: ${{ secrets.SSH_HOST }}
-          SSH_PORT: ${{ secrets.SSH_PORT }}
+
+      - name: Configure SSH for Cloudflare Tunnel
         run: |
-          ssh -o StrictHostKeyChecking=no -p $SSH_PORT $SSH_USERNAME@$SSH_HOST "cd /Users/liqiangwang/Repo/FireflyArticles/Deploy && export PATH=/usr/local/bin:/opt/homebrew/bin:$PATH && docker compose -f docker-compose.backend.yml up -d"
+          echo "Host cf-mac-server
+            HostName ${{ secrets.SSH_HOST }}
+            User ${{ secrets.SSH_USERNAME }}
+            ProxyCommand cloudflared access ssh --hostname %h" >> ~/.ssh/config
+
+      - name: Deploy to macOS server over Cloudflare Tunnel
+        run: |
+          ssh -o StrictHostKeyChecking=no cf-mac-server \
+            "cd /Users/liqiangwang/Repo/FireflyArticles/Deploy && export PATH=/usr/local/bin:/opt/homebrew/bin:$PATH && docker compose -f docker-compose.backend.yml up -d"
 
   deploy-frontend-to-server:
     runs-on: ubuntu-latest
