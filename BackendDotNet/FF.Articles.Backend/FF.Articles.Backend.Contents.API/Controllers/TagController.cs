@@ -38,8 +38,16 @@ public class TagController(ITagService _tagService) : ControllerBase
         if (!string.IsNullOrWhiteSpace(tagEditRequest.TagName))
         {
             tag.TagName = tagEditRequest.TagName;
-            await _tagService.UpdateAsync(tag);
         }
+        if (!string.IsNullOrWhiteSpace(tagEditRequest.TagGroup))
+        {
+            tag.TagGroup = tagEditRequest.TagGroup;
+        }
+        if (!string.IsNullOrWhiteSpace(tagEditRequest.TagColour))
+        {
+            tag.TagColour = tagEditRequest.TagColour;
+        }
+        await _tagService.UpdateAsync(tag);
         return ResultUtil.Success(true);
     }
     [HttpDelete("{id}")]
