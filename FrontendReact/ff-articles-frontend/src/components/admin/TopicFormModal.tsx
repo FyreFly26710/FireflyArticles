@@ -56,7 +56,6 @@ const TopicFormModal = ({
             } else {
                 // Default values for new topic
                 form.setFieldsValue({
-                    category: 'Normal',
                     sortNumber: 0,
                     isHidden: 0,
                 });

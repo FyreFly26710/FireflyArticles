@@ -1,3 +1,6 @@
+using FF.Articles.Backend.Contents.API.Constants;
+using FF.Articles.Backend.Contents.API.Models.Requests.Articles;
+
 namespace FF.Articles.Backend.Contents.API.Controllers;
 
 [ApiController]
@@ -48,8 +51,20 @@ public class ArticleController(IArticleService _articleService) : ControllerBase
         var article = await _articleService.GetByIdAsync(articleEditRequest.ArticleId);
         if (article == null)
         {
-
-            throw new ApiException(ErrorCode.NOT_FOUND_ERROR, "Article not found");
+            var articleAddRequest = new ArticleAddRequest()
+            {
+                Id = articleEditRequest.ArticleId,
+                Title = articleEditRequest.Title ?? "",
+                Abstract = articleEditRequest.Abstract ?? "",
+                Content = articleEditRequest.Content ?? "",
+                Tags = articleEditRequest.Tags ?? new List<string>(),
+                TopicId = articleEditRequest.TopicId ?? 0,
+                ArticleType = articleEditRequest.ArticleType ?? ArticleTypes.Article,
+                ParentArticleId = articleEditRequest.ParentArticleId ?? 0,
+                SortNumber = articleEditRequest.SortNumber ?? 0,
+                IsHidden = articleEditRequest.IsHidden ?? 0,
+            };
+            await _articleService.CreateByRequest(articleAddRequest, UserUtil.GetUserId(Request));
         }
         else
         {

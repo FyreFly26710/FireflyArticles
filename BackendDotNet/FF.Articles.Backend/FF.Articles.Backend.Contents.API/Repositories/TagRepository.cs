@@ -65,6 +65,7 @@ public class TagRepository(ContentsDbContext _context)
         List<string> preDefinedGroups = ["Skill Level", "Article Style", "Tone"];
         List<string> aiGroups = ["Focus Area", "Tech Stack/Language"];
 
+        // Set groups
         var preDefinedTags = new List<Tag>();
         var aiTags = new List<Tag>();
         if (names.Count == 5)
@@ -83,16 +84,27 @@ public class TagRepository(ContentsDbContext _context)
             preDefinedTags.Add(new Tag { TagName = names[3], TagGroup = preDefinedGroups[2] });
         }
 
-        // Remove spaces from tag names
-        preDefinedTags = preDefinedTags.Select(t => new Tag
-        {
-            TagName = t.TagName.Replace(" ", ""),
-            TagGroup = t.TagGroup
-        }).ToList();
+        // Normalize predefined names
+        preDefinedTags = preDefinedTags
+            .Select(t => new Tag
+            {
+                TagName = t.TagName.Replace(" ", "").ToLower(),
+                TagGroup = t.TagGroup
+            })
+            .ToList();
 
-        var existingTags = await base.GetQueryable()
-            .Where(t => preDefinedTags.Any(p => p.TagName.ToLower() == t.TagName.ToLower() && p.TagGroup == t.TagGroup))
+        // get tags by groups
+        var dbCandidates = await base.GetQueryable()
+            .Where(t => preDefinedTags.Select(p => p.TagGroup).Contains(t.TagGroup))
             .ToListAsync();
+
+        // get matched tags
+        var existingTags = dbCandidates
+            .Where(t => preDefinedTags.Any(p =>
+                string.Equals(p.TagName, t.TagName.Replace(" ", "").ToLower(), StringComparison.OrdinalIgnoreCase) &&
+                p.TagGroup == t.TagGroup))
+            .ToList();
+
         var result = new List<Tag>();
         if (existingTags.Count != 3)
         {
@@ -117,8 +129,10 @@ public class TagRepository(ContentsDbContext _context)
     }
     private async Task<Tag> GetOrCreateByNameAndGroupAsync(string name, string group)
     {
+        var normalizedName = name.Trim().ToLower();
+
         var tag = await base.GetQueryable()
-            .FirstOrDefaultAsync(t => t.TagName.ToLower() == name.ToLower() && t.TagGroup == group);
+            .FirstOrDefaultAsync(t => t.TagGroup == group && t.TagName.ToLower() == normalizedName);
 
         if (tag == null)
         {
@@ -129,10 +143,13 @@ public class TagRepository(ContentsDbContext _context)
 
         return tag;
     }
+
     private async Task<Tag> GetOrCreateByNameAsync(string name)
     {
+        var normalizedName = name.Trim().ToLower();
+
         var tag = await base.GetQueryable()
-            .FirstOrDefaultAsync(t => t.TagName.ToLower() == name.ToLower());
+            .FirstOrDefaultAsync(t => t.TagName.ToLower() == normalizedName);
 
         if (tag == null)
         {
@@ -140,7 +157,9 @@ public class TagRepository(ContentsDbContext _context)
             var id = await CreateAsync(tag);
             tag.Id = id;
         }
+
         return tag;
     }
+
 
 }
