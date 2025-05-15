@@ -8,7 +8,7 @@ const TopicsPage = async () => {
         const response = await apiTopicGetByPage({
             PageNumber: 1,
             PageSize: 100,
-            OnlyCategoryTopic: true,
+            // OnlyCategoryTopic: true,
             // SortField: "category", // Sort by category to group them
             // SortOrder: "asc"
         });

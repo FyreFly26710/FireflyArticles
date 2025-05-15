@@ -48,8 +48,8 @@ public class TopicService(
                 topic.IsHidden = (int)topicEditRequest.IsHidden;
             if (topicEditRequest.Title != null && topic.Title != topicEditRequest.Title)
                 topic.Title = topicEditRequest.Title;
-            //if (topicEditRequest.Abstract != null && topic.Abstract != topicEditRequest.Abstract)
-            //    topic.Abstract = topicEditRequest.Abstract;
+            if (topicEditRequest.Abstract != null && topic.Abstract != topicEditRequest.Abstract)
+                topic.Abstract = topicEditRequest.Abstract;
             //if (topicEditRequest.Content != null && topic.Content != topicEditRequest.Content)
             //    topic.Content = topicEditRequest.Content;
             if (topicEditRequest.Category != null && topic.Category != topicEditRequest.Category)
