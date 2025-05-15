@@ -2,9 +2,6 @@ namespace FF.Articles.Backend.AI.API.Models.ApiDtos;
 public class ArticleApiDto
 {
     public long ArticleId { get; set; }
-    public DateTime? CreateTime { get; set; }
-    public DateTime? UpdateTime { get; set; }
-
     public string Title { get; set; }
     public string Content { get; set; }
     public string Abstract { get; set; }
@@ -18,6 +15,8 @@ public class ArticleApiDto
     public List<string> Tags { get; set; } = new();
     public int SortNumber { get; set; }
     public int IsHidden { get; set; }
+    public DateTime? CreateTime { get; set; }
+    public DateTime? UpdateTime { get; set; }
 
 }
 public static class ArticleTypes

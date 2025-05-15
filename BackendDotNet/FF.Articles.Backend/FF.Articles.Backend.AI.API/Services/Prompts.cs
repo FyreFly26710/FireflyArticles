@@ -43,7 +43,6 @@ public static class Prompts
     "AiMessage": "Your message here."
     }    
     """;
-
     public static string User_ArticleContent(ContentRequest request) =>
     magicPrompt
     + Environment.NewLine +
@@ -113,5 +112,51 @@ public static class Prompts
     • Code-heavy → dense with code examples, minimal prose.
     • Conversational → informal, casual, engaging tone. Placeholder for articles that are not applicable to above styles.
 
+    """;
+
+    public static string User_TopicArticleContent(TopicApiDto topic) =>
+    magicPrompt
+    + Environment.NewLine +
+    $"""
+    You are an expert content writer specializing in creating cohesive topic summaries. Generate a summary page for the following topic and its articles.
+
+    Inputs:
+    • Topic ID: {topic.TopicId}
+    • Topic Title: {topic.Title}
+    • Topic Description: {topic.Abstract}
+    • Category: {topic.Category}
+    • Articles: {(topic.Articles?.Count > 0 ? $"{topic.Articles.Count} articles" : "No articles available")}
+
+    {(topic.Articles != null && topic.Articles.Count > 0 ?
+    $"""
+    Article Details:
+    {string.Join("\n\n", topic.Articles.Select(article =>
+        $"• Article ID: {article.ArticleId}\n" +
+        $"  Title: {article.Title}\n" +
+        $"  Abstract: {article.Abstract}\n" +
+        $"  Content Summary: {(string.IsNullOrEmpty(article.Content) ? "No content available" :
+            (article.Content.Length > 200 ? article.Content.Substring(0, 200) + "..." : article.Content))}"
+    ))}
+    """
+    : "No article details available.")}
+
+    Content Requirements:
+    1. Start with a comprehensive summary paragraph explaining the topic as a whole.
+    2. After the summary, provide a brief explanation of each article in the topic.
+    3. For each article, format as follows:
+       - Begin with the article title as a link in markdown format: [Article Title](/topic/{topic.TopicId}/article/articleId)
+         (Replace "Article Title" with the actual title and "articleId" with the actual article ID)
+       - Follow with a concise 2-3 sentence summary of what the article covers
+       - Make the summary informative enough that readers can decide if they want to read the full article
+
+    Formatting Rules:
+    - Write in markdown format
+    - Generate ONLY the content to be displayed to the user
+    - Do not include any meta information like "Topic:", "Article:", or references to these instructions
+    - Do not include separate title, or abstract sections - just the content
+    - Maintain a cohesive narrative that connects all articles within the topic
+    - Ensure natural language flow and engaging style
+
+    The summary should show how all articles in the collection relate to each other and the main topic, creating a roadmap for readers to navigate the content.
     """;
 }

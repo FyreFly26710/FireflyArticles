@@ -13,6 +13,7 @@ public class ArticleAddRequest
     public string ArticleType { get; set; } = ArticleTypes.Article;
     public long? ParentArticleId { get; set; }
     public long TopicId { get; set; }
+    public long? UserId { get; set; }
     public List<string> Tags { get; set; } = new();
     public int SortNumber { get; set; } = 1;
     public int IsHidden { get; set; } = 0;

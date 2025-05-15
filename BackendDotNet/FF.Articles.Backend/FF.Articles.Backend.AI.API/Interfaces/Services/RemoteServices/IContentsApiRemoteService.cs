@@ -8,4 +8,5 @@ public interface IContentsApiRemoteService
     Task<long> AddTopic(TopicApiAddRequest payload, UserApiDto user);
     Task<bool> EditArticleAsync(ArticleApiUpsertRequest payload, UserApiDto user);
     Task<ArticleApiDto?> GetArticleById(long articleId);
+    Task<TopicApiDto?> GetTopicById(long topicId, bool isTopicArticle);
 }

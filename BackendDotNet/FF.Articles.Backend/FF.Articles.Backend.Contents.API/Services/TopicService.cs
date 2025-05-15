@@ -19,7 +19,6 @@ public class TopicService(
                 TopicId = topic.Id,
                 Title = topic.Title,
                 Category = topic.Category,
-                TopicImage = topic.TopicImage ?? "",
             };
             return topicDto;
         }

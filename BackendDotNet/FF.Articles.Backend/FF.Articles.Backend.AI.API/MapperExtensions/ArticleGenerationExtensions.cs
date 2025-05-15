@@ -13,8 +13,36 @@ public static class ArticleGenerationExtensions
             Tags = request.Tags,
             TopicId = request.TopicId,
             SortNumber = request.SortNumber,
-            ArticleType = parentArticleId.HasValue ? "SubArticle" : "Article",
+            ArticleType = parentArticleId.HasValue ? ArticleTypes.SubArticle : ArticleTypes.Article,
             ParentArticleId = parentArticleId,
+        };
+    }
+    public static ArticleApiUpsertRequest ToArticleApiUpsertRequest(this TopicApiDto request, string content = "")
+    {
+        return new ArticleApiUpsertRequest
+        {
+            ArticleId = request.TopicId,
+            Title = request.Title,
+            Abstract = request.Abstract,
+            Content = content,
+            Tags = new List<string>(),
+            TopicId = request.TopicId,
+            SortNumber = 0,
+            ArticleType = ArticleTypes.TopicArticle,
+        };
+    }
+    public static ContentRequest ToContentRequest(this ArticleApiDto dto, TopicApiDto topic)
+    {
+        return new ContentRequest
+        {
+            Id = dto.ArticleId,
+            Title = dto.Title,
+            Abstract = dto.Abstract,
+            Topic = topic.Title,
+            TopicAbstract = topic.Abstract,
+            Category = topic.Category,
+            Tags = dto.Tags,
+            SortNumber = dto.SortNumber,
         };
     }
 }

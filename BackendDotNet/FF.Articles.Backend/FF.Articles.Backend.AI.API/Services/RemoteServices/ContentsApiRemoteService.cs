@@ -81,6 +81,27 @@ public class ContentsApiRemoteService : IContentsApiRemoteService
         _logger.LogInformation("AddTopicByTitleAsync: {res}", res);
         return res?.Data ?? 0;
     }
+    public async Task<TopicApiDto?> GetTopicById(long topicId, bool isTopicArticle)
+    {
+        string url = RemoteApiUrlConstant.TopicUrl(topicId);
+        var queryParams = new Dictionary<string, bool>
+        {
+            { "IncludeArticles", isTopicArticle },
+            { "IncludeContent", isTopicArticle },
+        };
+        var queryString = string.Join("&", queryParams.Select(x => $"{x.Key}={x.Value.ToString().ToLower()}"));
+        url = $"{url}?{queryString}";
+
+        var requestMessage = CreateHttpRequestMessage(HttpMethod.Get, url, null, AdminUsers.SYSTEM_ADMIN_DEEPSEEK);
+        var response = await _httpClient.SendAsync(requestMessage);
+        if (!response.IsSuccessStatusCode)
+        {
+            return null;
+        }
+        var res = await response.Content.ReadFromJsonAsync<ApiResponse<TopicApiDto>>();
+        return res?.Data;
+    }
+
     private HttpRequestMessage CreateHttpRequestMessage(HttpMethod method, string url, object payload, UserApiDto user)
     {
         var requestMessage = new HttpRequestMessage(method, url);

@@ -4,6 +4,5 @@ public interface IArticleGenerationService
 {
     Task<string> GenerateArticleListsAsync(ArticleListRequest request, CancellationToken cancellationToken = default);
     Task<string> GenerateArticleContentAsync(ContentRequest request);
-    Task<long> DispatchArticleGenerationAsync(ContentRequest request);
-    Task<bool> RegenerateArticleContentAsync(long articleId);
+    Task<string> GenerateTopicContentAsync(TopicApiDto topic);
 }

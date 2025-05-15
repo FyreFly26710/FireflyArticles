@@ -1,7 +1,7 @@
 using FF.Articles.Backend.Common.Extensions;
 using FF.Articles.Backend.Common.Middlewares;
 using FF.Articles.Backend.Contents.API;
-using FF.Articles.Backend.Contents.API.MqConsumers;
+using FF.Articles.Backend.Contents.API.MessageConsumers;
 using FluentValidation.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);

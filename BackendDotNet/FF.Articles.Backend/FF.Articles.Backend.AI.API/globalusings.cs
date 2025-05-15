@@ -21,7 +21,6 @@ global using FF.Articles.Backend.AI.API.Models.Requests.ChatRounds;
 global using FF.Articles.Backend.AI.API.Models.Requests.Sessions;
 global using FF.Articles.Backend.AI.API.Repositories;
 global using FF.Articles.Backend.AI.API.Services;
-global using FF.Articles.Backend.AI.API.Services.Consumers;
 global using FF.Articles.Backend.AI.API.Services.RemoteServices;
 global using FF.Articles.Backend.AI.API.UnitOfWork;
 

@@ -15,5 +15,6 @@ public static class RemoteApiUrlConstant
     public static string ArticleUrl() => $"/api/contents/articles";
     public static string ArticleUrl(long articleId) => $"/api/contents/articles/{articleId}";
     public static string TopicUrl() => $"/api/contents/topics";
+    public static string TopicUrl(long topicId) => $"/api/contents/topics/{topicId}";
 }
 

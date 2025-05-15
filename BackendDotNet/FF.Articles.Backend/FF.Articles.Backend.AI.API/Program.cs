@@ -1,3 +1,4 @@
+using FF.Articles.Backend.AI.API.MessageConsumers;
 using FF.Articles.Backend.Common.Extensions;
 using FF.Articles.Backend.Common.Middlewares;
 
@@ -26,7 +27,7 @@ builder.Services.AddScoped<ISessionService, SessionService>();
 
 builder.AddRabbitMq();
 builder.Services.AddHostedService<GenerateArticleConsumer>();
-
+builder.Services.AddHostedService<GenerateTopicArticleConsumer>();
 // Stores
 
 builder.Services.AddControllers();
