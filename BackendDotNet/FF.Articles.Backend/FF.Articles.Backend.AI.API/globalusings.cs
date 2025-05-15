@@ -13,6 +13,7 @@ global using FF.Articles.Backend.AI.API.Interfaces.Repositories;
 global using FF.Articles.Backend.AI.API.Interfaces.Services;
 global using FF.Articles.Backend.AI.API.Interfaces.Services.RemoteServices;
 global using FF.Articles.Backend.AI.API.MapperExtensions;
+global using FF.Articles.Backend.AI.API.Models.ApiDtos;
 global using FF.Articles.Backend.AI.API.Models.Dtos;
 global using FF.Articles.Backend.AI.API.Models.Entities;
 global using FF.Articles.Backend.AI.API.Models.Requests.ArticleGenerations;

@@ -25,7 +25,7 @@ public static class ArticleExtensions
         {
             article.UserId = userId.Value;
         }
-        article.Id = articleAddRequest.Id ?? EntityUtil.GenerateSnowflakeId();
+        article.Id = articleAddRequest.ArticleId ?? EntityUtil.GenerateSnowflakeId();
         article.Title = articleAddRequest.Title;
         article.Content = articleAddRequest.Content;
         article.Abstract = articleAddRequest.Abstract;

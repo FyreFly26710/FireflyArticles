@@ -23,7 +23,7 @@ public class AddArticleConsumer(IConnection connection, IServiceScopeFactory ser
         using var scope = _serviceScopeFactory.CreateScope();
         var articleService = scope.ServiceProvider.GetRequiredService<IArticleService>();
 
-        var articleId = generateRequest.Id ?? 0L;
+        var articleId = generateRequest.ArticleId ?? 0L;
         var article = await articleService.GetByIdAsync(articleId);
         if (article is null)
         {
@@ -36,7 +36,7 @@ public class AddArticleConsumer(IConnection connection, IServiceScopeFactory ser
     {
         var createRequest = new ArticleAddRequest
         {
-            Id = generateRequest.Id,
+            ArticleId = generateRequest.ArticleId,
             Title = generateRequest.Title,
             Abstract = generateRequest.Abstract,
             ArticleType = generateRequest.ArticleType,

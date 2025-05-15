@@ -6,7 +6,7 @@ public static class ArticleGenerationExtensions
     {
         return new ArticleApiUpsertRequest
         {
-            Id = request.Id,
+            ArticleId = request.Id,
             Title = request.Title,
             Abstract = request.Abstract,
             Content = content,

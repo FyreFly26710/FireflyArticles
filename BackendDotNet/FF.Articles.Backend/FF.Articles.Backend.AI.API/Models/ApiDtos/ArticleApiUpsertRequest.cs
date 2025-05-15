@@ -1,14 +1,11 @@
-namespace FF.Articles.Backend.Common.ApiDtos;
+namespace FF.Articles.Backend.AI.API.Models.ApiDtos;
 
 public class ArticleApiUpsertRequest
 {
-    public long? Id { get; set; }
+    public long? ArticleId { get; set; }
     public string Title { get; set; }
     public string Content { get; set; } = string.Empty;
     public string Abstract { get; set; } = string.Empty;
-    /// <summary>
-    ///  Article = 1, SubArticle = 2, TopicArticle = 3
-    /// </summary>
     public string ArticleType { get; set; } = "Article";
     public long? ParentArticleId { get; set; }
     public long TopicId { get; set; }

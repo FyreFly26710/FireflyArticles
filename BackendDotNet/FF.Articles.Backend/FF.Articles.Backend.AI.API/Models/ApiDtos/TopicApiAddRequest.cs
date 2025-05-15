@@ -1,4 +1,4 @@
-namespace FF.Articles.Backend.Common.ApiDtos;
+namespace FF.Articles.Backend.AI.API.Models.ApiDtos;
 
 public class TopicApiAddRequest
 {

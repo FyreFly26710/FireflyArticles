@@ -119,7 +119,7 @@ public class ArticleGenerationService : IArticleGenerationService
     var article = request.ToArticleApiUpsertRequest("Generating content...");
     long id = EntityUtil.GenerateSnowflakeId();
     request.Id = id;
-    article.Id = id;
+    article.ArticleId = id;
     article.UserId = AdminUsers.SYSTEM_ADMIN_DEEPSEEK.UserId;
     _rabbitMqPublisher.Publish(QueueList.AddArticleQueue, article);
     _rabbitMqPublisher.Publish(QueueList.GenerateArticleQueue, request);
@@ -171,13 +171,19 @@ public class ArticleGenerationService : IArticleGenerationService
     }
 
     // if is topic article
-    if (article.ArticleType == "Topic Article")
+    if (article.ArticleType == "TopicArticle")
     {
       return false;
     }
 
     // if is article
     if (article.ArticleType == "Article")
+    {
+      return false;
+    }
+
+    // if is sub article
+    if (article.ArticleType == "SubArticle")
     {
       return false;
     }

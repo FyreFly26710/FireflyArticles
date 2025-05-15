@@ -20,7 +20,7 @@ public class UpdateArticleConsumer(IConnection connection, IServiceScopeFactory 
         using var scope = _serviceScopeFactory.CreateScope();
         var articleService = scope.ServiceProvider.GetRequiredService<IArticleService>();
 
-        var articleId = generateRequest.Id ?? 0L;
+        var articleId = generateRequest.ArticleId ?? 0L;
         var article = await articleService.GetByIdAsync(articleId);
         if (article is null)
         {
@@ -37,7 +37,7 @@ public class UpdateArticleConsumer(IConnection connection, IServiceScopeFactory 
     {
         var editRequest = new ArticleEditRequest
         {
-            ArticleId = (long)generateRequest.Id!,
+            ArticleId = (long)generateRequest.ArticleId!,
             Content = generateRequest.Content,
         };
 
