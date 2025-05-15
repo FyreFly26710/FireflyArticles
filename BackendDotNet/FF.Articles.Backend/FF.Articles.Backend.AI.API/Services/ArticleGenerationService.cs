@@ -160,6 +160,31 @@ public class ArticleGenerationService : IArticleGenerationService
     }
   }
 
+  public async Task<bool> RegenerateArticleContentAsync(long articleId)
+  {
+    // Get article from contents api
+    var article = await _contentsApiRemoteService.GetArticleById(articleId);
+    // if not found, return false
+    if (article == null)
+    {
+      return false;
+    }
+
+    // if is topic article
+    if (article.ArticleType == "Topic Article")
+    {
+      return false;
+    }
+
+    // if is article
+    if (article.ArticleType == "Article")
+    {
+      return false;
+    }
+
+    return true;
+  }
+
   private string mockResponse() =>
       """
         {

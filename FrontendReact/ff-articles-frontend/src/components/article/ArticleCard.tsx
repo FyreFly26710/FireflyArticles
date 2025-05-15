@@ -59,7 +59,7 @@ const ArticleCard = ({ topicId, article }: ArticleCardProps) => {
                 </Col>
             </Row>
             <ArticleButtons
-                topicId={topicId}
+                article={article}
                 onEditModal={() => openModal(article)}
             />
             {/* Only render the modal when it's visible */}

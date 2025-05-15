@@ -13,6 +13,7 @@ public static class RemoteApiUrlConstant
     public static string GetAIBaseUrl() => $"{GetBasePort()}24000";
     public static string GetUserApiDtoById(long userId) => $"/api/identity/users/{userId}";
     public static string ArticleUrl() => $"/api/contents/articles";
+    public static string ArticleUrl(long articleId) => $"/api/contents/articles/{articleId}";
     public static string TopicUrl() => $"/api/contents/topics";
 }
 

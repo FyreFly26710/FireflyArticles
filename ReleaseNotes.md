@@ -7,7 +7,9 @@
     - P2: Add quick article generation
     - P2: Generate Topic Article
     - P2: Generate existing topic
+    - P2: Article add page
     - P4: Fix Ai Gen possible codefence
+    - P4: Batch update article/topic/tag
 - Frontend:
     - P3: Refactor Contexts, use reduxStore + hooks.
     - P3: Refactor localStorage

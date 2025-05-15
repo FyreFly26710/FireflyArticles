@@ -9,17 +9,15 @@ import {
 import { useRouter } from 'next/navigation';
 
 interface ArticleButtonsProps {
-  topicId?: number;
+  article: API.ArticleDto;
   onEditModal?: () => void;
 }
 
-const ArticleButtons = ({ topicId, onEditModal }: ArticleButtonsProps) => {
+const ArticleButtons = ({ article, onEditModal }: ArticleButtonsProps) => {
   const router = useRouter();
 
   const handleNewArticle = () => {
-    if (topicId) {
-      router.push(`/topic/${topicId}/new`);
-    }
+    router.push(`/topic/${article.topicId}/new`);
   };
 
   const handleOpenArticleModal = () => {
@@ -37,9 +35,6 @@ const ArticleButtons = ({ topicId, onEditModal }: ArticleButtonsProps) => {
       });
     }
   };
-
-  // Don't show buttons if no topicId
-  if (!topicId) return null;
 
   return (
     <FloatButton.Group

@@ -28,7 +28,6 @@ export async function apiAiArticlesGenerateContent(
       "Content-Type": "application/json",
     },
     data: body,
-    timeout: 5 * 60 * 1000,
     ...(options || {}),
   });
 }

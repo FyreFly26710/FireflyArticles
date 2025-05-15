@@ -5,7 +5,7 @@ using RabbitMQ.Client;
 namespace FF.Articles.Backend.Contents.API.MqConsumers;
 
 public class UpdateArticleConsumer(IConnection connection, IServiceScopeFactory serviceScopeFactory, ILogger<UpdateArticleConsumer> logger)
-    : BaseConsumer(connection, serviceScopeFactory, logger, QueueList.ArticleReadyQueue)
+    : BaseConsumer(connection, serviceScopeFactory, logger, QueueList.EditArticleQueue)
 {
 
     protected override async Task HandleMessageAsync(string messageJson)
@@ -18,7 +18,7 @@ public class UpdateArticleConsumer(IConnection connection, IServiceScopeFactory 
         }
 
         using var scope = _serviceScopeFactory.CreateScope();
-        var articleService = scope.ServiceProvider.GetRequiredService<Func<string, IArticleService>>()("v1");
+        var articleService = scope.ServiceProvider.GetRequiredService<IArticleService>();
 
         var articleId = generateRequest.Id ?? 0L;
         var article = await articleService.GetByIdAsync(articleId);

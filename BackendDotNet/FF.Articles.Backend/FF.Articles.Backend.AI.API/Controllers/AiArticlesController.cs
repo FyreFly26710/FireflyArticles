@@ -27,7 +27,14 @@ public class AiArticlesController(IArticleGenerationService articleGenerationSer
     //     return Ok();
     // }
 
+    [HttpPost("regenerate-article-content")]
+    public async Task<ApiResponse<bool>> RegenerateArticleContent(long articleId)
+    {
+        var user = UserUtil.GetUserFromHttpRequest(Request);
 
+        var result = await articleGenerationService.RegenerateArticleContentAsync(articleId);
+        return ResultUtil.Success<bool>(result);
+    }
 
 }
 

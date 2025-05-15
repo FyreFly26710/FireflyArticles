@@ -19,6 +19,24 @@ public class ContentsApiRemoteService : IContentsApiRemoteService
         _httpClient.BaseAddress = new Uri(RemoteApiUrlConstant.GetContentsBaseUrl());
     }
 
+    public async Task<ArticleApiDto?> GetArticleById(long articleId)
+    {
+        var request = new ArticleApiGetRequest
+        {
+            ArticleId = articleId
+        };
+        string url = RemoteApiUrlConstant.ArticleUrl(articleId);
+        var requestMessage = CreateHttpRequestMessage(HttpMethod.Get, url, request, AdminUsers.SYSTEM_ADMIN_DEEPSEEK);
+        var response = await _httpClient.SendAsync(requestMessage);
+        if (!response.IsSuccessStatusCode)
+        {
+            return null;
+        }
+        var res = await response.Content.ReadFromJsonAsync<ApiResponse<ArticleApiDto>>();
+        return res?.Data;
+    }
+
+
     public async Task<long> AddArticleAsync(ArticleApiUpsertRequest payload, UserApiDto user)
     {
         string url = RemoteApiUrlConstant.ArticleUrl();
