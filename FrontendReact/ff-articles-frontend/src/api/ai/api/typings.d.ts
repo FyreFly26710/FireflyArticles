@@ -128,6 +128,10 @@ declare namespace API {
     tags: string[];
     provider: string;
   };
+  type TopicArticleContentRequest = {
+    articleId: number;
+    userPrompt?: string;
+  };
   type ChatProvider = {
     providerName: string;
     models: string[];

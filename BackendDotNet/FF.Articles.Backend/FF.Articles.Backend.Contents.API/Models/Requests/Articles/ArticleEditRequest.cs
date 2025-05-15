@@ -5,9 +5,6 @@ public class ArticleEditRequest
     public string? Title { get; set; }
     public string? Content { get; set; }
     public string? Abstract { get; set; }
-    /// <summary>
-    ///  Article = 1, SubArticle = 2, TopicArticle = 3
-    /// </summary>
     public string? ArticleType { get; set; }
     public long? ParentArticleId { get; set; }
     public long? TopicId { get; set; }

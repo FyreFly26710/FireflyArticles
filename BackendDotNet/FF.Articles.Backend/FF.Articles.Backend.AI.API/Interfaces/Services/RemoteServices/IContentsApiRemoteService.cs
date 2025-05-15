@@ -7,6 +7,7 @@ public interface IContentsApiRemoteService
     //Task<bool> EditContentBatchAsync(Dictionary<long, string> batchEditConentRequests, HttpRequest httpRequest);
     Task<long> AddTopic(TopicApiAddRequest payload, UserApiDto user);
     Task<bool> EditArticleAsync(ArticleApiUpsertRequest payload, UserApiDto user);
+    Task<bool> EditArticleContentAsync(long articleId, string content);
     Task<ArticleApiDto?> GetArticleById(long articleId);
     Task<TopicApiDto?> GetTopicById(long topicId, bool isTopicArticle);
 }

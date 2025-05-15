@@ -64,6 +64,24 @@ public class ContentsApiRemoteService : IContentsApiRemoteService
         }
         return true;
     }
+    public async Task<bool> EditArticleContentAsync(long articleId, string content)
+    {
+        string url = RemoteApiUrlConstant.ArticleUrl();
+        var payload = new
+        {
+            ArticleId = articleId,
+            Content = content
+        };
+        var requestMessage = CreateHttpRequestMessage(HttpMethod.Put, url, payload);
+
+        var response = await _httpClient.SendAsync(requestMessage);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new ApiException(ErrorCode.SYSTEM_ERROR, "Failed to edit article content");
+        }
+        return true;
+    }
 
     public async Task<long> AddTopic(TopicApiAddRequest payload, UserApiDto user)
     {
@@ -102,13 +120,14 @@ public class ContentsApiRemoteService : IContentsApiRemoteService
         return res?.Data;
     }
 
-    private HttpRequestMessage CreateHttpRequestMessage(HttpMethod method, string url, object payload, UserApiDto user)
+    private HttpRequestMessage CreateHttpRequestMessage(HttpMethod method, string url, object payload, UserApiDto? user = null)
     {
         var requestMessage = new HttpRequestMessage(method, url);
         if (payload != null)
         {
             requestMessage.Content = JsonContent.Create(payload);
         }
+        user ??= AdminUsers.SYSTEM_ADMIN_DEEPSEEK;
         var adminToken = _tokenService.GenerateApiToken(user);
         requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", adminToken);
         return requestMessage;

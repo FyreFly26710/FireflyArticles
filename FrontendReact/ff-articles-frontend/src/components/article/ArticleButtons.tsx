@@ -1,12 +1,14 @@
 "use client";
 
-import { FloatButton } from 'antd';
+import { FloatButton, message } from 'antd';
 import {
   PlusOutlined,
   EditOutlined,
-  VerticalAlignTopOutlined
+  VerticalAlignTopOutlined,
+  ReloadOutlined
 } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
+import { apiAiArticlesRegenerateContent } from '@/api/ai/api/aiarticles';
 
 interface ArticleButtonsProps {
   article: API.ArticleDto;
@@ -36,6 +38,22 @@ const ArticleButtons = ({ article, onEditModal }: ArticleButtonsProps) => {
     }
   };
 
+  const handleRegenerateArticle = async () => {
+    try {
+
+      await apiAiArticlesRegenerateContent({
+        articleId: article.articleId,
+      });
+      // Wait a bit and then refresh the page to show the updated content
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
+    } catch (error) {
+      message.error({ content: 'Failed to regenerate article content', key: 'regenerate' });
+      console.error('Error regenerating article:', error);
+    }
+  };
+
   return (
     <FloatButton.Group
       trigger="hover"
@@ -52,6 +70,11 @@ const ArticleButtons = ({ article, onEditModal }: ArticleButtonsProps) => {
         icon={<EditOutlined />}
         tooltip="Edit Article"
         onClick={handleOpenArticleModal}
+      />
+      <FloatButton
+        icon={<ReloadOutlined />}
+        tooltip="Regenerate with AI"
+        onClick={handleRegenerateArticle}
       />
       <FloatButton
         icon={<VerticalAlignTopOutlined />}

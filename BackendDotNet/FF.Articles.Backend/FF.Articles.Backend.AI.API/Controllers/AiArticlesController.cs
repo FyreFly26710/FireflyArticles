@@ -31,10 +31,10 @@ public class AiArticlesController(IArticleGenerationService _articleGenerationSe
     }
 
     [HttpPost("regenerate-article-content")]
-    public async Task<ApiResponse<bool>> RegenerateArticleContent(long articleId)
+    public async Task<ApiResponse<bool>> RegenerateArticleContent(TopicArticleContentRequest request)
     {
         var user = UserUtil.GetUserFromHttpRequest(Request);
-        var article = await _contentsApiRemoteService.GetArticleById(articleId);
+        var article = await _contentsApiRemoteService.GetArticleById(request.ArticleId);
         // if not found, return false
         if (article == null) throw new ApiException(ErrorCode.SYSTEM_ERROR, "Article not found");
 
@@ -44,6 +44,7 @@ public class AiArticlesController(IArticleGenerationService _articleGenerationSe
         var isTopicArticle = article.ArticleType == ArticleTypes.TopicArticle;
         var topic = await _contentsApiRemoteService.GetTopicById(article.TopicId, isTopicArticle);
         if (topic == null) throw new ApiException(ErrorCode.SYSTEM_ERROR, "Topic not found");
+        await _contentsApiRemoteService.EditArticleContentAsync(article.ArticleId, "Generating content...");
 
         // if is topic article
         if (isTopicArticle)
@@ -57,12 +58,10 @@ public class AiArticlesController(IArticleGenerationService _articleGenerationSe
         if (!isTopicArticle)
         {
             // topic does not include article
-            var contentRequest = article.ToContentRequest(topic);
+            var contentRequest = article.ToContentRequest(topic, request.UserPrompt);
             _rabbitMqPublisher.Publish(QueueList.GenerateArticleQueue, contentRequest);
             return ResultUtil.Success<bool>(true);
         }
-
-
 
         return ResultUtil.Success<bool>(true);
     }

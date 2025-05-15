@@ -31,3 +31,19 @@ export async function apiAiArticlesGenerateContent(
     ...(options || {}),
   });
 }
+
+/** POST /api/ai/articles/regenerate-article-content */
+export async function apiAiArticlesRegenerateContent(
+  body: API.TopicArticleContentRequest,
+  options?: { [key: string]: any }
+) {
+  return request<API.BooleanApiResponse>("/api/ai/articles/regenerate-article-content", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    data: body,
+    timeout: 2 * 60 * 1000,
+    ...(options || {}),
+  });
+}
