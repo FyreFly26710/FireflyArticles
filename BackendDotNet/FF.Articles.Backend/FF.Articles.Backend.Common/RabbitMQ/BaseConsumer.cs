@@ -51,19 +51,20 @@ public abstract class BaseConsumer : BackgroundService
         _consumer.Received += async (model, ea) =>
         {
             var messageJson = QueueDeclareHelper.GetJsonMessage(ea);
-            _logger.LogInformation("Received message: {messageJson}", messageJson);
+            var logMessage = $"{messageJson.Substring(0, Math.Min(messageJson.Length, 500))}...";
+            _logger.LogInformation("Received message: {logMessage}", logMessage);
 
             try
             {
                 await HandleMessageAsync(messageJson);
 
                 _channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
-                _logger.LogInformation("Message processed: {messageJson}", messageJson);
+                _logger.LogInformation("Message processed: {messageJson}", logMessage);
             }
             catch (Exception ex)
             {
                 var deathCount = QueueDeclareHelper.GetDeathCount(ea);
-                _logger.LogError(ex, "Error processing message: {messageJson}, Death count: {deathCount}", QueueDeclareHelper.GetJsonMessage(ea), deathCount);
+                _logger.LogError(ex, "Error processing message: {messageJson}, Death count: {deathCount}", logMessage, deathCount);
 
                 if (deathCount >= 3)
                 {
@@ -83,19 +84,19 @@ public abstract class BaseConsumer : BackgroundService
         _dlqConsumer = new EventingBasicConsumer(_channel);
         _dlqConsumer.Received += async (model, ea) =>
         {
+            var messageJson = QueueDeclareHelper.GetJsonMessage(ea);
+            var logMessage = $"{messageJson.Substring(0, Math.Min(messageJson.Length, 500))}...";
             try
             {
-                var messageJson = QueueDeclareHelper.GetJsonMessage(ea);
-
                 // Call the DLQ-specific handler method
                 await HandleDeadLetterMessageAsync(messageJson);
-                _logger.LogInformation("DLQ message processed: {messageJson}", messageJson);
+                _logger.LogInformation("DLQ message processed: {logMessage}", logMessage);
 
                 _channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error processing DLQ message: {messageJson}", QueueDeclareHelper.GetJsonMessage(ea));
+                _logger.LogError(ex, "Error processing DLQ message: {logMessage}", logMessage);
                 _channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
             }
         };

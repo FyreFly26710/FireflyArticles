@@ -44,10 +44,7 @@ const ArticleButtons = ({ article, onEditModal }: ArticleButtonsProps) => {
       await apiAiArticlesRegenerateContent({
         articleId: article.articleId,
       });
-      // Wait a bit and then refresh the page to show the updated content
-      setTimeout(() => {
-        window.location.reload();
-      }, 1500);
+      window.location.reload();
     } catch (error) {
       message.error({ content: 'Failed to regenerate article content', key: 'regenerate' });
       console.error('Error regenerating article:', error);

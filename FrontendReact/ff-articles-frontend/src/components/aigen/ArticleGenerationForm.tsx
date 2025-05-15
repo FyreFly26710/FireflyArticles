@@ -6,6 +6,7 @@ import { SendOutlined, InfoCircleOutlined, LoadingOutlined } from '@ant-design/i
 import { apiTopicGetByPage } from '@/api/contents/api/topic';
 import { useArticleGeneration } from '@/hooks/useAiGenArticle';
 import { useAiGenContext } from '@/states/AiGenContext';
+import { getTopicsByCategory } from '@/libs/utils/articleUtils';
 const { Title, Paragraph } = Typography;
 
 const ArticleGenerationForm: React.FC = () => {
@@ -13,13 +14,16 @@ const ArticleGenerationForm: React.FC = () => {
   const { generateArticles } = useArticleGeneration();
   const [categories, setCategories] = useState<string[]>([]);
   const [loadingCategories, setLoadingCategories] = useState(false);
+  const [topics, setTopics] = useState<API.TopicDto[]>([]);
+  const [topicsByCategory, setTopicsByCategory] = useState<Record<string, API.TopicDto[]>>({});
+  const [topicOptions, setTopicOptions] = useState<{ value: string }[]>([]);
   const { loading } = useAiGenContext();
 
   useEffect(() => {
-    fetchCategories();
+    fetchTopics();
   }, []);
 
-  const fetchCategories = async () => {
+  const fetchTopics = async () => {
     setLoadingCategories(true);
     try {
       const response = await apiTopicGetByPage({
@@ -28,21 +32,42 @@ const ArticleGenerationForm: React.FC = () => {
       });
 
       if (response.data?.data) {
+        const topicsData = response.data.data;
+
         // Extract unique categories
         const uniqueCategories = Array.from(
           new Set(
-            response.data.data
+            topicsData
               .map((topic: API.TopicDto) => topic.category)
               .filter(Boolean) as string[]
           )
         ).sort();
 
+        setTopics(topicsData);
         setCategories(uniqueCategories);
+
+        // Use the utility function to organize topics by category
+        const topicsByCat = getTopicsByCategory(topicsData);
+        setTopicsByCategory(topicsByCat);
       }
     } catch (error) {
-      console.error('Failed to fetch categories:', error);
+      console.error('Failed to fetch topics:', error);
     } finally {
       setLoadingCategories(false);
+    }
+  };
+
+  const handleCategoryChange = (categoryValue: string) => {
+    form.setFieldsValue({ topic: undefined });
+
+    // Update topic options based on selected category
+    if (categoryValue && topicsByCategory[categoryValue]) {
+      const options = topicsByCategory[categoryValue].map(topic => ({
+        value: topic.title || ''
+      }));
+      setTopicOptions(options);
+    } else {
+      setTopicOptions([]);
     }
   };
 
@@ -104,6 +129,7 @@ const ArticleGenerationForm: React.FC = () => {
                     filterOption={(inputValue, option) =>
                       option!.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
                     }
+                    onChange={handleCategoryChange}
                   >
                     <Input size="large" />
                   </AutoComplete>
@@ -131,7 +157,15 @@ const ArticleGenerationForm: React.FC = () => {
               label="Topic"
               rules={[{ required: true, message: 'Please enter a topic' }]}
             >
-              <Input size="large" />
+              <AutoComplete
+                options={topicOptions}
+                size="large"
+                filterOption={(inputValue, option) =>
+                  option!.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+                }
+              >
+                <Input size="large" placeholder="Select an existing topic or enter a new one" />
+              </AutoComplete>
             </Form.Item>
 
             {/* Description - Full Width, 2 lines */}

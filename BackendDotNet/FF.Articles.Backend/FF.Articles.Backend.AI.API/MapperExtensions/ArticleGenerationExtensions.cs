@@ -36,6 +36,7 @@ public static class ArticleGenerationExtensions
         return new ContentRequest
         {
             Id = dto.ArticleId,
+            TopicId = topic.TopicId,
             Title = dto.Title,
             Abstract = dto.Abstract,
             Topic = topic.Title,

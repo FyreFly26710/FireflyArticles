@@ -20,9 +20,9 @@ namespace FF.Articles.Backend.Contents.API.Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false),
-                    Title = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false, defaultValue: ""),
+                    Title = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false, defaultValue: ""),
                     Content = table.Column<string>(type: "text", nullable: false, defaultValue: ""),
-                    Abstract = table.Column<string>(type: "character varying(512)", maxLength: 512, nullable: false, defaultValue: ""),
+                    Abstract = table.Column<string>(type: "character varying(1024)", maxLength: 1024, nullable: false, defaultValue: ""),
                     ArticleType = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false, defaultValue: "Article"),
                     ParentArticleId = table.Column<long>(type: "bigint", nullable: true, defaultValue: 0L),
                     UserId = table.Column<long>(type: "bigint", nullable: false, defaultValue: 0L),
@@ -58,7 +58,9 @@ namespace FF.Articles.Backend.Contents.API.Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false),
-                    TagName = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false)
+                    TagName = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    TagGroup = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: true),
+                    TagColour = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -71,10 +73,9 @@ namespace FF.Articles.Backend.Contents.API.Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false),
-                    Title = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false, defaultValue: ""),
-                    Content = table.Column<string>(type: "text", nullable: false, defaultValue: ""),
-                    Abstract = table.Column<string>(type: "character varying(512)", maxLength: 512, nullable: false, defaultValue: ""),
-                    Category = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false, defaultValue: ""),
+                    Title = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false, defaultValue: ""),
+                    Abstract = table.Column<string>(type: "character varying(1024)", maxLength: 1024, nullable: false, defaultValue: ""),
+                    Category = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false, defaultValue: ""),
                     TopicImage = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: false, defaultValue: ""),
                     UserId = table.Column<long>(type: "bigint", nullable: false, defaultValue: 0L),
                     SortNumber = table.Column<int>(type: "integer", nullable: false, defaultValue: 0),

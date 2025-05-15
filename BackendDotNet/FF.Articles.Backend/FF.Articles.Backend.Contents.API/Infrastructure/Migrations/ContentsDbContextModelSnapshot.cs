@@ -31,8 +31,8 @@ namespace FF.Articles.Backend.Contents.API.Infrastructure.Migrations
                     b.Property<string>("Abstract")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
-                        .HasMaxLength(512)
-                        .HasColumnType("character varying(512)")
+                        .HasMaxLength(1024)
+                        .HasColumnType("character varying(1024)")
                         .HasDefaultValue("");
 
                     b.Property<string>("ArticleType")
@@ -74,8 +74,8 @@ namespace FF.Articles.Backend.Contents.API.Infrastructure.Migrations
                     b.Property<string>("Title")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
-                        .HasMaxLength(64)
-                        .HasColumnType("character varying(64)")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)")
                         .HasDefaultValue("");
 
                     b.Property<long>("TopicId")
@@ -149,15 +149,15 @@ namespace FF.Articles.Backend.Contents.API.Infrastructure.Migrations
                     b.Property<string>("Abstract")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
-                        .HasMaxLength(512)
-                        .HasColumnType("character varying(512)")
+                        .HasMaxLength(1024)
+                        .HasColumnType("character varying(1024)")
                         .HasDefaultValue("");
 
                     b.Property<string>("Category")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
-                        .HasMaxLength(64)
-                        .HasColumnType("character varying(64)")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)")
                         .HasDefaultValue("");
 
                     b.Property<DateTime?>("CreateTime")
@@ -181,8 +181,8 @@ namespace FF.Articles.Backend.Contents.API.Infrastructure.Migrations
                     b.Property<string>("Title")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
-                        .HasMaxLength(64)
-                        .HasColumnType("character varying(64)")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)")
                         .HasDefaultValue("");
 
                     b.Property<string>("TopicImage")

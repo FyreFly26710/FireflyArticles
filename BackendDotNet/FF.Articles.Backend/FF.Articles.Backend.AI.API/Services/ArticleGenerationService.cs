@@ -19,7 +19,6 @@ public class ArticleGenerationService : IArticleGenerationService
   /// </summary>
   public async Task<string> GenerateArticleListsAsync(ArticleListRequest request, CancellationToken cancellationToken = default)
   {
-    return mockResponse();
     var model = getModel(request.Provider, false);
     var chatRequest = new ChatRequest
     {
@@ -38,6 +37,7 @@ public class ArticleGenerationService : IArticleGenerationService
       Abstract = request.TopicAbstract
     };
     var topicId = await _contentsApiRemoteService.AddTopic(topic, AdminUsers.SYSTEM_ADMIN_DEEPSEEK);
+
     _logger.LogInformation("AI:{model};Begin to generate topic: {topic}; TopicId: {topicId}", model, request.Topic, topicId);
     var response = await _aiChatAssistant.ChatAsync(chatRequest, cancellationToken);
     var jsonContent = response?.Message?.Content ?? "";
@@ -52,7 +52,6 @@ public class ArticleGenerationService : IArticleGenerationService
 
   public async Task<string> GenerateArticleContentAsync(ContentRequest request)
   {
-    return "test";
     if (request.TopicId == 0 || string.IsNullOrEmpty(request.Title) || string.IsNullOrEmpty(request.Abstract) || request.Id == null)
       throw new ApiException(ErrorCode.PARAMS_ERROR, "Invalid request");
 
@@ -61,12 +60,17 @@ public class ArticleGenerationService : IArticleGenerationService
     {
       Model = model,
       Provider = request.Provider!,
-      Messages = [Message.User(Prompts.User_ArticleContent(request))],
       Options = new ChatOptions() { Temperature = 0.5 }
     };
-    if (request.UserPrompt != null)
+    if (!string.IsNullOrEmpty(request.UserPrompt?.Trim()))
     {
+      // Last message is user prompt
+      chatRequest.Messages.Add(Message.System(Prompts.User_ArticleContent(request)));
       chatRequest.Messages.Add(Message.User(request.UserPrompt));
+    }
+    else
+    {
+      chatRequest.Messages.Add(Message.User(Prompts.User_ArticleContent(request)));
     }
     _logger.LogInformation("AI: {model}. Begin to generate article: {title}", model, request.Title);
     var response = await _aiChatAssistant.ChatAsync(chatRequest, new CancellationToken());

@@ -34,8 +34,8 @@ public class ContentsDbContext : DbContext
         modelBuilder.Entity<Article>(entity =>
         {
             entity.ToTable("Article");
-            entity.Property(e => e.Title).HasMaxLength(64).IsRequired().HasDefaultValue("");
-            entity.Property(e => e.Abstract).HasMaxLength(512).IsRequired().HasDefaultValue("");
+            entity.Property(e => e.Title).HasMaxLength(256).IsRequired().HasDefaultValue("");
+            entity.Property(e => e.Abstract).HasMaxLength(1024).IsRequired().HasDefaultValue("");
             entity.Property(e => e.Content).HasDefaultValue("");
             entity.Property(e => e.ArticleType).HasMaxLength(32).IsRequired().HasDefaultValue(ArticleTypes.Article);
             entity.Property(e => e.ParentArticleId).HasDefaultValue(0L);
@@ -55,10 +55,10 @@ public class ContentsDbContext : DbContext
         modelBuilder.Entity<Topic>(entity =>
         {
             entity.ToTable("Topic");
-            entity.Property(e => e.Title).HasMaxLength(64).IsRequired().HasDefaultValue("");
-            entity.Property(e => e.Abstract).HasMaxLength(512).IsRequired().HasDefaultValue("");
+            entity.Property(e => e.Title).HasMaxLength(256).IsRequired().HasDefaultValue("");
+            entity.Property(e => e.Abstract).HasMaxLength(1024).IsRequired().HasDefaultValue("");
             //entity.Property(e => e.Content).HasDefaultValue("");
-            entity.Property(e => e.Category).HasMaxLength(64).IsRequired().HasDefaultValue("");
+            entity.Property(e => e.Category).HasMaxLength(256).IsRequired().HasDefaultValue("");
             entity.Property(e => e.TopicImage).HasMaxLength(2048).IsRequired().HasDefaultValue("");
             entity.Property(e => e.UserId).HasDefaultValue(0L);
             entity.Property(e => e.SortNumber).HasDefaultValue(0);

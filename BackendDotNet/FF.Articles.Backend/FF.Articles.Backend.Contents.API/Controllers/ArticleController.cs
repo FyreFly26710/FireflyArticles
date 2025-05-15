@@ -53,7 +53,7 @@ public class ArticleController(IArticleService _articleService) : ControllerBase
         {
             var articleAddRequest = new ArticleAddRequest()
             {
-                Id = articleEditRequest.ArticleId,
+                ArticleId = articleEditRequest.ArticleId,
                 Title = articleEditRequest.Title ?? "",
                 Abstract = articleEditRequest.Abstract ?? "",
                 Content = articleEditRequest.Content ?? "",

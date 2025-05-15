@@ -12,35 +12,44 @@ public class DeepSeekAssistant : BaseAssistant, IAssistant<DeepSeekProvider>
         deepSeekRequest.Stream = false;
         var extraInfo = new ExtraInfo() { CreatedAt = DateTime.UtcNow, Model = deepSeekRequest.Model };
         var content = new StringContent(JsonSerializer.Serialize(deepSeekRequest, _jsonSerializerOptions), Encoding.UTF8, "application/json");
-
-        var response = await _httpClient.PostAsync(_provider.ChatEndpoint, content, cancellationToken);
-        var resContent = await response.Content.ReadAsStringAsync();
-
-        if (!response.IsSuccessStatusCode)
+        try
         {
-            return new ChatResponse(Message.Assistant(resContent), ChatEvent.Finish, extraInfo);
+
+            var response = await _httpClient.PostAsync(_provider.ChatEndpoint, content, cancellationToken);
+            var resContent = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return new ChatResponse(Message.Assistant(resContent), ChatEvent.Finish, extraInfo);
+            }
+            if (string.IsNullOrWhiteSpace(resContent))
+            {
+                return new ChatResponse(Message.Assistant("invalid response"), ChatEvent.Finish, extraInfo);
+            }
+
+            var deepSeekResponse = JsonSerializer.Deserialize<DeepSeekResponse>(resContent, _jsonSerializerOptions);
+            if (deepSeekResponse is null)
+            {
+                return new ChatResponse(Message.Assistant("invalid response"), ChatEvent.Finish, extraInfo);
+            }
+
+            extraInfo.InputTokens = deepSeekResponse.Usage?.PromptTokens;
+            extraInfo.OutputTokens = deepSeekResponse.Usage?.CompletionTokens;
+            extraInfo.Duration = (int)(DateTime.UtcNow - extraInfo.CreatedAt.Value).TotalMilliseconds;
+            var chatResponse = new ChatResponse()
+            {
+                Message = Message.Assistant(deepSeekResponse.Choices.FirstOrDefault()?.Message?.Content ?? string.Empty),
+                Event = ChatEvent.Finish,
+                ExtraInfo = extraInfo
+            };
+            return chatResponse;
+
         }
-        if (string.IsNullOrWhiteSpace(resContent))
+        catch (Exception ex)
         {
-            return new ChatResponse(Message.Assistant("invalid response"), ChatEvent.Finish, extraInfo);
+            
+            return new ChatResponse(Message.Assistant($"Error Generating Contents: {ex.Message}"), ChatEvent.Finish, extraInfo);
         }
-
-        var deepSeekResponse = JsonSerializer.Deserialize<DeepSeekResponse>(resContent, _jsonSerializerOptions);
-        if (deepSeekResponse is null)
-        {
-            return new ChatResponse(Message.Assistant("invalid response"), ChatEvent.Finish, extraInfo);
-        }
-
-        extraInfo.InputTokens = deepSeekResponse.Usage?.PromptTokens;
-        extraInfo.OutputTokens = deepSeekResponse.Usage?.CompletionTokens;
-        extraInfo.Duration = (int)(DateTime.UtcNow - extraInfo.CreatedAt.Value).TotalMilliseconds;
-        var chatResponse = new ChatResponse()
-        {
-            Message = Message.Assistant(deepSeekResponse.Choices.FirstOrDefault()?.Message?.Content ?? string.Empty),
-            Event = ChatEvent.Finish,
-            ExtraInfo = extraInfo
-        };
-        return chatResponse;
     }
     /*
     https://api-docs.deepseek.com/api/create-chat-completion

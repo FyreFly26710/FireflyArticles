@@ -13,5 +13,5 @@ public class ContentRequest
     public List<string> Tags { get; set; } = new();
     public string? Provider { get; set; } = ProviderList.DeepSeek;
     // For regenerate article content
-    public string? UserPrompt { get; set; } = "";
+    public string? UserPrompt { get; set; } = null;
 }

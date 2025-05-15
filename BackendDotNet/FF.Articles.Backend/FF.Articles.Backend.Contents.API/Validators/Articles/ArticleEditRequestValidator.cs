@@ -5,11 +5,9 @@ public class ArticleEditRequestValidator : AbstractValidator<ArticleEditRequest>
     public ArticleEditRequestValidator()
     {
         RuleFor(x => x.Title)
-            .NotEmpty().WithMessage("Title is required")
             .MaximumLength(400).WithMessage("Title cannot exceed 400 characters");
 
         RuleFor(x => x.Content)
-            .NotEmpty().WithMessage("Content is required")
             .MaximumLength(80000).WithMessage("Content cannot exceed 80000 characters");
 
         RuleFor(x => x.Abstract)
