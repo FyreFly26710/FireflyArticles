@@ -12,6 +12,5 @@ public class ContentRequest
     public string Abstract { get; set; } = "";
     public List<string> Tags { get; set; } = new();
     public string? Provider { get; set; } = ProviderList.DeepSeek;
-    // For regenerate article content
     public string? UserPrompt { get; set; } = null;
 }

@@ -2,12 +2,15 @@ namespace FF.Articles.Backend.AI.API.Services;
 
 public static class Prompts
 {
-    private const string magicPrompt = "Take a deep breath. Think step by step.";
 
-    public static string User_ArticleList(ArticleListRequest request) =>
-    magicPrompt
-    + Environment.NewLine +
+    public const string User_ArticleList = "Please generate a well-structured list of articles covering the specified topic. Each article should have a unique focus while maintaining cohesiveness across the collection.";
+    public const string User_ArticleContent = "Please write a comprehensive article based on the provided title and abstract. Include relevant examples and follow the specified tags for style and tone.";
+    public const string User_TopicArticleContent = "Please create a summary page that ties together all the articles in this topic, highlighting their relationships and providing a roadmap for readers.";
+    public const string User_RegenerateArticleList = "Please generate additional articles for this topic, ensuring they complement the existing articles while exploring new aspects of the subject matter.";
+
+    public static string System_ArticleList(ArticleListRequest request) =>
     $"""
+    Take a deep breath. Think step by step.
     Generate {request.ArticleCount} articles covering Topic: {request.Topic} in Category: {request.Category}.
     {(!string.IsNullOrWhiteSpace(request.TopicAbstract) ? $"Topic Description: {request.TopicAbstract}" : "")}
     Each article should include:
@@ -24,29 +27,15 @@ public static class Prompts
         If the topic is valid: List key subtopics covered and confirm completion.
         If invalid/off-topic: Leave `Articles` an empty list and explain why in `AIMessage`.
     Follow the tags rules. Be very careful with abstract and tags.
-    You do not have to provide exact number of articles. The number of articles is flexible. You can provide +- 3 articles.
+    You do not have to provide exact number of articles. The number of articles is flexible. You can provide more or fewer articles as needed to comprehensively cover the topic.
     """
     + Environment.NewLine +
     TagRules
     + Environment.NewLine +
-    """
-    Generate a JSON response in this EXACT structure:
-    {
-    "Articles": [
-        {
-        "SortNumber": 1,
-        "Title": "Rapid HTML Enhancement & Best Practices",
-        "Abstract": Your concise abstract written in plain text (DO NOT USE MARKDOWN)",
-        "Tags": ["Advanced", "Web Development", "HTML", "Best-practices", "Technical"]
-        }
-    ],
-    "AiMessage": "Your message here."
-    }    
-    """;
-    public static string User_ArticleContent(ContentRequest request) =>
-    magicPrompt
-    + Environment.NewLine +
+    StructureRules;
+    public static string System_ArticleContent(ContentRequest request) =>
     $"""
+    Take a deep breath. Think step by step.
     You are an expert content writer and programming specialist. Your job is to turn the information I give you into a polished, engaging, and well-structured article suitable for publication on a professional tech blog.
 
     Inputs:
@@ -74,6 +63,20 @@ public static class Prompts
     """
     + Environment.NewLine +
     TagRules;
+    private static string StructureRules = """
+    Generate a JSON response in this EXACT structure:
+    {
+    "Articles": [
+        {
+        "SortNumber": 1,
+        "Title": "Rapid HTML Enhancement & Best Practices",
+        "Abstract": Your concise abstract written in plain text (DO NOT USE MARKDOWN)",
+        "Tags": ["Advanced", "Web Development", "HTML", "Best-practices", "Technical"]
+        }
+    ],
+    "AiMessage": "Your message here."
+    }   
+    """;
 
     private static string TagRules = """
     Tags list (following the same order,exactly four/five tags, you can omit Tech Stack/Language if not applicable):
@@ -114,10 +117,9 @@ public static class Prompts
 
     """;
 
-    public static string User_TopicArticleContent(TopicApiDto topic) =>
-    magicPrompt
-    + Environment.NewLine +
+    public static string System_TopicArticleContent(TopicApiDto topic) =>
     $"""
+    Take a deep breath. Think step by step.
     You are an expert content writer specializing in creating cohesive topic summaries. Generate a summary page for the following topic and its articles.
 
     Inputs:
@@ -159,4 +161,52 @@ public static class Prompts
 
     The summary should show how all articles in the collection relate to each other and the main topic, creating a roadmap for readers to navigate the content.
     """;
+
+    public static string System_RegenerateArticleList(ExistingArticleListRequest request, TopicApiDto topic) =>
+    $"""
+    Take a deep breath. Think step by step.
+    Generate {request.ArticleCount} additional articles to expand the existing collection for Topic: {topic.Title} in Category: {topic.Category}.
+    {(!string.IsNullOrWhiteSpace(topic.Abstract) ? $"Topic Description: {topic.Abstract}" : "")}
+
+    Existing Articles:
+    {(topic.Articles != null && topic.Articles.Count > 0 ?
+    string.Join("\n\n", topic.Articles.Select((article, index) =>
+        $"Article {index + 1}:\n" +
+        $"Title: {article.Title}\n" +
+        $"Abstract: {article.Abstract}\n" +
+        $"Tags: {string.Join(", ", article.Tags)}"
+    ))
+    : "No existing articles.")}
+
+    You need to generate additional articles that:
+    1. Complement the existing articles without duplicating their focus
+    2. Explore new aspects or angles of the main topic not covered by existing articles
+    3. Maintain a cohesive narrative across the entire collection
+    4. Follow the same high-quality standards as the existing articles
+
+    Each new article should include:
+        Title: Clear and concise, describing the article's focus.
+        Abstract:
+            - Write abstract in plain text, do not use markdown
+            - One paragraph maximum 300 characters, very briefly cover what will be in the article. 
+            - You have the overview of all articles in the topic. Carefully decide abstract. 
+            - Another AI Assistant will write the article based on category, topic, title, abstract, and tags for that article.
+        Tags:
+            - Provide tags for the article following the tags rules below.
+        SortNumber:
+            - You can use sort number from existing articles as a reference.
+            - Sort number does not need to be unique or sequential.
+            - You need alreay existed sort number in the existing articles to arrange the new articles.
+
+    You should also provide a message in AIMessage explaining:
+        - How the new articles complement the existing ones
+        - What additional aspects of the topic they cover
+        - Any other relevant information about your generation strategy
+
+    Follow the tags rules below very carefully. Be particularly attentive to abstract quality and tag selection.
+    """
+    + Environment.NewLine +
+    TagRules
+    + Environment.NewLine +
+    StructureRules;
 }

@@ -31,7 +31,7 @@ public static class ArticleGenerationExtensions
             ArticleType = ArticleTypes.TopicArticle,
         };
     }
-    public static ContentRequest ToContentRequest(this ArticleApiDto dto, TopicApiDto topic, string? userPrompt = null  )
+    public static ContentRequest ToContentRequest(this ArticleApiDto dto, TopicApiDto topic, string? userPrompt = null)
     {
         return new ContentRequest
         {
@@ -45,6 +45,14 @@ public static class ArticleGenerationExtensions
             Tags = dto.Tags,
             SortNumber = dto.SortNumber,
             UserPrompt = userPrompt,
+        };
+    }
+    public static MessageDto ToMessageDto(this Message message)
+    {
+        return new MessageDto
+        {
+            Content = message.Content,
+            Role = message.Role
         };
     }
 }

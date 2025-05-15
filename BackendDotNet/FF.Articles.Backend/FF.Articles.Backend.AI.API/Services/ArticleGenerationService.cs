@@ -1,35 +1,42 @@
 namespace FF.Articles.Backend.AI.API.Services;
 
-public class ArticleGenerationService : IArticleGenerationService
+public class ArticleGenerationService(
+  IAssistant _aiChatAssistant,
+  IContentsApiRemoteService _contentsApiRemoteService,
+  ILogger<ArticleGenerationService> _logger,
+  IRabbitMqPublisher _rabbitMqPublisher
+) : IArticleGenerationService
 {
-  private readonly IAssistant _aiChatAssistant;
-  private readonly IContentsApiRemoteService _contentsApiRemoteService;
-  private readonly ILogger<ArticleGenerationService> _logger;
-  // private readonly IDatabase _redis;
-  public ArticleGenerationService(IAssistant aiChatAssistant, IContentsApiRemoteService contentsApiRemoteService, ILogger<ArticleGenerationService> logger, IRabbitMqPublisher rabbitMqPublisher)
+  private ChatRequest GetChatRequest(List<Message> messages, string model, string provider) =>
+  new ChatRequest
   {
-    _aiChatAssistant = aiChatAssistant;
-    _contentsApiRemoteService = contentsApiRemoteService;
-    _logger = logger;
-    // _redis = redis.GetDatabase();
+    Model = model,
+    Provider = provider,
+    Messages = messages,
+    Options = new ChatOptions() { Temperature = 0.5 }
+  };
+  private async Task<string> ChatAsync(ChatRequest request, string session)
+  {
+    _logger.LogInformation("AI:{model} begin generate {session}", request.Model, session);
+    var response = await _aiChatAssistant.ChatAsync(request, new CancellationToken());
+    if (response is null || response.Message is null)
+      throw new ApiException(ErrorCode.SYSTEM_ERROR, "Failed to generate article");
+
+    _logger.LogInformation("AI:{model} end generate {session}; Milliseconds taken : {time}; Tokens: {tokens}", request.Model, session, response.ExtraInfo.Duration, response.ExtraInfo.OutputTokens);
+    var jsonContent = response.Message.Content;
+    if (string.IsNullOrEmpty(jsonContent))
+      jsonContent = "Ai generate blank content";
+
+    return jsonContent;
   }
-  /// <summary>
-  /// Round 1: Generate article lists
-  /// Ai may not generate valid json response. Send the string let frontend parse it.
-  /// </summary>
-  public async Task<string> GenerateArticleListsAsync(ArticleListRequest request, CancellationToken cancellationToken = default)
+  public async Task<string> GenerateArticleListsAsync(ArticleListRequest request)
   {
-    var model = getModel(request.Provider, false);
-    var chatRequest = new ChatRequest
+    var messages = new List<Message>
     {
-      Model = model,
-      Provider = request.Provider!,
-      Messages = {
-                Message.User(Prompts.User_ArticleList(request)),
-            },
-      Options = new ChatOptions() { Temperature = 0.5 }
-      //Options = new ChatOptions() { ResponseFormat = ChatOptions.GetResponseFormat<ArticlesAIResponseDto>(), Temperature = 0.5 }
+      Message.System(Prompts.System_ArticleList(request)),
+      Message.User(request.UserPrompt ?? Prompts.User_ArticleList)
     };
+    var chatRequest = GetChatRequest(messages, getModel(request.Provider, false), request.Provider!);
     var topic = new TopicApiAddRequest
     {
       Title = request.Topic,
@@ -37,51 +44,38 @@ public class ArticleGenerationService : IArticleGenerationService
       Abstract = request.TopicAbstract
     };
     var topicId = await _contentsApiRemoteService.AddTopic(topic, AdminUsers.SYSTEM_ADMIN_DEEPSEEK);
-
-    _logger.LogInformation("AI:{model};Begin to generate topic: {topic}; TopicId: {topicId}", model, request.Topic, topicId);
-    var response = await _aiChatAssistant.ChatAsync(chatRequest, cancellationToken);
-    var jsonContent = response?.Message?.Content ?? "";
-    _logger.LogInformation("Request to generate topic: {topic}; Milliseconds taken : {time}; Tokens: {tokens}", request.Topic, response?.ExtraInfo?.Duration, response?.ExtraInfo?.OutputTokens);
-
+    var jsonContent = await ChatAsync(chatRequest, $"Generate article list for topic: {request.Topic}");
     var extractedJson = extractJson(jsonContent, topicId, request.Category);
 
     return extractedJson;
   }
 
+  public async Task<string> RegenerateArticleListAsync(ExistingArticleListRequest request, TopicApiDto topic)
+  {
+    var messages = new List<Message>
+    {
+      Message.System(Prompts.System_RegenerateArticleList(request, topic)),
+      Message.User(request.UserPrompt ?? Prompts.User_ArticleList)
+    };
+    var chatRequest = GetChatRequest(messages, getModel(), ProviderList.DeepSeek);
+    var jsonContent = await ChatAsync(chatRequest, $"Regenerate article list for topic: {topic.Title}");
 
+    return jsonContent;
+  }
 
   public async Task<string> GenerateArticleContentAsync(ContentRequest request)
   {
     if (request.TopicId == 0 || string.IsNullOrEmpty(request.Title) || string.IsNullOrEmpty(request.Abstract) || request.Id == null)
       throw new ApiException(ErrorCode.PARAMS_ERROR, "Invalid request");
 
-    var model = getModel(request.Provider, false);
-    var chatRequest = new ChatRequest
+    var messages = new List<Message>
     {
-      Model = model,
-      Provider = request.Provider!,
-      Options = new ChatOptions() { Temperature = 0.5 }
+      Message.System(Prompts.System_ArticleContent(request)),
+      Message.User(request.UserPrompt ?? Prompts.User_ArticleContent)
     };
-    if (!string.IsNullOrEmpty(request.UserPrompt?.Trim()))
-    {
-      // Last message is user prompt
-      chatRequest.Messages.Add(Message.System(Prompts.User_ArticleContent(request)));
-      chatRequest.Messages.Add(Message.User(request.UserPrompt));
-    }
-    else
-    {
-      chatRequest.Messages.Add(Message.User(Prompts.User_ArticleContent(request)));
-    }
-    _logger.LogInformation("AI: {model}. Begin to generate article: {title}", model, request.Title);
-    var response = await _aiChatAssistant.ChatAsync(chatRequest, new CancellationToken());
-
-    var content = response?.Message?.Content ?? "";
-    if (string.IsNullOrEmpty(content)) throw new ApiException(ErrorCode.SYSTEM_ERROR, "Failed to generate article");
-
-    content = removeOuterCodeFences(content);
-    _logger.LogInformation("Request to generate article: {title}; Milliseconds taken : {time}; Tokens: {tokens}", request.Title, response?.ExtraInfo?.Duration, response?.ExtraInfo?.OutputTokens);
-
-    return content;
+    var chatRequest = GetChatRequest(messages, getModel(request.Provider, false), request.Provider!);
+    var content = await ChatAsync(chatRequest, $"Generate article: {request.Title}");
+    return removeOuterCodeFences(content);
   }
 
   public async Task<string> GenerateTopicContentAsync(TopicApiDto topic)
@@ -89,26 +83,14 @@ public class ArticleGenerationService : IArticleGenerationService
     if (topic.TopicId == 0 || string.IsNullOrEmpty(topic.Title))
       throw new ApiException(ErrorCode.PARAMS_ERROR, "Invalid request");
 
-    var model = getModel();
-    var chatRequest = new ChatRequest
+    var messages = new List<Message>
     {
-      Model = model,
-      Provider = ProviderList.DeepSeek,
-      Messages = [
-            Message.User(Prompts.User_TopicArticleContent(topic)),
-            ],
-      Options = new ChatOptions() { Temperature = 0.5 }
+      Message.System(Prompts.System_TopicArticleContent(topic)),
+      Message.User(Prompts.User_TopicArticleContent)
     };
-    _logger.LogInformation("AI: {model}. Begin to generate topic article: {title}", model, topic.Title);
-    var response = await _aiChatAssistant.ChatAsync(chatRequest, new CancellationToken());
-
-    var content = response?.Message?.Content ?? "";
-    if (string.IsNullOrEmpty(content)) throw new ApiException(ErrorCode.SYSTEM_ERROR, "Failed to generate topic article");
-
-    content = removeOuterCodeFences(content);
-    _logger.LogInformation("Request to generate topic article: {title}; Milliseconds taken : {time}; Tokens: {tokens}", topic.Title, response?.ExtraInfo?.Duration, response?.ExtraInfo?.OutputTokens);
-
-    return content;
+    var chatRequest = GetChatRequest(messages, getModel(), ProviderList.DeepSeek);
+    var content = await ChatAsync(chatRequest, $"Generate topic article: {topic.Title}");
+    return removeOuterCodeFences(content);
   }
 
 
@@ -117,51 +99,35 @@ public class ArticleGenerationService : IArticleGenerationService
   {
     if (string.IsNullOrWhiteSpace(content))
       return content;
-
     var lines = content.Split('\n').Select(l => l.TrimEnd('\r')).ToList();
-
-    // Check for opening fence
     if (lines.Count >= 2 && lines[0].StartsWith("```") && lines[^1] == "```")
     {
-      lines.RemoveAt(0);           // remove first line
-      lines.RemoveAt(lines.Count - 1);  // remove last line
+      lines.RemoveAt(0);
+      lines.RemoveAt(lines.Count - 1);
     }
-
     return string.Join("\n", lines).Trim();
   }
 
   private string getModel(string? provider = null, bool requireStructuredOutput = false)
   {
     if (provider is null || provider == ProviderList.DeepSeek)
-    {
       return requireStructuredOutput ? "deepseek-chat" : "deepseek-reasoner";
-    }
     else if (provider == ProviderList.Gemini)
-    {
       return requireStructuredOutput ? "gemini-2.5-flash-preview-04-17" : "gemini-2.5-flash-preview-04-17";
-    }
     else
-    {
       throw new ApiException(ErrorCode.PARAMS_ERROR, "Invalid provider");
-    }
   }
   private string extractJson(string jsonContent, long topicId, string category)
   {
     try
     {
-      // Extract content between first { and last }
       int firstBrace = jsonContent.IndexOf('{');
       int lastBrace = jsonContent.LastIndexOf('}');
 
       if (firstBrace >= 0 && lastBrace > firstBrace && lastBrace < jsonContent.Length)
       {
-        // Get the JSON content
         string extractedJson = jsonContent.Substring(firstBrace, lastBrace - firstBrace + 1);
-
-        // Remove the closing brace to add our properties
         string jsonWithoutClosingBrace = extractedJson.Substring(0, extractedJson.Length - 1);
-
-        // Append TopicId and Category and add the closing brace back
         jsonContent = jsonWithoutClosingBrace +
                     $", \"TopicId\": {topicId}, \"Category\": \"{category}\"" +
                     "}";

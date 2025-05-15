@@ -5,11 +5,12 @@
     - P5: Add Redis for caching or store identity API
     - P3: Refactor Contents.API to clean archtecture or DDD
     - P2: Add quick article generation
-    - P2: Generate Topic Article
+    - P2: Generate Topic Article (done)
     - P2: Generate existing topic
-    - P2: Regarnerate Article
+    - P2: Regarnerate Article (done)
+    - P2: Add Prompts API (done)
     - P2: Article add page
-    - P4: Fix Ai Gen possible codefence
+    - P4: Fix Ai Gen possible codefence (done)
     - P4: Batch update article/topic/tag
 - Frontend:
     - P3: Refactor Contexts, use reduxStore + hooks.
@@ -57,9 +58,9 @@
         - Added and organized global usings across all projects
         - Clean up backend codebase
 - Fix:
-    - 0.0.61: Fixed dockerfile
-    - 0.0.62: Fixed scrollbar and Topic articles
-    - 0.0.63: FIxed ArticleTable
+    - Fixed dockerfile
+    - Fixed scrollbar and Topic articles
+    - Fixed ArticleTable
 
 ### Release App Version 0.0.5 (09/05/2025)
 - Overview: Testing release.

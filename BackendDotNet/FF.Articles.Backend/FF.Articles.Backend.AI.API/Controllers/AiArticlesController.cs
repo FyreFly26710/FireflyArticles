@@ -6,17 +6,26 @@ public class AiArticlesController(IArticleGenerationService _articleGenerationSe
     IContentsApiRemoteService _contentsApiRemoteService,
     IRabbitMqPublisher _rabbitMqPublisher) : ControllerBase
 {
-
     [HttpPost("generate-article-list")]
-    public async Task<ApiResponse<string>> GenerateArticleList(ArticleListRequest request, CancellationToken cancellationToken)
+    public async Task<ApiResponse<string>> GenerateArticleList([FromBody] ArticleListRequest request)
     {
         var user = UserUtil.GetUserFromHttpRequest(Request);
-        var article = await _articleGenerationService.GenerateArticleListsAsync(request, cancellationToken);
+        var article = await _articleGenerationService.GenerateArticleListsAsync(request);
         return ResultUtil.Success<string>(article);
+    }
+    [HttpPost("regenerate-article-list")]
+    public async Task<ApiResponse<string>> RegenerateArticleList([FromBody] ExistingArticleListRequest request)
+    {
+        var user = UserUtil.GetUserFromHttpRequest(Request);
+        var topic = await _contentsApiRemoteService.GetTopicById(request.TopicId, true);
+        if (topic == null) throw new ApiException(ErrorCode.SYSTEM_ERROR, "Topic not found");
+        var article = await _articleGenerationService.RegenerateArticleListAsync(request, topic);
+        return ResultUtil.Success<string>(article);
+
     }
 
     [HttpPost("generate-article-content")]
-    public ApiResponse<long> GenerateArticleContent(ContentRequest request)
+    public ApiResponse<long> GenerateArticleContent([FromBody] ContentRequest request)
     {
         var user = UserUtil.GetUserFromHttpRequest(Request);
         var article = request.ToArticleApiUpsertRequest("Generating content...");
@@ -31,7 +40,7 @@ public class AiArticlesController(IArticleGenerationService _articleGenerationSe
     }
 
     [HttpPost("regenerate-article-content")]
-    public async Task<ApiResponse<bool>> RegenerateArticleContent(TopicArticleContentRequest request)
+    public async Task<ApiResponse<bool>> RegenerateArticleContent([FromBody] TopicArticleContentRequest request)
     {
         var user = UserUtil.GetUserFromHttpRequest(Request);
         var article = await _contentsApiRemoteService.GetArticleById(request.ArticleId);
