@@ -17,7 +17,7 @@ public static class Prompts
         Title: Clear and concise, describing the article's focus.
         Abstract:
             - Write abstract in plain text, do not use markdown
-            - One paragraph maximum 300 characters, very briefly cover what will be in the article. 
+            - One paragraph maximum 500 characters, very briefly cover what will be in the article. 
             - You have the overview of all articles in the topic. Carefully deside abstract. 
             - Another AI Assistant will write the ariticle based on category, topic, title, abstract, and tags for that article. He does not know what other articles are in the topic.
         Tags:
@@ -188,7 +188,7 @@ public static class Prompts
         Title: Clear and concise, describing the article's focus.
         Abstract:
             - Write abstract in plain text, do not use markdown
-            - One paragraph maximum 300 characters, very briefly cover what will be in the article. 
+            - One paragraph maximum 500 characters, very briefly cover what will be in the article. 
             - You have the overview of all articles in the topic. Carefully decide abstract. 
             - Another AI Assistant will write the article based on category, topic, title, abstract, and tags for that article.
         Tags:

@@ -113,8 +113,27 @@ public abstract class BaseConsumer : BackgroundService
 
     public override void Dispose()
     {
-        _channel.Close();
-        _connection.Close();
-        base.Dispose();
+        try
+        {
+            if (_channel?.IsOpen == true)
+            {
+                _channel.Close();
+            }
+            if (_connection?.IsOpen == true)
+            {
+                _connection.Close();
+            }
+        }
+        catch (Exception ex)
+        {
+            // Log the error but don't throw it during disposal
+            _logger.LogError(ex, "Error occurred while disposing RabbitMQ connection");
+        }
+        finally
+        {
+            _channel?.Dispose();
+            _connection?.Dispose();
+            base.Dispose();
+        }
     }
 }

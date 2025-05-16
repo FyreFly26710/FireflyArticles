@@ -142,4 +142,22 @@ declare namespace API {
     message?: string;
     data?: ChatProvider[];
   };
+
+  // Article Prompts API types
+  type MessageDto = {
+    content: string;
+    role: string;
+  };
+
+  type MessageDtoListApiResponse = {
+    code?: number;
+    message?: string;
+    data?: MessageDto[];
+  };
+
+  type ExistingArticleListRequest = {
+    topicId: number;
+    articleCount?: number;
+    userPrompt?: string;
+  };
 }

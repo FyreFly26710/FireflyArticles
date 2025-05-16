@@ -2,11 +2,12 @@
 
 import React, { useEffect, useState } from 'react';
 import { Form, Input, Button, InputNumber, Card, Typography, Row, Col, Tooltip, AutoComplete, Spin, Radio } from 'antd';
-import { SendOutlined, InfoCircleOutlined, LoadingOutlined } from '@ant-design/icons';
+import { SendOutlined, InfoCircleOutlined, LoadingOutlined, MessageOutlined } from '@ant-design/icons';
 import { apiTopicGetByPage } from '@/api/contents/api/topic';
 import { useArticleGeneration } from '@/hooks/useAiGenArticle';
 import { useAiGenContext } from '@/states/AiGenContext';
 import { getTopicsByCategory } from '@/libs/utils/articleUtils';
+import AiPromptDrawer from '@/components/shared/AiPromptDrawer';
 const { Title, Paragraph } = Typography;
 
 const ArticleGenerationForm: React.FC = () => {
@@ -18,6 +19,10 @@ const ArticleGenerationForm: React.FC = () => {
   const [topicsByCategory, setTopicsByCategory] = useState<Record<string, API.TopicDto[]>>({});
   const [topicOptions, setTopicOptions] = useState<{ value: string }[]>([]);
   const { loading } = useAiGenContext();
+  
+  // Simplified for the drawer - we only need visibility and form data
+  const [drawerVisible, setDrawerVisible] = useState(false);
+  const [formData, setFormData] = useState<API.ArticleListRequest | null>(null);
 
   useEffect(() => {
     fetchTopics();
@@ -76,6 +81,29 @@ const ArticleGenerationForm: React.FC = () => {
       await generateArticles(values);
     } catch (error) {
       console.error('Failed to generate articles:', error);
+    }
+  };
+
+  // Open drawer with form data
+  const openPromptDrawer = async () => {
+    try {
+      const values = await form.validateFields();
+      setFormData(values);
+      setDrawerVisible(true);
+    } catch (error) {
+      console.error('Validation failed:', error);
+    }
+  };
+
+  // Handle prompt confirmation
+  const handlePromptConfirm = async () => {
+    if (!formData) return;
+    
+    try {
+      await generateArticles(formData);
+      setDrawerVisible(false);
+    } catch (error) {
+      console.error('Failed to generate articles after prompt confirmation:', error);
     }
   };
 
@@ -193,17 +221,33 @@ const ArticleGenerationForm: React.FC = () => {
             </Form.Item>
 
             <Form.Item>
-              <Button
-                type="primary"
-                htmlType="submit"
-                size="large"
-                icon={<SendOutlined />}
-                style={{ width: '100%', marginTop: 16 }}
-                loading={loading}
-                disabled={loading}
-              >
-                {loading ? 'Generating...' : 'Generate Articles'}
-              </Button>
+              <Row gutter={16}>
+                <Col span={12}>
+                  <Button
+                    type="default"
+                    size="large"
+                    icon={<MessageOutlined />}
+                    style={{ width: '100%', marginTop: 16 }}
+                    onClick={openPromptDrawer}
+                    disabled={loading}
+                  >
+                    View Prompts
+                  </Button>
+                </Col>
+                <Col span={12}>
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    size="large"
+                    icon={<SendOutlined />}
+                    style={{ width: '100%', marginTop: 16 }}
+                    loading={loading}
+                    disabled={loading}
+                  >
+                    {loading ? 'Generating...' : 'Generate Articles'}
+                  </Button>
+                </Col>
+              </Row>
             </Form.Item>
           </Form>
         </Col>
@@ -223,6 +267,19 @@ const ArticleGenerationForm: React.FC = () => {
           </Card>
         </Col>
       </Row>
+
+      {/* Add the AiPromptDrawer component with simplified props */}
+      {formData && (
+        <AiPromptDrawer
+          visible={drawerVisible}
+          onClose={() => setDrawerVisible(false)}
+          onConfirm={handlePromptConfirm}
+          title="AI Prompt Preview"
+          width={600}
+          promptType="generateList"
+          requestData={formData}
+        />
+      )}
     </div>
   );
 };
