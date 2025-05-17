@@ -17,6 +17,22 @@
     - P3: Refactor Contexts, use reduxStore + hooks.
     - P3: Refactor localStorage
 
+### Release App Version 0.0.9 (17/05/2025)
+- Overview: Enhanced AI Article Generation and Prompts System
+- Changes:
+    - Feature:
+        - Added Topic Article Generation capability
+        - Added Article List Regeneration for existing topics
+        - Added Single Article Regeneration
+        - Implemented AI Prompts API and UI drawer
+    - Improvements:
+        - Enhanced AI generation with better code fence handling
+        - Added preview capability for AI prompts before generation
+        - Improved URL encoding for special characters in API requests
+        - CICD: Switched to Cloudflare tunnel
+    - Bug fix:
+        - Fixed code fence issues in AI-generated content
+        - Fixed Title length being too short
 
 ### Release App Version 0.0.8 (14/05/2025)
 - Overview: Tag Management and UI Improvements
@@ -101,15 +117,6 @@
     - Bug fix:
     - Improvements:
 - ToDo:
-
-
-## TODO List:
-- improve log
-- add redis to frontend server
-- modify controllerbase to capture errors and return error types instead of middleware.
-
-
-
 
 
 
