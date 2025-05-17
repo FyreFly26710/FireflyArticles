@@ -8,7 +8,6 @@ export const useAiGenEdit = () => {
         responseData,
         setResponseData,
         setParsedArticles,
-        setError,
         articleListRequest,
         generationState
     } = useAiGenContext();
@@ -69,11 +68,9 @@ export const useAiGenEdit = () => {
             }
 
             setParsedArticles(formattedData);
-            setError(null);
             return formattedData;
         } catch (error) {
             console.error('Error parsing article data:', error);
-            setError(error instanceof Error ? error.message : 'Failed to parse response data');
             setParsedArticles(null);
             return null;
         }
@@ -94,7 +91,7 @@ export const useAiGenEdit = () => {
 
     const generateContent = async (article: API.AIGenArticleDto) => {
         if (!articleListRequest) {
-            setError('Missing article request information');
+            message.error('Missing article request information');
             return;
         }
 
@@ -115,7 +112,7 @@ export const useAiGenEdit = () => {
             await generateArticleContent(article);
         } catch (error) {
             console.error('Error generating article content:', error);
-            setError(error instanceof Error ? error.message : 'Failed to generate article content');
+            message.error(error instanceof Error ? error.message : 'Failed to generate article content');
         }
     };
 
@@ -124,7 +121,7 @@ export const useAiGenEdit = () => {
             await generateAllArticles();
         } catch (error) {
             console.error('Error generating all article content:', error);
-            setError(error instanceof Error ? error.message : 'Failed to generate all article content');
+            message.error(error instanceof Error ? error.message : 'Failed to generate all article content');
         }
     };
 

@@ -119,8 +119,22 @@ public class ContentsApiRemoteService : IContentsApiRemoteService
         var res = await response.Content.ReadFromJsonAsync<ApiResponse<TopicApiDto>>();
         return res?.Data;
     }
+    public async Task<TopicApiDto?> GetTopicByTitleCategory(string title, string category)
+    {
+        string url = RemoteApiUrlConstant.TopicUrlByTitleCategory(title, category);
 
-    private HttpRequestMessage CreateHttpRequestMessage(HttpMethod method, string url, object payload, UserApiDto? user = null)
+        var requestMessage = CreateHttpRequestMessage(HttpMethod.Get, url);
+        var response = await _httpClient.SendAsync(requestMessage);
+        if (!response.IsSuccessStatusCode)
+        {
+            return null;
+        }
+        var res = await response.Content.ReadFromJsonAsync<ApiResponse<TopicApiDto>>();
+        return res?.Data;
+    }
+
+
+    private HttpRequestMessage CreateHttpRequestMessage(HttpMethod method, string url, object? payload = null, UserApiDto? user = null)
     {
         var requestMessage = new HttpRequestMessage(method, url);
         if (payload != null)

@@ -3,18 +3,18 @@
 import React from 'react';
 import { Typography, Row, Col, Collapse, Space, Button, Alert, Tooltip } from 'antd';
 import { ThunderboltOutlined } from '@ant-design/icons';
-import ArticleCard from './ArticleCard';
+import ArticleGenCard from './ArticleGenCard';
 import { useAiGenContext } from '@/states/AiGenContext';
 import { useAiGenEdit } from '@/hooks/useAiGenEditArticle';
 
 const { Title, Paragraph, Text } = Typography;
 const { Panel } = Collapse;
 
-interface ArticleCardListProps {
+interface ArticleGenCardListProps {
     parsedArticles: API.ArticlesAIResponse;
 }
 
-const ArticleCardList: React.FC<ArticleCardListProps> = ({ parsedArticles }) => {
+const ArticleGenCardList: React.FC<ArticleGenCardListProps> = ({ parsedArticles }) => {
     const { generationState, articleListRequest } = useAiGenContext();
     const { generateAllContent } = useAiGenEdit();
 
@@ -93,7 +93,7 @@ const ArticleCardList: React.FC<ArticleCardListProps> = ({ parsedArticles }) => 
             <Row gutter={[16, 16]}>
                 {parsedArticles.articles.map((article) => (
                     <Col xs={24} sm={24} md={12} key={article.sortNumber}>
-                        <ArticleCard article={article} />
+                        <ArticleGenCard article={article} />
                     </Col>
                 ))}
             </Row>
@@ -101,4 +101,4 @@ const ArticleCardList: React.FC<ArticleCardListProps> = ({ parsedArticles }) => 
     );
 };
 
-export default ArticleCardList; 
+export default ArticleGenCardList; 

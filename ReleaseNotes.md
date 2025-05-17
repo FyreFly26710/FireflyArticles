@@ -6,13 +6,14 @@
     - P3: Refactor Contents.API to clean archtecture or DDD
     - P2: Add quick article generation
     - P2: Generate Topic Article (done)
-    - P2: Generate existing topic
+    - P2: Regenerate list based on existing topic (done)
     - P2: Regarnerate Article (done)
     - P2: Add Prompts API (done)
     - P2: Article add page
     - P4: Fix Ai Gen possible codefence (done)
     - P4: Batch update article/topic/tag
 - Frontend:
+    - P2: Add AI Prompts drawer (done)
     - P3: Refactor Contexts, use reduxStore + hooks.
     - P3: Refactor localStorage
 

@@ -3,18 +3,18 @@ namespace FF.Articles.Backend.AI.API.Services;
 public class ArticleGenerationService(
   IAssistant _aiChatAssistant,
   IContentsApiRemoteService _contentsApiRemoteService,
-  ILogger<ArticleGenerationService> _logger,
-  IRabbitMqPublisher _rabbitMqPublisher
+  ILogger<ArticleGenerationService> _logger
+// IRabbitMqPublisher _rabbitMqPublisher
 ) : IArticleGenerationService
 {
   private ChatRequest GetChatRequest(List<Message> messages, string model, string provider) =>
-  new ChatRequest
-  {
-    Model = model,
-    Provider = provider,
-    Messages = messages,
-    Options = new ChatOptions() { Temperature = 0.5 }
-  };
+    new ChatRequest
+    {
+      Model = model,
+      Provider = provider,
+      Messages = messages,
+      Options = new ChatOptions() { Temperature = 0.5 }
+    };
   private async Task<string> ChatAsync(ChatRequest request, string session)
   {
     _logger.LogInformation("AI:{model} begin generate {session}", request.Model, session);
@@ -22,7 +22,7 @@ public class ArticleGenerationService(
     if (response is null || response.Message is null)
       throw new ApiException(ErrorCode.SYSTEM_ERROR, "Failed to generate article");
 
-    _logger.LogInformation("AI:{model} end generate {session}; Milliseconds taken : {time}; Tokens: {tokens}", request.Model, session, response.ExtraInfo.Duration, response.ExtraInfo.OutputTokens);
+    _logger.LogInformation("AI:{model} end generate {session}; Milliseconds taken : {time}; Tokens: {tokens}", request.Model, session, response.ExtraInfo.Duration, response.ExtraInfo.OutputTokens + response.ExtraInfo.InputTokens);
     var jsonContent = response.Message.Content;
     if (string.IsNullOrEmpty(jsonContent))
       jsonContent = "Ai generate blank content";
@@ -32,10 +32,10 @@ public class ArticleGenerationService(
   public async Task<string> GenerateArticleListsAsync(ArticleListRequest request)
   {
     var messages = new List<Message>
-    {
-      Message.System(Prompts.System_ArticleList(request)),
-      Message.User(request.UserPrompt ?? Prompts.User_ArticleList)
-    };
+        {
+          Message.System(Prompts.System_ArticleList(request)),
+          Message.User(string.IsNullOrEmpty(request.UserPrompt) ? Prompts.User_ArticleList : request.UserPrompt)
+        };
     var chatRequest = GetChatRequest(messages, getModel(request.Provider, false), request.Provider!);
     var topic = new TopicApiAddRequest
     {
@@ -50,17 +50,18 @@ public class ArticleGenerationService(
     return extractedJson;
   }
 
-  public async Task<string> RegenerateArticleListAsync(ExistingArticleListRequest request, TopicApiDto topic)
+  public async Task<string> RegenerateArticleListAsync(ArticleListRequest request, TopicApiDto topic)
   {
     var messages = new List<Message>
-    {
-      Message.System(Prompts.System_RegenerateArticleList(request, topic)),
-      Message.User(request.UserPrompt ?? Prompts.User_ArticleList)
-    };
+        {
+          Message.System(Prompts.System_RegenerateArticleList(request, topic)),
+          Message.User(string.IsNullOrEmpty(request.UserPrompt) ? Prompts.User_ArticleList : request.UserPrompt)
+        };
     var chatRequest = GetChatRequest(messages, getModel(), ProviderList.DeepSeek);
     var jsonContent = await ChatAsync(chatRequest, $"Regenerate article list for topic: {topic.Title}");
+    var extractedJson = extractJson(jsonContent, topic.TopicId, request.Category);
 
-    return jsonContent;
+    return extractedJson;
   }
 
   public async Task<string> GenerateArticleContentAsync(ContentRequest request)
@@ -69,10 +70,10 @@ public class ArticleGenerationService(
       throw new ApiException(ErrorCode.PARAMS_ERROR, "Invalid request");
 
     var messages = new List<Message>
-    {
-      Message.System(Prompts.System_ArticleContent(request)),
-      Message.User(request.UserPrompt ?? Prompts.User_ArticleContent)
-    };
+        {
+          Message.System(Prompts.System_ArticleContent(request)),
+          Message.User(string.IsNullOrEmpty(request.UserPrompt) ? Prompts.User_ArticleContent : request.UserPrompt)
+        };
     var chatRequest = GetChatRequest(messages, getModel(request.Provider, false), request.Provider!);
     var content = await ChatAsync(chatRequest, $"Generate article: {request.Title}");
     return removeOuterCodeFences(content);
@@ -84,10 +85,10 @@ public class ArticleGenerationService(
       throw new ApiException(ErrorCode.PARAMS_ERROR, "Invalid request");
 
     var messages = new List<Message>
-    {
-      Message.System(Prompts.System_TopicArticleContent(topic)),
-      Message.User(Prompts.User_TopicArticleContent)
-    };
+        {
+          Message.System(Prompts.System_TopicArticleContent(topic)),
+          Message.User(Prompts.User_TopicArticleContent)
+        };
     var chatRequest = GetChatRequest(messages, getModel(), ProviderList.DeepSeek);
     var content = await ChatAsync(chatRequest, $"Generate topic article: {topic.Title}");
     return removeOuterCodeFences(content);
@@ -95,17 +96,19 @@ public class ArticleGenerationService(
 
 
   #region Helper methods
+  // TODO: Need a better way to handle the code fences
   private string removeOuterCodeFences(string content)
   {
-    if (string.IsNullOrWhiteSpace(content))
-      return content;
-    var lines = content.Split('\n').Select(l => l.TrimEnd('\r')).ToList();
-    if (lines.Count >= 2 && lines[0].StartsWith("```") && lines[^1] == "```")
-    {
-      lines.RemoveAt(0);
-      lines.RemoveAt(lines.Count - 1);
-    }
-    return string.Join("\n", lines).Trim();
+    return content;
+    // if (string.IsNullOrWhiteSpace(content))
+    //     return content;
+    // var lines = content.Split('\n').Select(l => l.TrimEnd('\r')).ToList();
+    // if (lines.Count >= 2 && lines[0].StartsWith("```") && lines[^1] == "```")
+    // {
+    //     lines.RemoveAt(0);
+    //     lines.RemoveAt(lines.Count - 1);
+    // }
+    // return string.Join("\n", lines).Trim();
   }
 
   private string getModel(string? provider = null, bool requireStructuredOutput = false)
@@ -210,7 +213,7 @@ public class ArticleGenerationService(
             }
           ],
           "AiMessage": "The topic 'React in Category: Web Development' is valid. The articles cover the following key subtopics: Introduction to Components and JSX, State and Props, React Hooks (useState, useEffect), Client-Side Routing, and Component Composition. The generation of 5 articles is complete.",
-          "TopicId":"12345",
+          "TopicId":"100",
           "Category":"Web Development"
         }
         """;

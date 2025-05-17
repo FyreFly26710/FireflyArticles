@@ -5,7 +5,7 @@ import { Card, Alert, Row, Col } from 'antd';
 import { useAiGenContext } from '@/states/AiGenContext';
 import { useAiGenEdit } from '@/hooks/useAiGenEditArticle';
 import ArticleRawJson from './ArticleRawJson';
-import ArticleCardList from './ArticleCardList';
+import ArticleCardList from './ArticleGenCardList';
 
 const ArticleResults: React.FC = () => {
   const {

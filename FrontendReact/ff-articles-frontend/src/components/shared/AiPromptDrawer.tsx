@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Drawer, Button, Typography, Space, Divider, Spin } from 'antd';
 import { MessageOutlined, CheckCircleOutlined, LoadingOutlined } from '@ant-design/icons';
-import { apiAiArticlesPromptsGenerateList, apiAiArticlesPromptsRegenerateList, apiAiArticlesPromptsGenerateContent, apiAiArticlesPromptsGenerateTopicContent } from '@/api/ai/api/aiarticlesprompts';
+import { apiAiArticlesPromptsGenerateList, apiAiArticlesPromptsRegenerateList, apiAiArticlesPromptsGenerateContent, apiAiArticlesPromptsRegenerateContent } from '@/api/ai/api/aiarticlesprompts';
 
 const { Title, Text } = Typography;
 
-export type PromptType = 'generateList' | 'regenerateList' | 'generateContent' | 'generateTopicContent';
+export type PromptType = 'generateList' | 'regenerateList' | 'generateContent' | 'regenerateContent';
 
 interface AiPromptDrawerProps {
   visible: boolean;
@@ -15,7 +15,6 @@ interface AiPromptDrawerProps {
   width?: number;
   promptType: PromptType;
   requestData: any;
-  topicId?: number;
 }
 
 const AiPromptDrawer: React.FC<AiPromptDrawerProps> = ({
@@ -26,7 +25,6 @@ const AiPromptDrawer: React.FC<AiPromptDrawerProps> = ({
   width = 500,
   promptType,
   requestData,
-  topicId,
 }) => {
   const [messages, setMessages] = useState<API.MessageDto[]>([]);
   const [loading, setLoading] = useState(false);
@@ -35,34 +33,30 @@ const AiPromptDrawer: React.FC<AiPromptDrawerProps> = ({
     if (visible) {
       fetchPrompts();
     }
-  }, [visible, promptType, requestData, topicId]);
+  }, [visible, promptType, requestData]);
 
   const fetchPrompts = async () => {
     if (!visible) return;
-    
+
     setLoading(true);
     try {
-      let response;
-      
+      let response: API.MessageDtoListApiResponse | undefined;
+
       switch (promptType) {
         case 'generateList':
-          response = await apiAiArticlesPromptsGenerateList(requestData);
+          response = await apiAiArticlesPromptsGenerateList(requestData as API.ArticleListRequest);
           break;
         case 'regenerateList':
-          response = await apiAiArticlesPromptsRegenerateList(requestData);
+          response = await apiAiArticlesPromptsRegenerateList(requestData as API.ExistingArticleListRequest);
           break;
         case 'generateContent':
-          response = await apiAiArticlesPromptsGenerateContent(requestData);
+          response = await apiAiArticlesPromptsGenerateContent(requestData as API.ContentRequest);
           break;
-        case 'generateTopicContent':
-          if (!topicId) {
-            console.error('Topic ID is required for generateTopicContent');
-            return;
-          }
-          response = await apiAiArticlesPromptsGenerateTopicContent(topicId);
+        case 'regenerateContent':
+          response = await apiAiArticlesPromptsRegenerateContent(requestData as API.RegenerateArticleContentRequest);
           break;
       }
-      
+
       if (response?.data) {
         setMessages(response.data);
       }
@@ -73,30 +67,28 @@ const AiPromptDrawer: React.FC<AiPromptDrawerProps> = ({
     }
   };
 
-  const renderMessageContent = (content: string, role: string) => {
-    // If the content is likely markdown (has code blocks, headers, etc.)
-    const hasMarkdown = 
-      content.includes('```') || 
-      content.includes('#') ||
-      content.includes('*') ||
-      content.includes('- ');
+  const handleConfirm = () => {
+    onConfirm();
+    onClose();
+  };
 
+  const renderMessageContent = (content: string, role: string) => {
     // Special styling for system messages
     const isSystem = role.toLowerCase() === 'system';
-    
+
     return (
-      <div 
-        style={{ 
+      <div
+        style={{
           backgroundColor: isSystem ? '#f6f6f6' : (role.toLowerCase() === 'user' ? '#e6f7ff' : '#f0f9eb'),
           padding: '12px',
           borderRadius: '8px',
           marginBottom: '12px',
-          maxHeight: '400px',
+          maxHeight: '500px',
           overflowY: 'auto',
         }}
       >
         <Text strong style={{ color: isSystem ? '#666' : (role.toLowerCase() === 'user' ? '#1890ff' : '#52c41a') }}>
-          {role.charAt(0).toUpperCase() + role.slice(1)}:
+          {role.charAt(0).toUpperCase() + role.slice(1)} Prompt:
         </Text>
         <div style={{ whiteSpace: 'pre-wrap' }}>{content}</div>
       </div>
@@ -120,7 +112,7 @@ const AiPromptDrawer: React.FC<AiPromptDrawerProps> = ({
           <Button onClick={onClose} style={{ marginRight: 8 }}>
             Cancel
           </Button>
-          <Button onClick={onConfirm} type="primary" icon={<CheckCircleOutlined />} disabled={loading}>
+          <Button onClick={handleConfirm} type="primary" icon={<CheckCircleOutlined />} disabled={loading}>
             Confirm
           </Button>
         </div>

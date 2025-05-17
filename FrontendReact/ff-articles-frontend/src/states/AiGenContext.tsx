@@ -16,8 +16,6 @@ interface AiGenContextType {
   setResponseData: (data: string) => void;
   parsedArticles: API.ArticlesAIResponse | null;
   setParsedArticles: (articles: API.ArticlesAIResponse | null) => void;
-  error: string | null;
-  setError: (error: string | null) => void;
   clearResults: () => void;
   articleListRequest: API.ArticleListRequest | null;
   setArticleListRequest: (request: API.ArticleListRequest | null) => void;
@@ -32,14 +30,12 @@ export const AiGenProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const [loading, setLoading] = useState(false);
   const [responseData, setResponseData] = useState('');
   const [parsedArticles, setParsedArticles] = useState<API.ArticlesAIResponse | null>(null);
-  const [error, setError] = useState<string | null>(null);
   const [articleListRequest, setArticleListRequest] = useState<API.ArticleListRequest | null>(null);
   const [generationState, setGenerationState] = useState<ArticleGenerationState>({});
 
   const clearResults = () => {
     setResponseData('');
     setParsedArticles(null);
-    setError(null);
     setArticleListRequest(null);
     resetArticleGenerationState();
   };
@@ -70,8 +66,6 @@ export const AiGenProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         setResponseData,
         parsedArticles,
         setParsedArticles,
-        error,
-        setError,
         clearResults,
         articleListRequest,
         setArticleListRequest,

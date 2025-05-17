@@ -135,9 +135,7 @@ public static class Prompts
     {string.Join("\n\n", topic.Articles.Select(article =>
         $"• Article ID: {article.ArticleId}\n" +
         $"  Title: {article.Title}\n" +
-        $"  Abstract: {article.Abstract}\n" +
-        $"  Content Summary: {(string.IsNullOrEmpty(article.Content) ? "No content available" :
-            (article.Content.Length > 200 ? article.Content.Substring(0, 200) + "..." : article.Content))}"
+        $"  Abstract: {article.Abstract}\n"
     ))}
     """
     : "No article details available.")}
@@ -162,7 +160,7 @@ public static class Prompts
     The summary should show how all articles in the collection relate to each other and the main topic, creating a roadmap for readers to navigate the content.
     """;
 
-    public static string System_RegenerateArticleList(ExistingArticleListRequest request, TopicApiDto topic) =>
+    public static string System_RegenerateArticleList(ArticleListRequest request, TopicApiDto topic) =>
     $"""
     Take a deep breath. Think step by step.
     Generate {request.ArticleCount} additional articles to expand the existing collection for Topic: {topic.Title} in Category: {topic.Category}.

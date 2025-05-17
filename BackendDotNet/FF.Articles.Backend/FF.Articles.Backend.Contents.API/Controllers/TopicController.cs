@@ -32,6 +32,14 @@ public class TopicController(ITopicService _topicService) : ControllerBase
         return ResultUtil.Success(res);
     }
 
+    [HttpGet("search")]
+    public async Task<ApiResponse<TopicDto>> Search([FromQuery] string title, [FromQuery] string category)
+    {
+        var topicDto = await _topicService.GetTopicByTitleCategory(title, category);
+        if (topicDto == null) throw new ApiException(ErrorCode.NOT_FOUND_ERROR, "Topic not found");
+        return ResultUtil.Success(topicDto);
+    }
+
     [HttpPost]
     [Authorize(Roles = UserConstant.ADMIN_ROLE)]
     public async Task<ApiResponse<long>> AddByRequest([FromBody] TopicAddRequest topicAddRequest)

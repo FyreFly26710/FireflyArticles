@@ -10,16 +10,16 @@ public class AiArticlesController(IArticleGenerationService _articleGenerationSe
     public async Task<ApiResponse<string>> GenerateArticleList([FromBody] ArticleListRequest request)
     {
         var user = UserUtil.GetUserFromHttpRequest(Request);
-        var article = await _articleGenerationService.GenerateArticleListsAsync(request);
-        return ResultUtil.Success<string>(article);
-    }
-    [HttpPost("regenerate-article-list")]
-    public async Task<ApiResponse<string>> RegenerateArticleList([FromBody] ExistingArticleListRequest request)
-    {
-        var user = UserUtil.GetUserFromHttpRequest(Request);
-        var topic = await _contentsApiRemoteService.GetTopicById(request.TopicId, true);
-        if (topic == null) throw new ApiException(ErrorCode.SYSTEM_ERROR, "Topic not found");
-        var article = await _articleGenerationService.RegenerateArticleListAsync(request, topic);
+        var topic = await _contentsApiRemoteService.GetTopicByTitleCategory(request.Topic, request.Category);
+        var article = string.Empty;
+        if (topic == null)
+        {
+            article = await _articleGenerationService.GenerateArticleListsAsync(request);
+        }
+        else
+        {
+            article = await _articleGenerationService.RegenerateArticleListAsync(request, topic);
+        }
         return ResultUtil.Success<string>(article);
 
     }
@@ -40,7 +40,7 @@ public class AiArticlesController(IArticleGenerationService _articleGenerationSe
     }
 
     [HttpPost("regenerate-article-content")]
-    public async Task<ApiResponse<bool>> RegenerateArticleContent([FromBody] TopicArticleContentRequest request)
+    public async Task<ApiResponse<bool>> RegenerateArticleContent([FromBody] RegenerateArticleContentRequest request)
     {
         var user = UserUtil.GetUserFromHttpRequest(Request);
         var article = await _contentsApiRemoteService.GetArticleById(request.ArticleId);

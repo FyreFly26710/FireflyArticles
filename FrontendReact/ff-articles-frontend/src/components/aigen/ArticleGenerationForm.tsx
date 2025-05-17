@@ -19,7 +19,7 @@ const ArticleGenerationForm: React.FC = () => {
   const [topicsByCategory, setTopicsByCategory] = useState<Record<string, API.TopicDto[]>>({});
   const [topicOptions, setTopicOptions] = useState<{ value: string }[]>([]);
   const { loading } = useAiGenContext();
-  
+
   // Simplified for the drawer - we only need visibility and form data
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [formData, setFormData] = useState<API.ArticleListRequest | null>(null);
@@ -98,7 +98,7 @@ const ArticleGenerationForm: React.FC = () => {
   // Handle prompt confirmation
   const handlePromptConfirm = async () => {
     if (!formData) return;
-    
+
     try {
       await generateArticles(formData);
       setDrawerVisible(false);
@@ -159,7 +159,7 @@ const ArticleGenerationForm: React.FC = () => {
                     }
                     onChange={handleCategoryChange}
                   >
-                    <Input size="large" />
+                    <Input size="large" placeholder="Please select a category or enter a new one" />
                   </AutoComplete>
                 </Form.Item>
               </Col>
@@ -200,9 +200,9 @@ const ArticleGenerationForm: React.FC = () => {
             <Form.Item
               name="topicAbstract"
               label="Description"
-              rules={[{ required: true, message: 'Please enter topic description' }]}
+              rules={[{ message: 'Please enter topic description' }]}
             >
-              <Input.TextArea rows={2} size="large" style={{ resize: 'none' }} />
+              <Input.TextArea rows={2} size="large" style={{ resize: 'none' }} placeholder="Optional: Enter a description for the topic" />
             </Form.Item>
 
             {/* Model Selection */}
@@ -218,6 +218,9 @@ const ArticleGenerationForm: React.FC = () => {
                   </Radio.Button>
                 ))}
               </Radio.Group>
+            </Form.Item>
+            <Form.Item name="userPrompt" label="User Prompt">
+              <Input.TextArea rows={2} size="large" style={{ resize: 'none' }} placeholder="Optional: Add your own prompt" />
             </Form.Item>
 
             <Form.Item>
@@ -268,7 +271,6 @@ const ArticleGenerationForm: React.FC = () => {
         </Col>
       </Row>
 
-      {/* Add the AiPromptDrawer component with simplified props */}
       {formData && (
         <AiPromptDrawer
           visible={drawerVisible}

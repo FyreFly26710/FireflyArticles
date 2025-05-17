@@ -61,10 +61,18 @@ public class TopicService(
         });
         return true;
     }
-    public async Task<Topic?> GetTopicByTitle(string title)
+    public async Task<TopicDto?> GetTopicByTitleCategory(string title, string category)
     {
-        return await _topicRepository.GetQueryable()
-            .FirstOrDefaultAsync(t => t.Title.Trim().ToLower() == title.Trim().ToLower());
+        var topic = await _topicRepository.GetQueryable()
+            .FirstOrDefaultAsync(t => t.Title.Trim().ToLower() == title.Trim().ToLower()
+                 && t.Category.Trim().ToLower() == category.Trim().ToLower());
+        if (topic == null) return null;
+        var request = new TopicQueryRequest
+        {
+            IncludeArticles = true,
+        };
+        var topicDto = await GetTopicDto(topic, request);
+        return topicDto;
     }
     public override async Task<bool> DeleteAsync(long topicId)
     {

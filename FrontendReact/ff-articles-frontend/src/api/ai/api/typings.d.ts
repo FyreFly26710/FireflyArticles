@@ -96,6 +96,7 @@ declare namespace API {
     category: string;
     articleCount?: number;
     provider: string;
+    userPrompt?: string;
   };
 
   type ArticlesAIResponseDto = {
@@ -128,7 +129,7 @@ declare namespace API {
     tags: string[];
     provider: string;
   };
-  type TopicArticleContentRequest = {
+  type RegenerateArticleContentRequest = {
     articleId: number;
     userPrompt?: string;
   };

@@ -8,25 +8,20 @@ import {
   ReloadOutlined
 } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
-import { apiAiArticlesRegenerateContent } from '@/api/ai/api/aiarticles';
 
 interface ArticleButtonsProps {
   article: API.ArticleDto;
-  onEditModal?: () => void;
+  onEditModal: () => void;
+  onRegenerateArticle: () => void;
 }
 
-const ArticleButtons = ({ article, onEditModal }: ArticleButtonsProps) => {
+const ArticleButtons = ({ article, onEditModal, onRegenerateArticle }: ArticleButtonsProps) => {
   const router = useRouter();
 
   const handleNewArticle = () => {
     router.push(`/topic/${article.topicId}/new`);
   };
 
-  const handleOpenArticleModal = () => {
-    if (onEditModal) {
-      onEditModal();
-    }
-  };
 
   const handleScrollToTop = () => {
     const contentContainer = document.querySelector('.content-container');
@@ -35,19 +30,6 @@ const ArticleButtons = ({ article, onEditModal }: ArticleButtonsProps) => {
         top: 0,
         behavior: 'smooth'
       });
-    }
-  };
-
-  const handleRegenerateArticle = async () => {
-    try {
-
-      await apiAiArticlesRegenerateContent({
-        articleId: article.articleId,
-      });
-      window.location.reload();
-    } catch (error) {
-      message.error({ content: 'Failed to regenerate article content', key: 'regenerate' });
-      console.error('Error regenerating article:', error);
     }
   };
 
@@ -66,12 +48,12 @@ const ArticleButtons = ({ article, onEditModal }: ArticleButtonsProps) => {
       <FloatButton
         icon={<EditOutlined />}
         tooltip="Edit Article"
-        onClick={handleOpenArticleModal}
+        onClick={onEditModal}
       />
       <FloatButton
         icon={<ReloadOutlined />}
         tooltip="Regenerate with AI"
-        onClick={handleRegenerateArticle}
+        onClick={onRegenerateArticle}
       />
       <FloatButton
         icon={<VerticalAlignTopOutlined />}

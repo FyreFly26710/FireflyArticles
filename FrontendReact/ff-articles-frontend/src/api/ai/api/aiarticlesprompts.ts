@@ -45,17 +45,17 @@ export async function apiAiArticlesPromptsGenerateContent(
     ...(options || {}),
   });
 }
-
-/** POST /api/ai/articles-prompts/generate-topic-content/{topicId} */
-export async function apiAiArticlesPromptsGenerateTopicContent(
-  topicId: number,
+/** POST /api/ai/articles-prompts/regenerate-article-content */
+export async function apiAiArticlesPromptsRegenerateContent(
+  body: API.RegenerateArticleContentRequest,
   options?: { [key: string]: any }
 ) {
-  return request<API.MessageDtoListApiResponse>(`/api/ai/articles-prompts/generate-topic-content/${topicId}`, {
+  return request<API.MessageDtoListApiResponse>("/api/ai/articles-prompts/regenerate-article-content", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
+    data: body,
     ...(options || {}),
   });
 }

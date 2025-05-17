@@ -1,4 +1,6 @@
-﻿namespace FF.Articles.Backend.Common.Constants;
+﻿using System.Web;
+
+namespace FF.Articles.Backend.Common.Constants;
 public static class RemoteApiUrlConstant
 {
     /// <summary>
@@ -16,5 +18,7 @@ public static class RemoteApiUrlConstant
     public static string ArticleUrl(long articleId) => $"/api/contents/articles/{articleId}";
     public static string TopicUrl() => $"/api/contents/topics";
     public static string TopicUrl(long topicId) => $"/api/contents/topics/{topicId}";
+    public static string TopicUrlByTitleCategory(string title, string category) =>
+        $"/api/contents/topics/search?Title={HttpUtility.UrlEncode(title)}&Category={HttpUtility.UrlEncode(category)}";
 }
 

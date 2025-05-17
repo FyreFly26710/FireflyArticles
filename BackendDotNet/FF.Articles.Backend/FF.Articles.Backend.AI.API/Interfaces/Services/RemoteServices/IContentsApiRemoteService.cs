@@ -10,4 +10,6 @@ public interface IContentsApiRemoteService
     Task<bool> EditArticleContentAsync(long articleId, string content);
     Task<ArticleApiDto?> GetArticleById(long articleId);
     Task<TopicApiDto?> GetTopicById(long topicId, bool isTopicArticle);
+    Task<TopicApiDto?> GetTopicByTitleCategory(string title, string category);
+
 }

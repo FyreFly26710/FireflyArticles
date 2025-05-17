@@ -17,6 +17,20 @@ export async function apiAiArticlesGenerateList(
   });
 }
 
+/** POST /api/ai/articles/regenerate-article-list */
+export async function apiAiArticlesRegenerateList(
+  body: API.ExistingArticleListRequest,
+  options?: { [key: string]: any }
+) {
+  return request<API.ArticlesAIResponseDto>("/api/ai/articles/regenerate-article-list", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
 /** POST /api/ai/articles/generate-article-content */
 export async function apiAiArticlesGenerateContent(
   body: API.ContentRequest,
@@ -34,7 +48,7 @@ export async function apiAiArticlesGenerateContent(
 
 /** POST /api/ai/articles/regenerate-article-content */
 export async function apiAiArticlesRegenerateContent(
-  body: API.TopicArticleContentRequest,
+  body: API.RegenerateArticleContentRequest,
   options?: { [key: string]: any }
 ) {
   return request<API.BooleanApiResponse>("/api/ai/articles/regenerate-article-content", {
@@ -43,7 +57,6 @@ export async function apiAiArticlesRegenerateContent(
       "Content-Type": "application/json",
     },
     data: body,
-    timeout: 2 * 60 * 1000,
     ...(options || {}),
   });
 }

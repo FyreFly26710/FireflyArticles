@@ -3,13 +3,12 @@ import { message } from 'antd';
 import { useAiGenContext } from '@/states/AiGenContext';
 
 const useArticleGeneration = () => {
-    const { setLoading, setResponseData, setError, setArticleListRequest } = useAiGenContext();
+    const { setLoading, setResponseData, setArticleListRequest } = useAiGenContext();
 
     // Round 1: Generate article list
     const generateArticles = async (articleListRequest: API.ArticleListRequest) => {
         try {
             setLoading(true);
-            setError(null);
 
             // Save the request to context
             setArticleListRequest(articleListRequest);
@@ -17,7 +16,6 @@ const useArticleGeneration = () => {
             const response = await apiAiArticlesGenerateList(articleListRequest);
             if (response.code !== 200) {
                 console.log('Error generating articles:', response.message);
-                setError(response.message || 'Failed to generate articles');
                 throw new Error(response.message);
             }
 
@@ -26,7 +24,6 @@ const useArticleGeneration = () => {
             // Handle the string response
             if (typeof jsonData !== 'string') {
                 const error = 'Invalid response: Expected string data';
-                setError(error);
                 throw new Error(error);
             }
 
@@ -35,9 +32,9 @@ const useArticleGeneration = () => {
         } catch (error) {
             console.error('Error in generateArticles:', error);
             if (error instanceof Error) {
-                setError(error.message);
+                message.error(error.message);
             } else {
-                setError('An unknown error occurred');
+                message.error('An unknown error occurred');
             }
             throw error;
         } finally {
