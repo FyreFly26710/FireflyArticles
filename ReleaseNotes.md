@@ -4,20 +4,36 @@
 - Backend:
     - P5: Add Redis for caching or store identity API
     - P3: Refactor Contents.API to clean archtecture or DDD
-    - P2: Add quick article generation
-    - P2: Generate Topic Article (done)
-    - P2: Regenerate list based on existing topic (done)
-    - P2: Regarnerate Article (done)
-    - P2: Add Prompts API (done)
-    - P2: Article add page
-    - P4: Fix Ai Gen possible codefence (done)
-    - P4: Batch update article/topic/tag
+    - P1: Add quick article generation
+    - P4: Article add page
+    - P1: Batch update article/topic/tag
+    - P1: Improve Admin page
+    - P1: Fix 2 minutes time out error
+    - P5: A summary of entire content database
+    - P1: Update remove code fence rule
 - Frontend:
-    - P2: Add AI Prompts drawer (done)
     - P3: Refactor Contexts, use reduxStore + hooks.
     - P3: Refactor localStorage
+    - P1: Remove focus area / tech stack tags
+    - P1: Move regen button to article card
+    - P1: Edit prompt in prompt drawer
+- Other:
+    - Add readme.md
+    - Add mermaid diagram
+    - Change CICD branch naming convension.
 
-### Release App Version 0.0.9 (17/05/2025)
+---
+
+
+### App Version 0.1.0
+- Overview: Release
+
+---
+### App Version 0.0.11
+- Overview: Enhanced admin page and fixed bugs
+
+---
+### App Version 0.0.9 (17/05/2025)
 - Overview: Enhanced AI Article Generation and Prompts System
 - Changes:
     - Feature:
@@ -34,7 +50,8 @@
         - Fixed code fence issues in AI-generated content
         - Fixed Title length being too short
 
-### Release App Version 0.0.8 (14/05/2025)
+---
+### App Version 0.0.8 (14/05/2025)
 - Overview: Tag Management and UI Improvements
 - Changes:
     - Feature:
@@ -45,7 +62,8 @@
         - Exclude AppHost from Dockerfile
         - Disable migrations in prod env
 
-### Release App Version 0.0.7 (13/05/2025)
+---
+### App Version 0.0.7 (13/05/2025)
 - Overview: Tag Selector Improvements
 - Changes:
     - Feature:
@@ -59,7 +77,8 @@
         - Fixed topic image display
         - Adjusted article table layout
 
-### Release App Version 0.0.6 (11/05/2025)
+---
+### App Version 0.0.6 (11/05/2025)
 - Overview: Nearly Ready.
 - Changes:
     - Feature:
@@ -79,7 +98,8 @@
     - Fixed scrollbar and Topic articles
     - Fixed ArticleTable
 
-### Release App Version 0.0.5 (09/05/2025)
+---
+### App Version 0.0.5 (09/05/2025)
 - Overview: Testing release.
 - Changes:
     - Feature: 
@@ -91,32 +111,18 @@
         - Improved AI Article Gen process: 
             Ai.API send back the entire response to client. Client handle json parse.
 
-### Release App Version 0.0.4 (04/05/2025)
+---
+### App Version 0.0.4 (04/05/2025)
 - Overview: Testing release.
 - Changes:
     - Bug fix: Fix Gmail OAuth and add more checks
 
-### Release App Version 0.0.3 (27/04/2025)
+---
+### App Version 0.0.3 (27/04/2025)
 - Overview: Testing release.
 - Changes:
     - Feature: Added RabbitMQ
     - Improvements: 
         - Added dockerfile and docker compose for dev
         - Use generate articles using MQ
-
-
-
-
-
-## Template
-
-### Release App Version X.Y.Z (dd/mm/yyyy)
-- Overview: Testing release.
-- Changes:
-    - Feature:
-    - Bug fix:
-    - Improvements:
-- ToDo:
-
-
 

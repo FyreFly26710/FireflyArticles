@@ -8,16 +8,12 @@ on:
   workflow_dispatch:
 # Commit message format to trigger the workflow:
 # 
-# Release Frontend Version X.Y.Z - Only builds and pushes the frontend
-# Release Backend Version X.Y.Z - Only builds and pushes the backend
-# Release App Version X.Y.Z - Builds and pushes both frontend and backend 
+# App Version X.Y.Z - Builds and pushes both frontend and backend 
 # 
 jobs:
   check-commit:
     runs-on: ubuntu-latest
     outputs:
-      build_frontend: ${{ steps.check.outputs.build_frontend }}
-      build_backend: ${{ steps.check.outputs.build_backend }}
       build_app: ${{ steps.check.outputs.build_app }}
       version: ${{ steps.check.outputs.version }}
     
@@ -33,42 +29,20 @@ jobs:
           COMMIT_MSG=$(git log -1 --pretty=%B)
           echo "Commit message: $COMMIT_MSG"
           
-          if [[ "$COMMIT_MSG" =~ Release[[:space:]]+(Frontend|Backend|App)[[:space:]]+Version[[:space:]]+([0-9]+\.[0-9]+\.[0-9]+) ]]; then
-            
-            # Extract version from commit message
+          if [[ "$COMMIT_MSG" =~ App[[:space:]]+Version[[:space:]]+([0-9]+\.[0-9]+\.[0-9]+) ]]; then
             VERSION=$(echo "$COMMIT_MSG" | grep -oP 'Version \K[0-9]+\.[0-9]+\.[0-9]+')
             echo "version=$VERSION" >> $GITHUB_OUTPUT
             echo "Extracted version: $VERSION"
             
-            if [[ "$COMMIT_MSG" =~ Release[[:space:]]+Frontend ]]; then
-              echo "build_frontend=true" >> $GITHUB_OUTPUT
-            else
-              echo "build_frontend=false" >> $GITHUB_OUTPUT
-            fi
-            
-            if [[ "$COMMIT_MSG" =~ Release[[:space:]]+Backend ]]; then
-              echo "build_backend=true" >> $GITHUB_OUTPUT
-            else
-              echo "build_backend=false" >> $GITHUB_OUTPUT
-            fi
-            
-            if [[ "$COMMIT_MSG" =~ Release[[:space:]]+App ]]; then
-              echo "build_app=true" >> $GITHUB_OUTPUT
-              echo "build_frontend=true" >> $GITHUB_OUTPUT
-              echo "build_backend=true" >> $GITHUB_OUTPUT
-            else
-              echo "build_app=false" >> $GITHUB_OUTPUT
-            fi
+            echo "build_app=true" >> $GITHUB_OUTPUT
           else
-            echo "build_frontend=false" >> $GITHUB_OUTPUT
-            echo "build_backend=false" >> $GITHUB_OUTPUT
             echo "build_app=false" >> $GITHUB_OUTPUT
             echo "version=latest" >> $GITHUB_OUTPUT
           fi
 
   build-and-push-frontend:
     needs: check-commit
-    if: needs.check-commit.outputs.build_frontend == 'true'
+    if: needs.check-commit.outputs.build_app == 'true'
     runs-on: ubuntu-latest
 
     steps:
@@ -88,7 +62,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and push frontend image
-        if: needs.check-commit.outputs.build_frontend == 'true'
+        if: needs.check-commit.outputs.build_app == 'true'
         uses: docker/build-push-action@v4
         with:
           context: ./FrontendReact/ff-articles-frontend
@@ -102,6 +76,7 @@ jobs:
 
   deploy-frontend-to-server:
     needs: build-and-push-frontend
+    if: needs.check-commit.outputs.build_app == 'true'
     runs-on: ubuntu-latest
 
     steps:
