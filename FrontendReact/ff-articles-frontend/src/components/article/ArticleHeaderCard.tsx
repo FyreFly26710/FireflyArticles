@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, Typography, Tag, Space, Avatar, Divider, Button, Input, Tooltip, message } from 'antd';
-import { UserOutlined, CalendarOutlined, EditOutlined, PlusOutlined, CloseOutlined, SaveOutlined } from '@ant-design/icons';
+import { UserOutlined, CalendarOutlined, EditOutlined, PlusOutlined, CloseOutlined, SaveOutlined, ReloadOutlined } from '@ant-design/icons';
 import dynamic from 'next/dynamic';
 import { useArticleEdit } from '@/hooks/useArticleEdit';
 import { useState, useEffect } from 'react';
@@ -19,9 +19,10 @@ const { TextArea } = Input;
 
 interface ArticleHeaderCardProps {
   article: API.ArticleDto;
+  onRegenerateArticle: () => void;
 }
 
-const ArticleHeaderCard = ({ article }: ArticleHeaderCardProps) => {
+const ArticleHeaderCard = ({ article, onRegenerateArticle }: ArticleHeaderCardProps) => {
   const { isEditing, currentArticle, startEditing, updateArticle, cancelEditing, submitEdit } = useArticleEdit();
   const [tags, setTags] = useState<API.TagDto[]>([]);
   useEffect(() => {
@@ -97,13 +98,22 @@ const ArticleHeaderCard = ({ article }: ArticleHeaderCardProps) => {
               </Button>
             </Space>
           ) : (
-            <Button
-              type="primary"
-              icon={<EditOutlined />}
-              onClick={() => startEditing(article)}
-            >
-              Edit
-            </Button>
+            <Space.Compact>
+              <Button
+                type="primary"
+                icon={<EditOutlined />}
+                onClick={() => startEditing(article)}
+              >
+                Edit
+              </Button>
+              <Button
+                type="primary"
+                icon={<ReloadOutlined />}
+                onClick={onRegenerateArticle}
+              >
+                Generate
+              </Button>
+            </Space.Compact>
           )}
         </div>
 

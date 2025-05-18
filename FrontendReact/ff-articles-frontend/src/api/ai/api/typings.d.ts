@@ -97,6 +97,7 @@ declare namespace API {
     articleCount?: number;
     provider: string;
     userPrompt?: string;
+    topicImage?: string;
   };
 
   type ArticlesAIResponseDto = {

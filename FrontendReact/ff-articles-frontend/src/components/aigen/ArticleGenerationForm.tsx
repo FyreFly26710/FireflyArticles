@@ -196,11 +196,17 @@ const ArticleGenerationForm: React.FC = () => {
               </AutoComplete>
             </Form.Item>
 
+            <Form.Item
+              name="topicImage"
+              label="Topic Image"
+            >
+              <Input size="large" placeholder="Enter topic image url" />
+            </Form.Item>
+
             {/* Description - Full Width, 2 lines */}
             <Form.Item
               name="topicAbstract"
               label="Description"
-              rules={[{ message: 'Please enter topic description' }]}
             >
               <Input.TextArea rows={2} size="large" style={{ resize: 'none' }} placeholder="Optional: Enter a description for the topic" />
             </Form.Item>

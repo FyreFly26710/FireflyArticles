@@ -63,7 +63,7 @@ const ArticleCard = ({ topicId, article }: ArticleCardProps) => {
         <div>
             <Row gutter={[16, 16]} style={{ margin: '0px' }}>
                 <Col xs={24} lg={24}>
-                    <ArticleHeaderCard article={article} />
+                    <ArticleHeaderCard article={article} onRegenerateArticle={() => setIsPromptVisible(true)} />
                 </Col>
                 <Col xs={24} lg={24}>
                     <ArticleContentCard article={article} />

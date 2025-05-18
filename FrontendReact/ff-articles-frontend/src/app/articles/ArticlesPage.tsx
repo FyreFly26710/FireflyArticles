@@ -10,16 +10,16 @@ import { ArticlesProvider } from "@/states/ArticlesContext";
 const ArticlesPage = async () => {
     try {
         // Fetch initial articles with server-side rendering
-        const articlesResponse = await apiArticleGetByPage({
-            PageNumber: 1,
-            PageSize: 10,
-            IncludeUser: false,
-            DisplaySubArticles: true,
-            SortByRelevance: true,
-        });
+        // const articlesResponse = await apiArticleGetByPage({
+        //     PageNumber: 1,
+        //     PageSize: 10,
+        //     IncludeUser: false,
+        //     DisplaySubArticles: true,
+        //     SortByRelevance: true,
+        // });
 
-        const articles = articlesResponse.data?.data || [];
-        const totalCount = articlesResponse.data?.counts || 0;
+        // const articles = articlesResponse.data?.data || [];
+        // const totalCount = articlesResponse.data?.counts || 0;
 
         const topicsResponse = await apiTopicGetByPage({
             PageNumber: 1,
@@ -37,8 +37,6 @@ const ArticlesPage = async () => {
             <div className="max-width-content">
                 <Suspense fallback={<div>Loading filters...</div>}>
                     <ArticlesProvider
-                        initialArticles={articles}
-                        initialTotal={totalCount}
                         initialTopics={topics}
                         initialTags={tags}
                         initialTopicsByCategory={topicsByCategory}

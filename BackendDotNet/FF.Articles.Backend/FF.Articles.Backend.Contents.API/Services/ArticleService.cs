@@ -153,25 +153,24 @@ public class ArticleService(
         Paged<Article> pagedData;
 
         // Disable elasticsearch, need more testing
-        if (pageRequest.SortByRelevance && !string.IsNullOrEmpty(pageRequest.Keyword))
-        {
-            // List<long>? articleIds = null;
-            // // tagid - articleId is many to many, get all articleIds from tagIds and pass articleIds to elasticsearch
-            // if (pageRequest.TagIds?.Count > 0)
-            // {
-            //     var articleTags = await _articleTagRepository.GetByIdsAsync(pageRequest.TagIds);
-            //     articleIds = articleTags.Select(at => at.ArticleId).Distinct().ToList();
-            // }
-            // pagedData = await _elasticsearchService.SearchArticlesAsync(pageRequest.Keyword, pageRequest.PageSize, pageRequest.PageNumber, pageRequest.TopicIds, articleIds);
-            var query = _articleRepository.BuildSearchQueryFromRequest(pageRequest);
-            pagedData = await _articleRepository.GetPagedFromQueryAsync(query, pageRequest);
-        }
-        else
-        {
-            var query = _articleRepository.BuildSearchQueryFromRequest(pageRequest);
-            pagedData = await _articleRepository.GetPagedFromQueryAsync(query, pageRequest);
-        }
-
+        // if (pageRequest.SortByRelevance && !string.IsNullOrEmpty(pageRequest.Keyword))
+        // {
+        //     List<long>? articleIds = null;
+        //     // tagid - articleId is many to many, get all articleIds from tagIds and pass articleIds to elasticsearch
+        //     if (pageRequest.TagIds?.Count > 0)
+        //     {
+        //         var articleTags = await _articleTagRepository.GetByIdsAsync(pageRequest.TagIds);
+        //         articleIds = articleTags.Select(at => at.ArticleId).Distinct().ToList();
+        //     }
+        //     pagedData = await _elasticsearchService.SearchArticlesAsync(pageRequest.Keyword, pageRequest.PageSize, pageRequest.PageNumber, pageRequest.TopicIds, articleIds);
+        // }
+        // else
+        // {
+        //     var query = _articleRepository.BuildSearchQueryFromRequest(pageRequest);
+        //     pagedData = await _articleRepository.GetPagedFromQueryAsync(query, pageRequest);
+        // }
+        var query = _articleRepository.BuildSearchQueryFromRequest(pageRequest);
+        pagedData = await _articleRepository.GetPagedFromQueryAsync(query, pageRequest);
         var articleList = await GetArticleDtos(pagedData.Data, pageRequest);
         var res = new Paged<ArticleDto>(pagedData.GetPageInfo(), articleList);
 

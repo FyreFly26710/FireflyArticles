@@ -6,22 +6,26 @@ public class AiArticlesController(IArticleGenerationService _articleGenerationSe
     IContentsApiRemoteService _contentsApiRemoteService,
     IRabbitMqPublisher _rabbitMqPublisher) : ControllerBase
 {
+    /// <summary>
+    /// Todo: Add a queue to generate article list and distribute the articles to add article queue
+    /// </summary>
     [HttpPost("generate-article-list")]
-    public async Task<ApiResponse<string>> GenerateArticleList([FromBody] ArticleListRequest request)
+    public async Task<ApiResponse<string>> GenerateArticleList([FromBody] ArticleListRequest request, [FromQuery] bool addToQueue = false)
     {
         var user = UserUtil.GetUserFromHttpRequest(Request);
+        if (addToQueue)
+        {
+            // Not implemented yet
+            _rabbitMqPublisher.Publish(QueueList.GenerateArticleListQueue, request);
+            return ResultUtil.Success<string>("Successfully added to queue");
+        }
         var topic = await _contentsApiRemoteService.GetTopicByTitleCategory(request.Topic, request.Category);
         var article = string.Empty;
         if (topic == null)
-        {
             article = await _articleGenerationService.GenerateArticleListsAsync(request);
-        }
         else
-        {
             article = await _articleGenerationService.RegenerateArticleListAsync(request, topic);
-        }
         return ResultUtil.Success<string>(article);
-
     }
 
     [HttpPost("generate-article-content")]

@@ -7,10 +7,8 @@ import { message } from 'antd';
 interface ArticlesContextType {
   // Articles data
   articles: API.ArticleDto[];
-  initialArticles: API.ArticleDto[];
   loading: boolean;
   total: number;
-  initialTotal: number;
 
   // Topics and Tags data
   topics: API.TopicDto[];
@@ -42,10 +40,8 @@ interface ArticlesContextType {
 
 const defaultValue: ArticlesContextType = {
   articles: [],
-  initialArticles: [],
   loading: true,
   total: 0,
-  initialTotal: 0,
   topics: [],
   topicsByCategory: {},
   tags: [],
@@ -69,8 +65,6 @@ export const useArticlesContext = () => useContext(ArticlesContext);
 
 interface ArticlesProviderProps {
   children: ReactNode;
-  initialArticles: API.ArticleDto[];
-  initialTotal: number;
   initialTopics: API.TopicDto[];
   initialTags: API.TagDto[];
   initialTopicsByCategory: Record<string, API.TopicDto[]>;
@@ -78,15 +72,13 @@ interface ArticlesProviderProps {
 
 export const ArticlesProvider = ({
   children,
-  initialArticles,
-  initialTotal,
   initialTopics,
   initialTags,
   initialTopicsByCategory,
 }: ArticlesProviderProps) => {
   const [articles, setArticles] = useState<API.ArticleDto[]>([]);
   const [loading, setLoading] = useState(false);
-  const [total, setTotal] = useState(initialTotal);
+  const [total, setTotal] = useState(0);
   const [pageNumber, setPageNumber] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [filters, setFilters] = useState<{
@@ -177,10 +169,8 @@ export const ArticlesProvider = ({
 
   const value = {
     articles,
-    initialArticles,
     loading,
     total,
-    initialTotal,
     topics: initialTopics,
     topicsByCategory: initialTopicsByCategory,
     tags: initialTags,

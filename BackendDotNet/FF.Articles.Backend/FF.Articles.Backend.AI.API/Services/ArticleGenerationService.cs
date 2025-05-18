@@ -41,7 +41,8 @@ public class ArticleGenerationService(
     {
       Title = request.Topic,
       Category = request.Category,
-      Abstract = request.TopicAbstract
+      Abstract = request.TopicAbstract,
+      TopicImage = string.IsNullOrEmpty(request.TopicImage) ? null : request.TopicImage
     };
     var topicId = await _contentsApiRemoteService.AddTopic(topic, AdminUsers.SYSTEM_ADMIN_DEEPSEEK);
     var jsonContent = await ChatAsync(chatRequest, $"Generate article list for topic: {request.Topic}");
