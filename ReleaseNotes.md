@@ -3,39 +3,40 @@
 ### To Do List
 - Backend:
     - P5: Add Redis for caching or store identity API
-    - P3: Refactor Contents.API to clean archtecture or DDD
-    - P1: Add quick article generation (to do)
+    - P1: Refactor Contents.API to clean archtecture or DDD
+    - P2: Add quick article generation
     - P4: Article add page
     - P3: Batch update article/topic/tag
     - P3: Improve Admin page
-    - P1: Fix 2 minutes time out error (done)
     - P5: A summary of entire content database
-    - P1: Update remove code fence rule (done)
     - P2: Get Pending tasks from MQ
 - Frontend:
-    - P3: Refactor Contexts, use reduxStore + hooks.
-    - P3: Refactor localStorage 
-    - P1: Remove focus area / tech stack tags (done)
-    - P1: Move regen button to article card (done)
-    - P1: Edit prompt in prompt drawer
+    - P1: Refactor Contexts, use reduxStore + hooks.
+    - P1: Refactor localStorage 
+    - P2: Edit prompt in prompt drawer
     - P3: Remove api url base away from image
     - P3: sider auto collpase
-    - P1: Add topic image in ai gen page (done)
-    - P1: Fix search by removing initial state (done)
 - Other:
     - Add readme.md
     - Add mermaid diagram
-    - Change CICD branch naming convension. (done)
     - Amend docker file for quick deployment
 ---
 
 
-### App Version 0.1.0
-- Overview: Release
-
----
-### App Version 0.0.11
-- Overview: Fixed bugs, minor ajustments
+### App Version 0.1.0 (18/05/2025)
+- Overview: Release, completed all major features.
+- Changes: 
+    - Feature: 
+        - Enable adding topic image in AI Gen page
+    - Improvements:
+        - Improved YARP settings
+        - Remove focus area / tech stack from tag selectors
+        - Add Generate button in article page for quick generation
+        - Changed CICD branch naming strategy
+    - Bug fix: 
+        - Fix Ai Gen page 100 seconds time out error caused by YARP
+- To do: 
+    - Refactor codebase
 
 ---
 ### App Version 0.0.9 (17/05/2025)
