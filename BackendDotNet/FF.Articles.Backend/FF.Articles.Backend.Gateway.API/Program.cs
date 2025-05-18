@@ -57,9 +57,7 @@ static IReadOnlyList<ClusterConfig> GetClusters(IConfiguration configuration)
         {
             { "destination1", new DestinationConfig { Address = config.Address } }
         },
-        HttpRequest = config.Timeout.HasValue
-            ? new ForwarderRequestConfig { ActivityTimeout = config.Timeout.Value }
-            : null
+        HttpRequest = new ForwarderRequestConfig { ActivityTimeout = TimeSpan.FromMinutes(10) }
     }).ToList();
 
     return clusterConfigs;
@@ -69,5 +67,4 @@ class ClusterConf
 {
     public string ClusterId { get; set; } = string.Empty;
     public string Address { get; set; } = string.Empty;
-    public TimeSpan? Timeout { get; set; }
 }

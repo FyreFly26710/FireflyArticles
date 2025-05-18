@@ -46,7 +46,6 @@ ENV ASPNETCORE_ENVIRONMENT=Production \
     Clusters__1__Address="http://127.0.0.1:23000" \
     Clusters__2__ClusterId="aiCluster" \
     Clusters__2__Address="http://127.0.0.1:24000" \
-    Clusters__2__Timeout="00:10:00" \
     DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1 \
     # GmailOAuth__ClientId="xxx" \
     # GmailOAuth__ClientSecret="xxxx" \
