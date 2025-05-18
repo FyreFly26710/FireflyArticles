@@ -1,8 +1,15 @@
+using Microsoft.AspNetCore.Http.Timeouts;
 using Yarp.ReverseProxy.Configuration;
 using Yarp.ReverseProxy.Forwarder;
 using Yarp.ReverseProxy.Transforms;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Log Kestrel settings
+Console.WriteLine("=== Kestrel Server Settings ===");
+Console.WriteLine($"MaxRequestBodySize: {104857600} bytes (100MB)");
+Console.WriteLine($"KeepAliveTimeout: {TimeSpan.FromMinutes(10)}");
+Console.WriteLine($"RequestHeadersTimeout: {TimeSpan.FromSeconds(60)}");
 
 builder.Services.AddReverseProxy()
     .LoadFromMemory(GetRoutes(), GetClusters(builder.Configuration))
@@ -16,9 +23,30 @@ builder.Services.AddReverseProxy()
         });
     });
 
-builder.WebHost.ConfigureKestrel(options => { options.Limits.MaxRequestBodySize = 104857600; }); // 100MB
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.Limits.MaxRequestBodySize = 104857600; // 100MB
+    options.Limits.KeepAliveTimeout = TimeSpan.FromMinutes(10);
+    options.Limits.RequestHeadersTimeout = TimeSpan.FromSeconds(60);
+});
 
 var app = builder.Build();
+
+// Log routes configuration
+Console.WriteLine("\n=== Route Configuration ===");
+foreach (var route in GetRoutes())
+{
+    Console.WriteLine($"Route: {route.RouteId} -> {route.ClusterId} (Path: {route.Match.Path})");
+}
+
+// Log timeout values
+Console.WriteLine("\n=== Timeout Settings ===");
+var clusters = GetClusters(builder.Configuration);
+foreach (var cluster in clusters)
+{
+    Console.WriteLine($"Cluster {cluster.ClusterId}:");
+    Console.WriteLine($"  Activity Timeout: {cluster.HttpRequest?.ActivityTimeout}");
+}
 
 app.MapReverseProxy();
 
@@ -59,7 +87,10 @@ static IReadOnlyList<ClusterConfig> GetClusters(IConfiguration configuration)
         },
         HttpRequest = new ForwarderRequestConfig { ActivityTimeout = TimeSpan.FromMinutes(10) }
     }).ToList();
-
+    foreach (var cluster in clusterConfigs)
+    {
+        Console.WriteLine($"Cluster {cluster.ClusterId} timeout: {cluster.HttpRequest?.ActivityTimeout}");
+    }
     return clusterConfigs;
 }
 

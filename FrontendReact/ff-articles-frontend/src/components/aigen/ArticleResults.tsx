@@ -11,8 +11,6 @@ const ArticleResults: React.FC = () => {
   const {
     responseData,
     parsedArticles,
-    error,
-    articleListRequest
   } = useAiGenContext();
   const { parseArticleData, handleDataChange } = useAiGenEdit();
 
@@ -30,7 +28,7 @@ const ArticleResults: React.FC = () => {
     }
   }, [responseData]);
 
-  if (!responseData && !parsedArticles && !error) {
+  if (!responseData && !parsedArticles) {
     return null; // Nothing to display yet
   }
 
@@ -46,18 +44,8 @@ const ArticleResults: React.FC = () => {
           />
         </Col>
 
-        {/* Right side: Parsed Data Display or Error */}
+        {/* Right side: Parsed Data Display*/}
         <Col xs={24} md={12}>
-          {/* Error Display */}
-          {error && (
-            <Alert
-              message="Parse Error"
-              description={error}
-              type="error"
-              showIcon
-              style={{ marginBottom: 16 }}
-            />
-          )}
 
           {/* Parsed Articles */}
           {parsedArticles && (
