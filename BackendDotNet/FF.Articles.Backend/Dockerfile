@@ -42,20 +42,15 @@ ENV ASPNETCORE_ENVIRONMENT=Production \
     ConnectionStrings__identitydb="Host=postgres;Port=5432;Username=postgres;Password=${POSTGRES_PASSWORD};Database=identitydb;Trust Server Certificate=True;" \
     ConnectionStrings__contentdb="Host=postgres;Port=5432;Username=postgres;Password=${POSTGRES_PASSWORD};Database=contentdb;Trust Server Certificate=True;" \
     ConnectionStrings__aidb="Host=postgres;Port=5432;Username=postgres;Password=${POSTGRES_PASSWORD};Database=aidb;Trust Server Certificate=True;" \
-    ConnectionStrings__redis="redis:6379" \
     ConnectionStrings__rabbitmq="amqp://${RABBITMQ_USERNAME}:${RABBITMQ_PASSWORD}@rabbitmq:5672" \
     # AllowedOrigins__0="http://localhost:3000" \
-    # YARP Route Configuration
-    ReverseProxy__Routes__contents-route__ClusterId=contentsCluster \
-    ReverseProxy__Routes__contents-route__Match__Path="/api/contents/{**catch-all}" \
-    ReverseProxy__Routes__identity-route__ClusterId=identityCluster \
-    ReverseProxy__Routes__identity-route__Match__Path="/api/identity/{**catch-all}" \
-    ReverseProxy__Routes__ai-route__ClusterId=aiCluster \
-    ReverseProxy__Routes__ai-route__Match__Path="/api/ai/{**catch-all}" \
     # YARP Cluster Configuration
-    ReverseProxy__Clusters__contentsCluster__Destinations__destination1__Address="http://127.0.0.1:23000" \
-    ReverseProxy__Clusters__identityCluster__Destinations__destination1__Address="http://127.0.0.1:22000" \
-    ReverseProxy__Clusters__aiCluster__Destinations__destination1__Address="http://127.0.0.1:24000" \
+    Clusters__0__ClusterId=identityCluster \
+    Clusters__0__Address="http://127.0.0.1:22000" \
+    Clusters__1__ClusterId=contentsCluster \
+    Clusters__1__Address="http://127.0.0.1:23000" \
+    Clusters__2__ClusterId=aiCluster \
+    Clusters__2__Address="http://127.0.0.1:24000" \
     DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1 \
     # GmailOAuth__ClientId="xxx" \
     # GmailOAuth__ClientSecret="xxxx" \

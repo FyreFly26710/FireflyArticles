@@ -17,20 +17,6 @@ export async function apiAiArticlesGenerateList(
   });
 }
 
-/** POST /api/ai/articles/regenerate-article-list */
-export async function apiAiArticlesRegenerateList(
-  body: API.ExistingArticleListRequest,
-  options?: { [key: string]: any }
-) {
-  return request<API.ArticlesAIResponseDto>("/api/ai/articles/regenerate-article-list", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    data: body,
-    ...(options || {}),
-  });
-}
 /** POST /api/ai/articles/generate-article-content */
 export async function apiAiArticlesGenerateContent(
   body: API.ContentRequest,

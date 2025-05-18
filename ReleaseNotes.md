@@ -6,9 +6,9 @@
     - P3: Refactor Contents.API to clean archtecture or DDD
     - P1: Add quick article generation
     - P4: Article add page
-    - P1: Batch update article/topic/tag
-    - P1: Improve Admin page
-    - P1: Fix 2 minutes time out error
+    - P3: Batch update article/topic/tag
+    - P3: Improve Admin page
+    - P1: Fix 2 minutes time out error (done)
     - P5: A summary of entire content database
     - P1: Update remove code fence rule
 - Frontend:
@@ -17,11 +17,14 @@
     - P1: Remove focus area / tech stack tags
     - P1: Move regen button to article card
     - P1: Edit prompt in prompt drawer
+    - P3: Try to remove api url base away from image
+    - P3: sider auto collpase
+    - P1: Add topic image in ai gen page
 - Other:
     - Add readme.md
     - Add mermaid diagram
     - Change CICD branch naming convension.
-
+    - Amend docker file for quick deployment
 ---
 
 
@@ -30,7 +33,7 @@
 
 ---
 ### App Version 0.0.11
-- Overview: Enhanced admin page and fixed bugs
+- Overview: Fixed bugs, minor ajustments
 
 ---
 ### App Version 0.0.9 (17/05/2025)

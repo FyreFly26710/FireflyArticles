@@ -10,8 +10,4 @@
     <PackageReference Include="Yarp.ReverseProxy" Version="2.1.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="../FF.Articles.Backend.Common/FF.Articles.Backend.Common.csproj" />
-  </ItemGroup>
-
 </Project>

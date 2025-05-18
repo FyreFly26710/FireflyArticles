@@ -1,46 +1,73 @@
-using FF.Articles.Backend.Common.Middlewares;
+using Yarp.ReverseProxy.Configuration;
+using Yarp.ReverseProxy.Forwarder;
 using Yarp.ReverseProxy.Transforms;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add YARP reverse proxy
 builder.Services.AddReverseProxy()
-    .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"))
+    .LoadFromMemory(GetRoutes(), GetClusters(builder.Configuration))
     .AddTransforms(transforms =>
     {
         transforms.AddRequestTransform(context =>
         {
-            // Log the transformation for debugging
-            Console.WriteLine($"Transforming request: {context.HttpContext.Request.Method} {context.HttpContext.Request.Path}");
-            Console.WriteLine($"Destination URL: {context.DestinationPrefix}");
-
             context.ProxyRequest.Headers.Add("X-Forwarded-Host", context.HttpContext.Request.Host.Value);
             context.ProxyRequest.Headers.Add("X-Request-Id", context.HttpContext.TraceIdentifier);
             return ValueTask.CompletedTask;
         });
     });
 
-// Increase Kestrel limits for larger requests/responses
 builder.WebHost.ConfigureKestrel(options => { options.Limits.MaxRequestBodySize = 104857600; }); // 100MB
 
 var app = builder.Build();
 
-app.UseMiddleware<GlobalExceptionMiddleware>();
-
-// Add diagnostic middleware
-app.Use(async (context, next) =>
-{
-    Console.WriteLine($"Request received: {context.Request.Method} {context.Request.Path}");
-    await next();
-    Console.WriteLine($"Response: {context.Response.StatusCode}");
-});
-
 app.MapReverseProxy();
 
-// Add a fallback route for debugging
-app.Map("/{**catch-all}", async context =>
-{
-    Console.WriteLine($"Fallback route hit: {context.Request.Path}");
-    await context.Response.WriteAsync($"Route not found: {context.Request.Path}. This indicates the reverse proxy didn't handle the request.");
-});
-
 app.Run();
+
+static IReadOnlyList<RouteConfig> GetRoutes() =>
+    [
+        new ()
+        {
+            RouteId = "identity-route",
+            ClusterId = "identityCluster",
+            Match = new RouteMatch {Path = "/api/identity/{**catch-all}"}
+        },
+        new ()
+        {
+            RouteId = "contents-route",
+            ClusterId = "contentsCluster",
+            Match = new RouteMatch {Path = "/api/contents/{**catch-all}"}
+        },
+        new ()
+        {
+            RouteId = "ai-route",
+            ClusterId = "aiCluster",
+            Match = new RouteMatch {Path = "/api/ai/{**catch-all}"}
+        }
+    ];
+
+static IReadOnlyList<ClusterConfig> GetClusters(IConfiguration configuration)
+{
+    var clusters = configuration.GetSection("Clusters").Get<List<ClusterConf>>() ?? new List<ClusterConf>();
+
+    var clusterConfigs = clusters.Select(config => new ClusterConfig
+    {
+        ClusterId = config.ClusterId,
+        Destinations = new Dictionary<string, DestinationConfig>
+        {
+            { "destination1", new DestinationConfig { Address = config.Address } }
+        },
+        HttpRequest = config.Timeout.HasValue
+            ? new ForwarderRequestConfig { ActivityTimeout = config.Timeout.Value }
+            : null
+    }).ToList();
+
+    return clusterConfigs;
+}
+
+class ClusterConf
+{
+    public string ClusterId { get; set; } = string.Empty;
+    public string Address { get; set; } = string.Empty;
+    public TimeSpan? Timeout { get; set; }
+}

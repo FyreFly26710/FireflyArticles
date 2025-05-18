@@ -50,7 +50,7 @@ function request<T = any>(url: string, config?: AxiosRequestConfig): Promise<T> 
     return axiosInstance.request<T, T>({
         url,
         ...config,
-        timeout, // Ensure timeout is applied
+        timeout,
     });
 }
 
