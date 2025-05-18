@@ -9,8 +9,12 @@ interface TagSelectorProps {
 const TagSelector = ({ onTagSelect, selectedTagIds = [] }: TagSelectorProps) => {
   const { tags } = useArticlesContext();
 
+  // Filter tags by specific categories
+  const allowedCategories = ['Skill Level', 'Article Style', 'Tone'];
+  const filteredTags = tags.filter(tag => allowedCategories.includes(tag.tagGroup || ''));
+
   // Group tags by tagGroup
-  const groupedTags = tags.reduce((acc, tag) => {
+  const groupedTags = filteredTags.reduce((acc, tag) => {
     const group = tag.tagGroup || 'Other';
     if (!acc[group]) {
       acc[group] = [];
@@ -45,14 +49,12 @@ const TagSelector = ({ onTagSelect, selectedTagIds = [] }: TagSelectorProps) => 
     onTagSelect(newSelections);
   };
 
-  // Convert grouped tags to array for easier mapping
-
   return (
     <Space direction="vertical" style={{ width: '100%' }}>
       <Row gutter={[16, 16]}>
         {Object.entries(groupedTags).map(([group, groupTags]) => (
           <Col key={group} span={4.8}>
-            <Space direction="vertical" style={{ width: '100%' }}>
+            <Space direction="horizontal" style={{ width: '100%' }}>
               <Typography.Text strong>{group}</Typography.Text>
               <Select
                 mode="multiple"
@@ -60,7 +62,7 @@ const TagSelector = ({ onTagSelect, selectedTagIds = [] }: TagSelectorProps) => 
                   groupTags.some(tag => tag.tagId === id)
                 )}
                 onChange={(value) => handleChange(value, group)}
-                style={{ width: '100%', minWidth: '200px' }}
+                style={{ width: '100%', minWidth: '150px' }}
                 optionFilterProp="label"
                 placeholder="Select tags"
                 options={[

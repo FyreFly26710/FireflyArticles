@@ -96,19 +96,17 @@ public class ArticleGenerationService(
 
 
   #region Helper methods
-  // TODO: Need a better way to handle the code fences
   private string removeOuterCodeFences(string content)
   {
-    return content;
-    // if (string.IsNullOrWhiteSpace(content))
-    //     return content;
-    // var lines = content.Split('\n').Select(l => l.TrimEnd('\r')).ToList();
-    // if (lines.Count >= 2 && lines[0].StartsWith("```") && lines[^1] == "```")
-    // {
-    //     lines.RemoveAt(0);
-    //     lines.RemoveAt(lines.Count - 1);
-    // }
-    // return string.Join("\n", lines).Trim();
+    if (string.IsNullOrWhiteSpace(content))
+      return content;
+    var lines = content.Split('\n').Select(l => l.TrimEnd('\r')).ToList();
+    if (lines.Count >= 2 && lines[0].StartsWith("```markdown") && lines[^1] == "```")
+    {
+      lines.RemoveAt(0);
+      lines.RemoveAt(lines.Count - 1);
+    }
+    return string.Join("\n", lines).Trim();
   }
 
   private string getModel(string? provider = null, bool requireStructuredOutput = false)

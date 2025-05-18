@@ -10,11 +10,11 @@
     - P3: Improve Admin page
     - P1: Fix 2 minutes time out error (done)
     - P5: A summary of entire content database
-    - P1: Update remove code fence rule
+    - P1: Update remove code fence rule (done)
 - Frontend:
     - P3: Refactor Contexts, use reduxStore + hooks.
-    - P3: Refactor localStorage
-    - P1: Remove focus area / tech stack tags
+    - P3: Refactor localStorage 
+    - P1: Remove focus area / tech stack tags (done)
     - P1: Move regen button to article card
     - P1: Edit prompt in prompt drawer
     - P3: Try to remove api url base away from image

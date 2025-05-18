@@ -35,23 +35,16 @@ const ArticleFilters = ({
       bodyStyle={{ paddingBottom: '12px' }}
       className="mb-4"
     >
-        <TopicSelector
-            onTopicSelect={onTopicChange}
-            selectedTopicIds={topicIds}
-        />
-        <TagSelector
-            onTagSelect={onTagChange}
-            selectedTagIds={tagIds}
-        />
+      <TopicSelector
+        onTopicSelect={onTopicChange}
+        selectedTopicIds={topicIds}
+      />
       <div className="mt-3">
         <Row gutter={16} align="middle">
           <Col span={18}>
-            <SelectedOptions
-                selectedTopicIds={topicIds}
-                selectedTagIds={tagIds}
-                onRemoveTopic={onRemoveTopic}
-                onRemoveTag={onRemoveTag}
-                onClearAll={onClearFilters}
+            <TagSelector
+              onTagSelect={onTagChange}
+              selectedTagIds={tagIds}
             />
           </Col>
           <Col span={6} className="mt-2 md:mt-0">
@@ -63,6 +56,13 @@ const ArticleFilters = ({
           </Col>
         </Row>
       </div>
+      <SelectedOptions
+        selectedTopicIds={topicIds}
+        selectedTagIds={tagIds}
+        onRemoveTopic={onRemoveTopic}
+        onRemoveTag={onRemoveTag}
+        onClearAll={onClearFilters}
+      />
 
 
     </Card>

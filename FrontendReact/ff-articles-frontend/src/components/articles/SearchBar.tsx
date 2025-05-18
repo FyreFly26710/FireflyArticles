@@ -27,7 +27,7 @@ const SearchBar = ({ onSearch, onClear, initialValue = '' }: SearchBarProps) => 
   };
 
   return (
-    <Space.Compact className="w-full h-full flex items-center">
+    <Space.Compact>
       <Input
         placeholder="Search articles and descriptions..."
         value={keyword}
@@ -35,17 +35,16 @@ const SearchBar = ({ onSearch, onClear, initialValue = '' }: SearchBarProps) => 
         onKeyDown={handleKeyDown}
         suffix={
           keyword ? (
-            <CloseCircleOutlined 
-              className="text-gray-400 cursor-pointer" 
-              onClick={handleClear} 
+            <CloseCircleOutlined
+              className="text-gray-400 cursor-pointer"
+              onClick={handleClear}
             />
           ) : null
         }
-        allowClear
       />
-      <Button 
-        type="primary" 
-        icon={<SearchOutlined />} 
+      <Button
+        type="primary"
+        icon={<SearchOutlined />}
         onClick={handleSearch}
       >
         Search
