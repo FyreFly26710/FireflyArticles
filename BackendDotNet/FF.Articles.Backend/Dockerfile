@@ -1,18 +1,13 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# COPY *.sln ./
 COPY FF.AI.Common/FF.AI.Common.csproj ./FF.AI.Common/
-# COPY FF.Articles.AppHost/FF.Articles.AppHost.csproj ./FF.Articles.AppHost/
 COPY FF.Articles.Backend.AI.API/FF.Articles.Backend.AI.API.csproj ./FF.Articles.Backend.AI.API/
 COPY FF.Articles.Backend.Common/FF.Articles.Backend.Common.csproj ./FF.Articles.Backend.Common/
 COPY FF.Articles.Backend.Contents.API/FF.Articles.Backend.Contents.API.csproj ./FF.Articles.Backend.Contents.API/
 COPY FF.Articles.Backend.Gateway.API/FF.Articles.Backend.Gateway.API.csproj ./FF.Articles.Backend.Gateway.API/
 COPY FF.Articles.Backend.Identity.API/FF.Articles.Backend.Identity.API.csproj ./FF.Articles.Backend.Identity.API/
-# COPY FF.Articles.Backend.RabbitMQ/FF.Articles.Backend.RabbitMQ.csproj ./FF.Articles.Backend.RabbitMQ/
-# COPY FF.Articles.Backend.ServiceDefaults/FF.Articles.Backend.ServiceDefaults.csproj ./FF.Articles.Backend.ServiceDefaults/
 
-# RUN dotnet restore
 # Restore each project individually
 RUN dotnet restore FF.Articles.Backend.Common/FF.Articles.Backend.Common.csproj
 RUN dotnet restore FF.AI.Common/FF.AI.Common.csproj
@@ -45,12 +40,13 @@ ENV ASPNETCORE_ENVIRONMENT=Production \
     ConnectionStrings__rabbitmq="amqp://${RABBITMQ_USERNAME}:${RABBITMQ_PASSWORD}@rabbitmq:5672" \
     # AllowedOrigins__0="http://localhost:3000" \
     # YARP Cluster Configuration
-    Clusters__0__ClusterId=identityCluster \
+    Clusters__0__ClusterId="identityCluster" \
     Clusters__0__Address="http://127.0.0.1:22000" \
-    Clusters__1__ClusterId=contentsCluster \
+    Clusters__1__ClusterId="contentsCluster" \
     Clusters__1__Address="http://127.0.0.1:23000" \
-    Clusters__2__ClusterId=aiCluster \
+    Clusters__2__ClusterId="aiCluster" \
     Clusters__2__Address="http://127.0.0.1:24000" \
+    Clusters__2__Timeout="00:10:00" \
     DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1 \
     # GmailOAuth__ClientId="xxx" \
     # GmailOAuth__ClientSecret="xxxx" \
