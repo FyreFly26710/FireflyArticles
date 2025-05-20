@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { Form, Input, Button, InputNumber, Card, Typography, Row, Col, Tooltip, AutoComplete, Spin, Radio } from 'antd';
 import { SendOutlined, InfoCircleOutlined, LoadingOutlined, MessageOutlined } from '@ant-design/icons';
 import { apiTopicGetByPage } from '@/api/contents/api/topic';
-import { useArticleGeneration } from '@/hooks/useAiGenArticle';
+import { useArticleGeneration } from '@/hook/useAiGenArticle';
 import { useAiGenContext } from '@/states/AiGenContext';
 import { getTopicsByCategory } from '@/libs/utils/articleUtils';
 import AiPromptDrawer from '@/components/shared/AiPromptDrawer';

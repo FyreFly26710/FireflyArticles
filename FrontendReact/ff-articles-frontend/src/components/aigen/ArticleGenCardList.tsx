@@ -5,7 +5,7 @@ import { Typography, Row, Col, Collapse, Space, Button, Alert, Tooltip } from 'a
 import { ThunderboltOutlined } from '@ant-design/icons';
 import ArticleGenCard from './ArticleGenCard';
 import { useAiGenContext } from '@/states/AiGenContext';
-import { useAiGenEdit } from '@/hooks/useAiGenEditArticle';
+import { useAiGenEdit } from '@/hook/useAiGenEditArticle';
 
 const { Title, Paragraph, Text } = Typography;
 const { Panel } = Collapse;

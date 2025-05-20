@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Card, Typography, Tag, Button, Space, Spin, Tooltip, message } from 'antd';
 import { FileTextOutlined, ArrowRightOutlined, CheckCircleOutlined, LoadingOutlined, MessageOutlined } from '@ant-design/icons';
 import { useAiGenContext } from '@/states/AiGenContext';
-import { useAiGenEdit } from '@/hooks/useAiGenEditArticle';
+import { useAiGenEdit } from '@/hook/useAiGenEditArticle';
 import AiPromptDrawer from '@/components/shared/AiPromptDrawer';
 
 const { Paragraph } = Typography;

@@ -2,7 +2,7 @@
 
 import { Card } from 'antd';
 import dynamic from 'next/dynamic';
-import { useArticleEdit } from '@/hooks/useArticleEdit';
+import { useArticleEdit } from '@/hook/useArticleEdit';
 
 // Dynamically import MdViewer to avoid SSR issues with markdown rendering
 const MdViewer = dynamic(() => import('@/components/shared/MdViewer'), {
