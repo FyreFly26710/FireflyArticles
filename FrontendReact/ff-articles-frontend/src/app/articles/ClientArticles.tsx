@@ -29,7 +29,6 @@ export default function ClientArticles({
         fetchArticles
     } = useArticles();
 
-    // Initialize data when component mounts
     useEffect(() => {
         initializeData({
             topics: initialTopics,
@@ -38,9 +37,7 @@ export default function ClientArticles({
         });
     }, []);
 
-    // Fetch articles when filters or pagination changes
     useEffect(() => {
-        // Skip initial fetch if no filters are set yet
         if (!filters) return;
 
         fetchArticles();

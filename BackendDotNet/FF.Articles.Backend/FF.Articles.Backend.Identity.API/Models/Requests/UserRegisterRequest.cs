@@ -3,5 +3,5 @@ public class UserRegisterRequest
 {
     public String UserAccount { get; set; }
     public String UserPassword { get; set; }
-    public String confirmPassword { get; set; }
+    public String checkPassword { get; set; }
 }

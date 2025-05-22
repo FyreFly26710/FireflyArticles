@@ -45,7 +45,7 @@ export default function AiChatPage() {
         <div
           className={styles.chatContainer}
           style={{
-            top: '64px', // Header height
+            top: '64px', 
             left: sidebarWidth,
             right: rightSidebarWidth
           }}

@@ -16,11 +16,14 @@ public class AuthController(
     [HttpPost("register")]
     public async Task<ApiResponse<string>> Register([FromBody] UserRegisterRequest userRegisterRequest)
     {
+        if (EnvUtil.IsProduction())
+            throw new ApiException(ErrorCode.PARAMS_ERROR, "User register is disabled in production environment");
+            
         if (userRegisterRequest == null) throw new ApiException(ErrorCode.PARAMS_ERROR, "User register request is null");
 
         string userAccount = userRegisterRequest.UserAccount;
         string userPassword = userRegisterRequest.UserPassword;
-        string confirmPassword = userRegisterRequest.confirmPassword;
+        string confirmPassword = userRegisterRequest.checkPassword;
         if (string.IsNullOrWhiteSpace(userAccount) || string.IsNullOrWhiteSpace(userPassword) || string.IsNullOrWhiteSpace(confirmPassword))
             throw new ApiException(ErrorCode.PARAMS_ERROR, "User account, password, and confirm password cannot be blank.");
 

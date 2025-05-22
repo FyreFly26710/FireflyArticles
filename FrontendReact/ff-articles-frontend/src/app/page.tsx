@@ -8,14 +8,12 @@ import { apiArticleGetByPage } from "@/api/contents/api/article";
 
 export const dynamic = 'force-dynamic';
 
-// App Router page components are already server components by default
 export default async function Page() {
     let topics: API.TopicDto[] = [];
     let articles: API.ArticleDto[] = [];
     let error = null;
 
     try {
-        // Fetch topics and articles in parallel for better performance
         const [topicResponse, articleResponse] = await Promise.all([
             apiTopicGetByPage({
                 PageSize: 12,
@@ -37,7 +35,6 @@ export default async function Page() {
         console.error("Failed to load homepage data:", err);
     }
 
-    // Handle error case
     if (error) {
         return (
             <div className="max-width-content">
@@ -47,7 +44,6 @@ export default async function Page() {
         );
     }
 
-    // Render the regular homepage
     return (
         <div id="homePage" className="max-width-content">
             <Flex justify="space-between" align="center">

@@ -7,7 +7,6 @@ interface TopicLayoutProps {
     params: { topicId: string };
 }
 
-// Server component that fetches data
 export default async function TopicLayout({ children, params }: TopicLayoutProps) {
     let topic: API.TopicDto | null = null;
 
@@ -30,6 +29,5 @@ export default async function TopicLayout({ children, params }: TopicLayoutProps
         console.error('Failed to fetch topic data', err);
     }
 
-    // Pass the server-fetched data to the client component
     return <ArticleLayout topic={topic}>{children}</ArticleLayout>;
 } 

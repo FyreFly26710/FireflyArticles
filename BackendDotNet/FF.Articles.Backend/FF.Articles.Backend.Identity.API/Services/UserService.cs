@@ -33,6 +33,7 @@ public class UserService(IUserRepository _userRepository, ILogger<UserService> _
         };
 
         long userId = await _userRepository.CreateAsync(user);
+        await _userRepository.SaveChangesAsync();
         return userId;
 
     }

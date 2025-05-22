@@ -4,18 +4,13 @@ import { getTopicsByCategory } from "@/libs/utils/articleUtils";
 
 const TopicsPage = async () => {
     try {
-        // Fetch topics with server-side rendering
         const response = await apiTopicGetByPage({
             PageNumber: 1,
             PageSize: 100,
-            // OnlyCategoryTopic: true,
-            // SortField: "category", // Sort by category to group them
-            // SortOrder: "asc"
         });
 
         const topicsData = response.data?.data || [];
 
-        // Process topics by category
         const topicsByCategory = getTopicsByCategory(topicsData);
 
         return (

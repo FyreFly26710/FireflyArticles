@@ -6,9 +6,7 @@ public static class RemoteApiUrlConstant
     /// <summary>
     /// Only run production in docker
     /// </summary>
-    //private static bool IsProduction() => Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true";
-    private static bool IsProduction() => Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Production";
-    private static string GetBasePort() => IsProduction() ? "http://127.0.0.1:" : "https://localhost:";
+    private static string GetBasePort() => EnvUtil.IsProduction() ? "http://127.0.0.1:" : "https://localhost:";
 
     public static string GetIdentityBaseUrl() => $"{GetBasePort()}22000";
     public static string GetContentsBaseUrl() => $"{GetBasePort()}23000";

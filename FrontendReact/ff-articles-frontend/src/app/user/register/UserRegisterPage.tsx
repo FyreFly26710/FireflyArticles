@@ -2,35 +2,27 @@
 
 import React from "react";
 import { LoginForm, ProForm, ProFormText } from "@ant-design/pro-form";
-import { message } from "antd";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { apiAuthRegister } from "@/api/identity/api/auth";
+import { useUserActions } from "@/hooks/useUserActions";
 
 /**
  * User registration page
  * @param props
  */
-const UserRegisterPage: React.FC = (props) => {
+const UserRegisterPage: React.FC = () => {
     const [form] = ProForm.useForm();
-    const router = useRouter();
+    const { handleRegister } = useUserActions();
 
     /**
      * Submit handler
      * @param values
      */
-    const doSubmit = async (values: any) => {
-        try {
-            const res = await apiAuthRegister(values);
-            if (res.data) {
-                message.success("Registration successful, please log in");
-                // Go to login page
-                router.push("/user/login");
-            }
-        } catch (e: any) {
-            message.error("Registration failed, " + e.message);
+    const doSubmit = async (values: API.UserRegisterRequest) => {
+        const success = await handleRegister(values);
+        if (success) {
+            form.resetFields();
         }
     };
 

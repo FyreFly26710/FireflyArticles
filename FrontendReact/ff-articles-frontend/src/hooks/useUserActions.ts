@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import { message } from 'antd';
 import { RootState } from '@/stores';
 import { setLoginUser } from '@/stores/loginUserSlice';
-import { apiAuthLogout, apiAuthGetLoginUser } from '@/api/identity/api/auth';
+import { apiAuthLogout, apiAuthGetLoginUser, apiAuthLogin, apiAuthRegister } from '@/api/identity/api/auth';
 import { DEFAULT_USER } from '@/libs/constants/user';
 
 export const useUserActions = () => {
@@ -32,6 +32,39 @@ export const useUserActions = () => {
         dispatch(setLoginUser(DEFAULT_USER));
     };
 
+    const handleLogin = async (values: API.UserLoginRequest) => {
+        try {
+            const res = await apiAuthLogin(values);
+            if (res.data) {
+                message.success("Login successful!");
+                dispatch(setLoginUser(res.data));
+                router.replace("/");
+                return true;
+            }
+            return false;
+        } catch (error: any) {
+            message.error('Login failed, ' + error.message);
+            return false;
+        }
+    };
+
+    const handleRegister = async (values: API.UserRegisterRequest) => {
+        try {
+            const res = await apiAuthRegister(values);
+            if (res.code === 200) {
+                message.success("Registration successful, please log in");
+                router.push("/user/login");
+                return true;
+            } else {
+                message.error("Registration failed, " + res.message);
+                return false;
+            }
+        } catch (error: any) {
+            message.error("Registration failed, " + error.message);
+            return false;
+        }
+    };
+
     const handleLogout = async () => {
         try {
             await apiAuthLogout();
@@ -44,14 +77,28 @@ export const useUserActions = () => {
         }
     };
 
+    const isLoggedIn = () => {
+        return loginUser?.id !== undefined && loginUser?.id !== null;
+    };
+
+    const isAdmin = () => {
+        return loginUser?.userRole === 'admin';
+    };
+
     return {
         // State
         loginUser,
+
+        // Status checks
+        isLoggedIn,
+        isAdmin,
 
         // Actions
         initializeUser,
         updateUser,
         clearUser,
+        handleLogin,
+        handleRegister,
         handleLogout,
     };
 }; 

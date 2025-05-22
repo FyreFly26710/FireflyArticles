@@ -6,7 +6,6 @@ import ArticleCard from '@/components/article/ArticleCard';
 export const dynamic = 'force-dynamic'; // Options: 'auto' | 'force-dynamic' | 'error' | 'force-static'
 // export const revalidate = 60; // Revalidate the data at most every 60 seconds
 
-// Server component to fetch data
 const TopicPage = async ({ params }: { params: { topicId: string } }) => {
     var article: API.ArticleDto;
     const topicId = parseInt(params.topicId);

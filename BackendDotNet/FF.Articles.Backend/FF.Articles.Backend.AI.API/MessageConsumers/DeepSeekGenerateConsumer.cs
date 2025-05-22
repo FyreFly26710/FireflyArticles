@@ -4,7 +4,7 @@ namespace FF.Articles.Backend.AI.API.MessageConsumers;
 
 public abstract class DeepSeekGenerateConsumer : BaseConsumer
 {
-    private static bool IsProduction => Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Production";
+    private static bool IsProduction => EnvUtil.IsProduction();
     private Timer _windowCheckTimer;
 
     public DeepSeekGenerateConsumer(

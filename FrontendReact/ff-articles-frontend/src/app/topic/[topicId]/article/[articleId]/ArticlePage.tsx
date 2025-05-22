@@ -4,7 +4,6 @@ import ArticleCard from '@/components/article/ArticleCard';
 
 export const dynamic = 'force-dynamic';
 
-// Server component to fetch data
 const ArticlePage = async ({ params }: { params: { topicId: string, articleId: string } }) => {
     var article: API.ArticleDto;
 
@@ -28,7 +27,6 @@ const ArticlePage = async ({ params }: { params: { topicId: string, articleId: s
 
     }
 
-    // Pass the server-fetched data to the client component
     return <ArticleCard article={article} topicId={parseInt(params.topicId)} />;
 };
 

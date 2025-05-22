@@ -4,14 +4,10 @@ import React from "react";
 import { LoginForm, ProForm, ProFormText } from "@ant-design/pro-form";
 import { Divider, message } from "antd";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { AppDispatch } from "@/stores";
-import { setLoginUser } from "@/stores/loginUserSlice";
-import { useDispatch } from "react-redux";
-import { apiAuthLogin } from "@/api/identity/api/auth";
 import GoogleLoginButton from "@/components/shared/GmailLoginBtn";
+import { useUserActions } from "@/hooks/useUserActions";
 
 /**
  * User login page
@@ -19,25 +15,16 @@ import GoogleLoginButton from "@/components/shared/GmailLoginBtn";
  */
 const UserLoginPage: React.FC = () => {
     const [form] = ProForm.useForm();
-    const router = useRouter();
-    const dispatch = useDispatch<AppDispatch>();
+    const { handleLogin } = useUserActions();
 
     /**
      * Submit handler
      * @param values
      */
-    const doSubmit = async (values: any) => {
-        try {
-            const res = await apiAuthLogin(values);
-            if (res.data) {
-                message.success("Login successful!");
-                // Save user to Redux store
-                dispatch(setLoginUser(res.data));
-                router.replace("/");
-                form.resetFields();
-            }
-        } catch (e: any) {
-            message.error('Login failed, ' + e.message);
+    const doSubmit = async (values: API.UserLoginRequest) => {
+        const success = await handleLogin(values);
+        if (success) {
+            form.resetFields();
         }
     };
 

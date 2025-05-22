@@ -49,7 +49,7 @@ const TagManagement = () => {
             backgroundColor: color,
             borderRadius: '50%',
             border: '1px solid #d9d9d9',
-            margin: 'auto', // Center the color circle
+            margin: 'auto',
           }} />
         ) : null
       ),
