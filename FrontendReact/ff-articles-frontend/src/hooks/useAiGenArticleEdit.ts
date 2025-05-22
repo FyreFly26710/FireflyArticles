@@ -1,4 +1,3 @@
-import { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { message } from 'antd';
 import { RootState } from '@/stores';
@@ -55,7 +54,7 @@ export const useAiGenArticleEdit = () => {
         }
     };
 
-    const parseArticleData = useCallback((data: string) => {
+    const parseArticleData = (data: string) => {
         try {
             let parsedData: any = JSON.parse(data);
             parsedData = transformKeys(parsedData);
@@ -73,9 +72,9 @@ export const useAiGenArticleEdit = () => {
             dispatch(setParsedArticles(null));
             return null;
         }
-    }, [dispatch]);
+    };
 
-    const handleDataChange = useCallback((data: string) => {
+    const handleDataChange = (data: string) => {
         if (data.trim() && !hasLineBreaks(data)) {
             const formatted = prettyFormatJson(data);
             if (formatted !== data) {
@@ -84,9 +83,9 @@ export const useAiGenArticleEdit = () => {
             }
         }
         dispatch(setResponseData(data));
-    }, [dispatch]);
+    };
 
-    const generateContent = useCallback(async (article: API.AIGenArticleDto) => {
+    const generateContent = async (article: API.AIGenArticleDto) => {
         if (!articleListRequest) {
             message.error('Missing article request information');
             return;
@@ -110,21 +109,21 @@ export const useAiGenArticleEdit = () => {
             console.error('Error generating article content:', error);
             message.error(error instanceof Error ? error.message : 'Failed to generate article content');
         }
-    }, [articleListRequest, generationState, generateArticleContent]);
+    };
 
-    const generateAllContent = useCallback(async () => {
+    const generateAllContent = async () => {
         try {
             await generateAllArticles();
         } catch (error) {
             console.error('Error generating all article content:', error);
             message.error(error instanceof Error ? error.message : 'Failed to generate all article content');
         }
-    }, [generateAllArticles]);
+    };
 
     return {
         // State
         responseData,
-        
+
         // Actions
         parseArticleData,
         handleDataChange,

@@ -1,4 +1,3 @@
-import { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { message } from 'antd';
 import { RootState } from '@/stores';
@@ -25,7 +24,7 @@ export const useAiGenArticle = () => {
         generationState
     } = useSelector((state: RootState) => state.aiGen);
 
-    const generateArticles = useCallback(async (articleListRequest: API.ArticleListRequest) => {
+    const generateArticles = async (articleListRequest: API.ArticleListRequest) => {
         try {
             dispatch(setLoading(true));
             dispatch(setArticleListRequest(articleListRequest));
@@ -49,9 +48,9 @@ export const useAiGenArticle = () => {
         } finally {
             dispatch(setLoading(false));
         }
-    }, [dispatch]);
+    };
 
-    const generateArticleContent = useCallback(async (article: API.AIGenArticleDto): Promise<number | undefined> => {
+    const generateArticleContent = async (article: API.AIGenArticleDto): Promise<number | undefined> => {
         if (!articleListRequest || !parsedArticles) {
             message.error('Missing required data to generate article content');
             return undefined;
@@ -87,7 +86,7 @@ export const useAiGenArticle = () => {
             return articleId;
         } catch (error) {
             console.error(`Error generating content for article ${article.sortNumber}:`, error);
-            
+
             dispatch(setArticleGenerationState({
                 sortNumber: article.sortNumber,
                 state: {
@@ -99,9 +98,9 @@ export const useAiGenArticle = () => {
             message.error(`Failed to generate content for "${article.title}"`);
             return undefined;
         }
-    }, [dispatch, articleListRequest, parsedArticles]);
+    };
 
-    const generateAllArticles = useCallback(async () => {
+    const generateAllArticles = async () => {
         if (!articleListRequest || !parsedArticles) {
             message.error('Missing required data to generate article content');
             return;
@@ -128,11 +127,11 @@ export const useAiGenArticle = () => {
         } else if (pendingArticles.length > 0) {
             message.error('Failed to generate any articles');
         }
-    }, [generateArticleContent, articleListRequest, parsedArticles, generationState]);
+    };
 
-    const clearGenerationResults = useCallback(() => {
+    const clearGenerationResults = () => {
         dispatch(clearResults());
-    }, [dispatch]);
+    };
 
     return {
         // State

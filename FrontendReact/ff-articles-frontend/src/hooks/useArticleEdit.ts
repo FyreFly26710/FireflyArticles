@@ -1,4 +1,3 @@
-import { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { message } from 'antd';
 import { RootState } from '@/stores';
@@ -13,19 +12,19 @@ export const useArticleEdit = () => {
     const dispatch = useDispatch();
     const { isEditing, currentArticle } = useSelector((state: RootState) => state.articleEdit);
 
-    const handleStartEditing = useCallback((article: API.ArticleDto) => {
+    const handleStartEditing = (article: API.ArticleDto) => {
         dispatch(startEditing(article));
-    }, [dispatch]);
+    };
 
-    const handleUpdateArticle = useCallback((updates: Partial<API.ArticleDto>) => {
+    const handleUpdateArticle = (updates: Partial<API.ArticleDto>) => {
         dispatch(updateEditingArticle(updates));
-    }, [dispatch]);
+    };
 
-    const handleCancelEditing = useCallback(() => {
+    const handleCancelEditing = () => {
         dispatch(cancelEditing());
-    }, [dispatch]);
+    };
 
-    const handleSubmitEdit = useCallback(async () => {
+    const handleSubmitEdit = async () => {
         if (!currentArticle) {
             message.error('No article is currently being edited');
             return false;
@@ -55,13 +54,13 @@ export const useArticleEdit = () => {
             message.error('An error occurred while updating the article');
             return false;
         }
-    }, [currentArticle, dispatch]);
+    };
 
     return {
         // State
         isEditing,
         currentArticle,
-        
+
         // Actions
         startEditing: handleStartEditing,
         updateArticle: handleUpdateArticle,

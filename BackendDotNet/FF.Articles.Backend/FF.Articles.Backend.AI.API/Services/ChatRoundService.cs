@@ -27,7 +27,6 @@ public class ChatRoundService(
         var response = await _aiChatAssistant.ChatAsync(chatRequest, new CancellationToken());
         if (response == null)
             throw new ApiException(ErrorCode.SYSTEM_ERROR, "Failed to get response from AI");
-
         newRound.AssistantMessage = response.Message?.Content ?? string.Empty;
         newRound.PromptTokens = response?.ExtraInfo?.InputTokens ?? 0;
         newRound.CompletionTokens = response?.ExtraInfo?.OutputTokens ?? 0;
@@ -55,6 +54,8 @@ public class ChatRoundService(
         var streamingResponse = _aiChatAssistant.ChatStreamAsync(chatRequest, cancellationToken);
         if (streamingResponse == null)
             throw new ApiException(ErrorCode.SYSTEM_ERROR, "Failed to get streaming response from AI");
+        //await Task.Delay(2000);
+        //var streamingResponse = mockStreamResponse(chatRequest.Messages.Last().Content);
         var fullResponse = "";
         await foreach (var chatResponse in streamingResponse)
         {
@@ -89,6 +90,40 @@ public class ChatRoundService(
         {
             Event = SseEvent.End,
             Data = JsonSerializer.Serialize(newRound.ToDto(), _jsonOptions)
+        };
+    }
+    private async IAsyncEnumerable<ChatResponse> mockStreamResponse(string mockResponse)
+    {
+        var temp = "";
+        for (int i = 0; i < 6; i++)
+        {
+            temp += $"Repeat {i + 1}: " + Environment.NewLine + mockResponse;
+        }
+
+        var chunks = temp.Split(' ');
+        var delay = 100; // milliseconds between chunks
+
+        foreach (var chunk in chunks)
+        {
+            await Task.Delay(delay);
+            yield return new ChatResponse
+            {
+                Event = ChatEvent.Generate,
+                Message = new Message { Content = chunk + " " }
+            };
+        }
+
+        await Task.Delay(100);
+        yield return new ChatResponse
+        {
+            Event = ChatEvent.Finish,
+            Message = new Message { Content = temp },
+            ExtraInfo = new()
+            {
+                InputTokens = 10,
+                OutputTokens = 50,
+                Duration = 2000
+            }
         };
     }
 

@@ -1,4 +1,3 @@
-import { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { message } from 'antd';
 import { apiArticleGetByPage } from '@/api/contents/api/article';
@@ -30,7 +29,7 @@ export const useArticles = () => {
         filters,
     } = useSelector((state: RootState) => state.articles);
 
-    const fetchArticles = useCallback(async () => {
+    const fetchArticles = async () => {
         dispatch(setLoading(true));
         try {
             const response = await apiArticleGetByPage({
@@ -54,47 +53,47 @@ export const useArticles = () => {
         } finally {
             dispatch(setLoading(false));
         }
-    }, [dispatch, pagination.pageNumber, pagination.pageSize, filters]);
+    };
 
-    const initializeData = useCallback((data: {
+    const initializeData = (data: {
         topics: API.TopicDto[];
         tags: API.TagDto[];
         topicsByCategory: Record<string, API.TopicDto[]>;
     }) => {
         dispatch(setInitialData(data));
-    }, [dispatch]);
+    };
 
-    const handleSearch = useCallback((keyword: string) => {
+    const handleSearch = (keyword: string) => {
         dispatch(setKeywordFilter(keyword));
-    }, [dispatch]);
+    };
 
-    const handleClearSearch = useCallback(() => {
+    const handleClearSearch = () => {
         dispatch(setKeywordFilter(undefined));
-    }, [dispatch]);
+    };
 
-    const handleTopicChange = useCallback((topicIds: number[]) => {
+    const handleTopicChange = (topicIds: number[]) => {
         dispatch(setTopicFilter(topicIds));
-    }, [dispatch]);
+    };
 
-    const handleTagChange = useCallback((tagIds: number[]) => {
+    const handleTagChange = (tagIds: number[]) => {
         dispatch(setTagFilter(tagIds));
-    }, [dispatch]);
+    };
 
-    const handlePageChange = useCallback((pageNumber: number, pageSize?: number) => {
+    const handlePageChange = (pageNumber: number, pageSize?: number) => {
         dispatch(setPagination({ pageNumber, pageSize }));
-    }, [dispatch]);
+    };
 
-    const handleRemoveTopicFilter = useCallback((topicId: number) => {
+    const handleRemoveTopicFilter = (topicId: number) => {
         dispatch(removeTopicFilter(topicId));
-    }, [dispatch]);
+    };
 
-    const handleRemoveTagFilter = useCallback((tagId: number) => {
+    const handleRemoveTagFilter = (tagId: number) => {
         dispatch(removeTagFilter(tagId));
-    }, [dispatch]);
+    };
 
-    const handleClearFilters = useCallback(() => {
+    const handleClearFilters = () => {
         dispatch(clearFilters());
-    }, [dispatch]);
+    };
 
     return {
         // State

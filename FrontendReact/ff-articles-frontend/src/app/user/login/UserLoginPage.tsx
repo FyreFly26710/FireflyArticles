@@ -7,12 +7,11 @@ import { LockOutlined, UserOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { AppDispatch } from "@/states/reduxStore";
-import { setLoginUser } from "@/states/reduxStore";
+import { AppDispatch } from "@/stores";
+import { setLoginUser } from "@/stores/loginUserSlice";
 import { useDispatch } from "react-redux";
 import { apiAuthLogin } from "@/api/identity/api/auth";
 import GoogleLoginButton from "@/components/shared/GmailLoginBtn";
-import { storage } from "@/states/localStorage";
 
 /**
  * User login page
@@ -32,9 +31,8 @@ const UserLoginPage: React.FC = () => {
             const res = await apiAuthLogin(values);
             if (res.data) {
                 message.success("Login successful!");
-                // Save user to both Redux and localStorage
+                // Save user to Redux store
                 dispatch(setLoginUser(res.data));
-                storage.setUser(res.data);
                 router.replace("/");
                 form.resetFields();
             }

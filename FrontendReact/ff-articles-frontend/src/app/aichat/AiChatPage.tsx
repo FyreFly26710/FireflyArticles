@@ -1,47 +1,31 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import MessageList from '@/components/aiChat/MessageList'
 import InputBox from '@/components/aiChat/InputBox'
 import SessionSidebar from '@/components/aiChat/SessionSidebar'
 import ChatSidebar from '@/components/aiChat/ChatSidebar'
-import { storage, LayoutSettings } from '@/states/localStorage';
+import { useSettings } from '@/hooks/useSettings';
+import { useChat } from '@/hooks/useChat';
 import styles from './AiChatPage.module.css';
 
 export default function AiChatPage() {
-  const [layoutSettings, setLayoutSettings] = useState<LayoutSettings>(() => storage.getLayoutSettings());
+  const { settings, updateLayoutSettings } = useSettings();
+  const { layout: layoutSettings } = settings;
+  const { initialize } = useChat();
 
   useEffect(() => {
-    // Handler for storage changes from other tabs
-    const handleStorageChange = (event: StorageEvent) => {
-      if (event.key === 'layout-settings') {
-        setLayoutSettings(storage.getLayoutSettings());
-      }
-    };
-
-    // Handler for layout settings changes in current tab
-    const handleLayoutChange = (event: CustomEvent<LayoutSettings>) => {
-      setLayoutSettings(event.detail);
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-    window.addEventListener('layoutSettingsChanged', handleLayoutChange);
-
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('layoutSettingsChanged', handleLayoutChange);
-    };
+    initialize();
   }, []);
 
   const sidebarWidth = layoutSettings.sidebarCollapsed ? '80px' : '240px';
   const rightSidebarWidth = layoutSettings.rightSidebarCollapsed ? '0px' : '240px';
 
-  const toggleRightSidebar = () => {
-    const newSettings = {
+  const handleToggleRightSidebar = () => {
+    updateLayoutSettings({
       ...layoutSettings,
       rightSidebarCollapsed: !layoutSettings.rightSidebarCollapsed
-    };
-    storage.setLayoutSettings(newSettings);
+    });
   };
 
   return (
@@ -84,7 +68,7 @@ export default function AiChatPage() {
       {/* Right Sidebar */}
       <ChatSidebar
         collapsed={layoutSettings.rightSidebarCollapsed}
-        toggleCollapsed={toggleRightSidebar}
+        toggleCollapsed={handleToggleRightSidebar}
       />
     </div>
   );

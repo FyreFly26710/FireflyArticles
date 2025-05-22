@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Input } from 'antd'
 import SessionItem from './SessionItem'
-import { useChat } from '@/states/ChatContext'
-
+import { useChat } from '@/hooks/useChat'
 
 export default function SessionList() {
     // const [searchText, setSearchText] = useState('')

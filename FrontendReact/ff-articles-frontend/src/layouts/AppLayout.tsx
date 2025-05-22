@@ -6,12 +6,11 @@ import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import menus from "../../config/menus";
-import { AppDispatch, RootState } from "@/states/reduxStore";
+import { AppDispatch, RootState } from "@/stores";
 import { useDispatch, useSelector } from "react-redux";
-import { setLoginUser } from "@/states/reduxStore";
+import { setLoginUser } from "@/stores/loginUserSlice";
 import { DEFAULT_USER } from "@/libs/constants/user";
 import { apiAuthLogout } from '@/api/identity/api/auth';
-import { storage } from "@/states/localStorage";
 import { getAccessibleMenus } from '@/libs/utils/accessUtils';
 import { MenuProps } from 'antd';
 import { MenuDataItem } from "@ant-design/pro-components";
@@ -41,8 +40,7 @@ export default function AppLayout({ children }: Props) {
         try {
             await apiAuthLogout();
             message.success("Logout successfully");
-            // Clear user from both Redux and localStorage
-            storage.clearUser();
+            // Clear user from Redux store
             dispatch(setLoginUser(DEFAULT_USER));
             router.push("/user/login");
         } catch (e: any) {

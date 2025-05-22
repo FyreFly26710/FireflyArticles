@@ -1,4 +1,3 @@
-import { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from "next/navigation";
 import { message } from 'antd';
@@ -12,28 +11,28 @@ export const useUserActions = () => {
     const router = useRouter();
     const loginUser = useSelector((state: RootState) => state.loginUser);
 
-    const initializeUser = useCallback(async () => {
+    const initializeUser = async () => {
         try {
             const response = await apiAuthGetLoginUser();
             const user = response.data ?? null;
-            
+
             if (user) {
                 dispatch(setLoginUser(user));
             }
         } catch (error) {
             console.error('Failed to initialize user:', error);
         }
-    }, [dispatch]);
+    };
 
-    const updateUser = useCallback((user: API.LoginUserDto) => {
+    const updateUser = (user: API.LoginUserDto) => {
         dispatch(setLoginUser(user));
-    }, [dispatch]);
+    };
 
-    const clearUser = useCallback(() => {
+    const clearUser = () => {
         dispatch(setLoginUser(DEFAULT_USER));
-    }, [dispatch]);
+    };
 
-    const handleLogout = useCallback(async () => {
+    const handleLogout = async () => {
         try {
             await apiAuthLogout();
             message.success("Logout successfully");
@@ -43,7 +42,7 @@ export const useUserActions = () => {
             console.error('Error during logout:', error);
             message.error(error instanceof Error ? error.message : 'Failed to logout');
         }
-    }, [clearUser, router]);
+    };
 
     return {
         // State

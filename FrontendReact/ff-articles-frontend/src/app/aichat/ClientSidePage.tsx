@@ -1,10 +1,10 @@
-import { ChatProvider } from '../../states/ChatContext';
-import AiChatPage from './AiChatPage';
+// import { ChatProvider } from '../../states/ChatContext';
+// import AiChatPage from './AiChatPage';
 
-export default function ClientSidePage() {
-    return (
-        <ChatProvider>
-            <AiChatPage />
-        </ChatProvider>
-    );
-} 
+// export default function ClientSidePage() {
+//     return (
+//         <ChatProvider>
+//             <AiChatPage />
+//         </ChatProvider>
+//     );
+// } 

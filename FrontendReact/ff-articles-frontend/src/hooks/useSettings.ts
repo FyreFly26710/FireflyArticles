@@ -1,4 +1,3 @@
-import { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/stores';
 import {
@@ -18,31 +17,31 @@ export const useSettings = () => {
     const dispatch = useDispatch();
     const settings = useSelector((state: RootState) => state.settings);
 
-    const updateDisplaySettings = useCallback((newSettings: ChatDisplaySettings) => {
+    const updateDisplaySettings = (newSettings: ChatDisplaySettings) => {
         dispatch(setChatDisplaySettings(newSettings));
-    }, [dispatch]);
+    };
 
-    const updateBehaviorSettings = useCallback((newSettings: ChatBehaviorSettings) => {
+    const updateBehaviorSettings = (newSettings: ChatBehaviorSettings) => {
         dispatch(setChatBehaviorSettings(newSettings));
-    }, [dispatch]);
+    };
 
-    const updateSelectedModel = useCallback((model: SelectedModel) => {
+    const updateSelectedModel = (model: SelectedModel) => {
         dispatch(setSelectedModel(model));
-    }, [dispatch]);
+    };
 
-    const toggleDisplaySetting = useCallback((key: keyof ChatDisplaySettings) => {
+    const toggleDisplaySetting = (key: keyof ChatDisplaySettings) => {
         dispatch(toggleChatDisplaySetting(key));
-    }, [dispatch]);
+    };
 
-    const toggleBehaviorSetting = useCallback((key: keyof Omit<ChatBehaviorSettings, 'selectedModel'>) => {
+    const toggleBehaviorSetting = (key: keyof Omit<ChatBehaviorSettings, 'selectedModel'>) => {
         dispatch(toggleChatBehaviorSetting(key));
-    }, [dispatch]);
+    };
 
-    const updateLayoutSettings = useCallback((newSettings: LayoutSettings) => {
+    const updateLayoutSettings = (newSettings: LayoutSettings) => {
         dispatch(setLayoutSettings(newSettings));
-    }, [dispatch]);
+    };
 
-    const loadProviders = useCallback(async () => {
+    const loadProviders = async () => {
         try {
             if (settings.chatProviders) {
                 return settings.chatProviders;
@@ -58,16 +57,16 @@ export const useSettings = () => {
             console.error('Error loading providers:', error);
             return [];
         }
-    }, [dispatch, settings.chatProviders]);
+    };
 
-    const handleResetSettings = useCallback(() => {
+    const handleResetSettings = () => {
         dispatch(resetSettings());
-    }, [dispatch]);
+    };
 
     return {
         // State
         settings,
-        
+
         // Actions
         updateDisplaySettings,
         updateBehaviorSettings,

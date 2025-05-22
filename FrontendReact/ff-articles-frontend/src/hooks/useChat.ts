@@ -1,6 +1,5 @@
-import { useCallback, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { message } from 'antd';
 import { RootState } from '@/stores';
 import { SelectedModel } from '@/types';
 import {
@@ -11,7 +10,8 @@ import {
     setProviders,
     setBehaviorSettings,
     addChatRound,
-    updateLastChatRound
+    updateLastChatRound,
+    updateSessionRounds
 } from '@/stores/chatSlice';
 import { setChatProviders, setSelectedModel } from '@/stores/settingsSlice';
 import {
@@ -32,149 +32,217 @@ import { apiAiAssistantProviders } from '@/api/ai/api/assistant';
 
 export const useChat = () => {
     const dispatch = useDispatch();
-    const {
-        session,
-        sessions,
-        loading,
-        isGenerating,
-        providers,
-        behaviorSettings
-    } = useSelector((state: RootState) => state.chat);
-
+    const chatState = useSelector((state: RootState) => state.chat);
     const settings = useSelector((state: RootState) => state.settings);
 
-    // Initialize chat behavior settings from Redux settings
-    useEffect(() => {
-        dispatch(setBehaviorSettings(settings.chatBehavior));
-    }, [dispatch, settings.chatBehavior]);
+    const initialize = async () => {
+        if (!chatState.sessions.length) {
+            dispatch(setLoading(true));
+            dispatch(setBehaviorSettings(settings.chatBehavior));
 
-    // Load sessions on mount
-    useEffect(() => {
-        const fetchSessions = async () => {
-            try {
-                dispatch(setLoading(true));
-                const response = await apiSessionGetSessions({ includeChatRounds: false });
-                const sessionData = Array.isArray(response.data) ? response.data : [];
+            const response = await apiSessionGetSessions({ includeChatRounds: true });
+            const sessions = response.data || [];
 
-                const validSessions = sessionData.map(session => ({
-                    ...session,
-                    rounds: Array.isArray(session.rounds) ? session.rounds : []
-                }));
-
-                dispatch(setSessions(validSessions));
-
-                if (validSessions.length === 0) {
-                    handleCreateSession();
-                    return;
-                }
-
-                const firstSession = validSessions[0];
-                if (firstSession.sessionId > 0) {
-                    try {
-                        const sessionResponse = await apiSessionGetById({ id: firstSession.sessionId });
-                        if (sessionResponse.data) {
-                            dispatch(setSession({
-                                ...sessionResponse.data,
-                                rounds: Array.isArray(sessionResponse.data.rounds) ? sessionResponse.data.rounds : []
-                            }));
-                        } else {
-                            dispatch(setSession(firstSession));
-                        }
-                    } catch (err) {
-                        console.error('Error fetching session details:', err);
-                        dispatch(setSession(firstSession));
-                    }
-                } else {
-                    dispatch(setSession(firstSession));
-                }
-            } catch (error) {
-                console.error('Error fetching sessions:', error);
-                handleCreateSession();
-            } finally {
-                dispatch(setLoading(false));
-            }
-        };
-
-        fetchSessions();
-    }, [dispatch]);
-
-    const handleSendMessage = useCallback(async (messageRequest: API.ChatRoundCreateRequest) => {
-        const enrichedRequest = {
-            ...messageRequest,
-            model: behaviorSettings.selectedModel.model,
-            provider: behaviorSettings.selectedModel.providerName
-        };
-
-        try {
-            dispatch(setIsGenerating(true));
-
-            const placeholderRound: API.ChatRoundDto = {
-                sessionId: enrichedRequest.sessionId,
-                chatRoundId: Date.now(),
-                userMessage: enrichedRequest.userMessage,
-                assistantMessage: "",
-                model: enrichedRequest.model,
-                provider: enrichedRequest.provider,
-                createTime: new Date().toISOString(),
-                updateTime: new Date().toISOString(),
-                promptTokens: 0,
-                completionTokens: 0,
-                totalTokens: 0,
-                timeTaken: 0,
-                isActive: true
-            };
-
-            dispatch(addChatRound(placeholderRound));
-
-            if (behaviorSettings.enableStreaming) {
-                await apiChatRoundStreamResponse(
-                    enrichedRequest,
-                    {
-                        onInit: (data) => {
-                            dispatch(updateLastChatRound({
-                                chatRoundId: data.chatRoundId,
-                                sessionId: data.sessionId
-                            }));
-                        },
-                        onChunk: (content) => {
-                            dispatch(updateLastChatRound({
-                                assistantMessage: (session.rounds?.[session.rounds.length - 1]?.assistantMessage || '') + content
-                            }));
-                        },
-                        onDone: (data) => {
-                            dispatch(setIsGenerating(false));
-                            dispatch(updateLastChatRound({
-                                ...data,
-                                promptTokens: data.promptTokens || 0,
-                                completionTokens: data.completionTokens || 0,
-                                timeTaken: data.timeTaken || 0,
-                                isActive: true
-                            }));
-                        },
-                        onError: (error: Error) => {
-                            dispatch(setIsGenerating(false));
-                            dispatch(updateLastChatRound({
-                                assistantMessage: `Error: ${error.message}`,
-                                isActive: true
-                            }));
-                        }
-                    }
-                );
+            if (sessions.length > 0) {
+                dispatch(setSessions(sessions));
+                dispatch(setSession(sessions[0]));
             } else {
-                const response = await apiChatRoundAddByRequest(enrichedRequest);
-                if (response.data) {
-                    dispatch(updateLastChatRound(response.data));
-                }
-                dispatch(setIsGenerating(false));
+                const newSession: API.SessionDto = {
+                    sessionId: 0,
+                    sessionName: 'New Chat',
+                    rounds: [],
+                    roundCount: 0,
+                    timestamp: Date.now(),
+                    createTime: new Date().toISOString(),
+                    updateTime: new Date().toISOString()
+                };
+                dispatch(setSession(newSession));
+                dispatch(setSessions([newSession]));
             }
-        } catch (error) {
-            dispatch(setIsGenerating(false));
-            console.error('Error sending message:', error);
-            message.error('Failed to send message');
-        }
-    }, [dispatch, session, behaviorSettings]);
 
-    const handleCreateSession = useCallback(async () => {
+            await getProviders();
+            dispatch(setLoading(false));
+        }
+    };
+
+    const handleSendMessage = async (messageRequest: API.ChatRoundCreateRequest) => {
+        const request = {
+            ...messageRequest,
+            model: chatState.behaviorSettings.selectedModel.model,
+            provider: chatState.behaviorSettings.selectedModel.providerName
+        };
+
+        dispatch(setIsGenerating(true));
+
+        const placeholderRound: API.ChatRoundDto = {
+            sessionId: request.sessionId,
+            chatRoundId: Date.now(),
+            userMessage: request.userMessage,
+            assistantMessage: "",
+            model: request.model,
+            provider: request.provider,
+            createTime: new Date().toISOString(),
+            updateTime: new Date().toISOString(),
+            promptTokens: 0,
+            completionTokens: 0,
+            totalTokens: 0,
+            timeTaken: 0,
+            isActive: true
+        };
+
+        // Initialize session with placeholder round
+        const updatedRounds = [...(chatState.session.rounds || []), placeholderRound];
+        dispatch(updateSessionRounds({
+            rounds: updatedRounds,
+            roundCount: updatedRounds.length
+        }));
+
+        let messageBuffer = "";
+
+        if (chatState.behaviorSettings.enableStreaming) {
+            await apiChatRoundStreamResponse(request, {
+                onInit: (data) => {
+                    dispatch(updateLastChatRound({
+                        chatRoundId: data.chatRoundId,
+                        sessionId: data.sessionId
+                    }));
+                },
+                onChunk: (content) => {
+                    messageBuffer += content;
+                    dispatch(updateLastChatRound({
+                        assistantMessage: messageBuffer
+                    }));
+                },
+                onDone: (data) => {
+                    dispatch(updateLastChatRound({
+                        ...data,
+                        promptTokens: data.promptTokens || 0,
+                        completionTokens: data.completionTokens || 0,
+                        timeTaken: data.timeTaken || 0,
+                        isActive: true
+                    }));
+                    dispatch(setIsGenerating(false));
+                },
+                onError: (data: Error) => {
+                    dispatch(updateLastChatRound({
+                        assistantMessage: data.message
+                    }));
+                    dispatch(setIsGenerating(false));
+                }
+            });
+        } else {
+            const response = await apiChatRoundAddByRequest(request);
+            if (response.data) {
+                dispatch(updateLastChatRound(response.data));
+            }
+            dispatch(setIsGenerating(false));
+        }
+    };
+
+    const handleSelectSession = async (session: API.SessionDto) => {
+        dispatch(setLoading(true));
+        const response = await apiSessionGetById({ id: session.sessionId });
+        if (response.data) {
+            dispatch(setSession(response.data));
+        }
+        dispatch(setLoading(false));
+    };
+
+    const handleEditSessionName = async (session: API.SessionDto) => {
+        await apiSessionUpdate({
+            sessionId: session.sessionId,
+            sessionName: session.sessionName
+        });
+        dispatch(setSessions(
+            chatState.sessions.map(s => s.sessionId === session.sessionId ? session : s)
+        ));
+    };
+
+    const handleDeleteSession = async (session: API.SessionDto) => {
+        await apiSessionDeleteById({ id: session.sessionId });
+        const updatedSessions = chatState.sessions.filter(s => s.sessionId !== session.sessionId);
+        dispatch(setSessions(updatedSessions));
+
+        if (chatState.session.sessionId === session.sessionId) {
+            if (updatedSessions.length > 0) {
+                dispatch(setSession(updatedSessions[0]));
+            } else {
+                const newSession: API.SessionDto = {
+                    sessionId: 0,
+                    sessionName: 'New Chat',
+                    rounds: [],
+                    roundCount: 0,
+                    timestamp: Date.now(),
+                    createTime: new Date().toISOString(),
+                    updateTime: new Date().toISOString()
+                };
+                dispatch(setSession(newSession));
+                dispatch(setSessions([newSession]));
+            }
+        }
+    };
+
+    const disableChatRounds = async (chatRoundIds: number[]) => {
+        await apiChatRoundDisable(chatRoundIds);
+        const updatedRounds = chatState.session.rounds?.map(round =>
+            chatRoundIds.includes(round.chatRoundId) ? { ...round, isActive: false } : round
+        ) || [];
+        dispatch(updateSessionRounds({ rounds: updatedRounds, roundCount: updatedRounds.length }));
+    };
+
+    const enableChatRounds = async (chatRoundIds: number[]) => {
+        await apiChatRoundEnable(chatRoundIds);
+        const updatedRounds = chatState.session.rounds?.map(round =>
+            chatRoundIds.includes(round.chatRoundId) ? { ...round, isActive: true } : round
+        ) || [];
+        dispatch(updateSessionRounds({ rounds: updatedRounds, roundCount: updatedRounds.length }));
+    };
+
+    const deleteChatRounds = async (chatRoundIds: number[]) => {
+        await apiChatRoundDeleteByIds(chatRoundIds);
+        const updatedRounds = chatState.session.rounds?.filter(
+            round => !chatRoundIds.includes(round.chatRoundId)
+        ) || [];
+        dispatch(updateSessionRounds({ rounds: updatedRounds, roundCount: updatedRounds.length }));
+    };
+
+    const refreshCurrentSession = async () => {
+        if (!chatState.session.sessionId) return;
+        const response = await apiSessionGetById({ id: chatState.session.sessionId });
+        const sessionData = response.data;
+        if (sessionData) {
+            dispatch(setSession(sessionData));
+            const updatedSessions = chatState.sessions.map(s =>
+                s.sessionId === sessionData.sessionId ? sessionData : s
+            );
+            dispatch(setSessions(updatedSessions));
+        }
+    };
+
+    const getProviders = async () => {
+        if (settings.chatProviders) {
+            dispatch(setProviders(settings.chatProviders));
+            return settings.chatProviders;
+        }
+        const response = await apiAiAssistantProviders();
+        if (response.data) {
+            dispatch(setProviders(response.data));
+            dispatch(setChatProviders(response.data));
+            return response.data;
+        }
+        return [];
+    };
+
+    const selectModel = (model: SelectedModel) => {
+        if (!model) return;
+        dispatch(setSelectedModel(model));
+        dispatch(setBehaviorSettings({
+            ...settings.chatBehavior,
+            selectedModel: model
+        }));
+    };
+
+    const handleCreateSession = async () => {
         const newSession: API.SessionDto = {
             sessionId: 0,
             sessionName: 'New Chat',
@@ -184,158 +252,26 @@ export const useChat = () => {
             createTime: new Date().toISOString(),
             updateTime: new Date().toISOString()
         };
-
-        dispatch(setSessions([...sessions, newSession]));
         dispatch(setSession(newSession));
-    }, [dispatch, sessions]);
-
-    const handleSelectSession = useCallback(async (selectedSession: API.SessionDto) => {
-        try {
-            dispatch(setLoading(true));
-            const response = await apiSessionGetById({ id: selectedSession.sessionId });
-            dispatch(setSession(response.data || selectedSession));
-        } catch (error) {
-            console.error('Error selecting session:', error);
-            dispatch(setSession(selectedSession));
-        } finally {
-            dispatch(setLoading(false));
-        }
-    }, [dispatch]);
-
-    const handleEditSessionName = useCallback(async (updatedSession: API.SessionDto) => {
-        try {
-            await apiSessionUpdate({
-                sessionId: updatedSession.sessionId,
-                sessionName: updatedSession.sessionName
-            });
-
-            dispatch(setSessions(
-                sessions.map(s => s.sessionId === updatedSession.sessionId ? updatedSession : s)
-            ));
-        } catch (error) {
-            console.error('Error updating session name:', error);
-            message.error('Failed to update session name');
-        }
-    }, [dispatch, sessions]);
-
-    const handleDeleteSession = useCallback(async (sessionToDelete: API.SessionDto) => {
-        try {
-            await apiSessionDeleteById({ id: sessionToDelete.sessionId });
-            
-            const updatedSessions = sessions.filter(s => s.sessionId !== sessionToDelete.sessionId);
-            dispatch(setSessions(updatedSessions));
-
-            if (session.sessionId === sessionToDelete.sessionId) {
-                if (updatedSessions.length > 0) {
-                    dispatch(setSession(updatedSessions[0]));
-                } else {
-                    handleCreateSession();
-                }
-            }
-        } catch (error) {
-            console.error('Error deleting session:', error);
-            message.error('Failed to delete session');
-        }
-    }, [dispatch, sessions, session, handleCreateSession]);
-
-    const handleDisableChatRounds = useCallback(async (chatRoundIds: number[]) => {
-        try {
-            await apiChatRoundDisable(chatRoundIds);
-            await refreshCurrentSession();
-        } catch (error) {
-            console.error('Error disabling chat rounds:', error);
-            message.error('Failed to disable chat rounds');
-        }
-    }, []);
-
-    const handleEnableChatRounds = useCallback(async (chatRoundIds: number[]) => {
-        try {
-            await apiChatRoundEnable(chatRoundIds);
-            await refreshCurrentSession();
-        } catch (error) {
-            console.error('Error enabling chat rounds:', error);
-            message.error('Failed to enable chat rounds');
-        }
-    }, []);
-
-    const handleDeleteChatRounds = useCallback(async (chatRoundIds: number[]) => {
-        try {
-            await apiChatRoundDeleteByIds(chatRoundIds);
-            await refreshCurrentSession();
-        } catch (error) {
-            console.error('Error deleting chat rounds:', error);
-            message.error('Failed to delete chat rounds');
-        }
-    }, []);
-
-    const refreshCurrentSession = useCallback(async () => {
-        try {
-            if (!session.sessionId || session.sessionId <= 0) return;
-
-            const response = await apiSessionGetById({ id: session.sessionId });
-            if (response.data) {
-                const updatedSession = {
-                    ...response.data,
-                    rounds: Array.isArray(response.data.rounds) ? response.data.rounds : []
-                };
-                dispatch(setSession(updatedSession));
-                dispatch(setSessions(
-                    sessions.map(s => s.sessionId === updatedSession.sessionId ? updatedSession : s)
-                ));
-            }
-        } catch (error) {
-            console.error('Error refreshing session:', error);
-            message.error('Failed to refresh session');
-        }
-    }, [dispatch, session, sessions]);
-
-    const getProviders = useCallback(async () => {
-        try {
-            if (settings.chatProviders) {
-                dispatch(setProviders(settings.chatProviders));
-                return settings.chatProviders;
-            }
-
-            const response = await apiAiAssistantProviders();
-            if (response.data) {
-                dispatch(setProviders(response.data));
-                dispatch(setChatProviders(response.data));
-                return response.data;
-            }
-            return [];
-        } catch (error) {
-            console.error('Error fetching providers:', error);
-            return [];
-        }
-    }, [dispatch, settings.chatProviders]);
-
-    const selectModel = useCallback((model: SelectedModel) => {
-        if (!model) return;
-        dispatch(setSelectedModel(model));
-        dispatch(setBehaviorSettings({
-            ...settings.chatBehavior,
-            selectedModel: model
-        }));
-    }, [dispatch, settings.chatBehavior]);
+        dispatch(setSessions([...chatState.sessions, newSession]));
+    };
 
     return {
-        // State
-        session,
-        sessions,
-        loading,
-        isGenerating,
-        providers,
-        behaviorSettings,
-
-        // Actions
+        session: chatState.session,
+        sessions: chatState.sessions,
+        loading: chatState.loading,
+        isGenerating: chatState.isGenerating,
+        providers: chatState.providers,
+        behaviorSettings: chatState.behaviorSettings,
+        initialize,
         handleSendMessage,
         handleCreateSession,
         handleSelectSession,
         handleEditSessionName,
         handleDeleteSession,
-        handleDisableChatRounds,
-        handleEnableChatRounds,
-        handleDeleteChatRounds,
+        disableChatRounds,
+        enableChatRounds,
+        deleteChatRounds,
         refreshCurrentSession,
         getProviders,
         selectModel,

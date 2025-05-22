@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from 'react'
+import { useRef } from 'react'
 import { Button, Badge, Layout, Space } from 'antd'
 import {
     PlusCircleOutlined,
@@ -6,43 +6,24 @@ import {
     MenuUnfoldOutlined
 } from '@ant-design/icons'
 import SessionList from './SessionList'
-import { useChat } from '@/states/ChatContext'
-import { storage, LayoutSettings } from '@/states/localStorage'
+import { useChat } from '@/hooks/useChat'
+import { useSettings } from '@/hooks/useSettings'
 const { Sider } = Layout
 
 export default function SessionSidebar() {
     const sessionListRef = useRef<HTMLDivElement>(null)
-    const [layoutSettings, setLayoutSettings] = useState(() => storage.getLayoutSettings());
+    const { settings, updateLayoutSettings } = useSettings();
     const {
         handleCreateSession,
+        handleSelectSession,
         sessions,
-        setSession
     } = useChat();
 
-    // Listen for layout settings changes
-    useEffect(() => {
-        const handleLayoutChange = (event: CustomEvent<LayoutSettings>) => {
-            setLayoutSettings(event.detail);
-        };
-
-        const handleStorageChange = (event: StorageEvent) => {
-            if (event.key === 'layout-settings') {
-                setLayoutSettings(storage.getLayoutSettings());
-            }
-        };
-
-        window.addEventListener('layoutSettingsChanged', handleLayoutChange);
-        window.addEventListener('storage', handleStorageChange);
-
-        return () => {
-            window.removeEventListener('layoutSettingsChanged', handleLayoutChange);
-            window.removeEventListener('storage', handleStorageChange);
-        };
-    }, []);
-
     const handleCollapse = (value: boolean) => {
-        const newSettings = { ...layoutSettings, sidebarCollapsed: value };
-        storage.setLayoutSettings(newSettings);
+        updateLayoutSettings({
+            ...settings.layout,
+            sidebarCollapsed: value
+        });
     }
 
     const handleCreateNewSession = () => {
@@ -65,21 +46,21 @@ export default function SessionSidebar() {
                 overflow: 'hidden'
             }}
             width={240}
-            collapsed={layoutSettings.sidebarCollapsed}
+            collapsed={settings.layout.sidebarCollapsed}
         >
             <div className="flex flex-col h-full">
                 <div className="flex items-center justify-between p-2">
                     <h2 className="text-lg font-semibold text-gray-800 ml-4">
-                        {!layoutSettings.sidebarCollapsed && 'Sessions'}
+                        {!settings.layout.sidebarCollapsed && 'Sessions'}
                     </h2>
                     <Button
                         type="text"
                         icon={<MenuFoldOutlined style={{ fontSize: '20px' }} />}
-                        onClick={() => handleCollapse(!layoutSettings.sidebarCollapsed)}
+                        onClick={() => handleCollapse(!settings.layout.sidebarCollapsed)}
                     />
                 </div>
 
-                {!layoutSettings.sidebarCollapsed && (
+                {!settings.layout.sidebarCollapsed && (
                     <div className="flex-1 overflow-y-auto" ref={sessionListRef}>
                         <SessionList />
                     </div>
@@ -90,11 +71,11 @@ export default function SessionSidebar() {
                         type="primary"
                         icon={<PlusCircleOutlined />}
                         onClick={sessions.find(session => session.sessionId === 0)
-                            ? () => setSession(sessions.find(session => session.sessionId === 0)!)
+                            ? () => handleSelectSession(sessions.find(session => session.sessionId === 0)!)
                             : handleCreateNewSession}
                         style={{ width: '100%', textAlign: 'left', height: 40 }}
                     >
-                        {!layoutSettings.sidebarCollapsed && 'New Chat'}
+                        {!settings.layout.sidebarCollapsed && 'New Chat'}
                     </Button>
                 </div>
             </div>

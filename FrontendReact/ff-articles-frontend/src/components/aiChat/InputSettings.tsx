@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Select, Switch, Divider, Typography } from 'antd';
 import {
   ThunderboltOutlined,
@@ -11,8 +11,8 @@ import {
   RobotOutlined,
   CompressOutlined
 } from '@ant-design/icons';
-import { storage, ChatDisplaySettings, ChatBehaviorSettings, SelectedModel } from '@/states/localStorage';
-import { apiAiAssistantProviders } from '@/api/ai/api/assistant';
+import { useSettings } from '@/hooks/useSettings';
+import { useChat } from '@/hooks/useChat';
 
 const { Text } = Typography;
 const { Option } = Select;
@@ -22,88 +22,13 @@ interface InputSettingsProps {
 }
 
 const InputSettings: React.FC<InputSettingsProps> = ({ visible }) => {
-  // Initialize with current settings
-  const [displaySettings, setDisplaySettings] = useState(() => storage.getChatDisplaySettings());
-  const [behaviorSettings, setBehaviorSettings] = useState(() => storage.getChatBehaviorSettings());
-  const [providers, setProviders] = useState<API.ChatProvider[]>([]);
-  const [selectedModel, setSelectedModel] = useState<SelectedModel>(behaviorSettings.selectedModel);
-  const [isLoading, setIsLoading] = useState(false);
-
-  // Fetch providers on mount
-  useEffect(() => {
-    const loadProviders = async () => {
-      setIsLoading(true);
-      try {
-        // Check storage first
-        const storedProviders = storage.getChatProviders();
-        if (storedProviders) {
-          setProviders(storedProviders);
-          setIsLoading(false);
-          return;
-        }
-
-        // Fetch from API if not in storage
-        const response = await apiAiAssistantProviders();
-        if (response?.data && Array.isArray(response.data)) {
-          setProviders(response.data);
-          // Save to storage for future use
-          storage.setChatProviders(response.data);
-        }
-      } catch (error) {
-        console.error('Error loading providers:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadProviders();
-  }, []);
-
-  // Listen for settings changes
-  useEffect(() => {
-    const handleDisplayChange = (event: CustomEvent<ChatDisplaySettings>) => {
-      setDisplaySettings(event.detail);
-    };
-
-    const handleBehaviorChange = (event: CustomEvent<ChatBehaviorSettings>) => {
-      setBehaviorSettings(event.detail);
-    };
-
-    const handleSelectedModelChange = (event: CustomEvent<SelectedModel>) => {
-      setSelectedModel(event.detail);
-    };
-
-    window.addEventListener('chatDisplaySettingsChanged', handleDisplayChange);
-    window.addEventListener('chatBehaviorSettingsChanged', handleBehaviorChange);
-    window.addEventListener('selectedModelChanged', handleSelectedModelChange);
-    return () => {
-      window.removeEventListener('chatDisplaySettingsChanged', handleDisplayChange);
-      window.removeEventListener('chatBehaviorSettingsChanged', handleBehaviorChange);
-      window.removeEventListener('selectedModelChanged', handleSelectedModelChange);
-    };
-  }, []);
-
-  // Update display settings
-  const updateDisplaySetting = (key: keyof ChatDisplaySettings, value: boolean) => {
-    const newSettings = { ...displaySettings, [key]: value };
-    storage.setChatDisplaySettings(newSettings);
-  };
-
-  // Update behavior settings
-  const updateBehaviorSetting = (key: keyof ChatBehaviorSettings, value: any) => {
-    const newSettings = { ...behaviorSettings, [key]: value };
-    storage.setChatBehaviorSettings(newSettings);
-  };
-
-  const updateSelectedModel = (value: SelectedModel) => {
-    storage.setSelectedModel(value);
-  };
+  const { settings, updateDisplaySettings, updateBehaviorSettings, updateSelectedModel, loadProviders } = useSettings();
+  const { providers } = useChat();
 
   // Create a unique key for each model option
   const getModelKey = (provider: string, model: string): string => {
     return `${provider}|${model}`;
   };
-
 
   return (
     <div
@@ -116,7 +41,7 @@ const InputSettings: React.FC<InputSettingsProps> = ({ visible }) => {
           <div className="flex items-center gap-2">
             <Text strong><RobotOutlined /> Model:</Text>
             <Select
-              value={selectedModel.model}
+              value={settings.chatBehavior.selectedModel.model}
               labelInValue={false}
               optionLabelProp="label"
               onChange={(value) => {
@@ -130,10 +55,10 @@ const InputSettings: React.FC<InputSettingsProps> = ({ visible }) => {
               style={{ width: 180 }}
               dropdownStyle={{ maxHeight: '300px', overflow: 'auto' }}
               listHeight={300}
-              loading={isLoading}
-              disabled={isLoading}
+              loading={!providers}
+              disabled={!providers}
             >
-              {providers.map(provider => (
+              {providers?.map(provider => (
                 provider.models.map(model => (
                   <Option
                     key={getModelKey(provider.providerName, model)}
@@ -154,32 +79,44 @@ const InputSettings: React.FC<InputSettingsProps> = ({ visible }) => {
           <div className="flex flex-wrap gap-4">
             <div className="flex items-center gap-2">
               <Switch
-                checked={behaviorSettings.enableThinking}
-                onChange={(checked) => updateBehaviorSetting('enableThinking', checked)}
+                checked={settings.chatBehavior.enableThinking}
+                onChange={(checked) => updateBehaviorSettings({
+                  ...settings.chatBehavior,
+                  enableThinking: checked
+                })}
                 size="small"
               />
               <Text><BulbOutlined /> Thinking</Text>
             </div>
             <div className="flex items-center gap-2">
               <Switch
-                checked={behaviorSettings.enableStreaming}
-                onChange={(checked) => updateBehaviorSetting('enableStreaming', checked)}
+                checked={settings.chatBehavior.enableStreaming}
+                onChange={(checked) => updateBehaviorSettings({
+                  ...settings.chatBehavior,
+                  enableStreaming: checked
+                })}
                 size="small"
               />
               <Text><ThunderboltOutlined /> Streaming</Text>
             </div>
             <div className="flex items-center gap-2">
               <Switch
-                checked={displaySettings.showOnlyActiveMessages}
-                onChange={(checked) => updateDisplaySetting('showOnlyActiveMessages', checked)}
+                checked={settings.chatDisplay.showOnlyActiveMessages}
+                onChange={(checked) => updateDisplaySettings({
+                  ...settings.chatDisplay,
+                  showOnlyActiveMessages: checked
+                })}
                 size="small"
               />
               <Text><EyeOutlined /> Only Active</Text>
             </div>
             <div className="flex items-center gap-2">
               <Switch
-                checked={displaySettings.enableCollapsibleMessages}
-                onChange={(checked) => updateDisplaySetting('enableCollapsibleMessages', checked)}
+                checked={settings.chatDisplay.enableCollapsibleMessages}
+                onChange={(checked) => updateDisplaySettings({
+                  ...settings.chatDisplay,
+                  enableCollapsibleMessages: checked
+                })}
                 size="small"
               />
               <Text><CompressOutlined /> Collapsible</Text>
@@ -193,40 +130,55 @@ const InputSettings: React.FC<InputSettingsProps> = ({ visible }) => {
         <div className="flex flex-wrap gap-4">
           <div className="flex items-center gap-2">
             <Switch
-              checked={displaySettings.showTokenUsed}
-              onChange={(checked) => updateDisplaySetting('showTokenUsed', checked)}
+              checked={settings.chatDisplay.showTokenUsed}
+              onChange={(checked) => updateDisplaySettings({
+                ...settings.chatDisplay,
+                showTokenUsed: checked
+              })}
               size="small"
             />
             <Text><FileTextOutlined /> Tokens</Text>
           </div>
           <div className="flex items-center gap-2">
             <Switch
-              checked={displaySettings.showModelName}
-              onChange={(checked) => updateDisplaySetting('showModelName', checked)}
+              checked={settings.chatDisplay.showModelName}
+              onChange={(checked) => updateDisplaySettings({
+                ...settings.chatDisplay,
+                showModelName: checked
+              })}
               size="small"
             />
             <Text><RobotOutlined /> Model</Text>
           </div>
           <div className="flex items-center gap-2">
             <Switch
-              checked={displaySettings.showTimeTaken}
-              onChange={(checked) => updateDisplaySetting('showTimeTaken', checked)}
+              checked={settings.chatDisplay.showTimeTaken}
+              onChange={(checked) => updateDisplaySettings({
+                ...settings.chatDisplay,
+                showTimeTaken: checked
+              })}
               size="small"
             />
             <Text><ClockCircleOutlined /> Time</Text>
           </div>
           <div className="flex items-center gap-2">
             <Switch
-              checked={displaySettings.showMessageTimestamp}
-              onChange={(checked) => updateDisplaySetting('showMessageTimestamp', checked)}
+              checked={settings.chatDisplay.showMessageTimestamp}
+              onChange={(checked) => updateDisplaySettings({
+                ...settings.chatDisplay,
+                showMessageTimestamp: checked
+              })}
               size="small"
             />
             <Text><ClockCircleOutlined /> Date</Text>
           </div>
           <div className="flex items-center gap-2">
             <Switch
-              checked={displaySettings.enableMarkdownRendering}
-              onChange={(checked) => updateDisplaySetting('enableMarkdownRendering', checked)}
+              checked={settings.chatDisplay.enableMarkdownRendering}
+              onChange={(checked) => updateDisplaySettings({
+                ...settings.chatDisplay,
+                enableMarkdownRendering: checked
+              })}
               size="small"
             />
             <Text><CodeOutlined /> Markdown</Text>

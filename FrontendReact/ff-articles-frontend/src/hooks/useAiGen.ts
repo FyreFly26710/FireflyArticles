@@ -1,4 +1,3 @@
-import { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { message } from 'antd';
 import { RootState } from '@/stores';
@@ -60,7 +59,7 @@ export const useAiGen = () => {
     } = useSelector((state: RootState) => state.aiGen);
 
     // Article List Generation
-    const generateArticles = useCallback(async (request: API.ArticleListRequest) => {
+    const generateArticles = async (request: API.ArticleListRequest) => {
         try {
             dispatch(setLoading(true));
             dispatch(setArticleListRequest(request));
@@ -84,10 +83,10 @@ export const useAiGen = () => {
         } finally {
             dispatch(setLoading(false));
         }
-    }, [dispatch]);
+    };
 
     // Single Article Content Generation
-    const generateArticleContent = useCallback(async (article: API.AIGenArticleDto): Promise<number | undefined> => {
+    const generateArticleContent = async (article: API.AIGenArticleDto): Promise<number | undefined> => {
         if (!articleListRequest || !parsedArticles) {
             message.error('Missing required data to generate article content');
             return undefined;
@@ -123,7 +122,7 @@ export const useAiGen = () => {
             return articleId;
         } catch (error) {
             console.error(`Error generating content for article ${article.sortNumber}:`, error);
-            
+
             dispatch(setArticleGenerationState({
                 sortNumber: article.sortNumber,
                 state: {
@@ -135,10 +134,10 @@ export const useAiGen = () => {
             message.error(`Failed to generate content for "${article.title}"`);
             return undefined;
         }
-    }, [dispatch, articleListRequest, parsedArticles]);
+    };
 
     // Generate All Pending Articles
-    const generateAllArticles = useCallback(async () => {
+    const generateAllArticles = async () => {
         if (!articleListRequest || !parsedArticles) {
             message.error('Missing required data to generate article content');
             return;
@@ -165,10 +164,10 @@ export const useAiGen = () => {
         } else if (pendingArticles.length > 0) {
             message.error('Failed to generate any articles');
         }
-    }, [generateArticleContent, articleListRequest, parsedArticles, generationState]);
+    };
 
     // Response Data Handling
-    const parseArticleData = useCallback((data: string) => {
+    const parseArticleData = (data: string) => {
         try {
             let parsedData: any = JSON.parse(data);
             parsedData = transformKeys(parsedData);
@@ -186,9 +185,9 @@ export const useAiGen = () => {
             dispatch(setParsedArticles(null));
             return null;
         }
-    }, [dispatch]);
+    };
 
-    const handleDataChange = useCallback((data: string) => {
+    const handleDataChange = (data: string) => {
         if (data.trim() && !hasLineBreaks(data)) {
             const formatted = prettyFormatJson(data);
             if (formatted !== data) {
@@ -197,11 +196,11 @@ export const useAiGen = () => {
             }
         }
         dispatch(setResponseData(data));
-    }, [dispatch]);
+    };
 
-    const clearGenerationResults = useCallback(() => {
+    const clearGenerationResults = () => {
         dispatch(clearResults());
-    }, [dispatch]);
+    };
 
     return {
         // State

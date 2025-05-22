@@ -1,40 +1,16 @@
-import { useEffect, useRef, useState } from 'react'
-import { useChat } from '@/states/ChatContext'
-import { storage, ChatDisplaySettings } from '@/states/localStorage'
+import { useEffect, useRef } from 'react'
+import { useChat } from '@/hooks/useChat'
+import { useSettings } from '@/hooks/useSettings'
 import Message from './Message'
 
 export default function MessageList() {
     const ref = useRef<HTMLDivElement>(null)
     const { session } = useChat()
+    const { settings } = useSettings();
     const rounds = session.rounds
 
-    // Initialize display settings with state
-    const [displaySettings, setDisplaySettings] = useState(() => storage.getChatDisplaySettings());
-
-    // Listen for display settings changes
-    useEffect(() => {
-        const handleDisplayChange = (event: CustomEvent<ChatDisplaySettings>) => {
-            setDisplaySettings(event.detail);
-        };
-
-        // Handle changes from other tabs
-        const handleStorageChange = (event: StorageEvent) => {
-            if (event.key === 'chat-display-settings') {
-                setDisplaySettings(storage.getChatDisplaySettings());
-            }
-        };
-
-        window.addEventListener('chatDisplaySettingsChanged', handleDisplayChange);
-        window.addEventListener('storage', handleStorageChange);
-
-        return () => {
-            window.removeEventListener('chatDisplaySettingsChanged', handleDisplayChange);
-            window.removeEventListener('storage', handleStorageChange);
-        };
-    }, []);
-
     // Filter messages if showOnlyActiveMessages is true
-    const filteredRounds = displaySettings.showOnlyActiveMessages
+    const filteredRounds = settings.chatDisplay.showOnlyActiveMessages
         ? rounds?.filter(round => round.isActive)
         : rounds;
 

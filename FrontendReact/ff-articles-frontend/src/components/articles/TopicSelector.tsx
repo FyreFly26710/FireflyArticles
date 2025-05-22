@@ -1,23 +1,15 @@
 import { useEffect, useState } from 'react';
-import { Tabs, Spin, Empty, List } from 'antd';
-import { useArticlesContext } from '@/states/ArticlesContext';
+import { Tabs, Empty, List } from 'antd';
+import { useArticles } from '@/hooks/useArticles';
 
-interface TopicSelectorProps {
-  onTopicSelect: (topicIds: number[]) => void;
-  selectedTopicIds?: number[];
-}
+const TopicSelector = () => {
+  const { topicsByCategory, filters, handleTopicChange } = useArticles();
+  const [selectedTopics, setSelectedTopics] = useState<Set<number>>(new Set(filters.topicIds));
 
-const TopicSelector = ({
-  onTopicSelect,
-  selectedTopicIds = []
-}: TopicSelectorProps) => {
-  const { topicsByCategory } = useArticlesContext();
-  const [selectedTopics, setSelectedTopics] = useState<Set<number>>(new Set(selectedTopicIds));
-
-  // Update selectedTopics when selectedTopicIds changes
+  // Update selectedTopics when filters.topicIds changes
   useEffect(() => {
-    setSelectedTopics(new Set(selectedTopicIds));
-  }, [selectedTopicIds]);
+    setSelectedTopics(new Set(filters.topicIds));
+  }, [filters.topicIds]);
 
   const handleTopicClick = (topicId: number) => {
     const updatedSelectedTopics = new Set(selectedTopics);
@@ -29,7 +21,7 @@ const TopicSelector = ({
     }
 
     setSelectedTopics(updatedSelectedTopics);
-    onTopicSelect(Array.from(updatedSelectedTopics));
+    handleTopicChange(Array.from(updatedSelectedTopics));
   };
 
   const categories = Object.keys(topicsByCategory).sort();

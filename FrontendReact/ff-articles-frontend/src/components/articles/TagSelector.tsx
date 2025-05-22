@@ -1,13 +1,9 @@
 import { Select, Space, Typography, Row, Col } from 'antd';
-import { useArticlesContext } from '@/states/ArticlesContext';
+import { useArticles } from '@/hooks/useArticles';
 
-interface TagSelectorProps {
-  onTagSelect: (tagIds: number[]) => void;
-  selectedTagIds?: number[];
-}
-
-const TagSelector = ({ onTagSelect, selectedTagIds = [] }: TagSelectorProps) => {
-  const { tags } = useArticlesContext();
+const TagSelector = () => {
+  const { tags, filters, handleTagChange } = useArticles();
+  const tagIds = filters.tagIds || [];
 
   // Filter tags by specific categories
   const allowedCategories = ['Skill Level', 'Article Style', 'Tone'];
@@ -43,10 +39,10 @@ const TagSelector = ({ onTagSelect, selectedTagIds = [] }: TagSelectorProps) => 
     const newGroupSelections = isAllSelected ? currentGroupTagIds : value;
 
     // Combine new selections with existing selections from other groups
-    const otherGroupSelections = selectedTagIds.filter(id => otherGroupTags.includes(id));
+    const otherGroupSelections = tagIds.filter(id => otherGroupTags.includes(id));
     const newSelections = [...otherGroupSelections, ...newGroupSelections];
 
-    onTagSelect(newSelections);
+    handleTagChange(newSelections);
   };
 
   return (
@@ -58,7 +54,7 @@ const TagSelector = ({ onTagSelect, selectedTagIds = [] }: TagSelectorProps) => 
               <Typography.Text strong>{group}</Typography.Text>
               <Select
                 mode="multiple"
-                value={selectedTagIds.filter(id =>
+                value={tagIds.filter(id =>
                   groupTags.some(tag => tag.tagId === id)
                 )}
                 onChange={(value) => handleChange(value, group)}

@@ -1,11 +1,22 @@
 "use client";
+import { useEffect, useCallback } from "react";
 import dynamic from "next/dynamic";
-import { useArticlesContext } from "@/states/ArticlesContext";
+import { useArticles } from "@/hooks/useArticles";
 
 const ArticleFilters = dynamic(() => import("@/components/articles/ArticleFilters"), { ssr: false });
 const ArticleTable = dynamic(() => import("@/components/articles/ArticleTable"), { ssr: false });
 
-export default function ClientArticles() {
+interface ClientArticlesProps {
+    initialTopics: API.TopicDto[];
+    initialTags: API.TagDto[];
+    initialTopicsByCategory: Record<string, API.TopicDto[]>;
+}
+
+export default function ClientArticles({
+    initialTopics,
+    initialTags,
+    initialTopicsByCategory
+}: ClientArticlesProps) {
     const {
         articles,
         loading,
@@ -13,32 +24,31 @@ export default function ClientArticles() {
         pageNumber,
         pageSize,
         filters,
-        handleSearch,
-        handleClearSearch,
-        handleTopicChange,
-        handleTagChange,
-        handleClearFilters,
+        initializeData,
         handlePageChange,
-        removeTopicFilter,
-        removeTagFilter,
-    } = useArticlesContext();
+        fetchArticles
+    } = useArticles();
 
+    // Initialize data when component mounts
+    useEffect(() => {
+        initializeData({
+            topics: initialTopics,
+            tags: initialTags,
+            topicsByCategory: initialTopicsByCategory
+        });
+    }, []);
+
+    // Fetch articles when filters or pagination changes
+    useEffect(() => {
+        // Skip initial fetch if no filters are set yet
+        if (!filters) return;
+
+        fetchArticles();
+    }, [filters?.keyword, filters?.topicIds, filters?.tagIds, pageNumber, pageSize]);
 
     return (
         <div>
-            <ArticleFilters
-                keyword={filters.keyword}
-                topicIds={filters.topicIds}
-                tagIds={filters.tagIds}
-                onSearch={handleSearch}
-                onClearSearch={handleClearSearch}
-                onTopicChange={handleTopicChange}
-                onTagChange={handleTagChange}
-                onClearFilters={handleClearFilters}
-                onRemoveTopic={removeTopicFilter}
-                onRemoveTag={removeTagFilter}
-            />
-
+            <ArticleFilters />
             <ArticleTable
                 articles={articles}
                 loading={loading}

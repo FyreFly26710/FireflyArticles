@@ -7,10 +7,9 @@ import {
   StopOutlined,
   PlayCircleOutlined,
   MoreOutlined,
-  SettingOutlined
 } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
-import { useChat } from '@/states/ChatContext';
+import { useChat } from '@/hooks/useChat';
 
 interface ChatSidebarProps {
   collapsed: boolean;
@@ -18,7 +17,7 @@ interface ChatSidebarProps {
 }
 
 const ChatSidebar: React.FC<ChatSidebarProps> = ({ collapsed, toggleCollapsed }) => {
-  const { session, handleDisableChatRounds, handleEnableChatRounds, handleDeleteChatRounds } = useChat();
+  const { session, disableChatRounds, enableChatRounds, deleteChatRounds } = useChat();
   const sidebarContentRef = useRef<HTMLDivElement>(null);
   const [isModifyMode, setIsModifyMode] = useState(false);
   const [selectedChatIds, setSelectedChatIds] = useState<number[]>([]);
@@ -135,12 +134,12 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({ collapsed, toggleCollapsed })
       return;
     }
 
-    handleEnableChatRounds(selectedChatIds)
+    enableChatRounds(selectedChatIds)
       .then(() => {
         message.success(`${selectedChatIds.length} chat(s) enabled`);
         exitModifyMode();
       })
-      .catch(error => {
+      .catch((error: Error) => {
         message.error('Failed to enable chats');
         console.error(error);
       });
@@ -153,12 +152,12 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({ collapsed, toggleCollapsed })
       return;
     }
 
-    handleDisableChatRounds(selectedChatIds)
+    disableChatRounds(selectedChatIds)
       .then(() => {
         message.success(`${selectedChatIds.length} chat(s) disabled`);
         exitModifyMode();
       })
-      .catch(error => {
+      .catch((error: Error) => {
         message.error('Failed to disable chats');
         console.error(error);
       });
@@ -178,12 +177,12 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({ collapsed, toggleCollapsed })
       okType: 'danger',
       cancelText: 'Cancel',
       onOk: () => {
-        return handleDeleteChatRounds(selectedChatIds)
+        return deleteChatRounds(selectedChatIds)
           .then(() => {
             message.success(`${selectedChatIds.length} chat(s) deleted`);
             exitModifyMode();
           })
-          .catch(error => {
+          .catch((error: Error) => {
             message.error('Failed to delete chats');
             console.error(error);
           });

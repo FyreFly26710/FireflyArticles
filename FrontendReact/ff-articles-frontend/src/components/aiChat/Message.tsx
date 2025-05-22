@@ -2,8 +2,8 @@ import { useEffect, useState, useRef } from 'react'
 import { Avatar, Typography, Divider } from 'antd'
 import { UserOutlined, RobotOutlined } from '@ant-design/icons'
 import Markdown from './Markdown'
-import { storage } from '@/states/localStorage'
-import { useChat } from '@/states/ChatContext'
+import { useSettings } from '@/hooks/useSettings'
+import { useChat } from '@/hooks/useChat'
 import { DEFAULT_USER } from '@/libs/constants/user'
 const setOpenSettingWindow = (type: string) => console.log('Open settings:', type)
 
@@ -15,10 +15,7 @@ interface MessageProps {
 
 export default function Message(props: MessageProps) {
     const { chatRound, collapseThreshold, displayMode = 'both' } = props
-    const user = storage.getUser() ?? DEFAULT_USER;
-
-    // Get settings from context
-    const displaySettings = storage.getChatDisplaySettings();
+    const { settings } = useSettings();
     const { isGenerating, session } = useChat();
 
     // Determine if this is the latest message
@@ -43,7 +40,7 @@ export default function Message(props: MessageProps) {
     const assistantContent = chatRound.assistantMessage || "";
 
     // Only apply collapse if the feature is enabled
-    const shouldUseCollapse = displaySettings.enableCollapsibleMessages && collapseThreshold !== undefined;
+    const shouldUseCollapse = settings.chatDisplay.enableCollapsibleMessages && collapseThreshold !== undefined;
     const assistantNeedsCollapse = shouldUseCollapse &&
         assistantContent.length > collapseThreshold &&
         assistantContent.length - collapseThreshold > 50;
@@ -56,20 +53,20 @@ export default function Message(props: MessageProps) {
     // Update collapse state when collapsible setting changes
     useEffect(() => {
         setIsAssistantCollapsed(assistantNeedsCollapse);
-    }, [displaySettings.enableCollapsibleMessages, assistantNeedsCollapse]);
+    }, [settings.chatDisplay.enableCollapsibleMessages, assistantNeedsCollapse]);
 
     // Prepare metadata tips for assistant message
     const tips: string[] = []
-    if (displaySettings.showTokenUsed && !(isGenerating && isLatestMessage)) {
+    if (settings.chatDisplay.showTokenUsed && !(isGenerating && isLatestMessage)) {
         tips.push(`tokens: input ${chatRound.promptTokens} output ${chatRound.completionTokens}`);
     }
-    if (displaySettings.showModelName) {
+    if (settings.chatDisplay.showModelName) {
         tips.push(`model: ${chatRound.model || 'unknown'}`);
     }
-    if (displaySettings.showTimeTaken && !(isGenerating && isLatestMessage)) {
+    if (settings.chatDisplay.showTimeTaken && !(isGenerating && isLatestMessage)) {
         tips.push(`time: ${Math.round(chatRound.timeTaken / 1000)}s`);
     }
-    if (displaySettings.showMessageTimestamp) {
+    if (settings.chatDisplay.showMessageTimestamp) {
         tips.push(`${new Date(chatRound.updateTime).toLocaleString()}`);
     }
     if (isInactive) {
@@ -116,7 +113,7 @@ export default function Message(props: MessageProps) {
             {(displayMode === 'user' || displayMode === 'both') && (
                 <div className="flex items-start py-2 flex-row-reverse">
                     <Avatar
-                        src={user.userAvatar}
+                        src={DEFAULT_USER.userAvatar}
                         size={28}
                         className="cursor-pointer mt-1"
                         onClick={() => setOpenSettingWindow('chat')}
@@ -136,7 +133,7 @@ export default function Message(props: MessageProps) {
                         <Avatar icon={<RobotOutlined />} size={28} className="bg-primary mt-1" />
                         <div className="flex-1 ml-4">
                             <div className={`mr-4 break-words whitespace-pre-wrap text-left ${isInactive ? 'text-gray-500' : ''}`}>
-                                {displaySettings.enableMarkdownRendering && !isAssistantCollapsed ? (
+                                {settings.chatDisplay.enableMarkdownRendering && !isAssistantCollapsed ? (
                                     <Markdown>{formattedAssistantContent}</Markdown>
                                 ) : (
                                     <div>

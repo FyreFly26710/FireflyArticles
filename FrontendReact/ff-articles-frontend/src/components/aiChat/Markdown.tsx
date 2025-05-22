@@ -52,7 +52,7 @@ export default function Markdown({ children, hiddenCodeCopyButton }: MarkdownPro
 }
 
 function CodeBlock({ children, hiddenCodeCopyButton }: CodeBlockProps) {
-    const match = /language-(\w+)/.exec( '')
+    const match = /language-(\w+)/.exec('')
     const language = match?.[1] || 'text'
 
     const handleCopy = async () => {
