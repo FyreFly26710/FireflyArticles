@@ -1,105 +1,32 @@
 "use client";
-import { Table, Button, Space, Modal, Form, Input, message, Select } from 'antd';
+import { Table, Button, Modal, Form, Input, Select } from 'antd';
 import type { SortOrder } from 'antd/es/table/interface';
-import { useEffect, useState } from 'react';
-import { apiTagGetAll, apiTagEditByRequest } from '@/api/contents/api/tag';
+import { useTagManagement } from '@/hooks/admin/useAdminTag';
 
-interface TagFormData {
-  tagId?: number;
-  tagName: string;
-  tagGroup?: string;
-  tagColour?: string;
-}
-
-const PREDEFINED_GROUPS = [
-  "Skill Level",
-  "Article Style",
-  "Tone",
-  "Focus Area",
-  "Tech Stack/Language"
-];
-
-const FILTER_OPTIONS = [
-  ...PREDEFINED_GROUPS.map(group => ({ label: group, value: group })),
-  { label: 'Other', value: 'other' }
-];
-
+// Component definition
 const TagManagement = () => {
-  const [tags, setTags] = useState<API.TagDto[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [form] = Form.useForm();
-  const [editingTag, setEditingTag] = useState<TagFormData | null>(null);
-  const [selectedGroup, setSelectedGroup] = useState<string | undefined>();
+  const {
+    loading,
+    modalVisible,
+    form,
+    selectedGroupFilter,
+    filteredTags,
+    handleEdit,
+    handleSubmit,
+    handleModalCancel,
+    setSelectedGroupFilter,
+    PREDEFINED_GROUPS,
+    FILTER_OPTIONS,
+  } = useTagManagement();
 
-  const fetchTags = async () => {
-    setLoading(true);
-    try {
-      const response = await apiTagGetAll();
-      if (response.data) {
-        setTags(response.data);
-      }
-    } catch (error) {
-      message.error('Failed to fetch tags');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchTags();
-  }, []);
-
-  const handleEdit = (record: API.TagDto) => {
-    setEditingTag({
-      tagId: record.tagId,
-      tagName: record.tagName || '',
-      tagGroup: record.tagGroup,
-      tagColour: record.tagColour,
-    });
-    form.setFieldsValue({
-      tagName: record.tagName,
-      tagGroup: record.tagGroup,
-      tagColour: record.tagColour,
-    });
-    setModalVisible(true);
-  };
-
-  const handleSubmit = async () => {
-    try {
-      const values = await form.validateFields();
-      if (editingTag?.tagId) {
-        await apiTagEditByRequest({
-          tagId: editingTag.tagId,
-          tagName: values.tagName,
-          tagGroup: values.tagGroup,
-          tagColour: values.tagColour,
-        });
-        message.success('Tag updated successfully');
-        setModalVisible(false);
-        fetchTags();
-      }
-    } catch (error) {
-      message.error('Operation failed');
-    }
-  };
-
-  const getFilteredTags = () => {
-    if (!selectedGroup) return tags;
-    
-    if (selectedGroup === 'other') {
-      return tags.filter(tag => !PREDEFINED_GROUPS.includes(tag.tagGroup || ''));
-    }
-    
-    return tags.filter(tag => tag.tagGroup === selectedGroup);
-  };
-
+  // Table column definitions
   const columns = [
     {
       title: 'Tag Name',
       dataIndex: 'tagName',
       key: 'tagName',
       sorter: (a: API.TagDto, b: API.TagDto) => (a.tagName || '').localeCompare(b.tagName || ''),
+      ellipsis: true,
     },
     {
       title: 'Group',
@@ -107,19 +34,22 @@ const TagManagement = () => {
       key: 'tagGroup',
       sorter: (a: API.TagDto, b: API.TagDto) => (a.tagGroup || '').localeCompare(b.tagGroup || ''),
       defaultSortOrder: 'ascend' as SortOrder,
+      ellipsis: true,
     },
     {
       title: 'Color',
       dataIndex: 'tagColour',
       key: 'tagColour',
-      render: (color: string) => (
+      width: 80,
+      render: (color: string | undefined) => (
         color ? (
-          <div style={{ 
-            width: 20, 
-            height: 20, 
+          <div style={{
+            width: 20,
+            height: 20,
             backgroundColor: color,
             borderRadius: '50%',
-            border: '1px solid #d9d9d9'
+            border: '1px solid #d9d9d9',
+            margin: 'auto', // Center the color circle
           }} />
         ) : null
       ),
@@ -127,6 +57,7 @@ const TagManagement = () => {
     {
       title: 'Actions',
       key: 'actions',
+      width: 100,
       render: (_: any, record: API.TagDto) => (
         <Button type="link" onClick={() => handleEdit(record)}>
           Edit
@@ -137,34 +68,37 @@ const TagManagement = () => {
 
   return (
     <div style={{ padding: '24px' }}>
-      <div style={{ marginBottom: '16px' }}>
+      <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Select
-          style={{ width: 200 }}
+          style={{ width: 240 }}
           placeholder="Filter by group"
           allowClear
           options={FILTER_OPTIONS}
-          value={selectedGroup}
-          onChange={setSelectedGroup}
+          value={selectedGroupFilter}
+          onChange={setSelectedGroupFilter}
         />
       </div>
 
       <Table
         columns={columns}
-        dataSource={getFilteredTags()}
+        dataSource={filteredTags}
         rowKey="tagId"
         loading={loading}
+        scroll={{ x: 'max-content' }}
       />
 
       <Modal
         title="Edit Tag"
         open={modalVisible}
         onOk={handleSubmit}
-        onCancel={() => setModalVisible(false)}
+        onCancel={handleModalCancel}
         destroyOnClose
+        confirmLoading={loading}
       >
         <Form
           form={form}
           layout="vertical"
+          name="tagEditForm"
         >
           <Form.Item
             name="tagName"
@@ -176,13 +110,12 @@ const TagManagement = () => {
           <Form.Item
             name="tagGroup"
             label="Group"
-            rules={[{ required: true, message: 'Please select a group!' }]}
           >
             <Select
-              placeholder="Select a group"
+              placeholder="Select or type a group"
               options={PREDEFINED_GROUPS.map(group => ({
                 label: group,
-                value: group
+                value: group,
               }))}
             />
           </Form.Item>
@@ -190,7 +123,7 @@ const TagManagement = () => {
             name="tagColour"
             label="Color"
           >
-            <Input type="color" />
+            <Input type="color" style={{ width: '100%' }} />
           </Form.Item>
         </Form>
       </Modal>
