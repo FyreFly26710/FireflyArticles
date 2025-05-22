@@ -1,18 +1,15 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { Card, Alert, Row, Col } from 'antd';
-import { useAiGenContext } from '@/states/AiGenContext';
-import { useAiGenEdit } from '@/hook/useAiGenEditArticle';
+import { Card, Row, Col } from 'antd';
+import { useAiGen } from '@/hooks/useAiGen';
+import { useAiGenArticleEdit } from '@/hooks/useAiGenArticleEdit';
 import ArticleRawJson from './ArticleRawJson';
 import ArticleCardList from './ArticleGenCardList';
 
 const ArticleResults: React.FC = () => {
-  const {
-    responseData,
-    parsedArticles,
-  } = useAiGenContext();
-  const { parseArticleData, handleDataChange } = useAiGenEdit();
+  const { responseData, parsedArticles } = useAiGen();
+  const { parseArticleData, handleDataChange } = useAiGenArticleEdit();
 
   // Try to parse data when the component mounts
   useEffect(() => {
@@ -46,7 +43,6 @@ const ArticleResults: React.FC = () => {
 
         {/* Right side: Parsed Data Display*/}
         <Col xs={24} md={12}>
-
           {/* Parsed Articles */}
           {parsedArticles && (
             <ArticleCardList parsedArticles={parsedArticles} />

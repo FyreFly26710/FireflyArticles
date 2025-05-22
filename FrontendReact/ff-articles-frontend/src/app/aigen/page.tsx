@@ -1,11 +1,11 @@
 import dynamic from 'next/dynamic'
 
 // Import entire page with ChatProvider dynamically with SSR disabled
-const ClientSidePage = dynamic(
-  () => import('./ClientSidePage'),
+const AiGenPage = dynamic(
+  () => import('./AiGenPage'),
   { ssr: false }
 );
 
 export default function Page() {
-  return <ClientSidePage />;
+  return <AiGenPage />;
 }

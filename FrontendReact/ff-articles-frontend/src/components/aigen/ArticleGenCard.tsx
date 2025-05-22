@@ -2,10 +2,10 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Card, Typography, Tag, Button, Space, Spin, Tooltip, message } from 'antd';
-import { FileTextOutlined, ArrowRightOutlined, CheckCircleOutlined, LoadingOutlined, MessageOutlined } from '@ant-design/icons';
-import { useAiGenContext } from '@/states/AiGenContext';
-import { useAiGenEdit } from '@/hook/useAiGenEditArticle';
+import { Card, Typography, Tag, Button, Space, Tooltip, message } from 'antd';
+import { FileTextOutlined, ArrowRightOutlined, CheckCircleOutlined, MessageOutlined } from '@ant-design/icons';
+import { useAiGen } from '@/hooks/useAiGen';
+import { useAiGenArticleEdit } from '@/hooks/useAiGenArticleEdit';
 import AiPromptDrawer from '@/components/shared/AiPromptDrawer';
 
 const { Paragraph } = Typography;
@@ -15,8 +15,8 @@ interface ArticleGenCardProps {
 }
 
 const ArticleGenCard: React.FC<ArticleGenCardProps> = ({ article }) => {
-    const { generationState, parsedArticles, articleListRequest } = useAiGenContext();
-    const { generateContent } = useAiGenEdit();
+    const { generationState, parsedArticles, articleListRequest } = useAiGen();
+    const { generateContent } = useAiGenArticleEdit();
     const [promptVisible, setPromptVisible] = useState(false);
 
     const articleState = generationState[article.sortNumber] || { loading: false };

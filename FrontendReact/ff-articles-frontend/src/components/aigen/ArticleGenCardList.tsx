@@ -4,8 +4,8 @@ import React from 'react';
 import { Typography, Row, Col, Collapse, Space, Button, Alert, Tooltip } from 'antd';
 import { ThunderboltOutlined } from '@ant-design/icons';
 import ArticleGenCard from './ArticleGenCard';
-import { useAiGenContext } from '@/states/AiGenContext';
-import { useAiGenEdit } from '@/hook/useAiGenEditArticle';
+import { useAiGen } from '@/hooks/useAiGen';
+import { useAiGenArticleEdit } from '@/hooks/useAiGenArticleEdit';
 
 const { Title, Paragraph, Text } = Typography;
 const { Panel } = Collapse;
@@ -15,8 +15,8 @@ interface ArticleGenCardListProps {
 }
 
 const ArticleGenCardList: React.FC<ArticleGenCardListProps> = ({ parsedArticles }) => {
-    const { generationState, articleListRequest } = useAiGenContext();
-    const { generateAllContent } = useAiGenEdit();
+    const { generationState, articleListRequest } = useAiGen();
+    const { generateAllContent } = useAiGenArticleEdit();
 
     if (!parsedArticles) return null;
 

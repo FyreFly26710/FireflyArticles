@@ -1,125 +1,30 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Form, Input, Button, InputNumber, Card, Typography, Row, Col, Tooltip, AutoComplete, Spin, Radio } from 'antd';
-import { SendOutlined, InfoCircleOutlined, LoadingOutlined, MessageOutlined } from '@ant-design/icons';
-import { apiTopicGetByPage } from '@/api/contents/api/topic';
-import { useArticleGeneration } from '@/hook/useAiGenArticle';
-import { useAiGenContext } from '@/states/AiGenContext';
-import { getTopicsByCategory } from '@/libs/utils/articleUtils';
+import { SendOutlined, MessageOutlined } from '@ant-design/icons';
+import { useAiGenForm } from '@/hooks/useAiGenForm';
 import AiPromptDrawer from '@/components/shared/AiPromptDrawer';
+
 const { Title, Paragraph } = Typography;
 
 const ArticleGenerationForm: React.FC = () => {
-  const [form] = Form.useForm<API.ArticleListRequest>();
-  const { generateArticles } = useArticleGeneration();
-  const [categories, setCategories] = useState<string[]>([]);
-  const [loadingCategories, setLoadingCategories] = useState(false);
-  const [topics, setTopics] = useState<API.TopicDto[]>([]);
-  const [topicsByCategory, setTopicsByCategory] = useState<Record<string, API.TopicDto[]>>({});
-  const [topicOptions, setTopicOptions] = useState<{ value: string }[]>([]);
-  const { loading } = useAiGenContext();
-
-  // Simplified for the drawer - we only need visibility and form data
-  const [drawerVisible, setDrawerVisible] = useState(false);
-  const [formData, setFormData] = useState<API.ArticleListRequest | null>(null);
-
-  useEffect(() => {
-    fetchTopics();
-  }, []);
-
-  const fetchTopics = async () => {
-    setLoadingCategories(true);
-    try {
-      const response = await apiTopicGetByPage({
-        OnlyCategoryTopic: true,
-        PageSize: 100,
-      });
-
-      if (response.data?.data) {
-        const topicsData = response.data.data;
-
-        // Extract unique categories
-        const uniqueCategories = Array.from(
-          new Set(
-            topicsData
-              .map((topic: API.TopicDto) => topic.category)
-              .filter(Boolean) as string[]
-          )
-        ).sort();
-
-        setTopics(topicsData);
-        setCategories(uniqueCategories);
-
-        // Use the utility function to organize topics by category
-        const topicsByCat = getTopicsByCategory(topicsData);
-        setTopicsByCategory(topicsByCat);
-      }
-    } catch (error) {
-      console.error('Failed to fetch topics:', error);
-    } finally {
-      setLoadingCategories(false);
-    }
-  };
-
-  const handleCategoryChange = (categoryValue: string) => {
-    form.setFieldsValue({ topic: undefined });
-
-    // Update topic options based on selected category
-    if (categoryValue && topicsByCategory[categoryValue]) {
-      const options = topicsByCategory[categoryValue].map(topic => ({
-        value: topic.title || ''
-      }));
-      setTopicOptions(options);
-    } else {
-      setTopicOptions([]);
-    }
-  };
-
-  const handleSubmit = async (values: API.ArticleListRequest) => {
-    try {
-      await generateArticles(values);
-    } catch (error) {
-      console.error('Failed to generate articles:', error);
-    }
-  };
-
-  // Open drawer with form data
-  const openPromptDrawer = async () => {
-    try {
-      const values = await form.validateFields();
-      setFormData(values);
-      setDrawerVisible(true);
-    } catch (error) {
-      console.error('Validation failed:', error);
-    }
-  };
-
-  // Handle prompt confirmation
-  const handlePromptConfirm = async () => {
-    if (!formData) return;
-
-    try {
-      await generateArticles(formData);
-      setDrawerVisible(false);
-    } catch (error) {
-      console.error('Failed to generate articles after prompt confirmation:', error);
-    }
-  };
-
-  const modelOptions = [
-    { label: 'DeepSeek-V3', provider: 'deepseek' },
-    { label: 'Gemini 2.5', provider: 'gemini' }
-  ];
-
-  const handleModelChange = (e: any) => {
-    const selectedModel = modelOptions.find(model => model.provider === e.target.value);
-    if (selectedModel) {
-      form.setFieldsValue({
-        provider: selectedModel.provider
-      });
-    }
-  };
+  const {
+    form,
+    loading,
+    loadingCategories,
+    categories,
+    topicOptions,
+    modelOptions,
+    formData,
+    drawerVisible,
+    handleCategoryChange,
+    handleSubmit,
+    handleModelChange,
+    handlePromptConfirm,
+    openPromptDrawer,
+    closePromptDrawer
+  } = useAiGenForm();
 
   return (
     <div>
@@ -146,7 +51,7 @@ const ArticleGenerationForm: React.FC = () => {
                   name="category"
                   label={
                     <span>
-                      Category {loadingCategories && <Spin indicator={<LoadingOutlined style={{ marginLeft: 8 }} spin />} />}
+                      Category {loadingCategories && <Spin />}
                     </span>
                   }
                   rules={[{ required: true, message: 'Please enter a category' }]}
@@ -280,7 +185,7 @@ const ArticleGenerationForm: React.FC = () => {
       {formData && (
         <AiPromptDrawer
           visible={drawerVisible}
-          onClose={() => setDrawerVisible(false)}
+          onClose={closePromptDrawer}
           onConfirm={handlePromptConfirm}
           title="AI Prompt Preview"
           width={600}

@@ -17,8 +17,8 @@ public class ArticleGenerationService(
     };
   private async Task<string> ChatAsync(ChatRequest request, string session)
   {
-    await Task.Delay(130*1000); 
-    return mockResponse();
+    //await Task.Delay(13*1000); 
+    //return mockResponse();
     _logger.LogInformation("AI:{model} begin generate {session}", request.Model, session);
     var response = await _aiChatAssistant.ChatAsync(request, new CancellationToken());
     if (response is null || response.Message is null)

@@ -3,7 +3,7 @@
 import { Card, Typography, Tag, Space, Avatar, Divider, Button, Input, Tooltip, message } from 'antd';
 import { UserOutlined, CalendarOutlined, EditOutlined, PlusOutlined, CloseOutlined, SaveOutlined, ReloadOutlined } from '@ant-design/icons';
 import dynamic from 'next/dynamic';
-import { useArticleEdit } from '@/hook/useArticleEdit';
+import { useArticleEdit } from '@/hooks/useArticleEdit';
 import { useState, useEffect } from 'react';
 import TagSelect from '@/components/shared/TagSelect';
 import { apiTagGetAll } from '@/api/contents/api/tag';

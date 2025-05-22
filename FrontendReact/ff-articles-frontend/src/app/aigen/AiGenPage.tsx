@@ -6,10 +6,10 @@ import Title from "antd/es/typography/Title";
 import ArticleGenerationForm from '../../components/aigen/ArticleGenerationForm';
 import styles from './aigen.module.css';
 import ArticleResults from '../../components/aigen/ArticleResults';
-import { useAiGenContext } from '@/states/AiGenContext';
+import { useAiGen } from '@/hooks/useAiGen';
 
 const AiGenPage = () => {
-    const { loading, clearResults, responseData } = useAiGenContext();
+    const { loading, clearGenerationResults, responseData } = useAiGen();
     const showForm = !responseData || responseData.length === 0;
 
     return (
@@ -18,7 +18,7 @@ const AiGenPage = () => {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <Title level={3}>AI Article Generator</Title>
                     <Space>
-                        <Button danger onClick={clearResults}>Clear Results</Button>
+                        <Button danger onClick={clearGenerationResults}>Clear Results</Button>
                     </Space>
                 </div>
 
