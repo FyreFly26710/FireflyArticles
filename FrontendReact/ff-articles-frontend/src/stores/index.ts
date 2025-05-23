@@ -1,6 +1,5 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { persistStore, persistReducer, PersistConfig } from "redux-persist";
-import storage from "redux-persist/lib/storage";
 import { loginUserSlice } from "./loginUserSlice";
 import { articleEditSlice } from "./articleEditSlice";
 import { settingsSlice } from "./settingsSlice";
@@ -8,6 +7,26 @@ import { aiGenSlice } from "./aiGenSlice";
 import { articlesSlice } from "./articlesSlice";
 import { chatSlice } from "./chatSlice";
 import { SettingsState } from "@/types";
+
+// Create a custom storage object that loads storage only on client side
+const createNoopStorage = () => {
+    return {
+        getItem(_key: string) {
+            return Promise.resolve(null);
+        },
+        setItem(_key: string, value: any) {
+            return Promise.resolve(value);
+        },
+        removeItem(_key: string) {
+            return Promise.resolve();
+        },
+    };
+};
+// Fix storage cannot be imported in docker build
+const storage = typeof window !== 'undefined' 
+    ? require('redux-persist/lib/storage').default 
+    : createNoopStorage();
+
 
 // Configure persist for login user
 const loginUserPersistConfig: PersistConfig<API.LoginUserDto> = {
