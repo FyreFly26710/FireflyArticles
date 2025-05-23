@@ -6,6 +6,7 @@ public abstract class DeepSeekGenerateConsumer : BaseConsumer
 {
     private static bool IsProduction => EnvUtil.IsProduction();
     private Timer _windowCheckTimer;
+    private string _consumerTag;
 
     public DeepSeekGenerateConsumer(
         IConnection connection,
@@ -43,14 +44,16 @@ public abstract class DeepSeekGenerateConsumer : BaseConsumer
         var isWithinWindow = IsWithinProcessingWindow();
         _logger.LogInformation("Checking processing window.");
 
-        if (isWithinWindow)
+        if (isWithinWindow && string.IsNullOrEmpty(_consumerTag))
         {
-            StartConsuming();
-            _logger.LogInformation("within processing window");
+            _consumerTag = StartConsuming();
+            _logger.LogInformation("Started consuming - within processing window");
         }
-        else
+        else if (!isWithinWindow && !string.IsNullOrEmpty(_consumerTag))
         {
-            _logger.LogInformation("outside processing window");
+            _channel.BasicCancel(_consumerTag);
+            _consumerTag = null;
+            _logger.LogInformation("Stopped consuming - outside processing window");
         }
     }
 
@@ -94,6 +97,17 @@ public abstract class DeepSeekGenerateConsumer : BaseConsumer
 
     public override void Dispose()
     {
+        if (!string.IsNullOrEmpty(_consumerTag))
+        {
+            try
+            {
+                _channel.BasicCancel(_consumerTag);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error canceling consumer during disposal");
+            }
+        }
         _windowCheckTimer?.Dispose();
         base.Dispose();
     }

@@ -1,21 +1,29 @@
 # FireflyArticles Release Notes
 
 ### To Do List
-- Backend:
-    - P5: Add Redis for caching or store identity API
-    - P1: Refactor Contents.API to clean archtecture or DDD
-    - P2: Add quick article generation
+- Backend improvements:
+    - P5: Add Redis for caching.
+    - P1: Refactor Contents.API to clean archtecture & DDD
     - P4: Article add page
     - P3: Batch update article/topic/tag
     - P3: Improve Admin page
-    - P5: A summary of entire content database
-    - P2: Get Pending tasks from MQ
-- Frontend:
-    - P1: Refactor Contexts, use reduxStore + hooks.
-    - P1: Refactor localStorage 
+    - P2: cancel message consuming outside processing window (done)
+- Frontend improvements:
+    - P1: Remove Context & localstorage, use redux & redux persist. (done)
+    - P1: Move logics to hooks (done)
     - P2: Edit prompt in prompt drawer
     - P3: Remove api url base away from image
     - P3: sider auto collpase
+- Feature: Visualize message queues
+    - article list generation message
+        - db: store messages in db: Category-Topic, input params, ai response, date, type (new/existing), status (pending/processing/completed)
+        - API: get, update, remove
+        - Front: get topicId, dispatch message, view messages from db, parse raw json to objects, dispatch article generation message
+    - article generation message
+        - db: store messages in db: Title, input params, date, type, status
+        - API: get, update, remove
+        - Front: view messages
+
 - Other:
     - Add readme.md
     - Add mermaid diagram
