@@ -42,6 +42,8 @@
     - Bug fix:
         - cancel message consuming outside processing window
         - set longer timeout for api gateway
+- HotFix:
+    - 0.2.1: add missing dependency
 
 ### App Version 0.1.0 (18/05/2025)
 - Overview: Release, completed all major features.
