@@ -8,8 +8,8 @@ WORKDIR /app
 # Copy package files
 COPY package.json package-lock.json* ./
 
-# Install dependencies
-RUN npm ci && \
+# Install dependencies with legacy peer deps to avoid conflicts
+RUN npm install --legacy-peer-deps && \
     npm cache clean --force
 
 # Copy the entire project
@@ -37,12 +37,15 @@ ENV NODE_ENV=production
 # Create .next directory explicitly
 RUN mkdir -p .next
 
-# Copy .next directory separately
+# Copy necessary files from builder
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/package-lock.json* ./
-COPY --from=builder /app/node_modules ./node_modules
+
+# Install production dependencies only
+RUN npm install --production --legacy-peer-deps && \
+    npm cache clean --force
 
 # Set runtime environment variables
 ARG NEXT_PUBLIC_GOOGLE_CLIENT_ID
