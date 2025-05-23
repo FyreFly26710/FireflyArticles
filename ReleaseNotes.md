@@ -14,6 +14,7 @@
     - P2: Edit prompt in prompt drawer
     - P3: Remove api url base away from image
     - P3: sider auto collpase
+    - P1: Fix aichat page, there are bugs around sessionid. 
 - Feature: Visualize message queues
     - article list generation message
         - db: store messages in db: Category-Topic, input params, ai response, date, type (new/existing), status (pending/processing/completed)
@@ -30,6 +31,17 @@
     - Amend docker file for quick deployment
 ---
 
+### App Version 0.2.0 (23/05/2025)
+- Overview: Refactored frontend codebase
+- Changes: 
+    - Improvements:
+        - split components logic into hooks
+        - remove context, use redux
+        - remove localstorage, use redux persist
+        - Improve api gateway config
+    - Bug fix:
+        - cancel message consuming outside processing window
+        - set longer timeout for api gateway
 
 ### App Version 0.1.0 (18/05/2025)
 - Overview: Release, completed all major features.
