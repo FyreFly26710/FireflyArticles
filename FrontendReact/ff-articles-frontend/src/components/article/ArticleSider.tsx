@@ -3,7 +3,7 @@
 import { Layout, Menu, Button, Typography, Tooltip, Avatar } from 'antd';
 import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 import Link from 'next/link';
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
 
 const { Sider } = Layout;
 const { Title } = Typography;
@@ -16,6 +16,7 @@ interface ArticleSiderProps {
 }
 
 const ArticleSider = ({ topic, collapsed, onCollapse, articleId }: ArticleSiderProps) => {
+
   // Determine selected keys based on current articleId
   const selectedKeys = useMemo(() => {
     return articleId ? [`article-${articleId}`] : [];
@@ -90,6 +91,12 @@ const ArticleSider = ({ topic, collapsed, onCollapse, articleId }: ArticleSiderP
       trigger={null}
       width={300}
       collapsedWidth={64}
+      breakpoint="lg"
+      onBreakpoint={(broken) => {
+        if (broken && !collapsed) {
+          onCollapse();
+        }
+      }}
       className="shadow-sm"
       style={{
         height: 'calc(100vh - 64px)',
@@ -97,7 +104,8 @@ const ArticleSider = ({ topic, collapsed, onCollapse, articleId }: ArticleSiderP
         top: 64,
         left: 0,
         overflow: 'hidden',
-        marginTop: 0
+        marginTop: 0,
+        transition: 'all 0.2s'
       }}
     >
       <div className="p-2 pb-0">

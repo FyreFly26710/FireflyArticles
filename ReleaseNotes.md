@@ -6,14 +6,9 @@
     - P1: Refactor Contents.API to clean archtecture & DDD
     - P4: Article add page
     - P3: Batch update article/topic/tag
-    - P3: Improve Admin page
-    - P2: cancel message consuming outside processing window (done)
 - Frontend improvements:
-    - P1: Remove Context & localstorage, use redux & redux persist. (done)
-    - P1: Move logics to hooks (done)
     - P2: Edit prompt in prompt drawer
     - P3: Remove api url base away from image
-    - P3: sider auto collpase
     - P1: Fix aichat page, there are bugs around sessionid. 
 - Feature: Visualize message queues
     - article list generation message
@@ -24,10 +19,6 @@
         - db: store messages in db: Title, input params, date, type, status
         - API: get, update, remove
         - Front: view messages
-
-- Known Bugs:
-    - Ai Chat session Id mismatch
-    - Articles search filter
 
 - Other:
     - Amend docker file for quick deployment
