@@ -44,6 +44,7 @@
         - set longer timeout for api gateway
 - HotFix:
     - 0.2.1: add missing dependency
+    - 0.2.2: fix minor issues in prompts
 
 ### App Version 0.1.0 (18/05/2025)
 - Overview: Release, completed all major features.
