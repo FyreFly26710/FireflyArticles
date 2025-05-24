@@ -48,10 +48,11 @@ public class ArticleRepository(ContentsDbContext _context)
         }
         if (tagIds != null && tagIds.Count > 0)
         {
-            query = from a in query
-                    join at in _context.Set<ArticleTag>() on a.Id equals at.ArticleId
-                    where tagIds.Contains(at.TagId)
-                    select a;
+            query = query.Where(a =>
+                _context.Set<ArticleTag>()
+                    .Where(at => at.ArticleId == a.Id && tagIds.Contains(at.TagId))
+                    .Count()
+                >= tagIds.Count); // return articles that have all the tags required
         }
         return query;
     }

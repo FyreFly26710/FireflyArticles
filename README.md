@@ -8,9 +8,9 @@ Firefly Articles is a web application designed to streamline content creation us
 
 * **AI-Powered Article Generation:** Automatically create multiple articles based on your specified inputs.
 * **Intuitive Interface:** Easy-to-use web interface for viewing, searching and generating articles.
-* **Article Search:** Search articles using category/topic/tags or keywords.
-* **Content Review & Editing:** Review and further refine or regenerate the AI-generated content.
-* **AI Chat:** Ahat with a varity of AIs and manage chat history
+* **Article Search:** Filter articles using category/topic/tags or search using keywords.
+* **Aricle Review & Editing:** Review and further refine or regenerate the AI-generated content.
+* **AI Chat:** Chat with a varity of AIs and manage chat history
 
 
 ## Technology Stack
@@ -29,10 +29,10 @@ Firefly Articles is a web application designed to streamline content creation us
     - PostgreSQL
     - Elastic Search
     - Redis
-
 * **DevOps:** 
     - GitActions CICD
     - Docker
+    - Nginx
 
 ![Architect.png](docs/images/Architect.png)
 
@@ -40,7 +40,7 @@ Firefly Articles is a web application designed to streamline content creation us
 
 ## Getting Started
 
-Todo
+To do
 
 
 ## Screenshots

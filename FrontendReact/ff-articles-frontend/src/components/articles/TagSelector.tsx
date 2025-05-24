@@ -19,7 +19,7 @@ const TagSelector = () => {
     return acc;
   }, {} as Record<string, typeof tags>);
 
-  const handleChange = (value: number[], group: string) => {
+  const handleChange = (value: number | null, group: string) => {
     // Get all tags from other groups
     const otherGroupTags = Object.entries(groupedTags)
       .filter(([g]) => g !== group)
@@ -27,20 +27,13 @@ const TagSelector = () => {
       .map(tag => tag.tagId)
       .filter(id => id !== undefined) as number[];
 
-    // Get all tag IDs for the current group
-    const currentGroupTagIds = groupedTags[group]
-      .map(tag => tag.tagId)
-      .filter(id => id !== undefined) as number[];
-
-    // Check if "All" is selected (it will be the first value if selected)
-    const isAllSelected = value.includes(-1);
-
-    // If "All" is selected, use all tags from the current group
-    const newGroupSelections = isAllSelected ? currentGroupTagIds : value;
-
-    // Combine new selections with existing selections from other groups
+    // Get existing selections from other groups
     const otherGroupSelections = tagIds.filter(id => otherGroupTags.includes(id));
-    const newSelections = [...otherGroupSelections, ...newGroupSelections];
+
+    // Combine with the new selection if it exists
+    const newSelections = value !== null
+      ? [...otherGroupSelections, value]
+      : otherGroupSelections;
 
     handleTagChange(newSelections);
   };
@@ -53,25 +46,19 @@ const TagSelector = () => {
             <Space direction="horizontal" style={{ width: '100%' }}>
               <Typography.Text strong>{group}</Typography.Text>
               <Select
-                mode="multiple"
-                value={tagIds.filter(id =>
+                value={tagIds.find(id =>
                   groupTags.some(tag => tag.tagId === id)
                 )}
                 onChange={(value) => handleChange(value, group)}
                 style={{ width: '100%', minWidth: '150px' }}
                 optionFilterProp="label"
-                placeholder="Select tags"
-                options={[
-                  { label: 'All', value: -1 },
-                  ...groupTags.map(tag => ({
-                    label: tag.tagName,
-                    value: tag.tagId,
-                  }))
-                ]}
+                placeholder="Select tag"
+                options={groupTags.map(tag => ({
+                  label: tag.tagName,
+                  value: tag.tagId,
+                }))}
                 showSearch
-                maxTagCount={3}
-                maxTagTextLength={10}
-                maxTagPlaceholder={(omittedValues) => `+${omittedValues.length} more`}
+                allowClear
               />
             </Space>
           </Col>

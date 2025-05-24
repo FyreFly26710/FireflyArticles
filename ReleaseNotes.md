@@ -25,10 +25,14 @@
         - API: get, update, remove
         - Front: view messages
 
+- Known Bugs:
+    - Ai Chat session Id mismatch
+    - Articles search filter
+
 - Other:
-    - Add readme.md
-    - Add mermaid diagram
     - Amend docker file for quick deployment
+
+
 ---
 
 ### App Version 0.2.0 (23/05/2025)
