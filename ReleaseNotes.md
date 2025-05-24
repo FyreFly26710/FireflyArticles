@@ -21,10 +21,22 @@
         - Front: view messages
 
 - Other:
-    - Amend docker file for quick deployment
+    - Amend docker file for quick start
 
 
 ---
+
+### App Version 0.3.0 (24/05/2025)
+- Overview: UI Improvements
+- Changes: 
+    - Improvements:
+        - Made article page fit mobile screens
+        - Changed tag selector to single select. API returns articles matchting all tags
+        - Added article sider auto collapse
+        - Improved ai gen form layout and tips
+    - Other:
+        - Added readme and license
+
 
 ### App Version 0.2.0 (23/05/2025)
 - Overview: Refactored frontend codebase
