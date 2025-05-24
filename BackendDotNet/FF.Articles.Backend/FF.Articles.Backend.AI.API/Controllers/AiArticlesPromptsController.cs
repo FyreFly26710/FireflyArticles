@@ -7,7 +7,6 @@ public class AiArticlesPromptsController(IContentsApiRemoteService _contentsApiR
     [HttpPost("generate-article-list")]
     public async Task<ApiResponse<List<MessageDto>>> GenerateArticleList([FromBody] ArticleListRequest request)
     {
-        var user = UserUtil.GetUserFromHttpRequest(Request);
         var topic = await _contentsApiRemoteService.GetTopicByTitleCategory(request.Topic, request.Category);
         var messages = new List<MessageDto>();
         if (topic == null)

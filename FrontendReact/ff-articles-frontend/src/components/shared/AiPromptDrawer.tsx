@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Drawer, Button, Typography, Space, Divider, Spin } from 'antd';
 import { MessageOutlined, CheckCircleOutlined, LoadingOutlined } from '@ant-design/icons';
-import { apiAiArticlesPromptsGenerateList, apiAiArticlesPromptsRegenerateList, apiAiArticlesPromptsGenerateContent, apiAiArticlesPromptsRegenerateContent } from '@/api/ai/api/aiarticlesprompts';
+import { apiAiArticlesPromptsGenerateList, apiAiArticlesPromptsGenerateContent, apiAiArticlesPromptsRegenerateContent } from '@/api/ai/api/aiarticlesprompts';
 
 const { Title, Text } = Typography;
 
-export type PromptType = 'generateList' | 'regenerateList' | 'generateContent' | 'regenerateContent';
+export type PromptType = 'generateList' | 'generateContent' | 'regenerateContent';
 
 interface AiPromptDrawerProps {
   visible: boolean;
@@ -45,9 +45,6 @@ const AiPromptDrawer: React.FC<AiPromptDrawerProps> = ({
       switch (promptType) {
         case 'generateList':
           response = await apiAiArticlesPromptsGenerateList(requestData as API.ArticleListRequest);
-          break;
-        case 'regenerateList':
-          response = await apiAiArticlesPromptsRegenerateList(requestData as API.ExistingArticleListRequest);
           break;
         case 'generateContent':
           response = await apiAiArticlesPromptsGenerateContent(requestData as API.ContentRequest);
