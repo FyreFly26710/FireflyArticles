@@ -7,10 +7,37 @@ import {
     cancelEditing
 } from '@/stores/articleEditSlice';
 import { apiArticleEditByRequest } from '@/api/contents/api/article';
+import { apiTagGetAll } from '@/api/contents/api/tag';
+import { useState, useEffect } from 'react';
 
 export const useArticleEdit = () => {
     const dispatch = useDispatch();
     const { isEditing, currentArticle } = useSelector((state: RootState) => state.articleEdit);
+    const [tags, setTags] = useState<API.TagDto[]>([]);
+
+    useEffect(() => {
+        const fetchTags = async () => {
+            try {
+                const response = await apiTagGetAll();
+                if (response.data) {
+                    setTags(response.data);
+                }
+            } catch (error) {
+                setTags([]);
+            }
+        };
+        if (isEditing) {
+            fetchTags();
+        }
+    }, [isEditing]);
+
+    const formatDate = (dateString: string) => {
+        return new Date(dateString).toLocaleDateString('en-GB', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+        });
+    };
 
     const handleStartEditing = (article: API.ArticleDto) => {
         dispatch(startEditing(article));
@@ -60,6 +87,10 @@ export const useArticleEdit = () => {
         // State
         isEditing,
         currentArticle,
+        tags,
+
+        // Utils
+        formatDate,
 
         // Actions
         startEditing: handleStartEditing,

@@ -7,8 +7,51 @@ import { useArticleEdit } from '@/hooks/useArticleEdit';
 import { useState, useEffect } from 'react';
 import TagSelect from '@/components/shared/TagSelect';
 import { apiTagGetAll } from '@/api/contents/api/tag';
+import styled from 'styled-components';
 
-// Dynamically import MdViewer to avoid SSR issues with markdown rendering
+// Styled Components
+const StyledButtonGroup = styled.div`
+  display: none;
+  @media (min-width: 768px) {
+    display: flex;
+  }
+`;
+
+const StyledContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  @media (min-width: 768px) {
+    flex-direction: row;
+    align-items: center;
+    gap: 0;
+  }
+`;
+
+const StyledSection = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+`;
+
+const StyledTagSection = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  
+  @media (min-width: 768px) {
+    &::before {
+      content: '';
+      width: 1px;
+      height: 20px;
+      background-color: rgba(0, 0, 0, 0.06);
+      margin: 0 8px;
+    }
+  }
+`;
+
 const MdViewer = dynamic(() => import('@/components/shared/MdViewer'), {
   ssr: false,
   loading: () => <div className="h-20 rounded animate-pulse" />
@@ -23,31 +66,16 @@ interface ArticleHeaderCardProps {
 }
 
 const ArticleHeaderCard = ({ article, onRegenerateArticle }: ArticleHeaderCardProps) => {
-  const { isEditing, currentArticle, startEditing, updateArticle, cancelEditing, submitEdit } = useArticleEdit();
-  const [tags, setTags] = useState<API.TagDto[]>([]);
-  useEffect(() => {
-    const fetchTags = async () => {
-      try {
-        const response = await apiTagGetAll();
-        if (response.data) {
-          setTags(response.data);
-        }
-      } catch (error) {
-        setTags([]);
-      }
-    };
-    if (isEditing) {
-      fetchTags();
-    }
-  }, [isEditing]);
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-GB', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
-  };
+  const {
+    isEditing,
+    currentArticle,
+    tags,
+    formatDate,
+    startEditing,
+    updateArticle,
+    cancelEditing,
+    submitEdit
+  } = useArticleEdit();
 
   const displayArticle = isEditing ? currentArticle : article;
 
@@ -75,87 +103,94 @@ const ArticleHeaderCard = ({ article, onRegenerateArticle }: ArticleHeaderCardPr
               style={{ maxWidth: 'calc(100% - 190px)' }}
             />
           ) : (
-            <Title level={2} style={{ marginBottom: 0 }}>
+            <Title level={3} style={{ marginBottom: 0 }}>
               {displayArticle.title}
             </Title>
           )}
 
           {isEditing ? (
-            <Space>
-              <Button
-                icon={<CloseOutlined />}
-                onClick={cancelEditing}
-                danger
-              >
-                Cancel
-              </Button>
-              <Button
-                type="primary"
-                icon={<SaveOutlined />}
-                onClick={submitEdit}
-              >
-                Save
-              </Button>
-            </Space>
+            <StyledButtonGroup>
+              <Space>
+                <Button
+                  icon={<CloseOutlined />}
+                  onClick={cancelEditing}
+                  danger
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="primary"
+                  icon={<SaveOutlined />}
+                  onClick={submitEdit}
+                >
+                  Save
+                </Button>
+              </Space>
+            </StyledButtonGroup>
           ) : (
-            <Space.Compact>
-              <Button
-                type="primary"
-                icon={<EditOutlined />}
-                onClick={() => startEditing(article)}
-              >
-                Edit
-              </Button>
-              <Button
-                type="primary"
-                icon={<ReloadOutlined />}
-                onClick={onRegenerateArticle}
-              >
-                Generate
-              </Button>
-            </Space.Compact>
+            <StyledButtonGroup>
+              <Space.Compact>
+                <Button
+                  type="primary"
+                  icon={<EditOutlined />}
+                  onClick={() => startEditing(article)}
+                >
+                  Edit
+                </Button>
+                <Button
+                  type="primary"
+                  icon={<ReloadOutlined />}
+                  onClick={onRegenerateArticle}
+                >
+                  Generate
+                </Button>
+              </Space.Compact>
+            </StyledButtonGroup>
           )}
         </div>
 
         {/* Topic metadata */}
-        <Space className="flex items-center">
-          {displayArticle.user && (
-            <Space>
-              <Avatar
-                icon={<UserOutlined />}
-                src={displayArticle.user.userAvatar}
-                size={24}
-                style={{ minWidth: 24, minHeight: 24, maxWidth: 24, maxHeight: 24 }}
-              />
-              <Text>{displayArticle.user.userName || displayArticle.user.userAccount}</Text>
-            </Space>
-          )}
-          <Divider type="vertical" style={{ height: '20px', margin: '0 8px' }} />
-          {displayArticle.updateTime && displayArticle.createTime && (
-            <Space>
-              <CalendarOutlined />
-              <Text>{formatDate(displayArticle.updateTime || displayArticle.createTime)}</Text>
-            </Space>
-          )}
+        <StyledContainer>
+          <StyledSection>
+            {displayArticle.user && (
+              <Space>
+                <Avatar
+                  icon={<UserOutlined />}
+                  src={displayArticle.user.userAvatar}
+                  size={24}
+                  style={{ minWidth: 24, minHeight: 24, maxWidth: 24, maxHeight: 24 }}
+                />
+                <Text style={{ whiteSpace: 'nowrap' }}>{displayArticle.user.userName || displayArticle.user.userAccount}</Text>
+              </Space>
+            )}
+            {displayArticle.updateTime && displayArticle.createTime && (
+              <>
+                <Divider type="vertical" style={{ height: '20px', margin: '0' }} />
+                <Space>
+                  <CalendarOutlined />
+                  <Text style={{ whiteSpace: 'nowrap' }}>{formatDate(displayArticle.updateTime || displayArticle.createTime)}</Text>
+                </Space>
+              </>
+            )}
+          </StyledSection>
 
           {/* Tags - editable when in edit mode */}
-          <Divider type="vertical" style={{ height: '20px', margin: '0 8px' }} />
-          {isEditing ? (
-            <div style={{ flex: 1, maxWidth: 600 }}>
-              <TagSelect
-                tags={tags}
-                selectedTags={displayArticle.tags || []}
-                onChange={(newTags) => updateArticle({ tags: newTags })}
-              />
-            </div>
-          ) : (
-            <Space size={4} wrap>
-              {displayArticle.tags && displayArticle.tags.map((tag, index) => (
+          <StyledTagSection>
+            {isEditing ? (
+              <div style={{ flex: 1, maxWidth: 600 }}>
+                <TagSelect
+                  tags={tags}
+                  selectedTags={displayArticle.tags || []}
+                  onChange={(newTags) => updateArticle({ tags: newTags })}
+                />
+              </div>
+            ) : (
+              displayArticle.tags && displayArticle.tags.map((tag, index) => (
                 <Tag color="blue" key={index}>{tag}</Tag>
-              ))}
-            </Space>
-          )}
-        </Space>
+              ))
+            )}
+          </StyledTagSection>
+        </StyledContainer>
 
         {/* Abstract/Description - use TextArea in edit mode */}
         {isEditing ? (
