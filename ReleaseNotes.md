@@ -31,7 +31,7 @@
 - Changes: 
     - Improvements:
         - Made article page fit mobile screens
-        - Changed tag selector to single select. API returns articles matchting all tags
+        - Changed tag selector to single select. API returns articles matching all tags
         - Added article sider auto collapse
         - Improved ai gen form layout and tips
     - Other:

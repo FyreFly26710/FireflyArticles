@@ -6,7 +6,7 @@ Firefly Articles is a web application designed to streamline content creation us
 
 ## Features
 
-* **AI-Powered Article Generation:** Automatically create multiple articles based on your inputs.
+* **AI-Powered Article Generation:** Automatically create multiple articles based on your inputs. Generation tasks are sent to message queues, everything will be handled in the background.
 * **Intuitive Interface:** Easy-to-use web interface for viewing, searching and generating articles.
 * **Article Search:** Filter articles using category/topic/tags or search using keywords.
 * **Aricle Review & Editing:** Review and further refine or regenerate the AI-generated content.
@@ -46,14 +46,24 @@ To do
 
 
 ## Screenshots
-Inputs to generate article list
+### Generate Article List
+- Inputs to generate article list
+
 ![GenerateArticleList_Begin.png](docs/images/GenerateArticleList_Begin.png)
 
-Return full Ai response as a string in case some ai responses could not be parsed properly. Users can edit raw json to modify prompts.
+---
+- Return full Ai response as a string in case some ai responses could not be parsed properly. Users can edit raw json to modify prompts for article.
+
 ![GenerateArticleList.png](docs/images/GenerateArticleList.png)
 
-Generate topic summary page.
+---
+
+### Generate Article
+- Generate topic summary page.
+
 ![GenerateArticle_TopicSummary.png](docs/images/GenerateArticle_TopicSummary.png)
 
-Generated summary page, include links to articles 
+---
+- Generated summary page, include links to articles 
+
 ![GenerateArticle_TopicSummary_Complete.png](docs/images/GenerateArticle_TopicSummary_Complete.png)
